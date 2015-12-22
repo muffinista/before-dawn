@@ -1,0 +1,30 @@
+html {
+    overflow-y: hidden;
+}
+.scrollable {
+    overflow-y: scroll;
+    min-height: 500px;
+    max-height: 600px;
+}
+iframe {
+    display: block;
+    overflow: hidden;
+    border: none;
+    height: calc(50vh);
+    width: 100%;
+}
+main {
+    padding: 5px;
+    height: calc(100vh - 55px);
+}
+footer {
+    padding: 5px;
+    height: 32px;
+}
+footer .right {
+    text-align: right;
+}
+
+.entry {
+    padding-left: 5px;
+}

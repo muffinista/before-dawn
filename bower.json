@@ -1,0 +1,24 @@
+{
+  "name": "screeny",
+  "version": "0.0.0",
+  "homepage": "https://github.com/muffinista/before-dawn",
+  "authors": [
+    "Colin Mitchell <muffinista@gmail.com>"
+  ],
+  "moduleType": [
+    "node"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "handlebars": "~3.0.3",
+    "jquery": "~2.1.4",
+    "pure": "~0.6.0"
+  }
+}

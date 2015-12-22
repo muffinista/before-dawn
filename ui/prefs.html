@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Preferences!</title>
+    <link href="../bower_components/pure/pure-nr.css" rel="stylesheet" type="text/css" />
+    <link href="styles.css" rel="stylesheet" type="text/css" />
+    
+    <script id="entry-template" type="text/x-handlebars-template">
+      {{#each this}}
+      <div class="entry">
+        <h1>{{name}}</h1>
+        <div class="body">
+          <input type="radio" name="screensaver" value="{{key}}" />
+          {{description}}
+        </div>
+      </div>
+      {{/each}}
+    </script>
+    <script id="preview-details-template" type="text/x-handlebars-template">
+      <h1>{{name}}</h1>
+      <h2>{{author}}</h2>
+      <p>{{description}}</p>     
+      <a href="{{aboutUrl}}">{{aboutUrl}}</a>
+    </script>
+
+    <script src="../bower_components/handlebars/handlebars.min.js"></script>
+    <script src="prefs.js"></script>
+  </head>
+
+  <body>
+    <main class="pure-g">
+      <div class="left pure-u-1-2">
+        <div class="scrollable">
+          <div id="savers"></div>
+        </div>
+      </div>
+      <div class="right pure-u-1-2">
+        <div id="preview"></div>
+        <div id="details"></div>
+      </div>
+    </main>
+
+    <footer class="pure-g">
+      <div class="left pure-u-1-2">
+        <a class="pure-button updater" href="#">Check for Updates</a>
+        <span class="update-results"></span>
+      </div>
+      <div class="right pure-u-1-2">
+        <a class="pure-button cancel" href="#">Cancel</a>
+        <a class="pure-button pure-button-primary save" href="#">Save</a>
+      </div>
+    </footer>
+  </body>
+</html>
