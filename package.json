@@ -16,7 +16,8 @@
     "request": "^2.60.0",
     "extract-zip": "^1.0.3",
     "lodash": "^3.10.1",
-    "temp": "^0.8.3"
+    "temp": "^0.8.3",
+    "node-system-idle-time": "git://github.com/paulcbetts/node-system-idle-time.git#master"
   },
   "devDependencies": {
     "electron-prebuilt": "^0.35.4"

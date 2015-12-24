@@ -12,6 +12,10 @@ require('./bootstrap.js');
 electron.crashReporter.start();
 
 
+// don't show app in dock
+// @todo -- show prefs window/etc
+app.dock.hide();
+
 // store our root path as a global variable so we can access it from screens
 //var APP_NAME = "Before Dawn";
 global.basePath = app.getPath('appData') + "/" + global.APP_NAME;
@@ -25,8 +29,6 @@ var windowOpts;
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
 
-let x = new Promise(function() {});
-
 // Quit when all windows are closed.
 app.on('window-all-closed', function() {
   // On OS X it is common for applications and their menu bar
@@ -38,11 +40,14 @@ app.on('window-all-closed', function() {
 
 
 let appIcon = null;
+let checkTimer = null;
+let isActive = false;
+var idler = require('@paulcbetts/system-idle-time');
+
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 app.on('ready', function() {  
-    var prefsUrl = 'file://' + __dirname + '/ui/prefs.html';
 
     var openAddPackageWindow = function() {
         var w = new BrowserWindow({width:500, height:200});
@@ -56,13 +61,18 @@ app.on('ready', function() {
     };
     
     var openPrefsWindow = function() {
+        var prefsUrl = 'file://' + __dirname + '/ui/prefs.html';
         var w = new BrowserWindow({width:800, height:600});
+
         w.loadURL(prefsUrl);
         w.on('closed', function() {
             w = null;
-            //mainWindow.reload();
+            savers.reload();
         });
     };
+
+    // Create the browser window.
+    var saverWindow = null;
 
     var runScreenSaver = function() {
         // lets pull together some handy values that screensavers might want to know about
@@ -78,6 +88,9 @@ app.on('ready', function() {
 
         var url = savers.getCurrentUrl(url_opts);
         console.log("loading " + url);
+
+        isActive = true;
+
         var windowOpts = {
             fullscreen: true,
             webgl: true,
@@ -85,62 +98,36 @@ app.on('ready', function() {
             'auto-hide-menu-bar': true
         };
 
-        // Create the browser window.
-        var saverWindow = new BrowserWindow(windowOpts);
-
-        // and load the index.html of the app.
-        saverWindow.loadUrl(url);
-
+        saverWindow = new BrowserWindow(windowOpts);
         // Emitted when the window is closed.
         saverWindow.on('closed', function() {
             // Dereference the window object, usually you would store windows
             // in an array if your app supports multi windows, this is the time
             // when you should delete the corresponding element.
             saverWindow = null;
+            
+            isActive = false;
         });
 
+
+        // and load the index.html of the app.
+        saverWindow.loadURL(url);
     };
 
-    var template = [
-        {
-            label: 'Before Dawn',
-            submenu: [
-                {
-                    label: 'Add Package',
-                    accelerator: 'CmdOrCtrl+A',
-                    click: function() { openAddPackageWindow(); }
-                },
-                {
-                    label: 'Reload',
-                    accelerator: 'CmdOrCtrl+R',
-                    click: function() { mainWindow.reload(); }
-                },
-                {
-                    label: 'Toggle DevTools',
-                    accelerator: 'Alt+CmdOrCtrl+I',
-                    click: function() { mainWindow.toggleDevTools(); }
-                },
-                {
-                    label: 'Quit',
-                    accelerator: 'CmdOrCtrl+Q',
-                    selector: 'terminate:'
-                }
-            ]
+    var stopScreenSaver = function() {
+        if ( saverWindow ) {
+            saverWindow.close();
         }
-    ];
-        
-    var menu = Menu.buildFromTemplate(template);
-    Menu.setApplicationMenu(menu);
+    };
 
     var trayMenu = Menu.buildFromTemplate([
         {
             label: 'Run Now',
             click: function() { runScreenSaver(); }
         },
-
         {
             label: 'Add Package',
-            click: function() { openAddPackageWindow(); }
+             click: function() { openAddPackageWindow(); }
         },
         {
             label: 'Preferences',
@@ -164,17 +151,17 @@ app.on('ready', function() {
     appIcon.setToolTip("Before Dawn");
     appIcon.setContextMenu(trayMenu); 
 
-    // Create the browser window.
-    mainWindow = new BrowserWindow(windowOpts);
+    var lastIdle = 0;
+    var checkIdle = function() {
+        var idle = idler.getIdleTime() / 1000;
+        if ( isActive && idle < lastIdle ) {
+            stopScreenSaver();
+        }
+        else if ( isActive == false && idle > 120 ) {
+            runScreenSaver();
+        }
 
-    // and load the index.html of the app.
-    mainWindow.loadURL(prefsUrl);
-    
-    // Emitted when the window is closed.
-    mainWindow.on('closed', function() {
-        // Dereference the window object, usually you would store windows
-        // in an array if your app supports multi windows, this is the time
-        // when you should delete the corresponding element.
-        mainWindow = null;
-    });
+        lastIdle = idle;
+    };
+    checkTimer = setInterval(checkIdle, 250);
 });

@@ -6,6 +6,7 @@ $(document).ready(function() {
 
     // we set the path to our data files/etc in the main app, and retreive it here
     var basePath = remote.getGlobal('basePath');
+    console.log("prefs load savers from " + basePath);
     savers.init(basePath);
 
     var loadPreview = function(key) {
@@ -26,6 +27,7 @@ $(document).ready(function() {
     };
 
     var closeWindow = function() {
+        console.log("close this window pls");
         var window = remote.getCurrentWindow();
         window.close();
     };

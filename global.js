@@ -5,7 +5,12 @@ window.urlParams = window.location.search.split(/[?&]/).slice(1).map(function(pa
     return obj;
 }, {});
 
-var firstMouseMove = false;
+/*
+ * leaving this code here for now just in case, but this is handled
+ * more cleanly by the idle check in main.js now
+ */
+/*
+ * var firstMouseMove = false;
 
 var exitScreenSaver = function() {
     // seems like you get a mousemove event even without moving the mouse, i'm
@@ -36,3 +41,4 @@ var loadEvents = function() {
 };
 
 var timeoutId = setTimeout(loadEvents, 100);
+*/

@@ -15,7 +15,10 @@ var url_opts = {};
 var init = function(_path, cb) {
     baseDir = path.resolve(_path);
     console.log("working from " + baseDir);
+    reload(cb);
+};
 
+var reload = function(cb) {
     var configPath = baseDir + "/" + config_file;
 
     console.log("baseDir: " + path);
@@ -367,6 +370,7 @@ var getUrl = function(key) {
 
 
 exports.init = init;
+exports.reload = reload;
 exports.setOpts = setOpts;
 exports.getByKey = getByKey;
 exports.getCurrent = getCurrent;
@@ -377,3 +381,4 @@ exports.listAll = listAll;
 exports.getCurrentUrl = getCurrentUrl;
 exports.getUrl = getUrl;
 exports.loadedData = loadedData;
+
