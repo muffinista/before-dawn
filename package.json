@@ -2,24 +2,26 @@
   "name": "before-dawn",
   "version": "1.0.0",
   "description": "screensaver fun",
-  "main": "index.js",
+  "main": "init.js",
   "scripts": {
-    "start": "electron main.js",
+    "start": "electron init.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "node-dir": ">= 0.1.9",
-    "wrench": ">= 1.5.8",
-    "nconf": "^0.8.2",
-    "request": "^2.60.0",
+    "electron-compile": "^1.0.2",
     "extract-zip": "^1.0.3",
     "lodash": "^3.10.1",
+    "nconf": "^0.8.2",
+    "node-dir": ">= 0.1.9",
+    "node-system-idle-time": "git://github.com/paulcbetts/node-system-idle-time.git#master",
+    "request": "^2.60.0",
     "temp": "^0.8.3",
-    "node-system-idle-time": "git://github.com/paulcbetts/node-system-idle-time.git#master"
+    "wrench": ">= 1.5.8"
   },
   "devDependencies": {
+    "electron-compilers": "^1.0.1",
     "electron-prebuilt": "^0.35.4"
   }
 }

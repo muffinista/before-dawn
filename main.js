@@ -1,4 +1,7 @@
 'use strict';
+
+[1, 2, 3].find(x => x == 3)
+
 const electron = require('electron');
 const app = electron.app;  // Module to control application life.
 const BrowserWindow = electron.BrowserWindow;  // Module to create native browser window.
