@@ -2,12 +2,7 @@ $ = jQuery = require('../bower_components/jquery/dist/jquery.min.js');
 
 $(document).ready(function() {
     var remote = require('remote');
-    var savers = require('../savers.js');
-
-    // we set the path to our data files/etc in the main app, and retreive it here
-    var basePath = remote.getGlobal('basePath');
-    console.log("prefs load savers from " + basePath);
-    savers.init(basePath);
+    var savers = remote.getGlobal('savers');
 
     var loadPreview = function(key) {
         var s = savers.getByKey(key);

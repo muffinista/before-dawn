@@ -1,15 +1,10 @@
 'use strict';
 
-[1, 2, 3].find(x => x == 3)
-
 const electron = require('electron');
 const app = electron.app;  // Module to control application life.
 const BrowserWindow = electron.BrowserWindow;  // Module to create native browser window.
 const Menu = electron.Menu;
 const Tray = electron.Tray;
-
-
-require('./bootstrap.js');
 
 // Report crashes to our server.
 electron.crashReporter.start();
@@ -19,12 +14,14 @@ electron.crashReporter.start();
 // @todo -- show prefs window/etc
 app.dock.hide();
 
-// store our root path as a global variable so we can access it from screens
-//var APP_NAME = "Before Dawn";
-global.basePath = app.getPath('appData') + "/" + global.APP_NAME;
 
-var savers = require('./savers.js');
-savers.init(global.basePath);
+// load a few global variables
+require('./bootstrap.js');
+
+// store our root path as a global variable so we can access it from screens
+global.basePath = app.getPath('appData') + "/" + global.APP_NAME;
+global.savers = require('./savers.js');
+global.savers.init(global.basePath);
 
 var windowOpts;
 
@@ -70,7 +67,7 @@ app.on('ready', function() {
         w.loadURL(prefsUrl);
         w.on('closed', function() {
             w = null;
-            savers.reload();
+            global.savers.reload();
         });
     };
 
@@ -87,9 +84,9 @@ app.on('ready', function() {
             height: size.height,
             platform: process.platform
         };
-        savers.setOpts(url_opts);
+        global.savers.setOpts(url_opts);
 
-        var url = savers.getCurrentUrl(url_opts);
+        var url = global.savers.getCurrentUrl(url_opts);
         console.log("loading " + url);
 
         isActive = true;
@@ -136,10 +133,11 @@ app.on('ready', function() {
             label: 'Preferences',
             click: function() { openPrefsWindow(); }
         },
-        {
-            label: 'Reload',
-            click: function() { mainWindow.reload(); }
-        },
+        // {
+        //     label: 'Reload',
+        //     click: function() { mainWindow.reload(); }
+        // },
+
         {
             label: 'Toggle DevTools',
             click: function() { mainWindow.toggleDevTools(); }
