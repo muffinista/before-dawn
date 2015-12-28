@@ -65,6 +65,7 @@ app.on('ready', function() {
         var w = new BrowserWindow({width:800, height:600});
 
         w.loadURL(prefsUrl);
+        w.webContents.openDevTools();
         w.on('closed', function() {
             w = null;
             global.savers.reload();

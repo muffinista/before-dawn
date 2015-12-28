@@ -158,7 +158,7 @@ function Saver(_attrs) {
     this.aboutUrl = _attrs.aboutUrl;
     this.author = _attrs.author;
     this.license = _attrs.license;
-
+    this.options = _attrs.options;
 
     // allow for a specified URL -- this way you could create a screensaver
     // that pointed to a remote URL

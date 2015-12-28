@@ -36,7 +36,14 @@ $(document).ready(function() {
             console.log("current selection", current);
 
             $("#savers").html(output);
+
+            var s = savers.getByKey(current);
+            console.log(s);
             
+            console.log("OPTS");
+            console.log(s.options);
+
+
             $("input[name=screensaver][value='" + current + "']").attr("checked", "checked");
             loadPreview(current);
         });
