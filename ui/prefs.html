@@ -2,41 +2,40 @@
 <html>
   <head>
     <title>Preferences!</title>
+
     <link href="../bower_components/pure/pure-nr.css" rel="stylesheet" type="text/css" />
     <link href="styles.css" rel="stylesheet" type="text/css" />
-    
-    <script id="entry-template" type="text/x-handlebars-template">
-      {{#each this}}
-      <div class="entry">
-        <h1>{{name}}</h1>
-        <div class="body">
-          <input type="radio" name="screensaver" value="{{key}}" />
-          {{description}}
-        </div>
-      </div>
-      {{/each}}
-    </script>
-    <script id="preview-details-template" type="text/x-handlebars-template">
-      <h1>{{name}}</h1>
-      <h2>{{author}}</h2>
-      <p>{{description}}</p>     
-      <a href="{{aboutUrl}}">{{aboutUrl}}</a>
-    </script>
+    <link href="slider.css" rel="stylesheet" type="text/css" />
 
     <script src="../bower_components/handlebars/handlebars.min.js"></script>
     <script src="prefs.js"></script>
+    <style>
+.rc-slider {
+  position: relative;
+  height: 4px;
+  width: 100%;
+  border-radius: 6px;
+  background-color: #e9e9e9;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+    </style>
   </head>
 
   <body>
     <main class="pure-g">
       <div class="left pure-u-1-2">
-        <div class="scrollable">
-          <div id="savers"></div>
+        <div class="scrollable" id="savers">
         </div>
       </div>
       <div class="right pure-u-1-2">
-        <div id="preview"></div>
-        <div id="details"></div>
+        <div id="details">
+        </div>
+        <div id="options">
+        </div>
+        <div id="preview">
+        </div>
       </div>
     </main>
 

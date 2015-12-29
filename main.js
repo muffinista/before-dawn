@@ -72,6 +72,8 @@ app.on('ready', function() {
         });
     };
 
+    openPrefsWindow();
+
     // Create the browser window.
     var saverWindow = null;
 

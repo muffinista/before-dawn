@@ -10,6 +10,11 @@
       "description": "how dense?",
       "min": "1",
       "max": "100"
+    },
+    {
+      "name": "url",
+      "type": "text",
+      "description": "url?"
     }
   ]
 }
