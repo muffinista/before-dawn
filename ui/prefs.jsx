@@ -2,12 +2,15 @@ var React = require('react');
 var ReactDOM = require('react-dom');
 var Slider = require('rc-slider');
 
+var _ = require('lodash');
+
 $ = jQuery = require('../bower_components/jquery/dist/jquery.min.js');
 
 
 $(document).ready(function() {
     var remote = window.require('remote');
     var savers = remote.getGlobal('savers');
+    var saverOpts = {};
 
     var SaverList = React.createClass({
         getInitialState: function() {
@@ -77,17 +80,44 @@ $(document).ready(function() {
         }
     });
 
+    var SliderWithValue = React.createClass({
+        onSliderChange: function(val) {
+            console.log("HEY!");
+            this.value = val;
+            this.setState({
+                name: this.name,
+                value: val
+            });
+
+            this.props.onChange({
+                name: this.props.name,
+                value: val
+            });
+            //log(value);
+            //this.setState({
+            //value: value
+        //});
+        },
+        render: function() {
+            return <Slider onChange={this.onSliderChange} />;
+        }
+    });
+
     var OptionsForm = React.createClass({
+        values: {},
         onChanged: function(e) {
             console.log("CHANGE", e);
+            console.log(this.getValues());
         },
-        renderOption: function(o) {
+        renderOption: function(o, index) {
             var guts;
+            var self = this;
+            var ref = "option" + index;
             if ( o.type === "slider" ) {
-                guts = <Slider name={o.name} min={o.min} max={o.max} onChange={this.onChanged} />;
+                guts = <SliderWithValue name={o.name} min={o.min} max={o.max} ref={ref} onChange={this.onChanged} />;
             }
             else {
-                guts = <input type="text" name={o.name} onChange={this.onChanged} />;
+                guts = <input type="text" name={o.name}  ref={ref} onChange={this.onChanged} />;
             }
 
             return (
@@ -98,18 +128,28 @@ $(document).ready(function() {
             );
         },
         getValues: function() {
-            var data = this.props.saver.options.map(function(o) {
-                return 0;
+            var self = this;
+            var data = {};
+            _.each(this.props.saver.options, function(o, i) {
+                var ref = "option" + i;
+                console.log(self.refs[ref], self.refs[ref].state, self.refs[ref].value);
+                data[o.name] = self.refs[ref].value;
+//                return self.refs[ref].value;
+                //return 0;
             });
+
+            console.log("DATA", data);
+            return data;
         },
         render: function() {
             var self = this;
             var s = this.props.saver;
+            var onChange = this.props.onChange;
             
-            var nodes = this.props.saver.options.map(function(o) {
+            var nodes = this.props.saver.options.map(function(o, i) {
                 return (
                     <div>
-                    {self.renderOption(o)}
+                    {self.renderOption(o, i)}
                     </div>
                 );
             });
@@ -131,6 +171,10 @@ $(document).ready(function() {
                 <Details saver={s} />,
             document.getElementById('details')
         );   
+    };
+
+    var optionsUpdated = function(e) {
+        console.log("heyyyy", e);
     };
 
     var loadOptionsForm = function(s) {
