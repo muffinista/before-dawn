@@ -106,8 +106,7 @@ $(document).ready(function() {
     var OptionsForm = React.createClass({
         values: {},
         onChanged: function(e) {
-            console.log("CHANGE", e);
-            console.log(this.getValues());
+            this.props.onChange(this.getValues());
         },
         renderOption: function(o, index) {
             var guts;
@@ -134,11 +133,8 @@ $(document).ready(function() {
                 var ref = "option" + i;
                 console.log(self.refs[ref], self.refs[ref].state, self.refs[ref].value);
                 data[o.name] = self.refs[ref].value;
-//                return self.refs[ref].value;
-                //return 0;
             });
 
-            console.log("DATA", data);
             return data;
         },
         render: function() {
@@ -169,17 +165,17 @@ $(document).ready(function() {
     var loadDetails = function(s) {
         ReactDOM.render(
                 <Details saver={s} />,
-            document.getElementById('details')
+            document.getElementById('details')           
         );   
     };
 
-    var optionsUpdated = function(e) {
-        console.log("heyyyy", e);
+    var optionsUpdated = function(data) {
+        saverOpts = data;
     };
 
     var loadOptionsForm = function(s) {
         ReactDOM.render(
-                <OptionsForm saver={s} />,
+                <OptionsForm saver={s} onChange={optionsUpdated} />,
             document.getElementById('options')
         );   
     };
@@ -223,6 +219,7 @@ $(document).ready(function() {
     $("a.save").on("click", function(e) {
         var val = $("input[name=screensaver]:checked").val();
         savers.setCurrent(val);
+        savers.setOptions(saverOpts, val);
         closeWindow();
     });
 

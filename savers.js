@@ -245,7 +245,7 @@ var setConfig = function(k, v) {
     console.log("set "+ k + " to " + v);
     nconf.save(function (err) {
         fs.readFile(config_file, function (err, data) {
-            //console.dir(JSON.parse(data.toString()));
+            console.dir(JSON.parse(data));
         });
     });   
 };
@@ -255,6 +255,23 @@ var setConfig = function(k, v) {
  */
 var setCurrent = function(x) {
     setConfig('saver', x);
+};
+
+/**
+ * set options for the specified screensaver
+ */
+var setOptions = function(opts, s) {
+    var key;
+    if ( typeof(s) === "undefined" ) {
+        s = getCurrent();
+    }
+    key = "options:" + s;
+    setConfig(key, opts);
+};
+
+var getOptions = function() {
+    var key = "options:" + getCurrent();
+    return nconf.get(key);
 };
 
 
@@ -377,6 +394,8 @@ exports.getCurrent = getCurrent;
 exports.getSources = getSources;
 exports.getCurrentData = getCurrentData;
 exports.setCurrent = setCurrent;
+exports.setOptions = setOptions;
+exports.getOptions = getOptions;
 exports.listAll = listAll;
 exports.getCurrentUrl = getCurrentUrl;
 exports.getUrl = getUrl;
