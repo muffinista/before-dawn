@@ -151,14 +151,6 @@ function copyFolderRecursiveSync( source, target ) {
 
 
 /**
- * specify a hash of options which will be tacked onto any screensaver URLs -- we will
- * pass some handy global info this way, such as screen resolution/etc
- */
-var setOpts = function(o) {
-    url_opts = o;
-};
-
-/**
  * look up a screensaver by key, and return it
  */
 var getByKey = function(key) {
@@ -299,6 +291,7 @@ var listAll = function(cb, reload) {
             }
 
             contents.settings = getOptions(contents.key);
+            console.log("OPTIONS", contents.settings);
 
             var s = new Saver(contents);
 
@@ -319,23 +312,7 @@ var listAll = function(cb, reload) {
  */
 var getCurrentUrl = function(opts) {
     var s = getCurrentData();
-    return s.getUrl(opts);
-    
-    /*var url = 'file://' + baseDir + '/savers/' + getCurrent();
-
-    if ( typeof(opts) === "undefined" ) {
-        opts = url_opts;
-    }
-
-    opts = serialize(opts);
-    if ( url.lastIndexOf("?") !== -1 ) {
-        url = url + "&" + opts;
-    }
-    else {
-        url = url + "?" + opts;
-    }
-
-    return url;*/
+    return s.getUrl(opts);   
 };
 
 
@@ -355,7 +332,6 @@ var getUrl = function(key) {
 
 exports.init = init;
 exports.reload = reload;
-exports.setOpts = setOpts;
 exports.getByKey = getByKey;
 exports.getCurrent = getCurrent;
 exports.getSources = getSources;

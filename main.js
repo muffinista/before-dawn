@@ -72,7 +72,10 @@ app.on('ready', function() {
         });
     };
 
-    openPrefsWindow();
+
+    // uncomment this to test the prefs window
+    // but also, should probably have a command line option to open it
+    //openPrefsWindow();
 
     // Create the browser window.
     var saverWindow = null;
@@ -87,9 +90,9 @@ app.on('ready', function() {
             height: size.height,
             platform: process.platform
         };
-        global.savers.setOpts(url_opts);
 
-        var url = global.savers.getCurrentUrl(url_opts);
+        var saver = global.savers.getCurrentData();
+        var url = saver.getUrl(url_opts);   
         console.log("loading " + url);
 
         isActive = true;
@@ -114,10 +117,13 @@ app.on('ready', function() {
 
 
         // and load the index.html of the app.
+        // @todo - load before opening?
         saverWindow.loadURL(url);
+        //        saverWindow.toggleDevTools();
     };
 
     var stopScreenSaver = function() {
+        console.log("close it up");
         if ( saverWindow ) {
             saverWindow.close();
         }
@@ -136,11 +142,6 @@ app.on('ready', function() {
             label: 'Preferences',
             click: function() { openPrefsWindow(); }
         },
-        // {
-        //     label: 'Reload',
-        //     click: function() { mainWindow.reload(); }
-        // },
-
         {
             label: 'Toggle DevTools',
             click: function() { mainWindow.toggleDevTools(); }

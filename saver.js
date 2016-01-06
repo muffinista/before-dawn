@@ -2,6 +2,7 @@
  * simple class for a screen saver
  */
 
+var _ = require('lodash');
 
 /**
  * take a hash and turn it into a URL string
@@ -61,10 +62,14 @@ module.exports = function Saver(_attrs) {
     this.getUrl = function(opts) {
         var joiner = "?";
         if ( typeof(opts) === "undefined" ) {
-            return this.url;
+            //return this.url;
+            opts = {};
         }
+
+        opts = _.merge(opts, this.settings);
+
         if ( this.url.lastIndexOf("?") !== -1 ) {
-            joiner ="&";
+            joiner = "&";
         }
 
         opts = serialize(opts);
