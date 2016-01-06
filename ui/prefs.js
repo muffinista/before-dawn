@@ -36970,12 +36970,12 @@ $(document).ready(function() {
         },
         render: function() {
             var self = this;
-            var nodes = this.props.data.map(function(s) {
+            var nodes = this.props.data.map(function(s, i) {
                 var is_checked = (s.key === self.state.value);
                 return (
-                    React.createElement("div", {class: "entry"}, 
+                    React.createElement("div", {className: "entry", key: i}, 
                     React.createElement("h1", null, s.name), 
-                    React.createElement("div", {class: "body"}, 
+                    React.createElement("div", {className: "body"}, 
                     React.createElement("input", {type: "radio", name: "screensaver", value: s.key, onChange: this.onChanged, defaultChecked: is_checked}), 
                     s.description
                 )
@@ -37019,7 +37019,7 @@ $(document).ready(function() {
       React.createElement("h1", null, s.name), 
       React.createElement("h2", null, s.author), 
       React.createElement("p", null, s.description), 
-      React.createElement("a", {href: "{s.aboutUrl}"}, s.aboutUrl)
+      React.createElement("a", {href: s.aboutUrl}, s.aboutUrl)
                     )
             );
         }

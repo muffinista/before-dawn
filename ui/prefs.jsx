@@ -28,12 +28,12 @@ $(document).ready(function() {
         },
         render: function() {
             var self = this;
-            var nodes = this.props.data.map(function(s) {
+            var nodes = this.props.data.map(function(s, i) {
                 var is_checked = (s.key === self.state.value);
                 return (
-                    <div class="entry">
+                    <div className={"entry"} key={i}>
                     <h1>{s.name}</h1>
-                    <div class="body">
+                    <div className={"body"}>
                     <input type="radio" name="screensaver" value={s.key} onChange={this.onChanged} defaultChecked={is_checked} />
                     {s.description}
                 </div>
@@ -77,7 +77,7 @@ $(document).ready(function() {
       <h1>{s.name}</h1>
       <h2>{s.author}</h2>
       <p>{s.description}</p>     
-      <a href="{s.aboutUrl}">{s.aboutUrl}</a>
+      <a href={s.aboutUrl}>{s.aboutUrl}</a>
                     </div>
             );
         }
