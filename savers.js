@@ -5,6 +5,8 @@ var nconf = require('nconf');
 var path = require('path');
 var _ = require('lodash');
 
+var Saver = require('./saver.js');
+
 var config_file = "config.json";
 
 var baseDir;
@@ -147,51 +149,6 @@ function copyFolderRecursiveSync( source, target ) {
 }
 
 
-/**
- * simple class for a screen saver
- */
-function Saver(_attrs) {
-    this.attrs = _attrs;
-    this.name = _attrs.name;
-    this.key = _attrs.key;
-    this.description = _attrs.description;
-    this.aboutUrl = _attrs.aboutUrl;
-    this.author = _attrs.author;
-    this.license = _attrs.license;
-    this.options = _attrs.options;
-
-    // allow for a specified URL -- this way you could create a screensaver
-    // that pointed to a remote URL
-    if ( typeof(this.attrs.url) !== "undefined" ) {
-        this.url = this.attrs.url;
-    }
-    else {
-        this.url = 'file://' + baseDir + '/savers/' + this.attrs.key;
-    }
-
-    // allow for custom preview URL -- if not specified, just use the default
-    if ( typeof(this.attrs.previewUrl) === "undefined" ) {
-        this.previewUrl = this.url;
-        if ( typeof(url_params) !== "undefined" ) {
-            var opts = serialize(url_params);
-            this.previewUrl = this.previewUrl + "?" + opts;
-        }
-    }
-    else {
-        this.previewUrl = this.attrs.previewUrl;
-    }
-
-
-    this.getPreviewUrl = function(opts) {
-        if ( typeof(opts) === "undefined" ) {
-            return this.previewUrl;
-        }
-
-        opts = serialize(opts);
-        return this.previewUrl + "?" + opts;
-    };
-}
-
 
 /**
  * specify a hash of options which will be tacked onto any screensaver URLs -- we will
@@ -253,8 +210,12 @@ var setConfig = function(k, v) {
 /**
  * set current screensaver key
  */
-var setCurrent = function(x) {
+var setCurrent = function(x, opts) {
     setConfig('saver', x);
+
+    if ( typeof(opts) !== "undefined" ) {
+        setOptions(opts, x);
+    }
 };
 
 /**
@@ -266,12 +227,19 @@ var setOptions = function(opts, s) {
         s = getCurrent();
     }
     key = "options:" + s;
+    console.log("SET OPTIONS", key, opts);
     setConfig(key, opts);
 };
 
-var getOptions = function() {
-    var key = "options:" + getCurrent();
-    return nconf.get(key);
+var getOptions = function(name) {
+    if ( typeof(name) === "undefined" ) {
+        name = getCurrent();
+    }
+    var key = "options:" + name;
+    console.log("GET OPTIONS " + key);
+    var result = nconf.get(key) || {};
+
+    return result;
 };
 
 
@@ -324,7 +292,16 @@ var listAll = function(cb, reload) {
 
             console.log("KEY: " + contents.key);
 
+            // allow for a specified URL -- this way you could create a screensaver
+            // that pointed to a remote URL
+            if ( typeof(contents.url) === "undefined" ) {
+                contents.url = 'file://' + baseDir + '/savers/' + contents.key;
+            }
+
+            contents.settings = getOptions(contents.key);
+
             var s = new Saver(contents);
+
             loadedData.push(s);
         }
     });
@@ -337,24 +314,14 @@ var listAll = function(cb, reload) {
 };
 
 /**
- * take a hash and turn it into a URL string
- * @see http://stackoverflow.com/questions/1714786/querystring-encoding-of-a-javascript-object
- */
-var serialize = function(obj) {
-  var str = [];
-  for(var p in obj)
-    if (obj.hasOwnProperty(p)) {
-      str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
-    }
-  return str.join("&");
-};
-
-/**
  * get a URL we can use to render current screensaver. if opts is passed in, use them
  * when generating URL. otherwise use our global URL options
  */
 var getCurrentUrl = function(opts) {
-    var url = 'file://' + baseDir + '/savers/' + getCurrent();
+    var s = getCurrentData();
+    return s.getUrl(opts);
+    
+    /*var url = 'file://' + baseDir + '/savers/' + getCurrent();
 
     if ( typeof(opts) === "undefined" ) {
         opts = url_opts;
@@ -368,7 +335,7 @@ var getCurrentUrl = function(opts) {
         url = url + "?" + opts;
     }
 
-    return url;
+    return url;*/
 };
 
 

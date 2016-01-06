@@ -72,16 +72,15 @@ void setup() {
   if ( typeof(window.urlParams) !== "undefined" ) {
     display_width = window.urlParams.width;
     display_height = window.urlParams.height;
+    console.log(window.urlParams);
+    count = window.urlParams.density * 2;
+    console.log("set count to " + count);
   }
   else {
     display_width = screen.width;
     display_height = screen.height;
   }
   
-//display_width = 800;
-//display_height = 600;
-
-
   size(display_width, display_height, P3D);
 
   min_r = int((height * 2) * min_radius);

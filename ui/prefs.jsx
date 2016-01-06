@@ -24,7 +24,6 @@ $(document).ready(function() {
             });
         },
         handleChange: function(event) {
-            console.log("change", event);
             this.setState({value: event.target.value});
         },
         render: function() {
@@ -56,7 +55,11 @@ $(document).ready(function() {
                 height: 200,
                 preview: 1
             };
-            var previewUrl = s.getPreviewUrl(url_opts);
+            console.log("PREVIEW", saverOpts);
+
+            var mergedOpts = _.merge(url_opts, s.settings);
+            mergedOpts = _.merge(mergedOpts, saverOpts);
+            var previewUrl = s.getPreviewUrl(mergedOpts);
 
             return (
                 <div>
@@ -82,7 +85,6 @@ $(document).ready(function() {
 
     var SliderWithValue = React.createClass({
         onSliderChange: function(val) {
-            console.log("HEY!");
             this.value = val;
             this.setState({
                 name: this.name,
@@ -93,13 +95,9 @@ $(document).ready(function() {
                 name: this.props.name,
                 value: val
             });
-            //log(value);
-            //this.setState({
-            //value: value
-        //});
         },
         render: function() {
-            return <Slider onChange={this.onSliderChange} />;
+            return <Slider defaultValue={this.props.value} onChange={this.onSliderChange} />;
         }
     });
 
@@ -108,15 +106,16 @@ $(document).ready(function() {
         onChanged: function(e) {
             this.props.onChange(this.getValues());
         },
-        renderOption: function(o, index) {
+        renderOption: function(o, index, val) {
             var guts;
             var self = this;
             var ref = "option" + index;
+
             if ( o.type === "slider" ) {
-                guts = <SliderWithValue name={o.name} min={o.min} max={o.max} ref={ref} onChange={this.onChanged} />;
+                guts = <SliderWithValue name={o.name} value={val} min={o.min} max={o.max} ref={ref} onChange={this.onChanged} />;
             }
             else {
-                guts = <input type="text" name={o.name}  ref={ref} onChange={this.onChanged} />;
+                guts = <input type="text" name={o.name} defaultValue={val} ref={ref} onChange={this.onChanged} />;
             }
 
             return (
@@ -131,7 +130,6 @@ $(document).ready(function() {
             var data = {};
             _.each(this.props.saver.options, function(o, i) {
                 var ref = "option" + i;
-                console.log(self.refs[ref], self.refs[ref].state, self.refs[ref].value);
                 data[o.name] = self.refs[ref].value;
             });
 
@@ -141,11 +139,19 @@ $(document).ready(function() {
             var self = this;
             var s = this.props.saver;
             var onChange = this.props.onChange;
+            var values = s.settings;
             
             var nodes = this.props.saver.options.map(function(o, i) {
+                var val = values[o.name];
+
+                if ( typeof(val) === "undefined" ) {
+                    val = o.default;
+                }
+
+
                 return (
                     <div>
-                    {self.renderOption(o, i)}
+                    {self.renderOption(o, i, val)}
                     </div>
                 );
             });
@@ -159,7 +165,7 @@ $(document).ready(function() {
         ReactDOM.render(
                 <Preview saver={s} />,
             document.getElementById('preview')
-        );   
+        );
     };
 
     var loadDetails = function(s) {
@@ -171,6 +177,11 @@ $(document).ready(function() {
 
     var optionsUpdated = function(data) {
         saverOpts = data;
+        console.log("updated!");
+
+        var current = savers.getCurrent();
+        var s = savers.getByKey(current);
+        redraw(s);        
     };
 
     var loadOptionsForm = function(s) {
@@ -209,6 +220,8 @@ $(document).ready(function() {
     $("body").on("change", "input[name=screensaver]", function() {
         var val = $("input[name=screensaver]:checked").val();
         var s = savers.getByKey(val);
+
+        saverOpts = s.settings;
         redraw(s);
     });
 
@@ -218,8 +231,9 @@ $(document).ready(function() {
 
     $("a.save").on("click", function(e) {
         var val = $("input[name=screensaver]:checked").val();
-        savers.setCurrent(val);
-        savers.setOptions(saverOpts, val);
+        console.log("set screensaver to " + val);
+        savers.setCurrent(val, saverOpts);
+
         closeWindow();
     });
 

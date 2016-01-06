@@ -9,7 +9,8 @@
       "type": "slider",
       "description": "how dense?",
       "min": "1",
-      "max": "100"
+      "max": "100",
+      "default": "75"
     },
     {
       "name": "url",
