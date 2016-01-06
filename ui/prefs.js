@@ -37097,7 +37097,7 @@ $(document).ready(function() {
 
 
                 return (
-                    React.createElement("div", null, 
+                    React.createElement("div", {key: i}, 
                     self.renderOption(o, i, val)
                     )
                 );
@@ -37187,6 +37187,8 @@ $(document).ready(function() {
         delay = parseInt(delay, 10);
         savers.setDelay(delay);
         savers.setLock(do_lock);
+
+        savers.write();
 
         closeWindow();
     });

@@ -155,7 +155,7 @@ $(document).ready(function() {
 
 
                 return (
-                    <div>
+                    <div key={i}>
                     {self.renderOption(o, i, val)}
                     </div>
                 );
@@ -245,6 +245,8 @@ $(document).ready(function() {
         delay = parseInt(delay, 10);
         savers.setDelay(delay);
         savers.setLock(do_lock);
+
+        savers.write();
 
         closeWindow();
     });

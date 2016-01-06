@@ -39,7 +39,7 @@ var reload = function(cb) {
         fs.mkdirSync(saversDir);
     }
     else {
-        console.log(saversDir + "already exists");
+        console.log(saversDir + " already exists");
     }
 
     // specify config path
@@ -192,11 +192,11 @@ var getSources = function() {
 var setConfig = function(k, v) {
     nconf.set(k, v);
     console.log("set "+ k + " to " + v);
-    nconf.save(function (err) {
+    /*nconf.save(function (err) {
         fs.readFile(config_file, function (err, data) {
             console.dir(JSON.parse(data));
         });
-    });   
+    });   */
 };
 
 /**
@@ -347,6 +347,16 @@ var getUrl = function(key) {
 };
 
 
+var write = function() {
+    var configPath = baseDir + "/" + config_file;
+    console.log("write config to " + configPath);
+    nconf.save(function (err) {
+        //fs.readFile(config_file, function (err, data) {
+        //console.dir(JSON.parse(data));
+        //});
+    });
+};
+
 exports.init = init;
 exports.reload = reload;
 exports.getByKey = getByKey;
@@ -364,4 +374,4 @@ exports.listAll = listAll;
 exports.getCurrentUrl = getCurrentUrl;
 exports.getUrl = getUrl;
 exports.loadedData = loadedData;
-
+exports.write = write;
