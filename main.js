@@ -75,7 +75,7 @@ app.on('ready', function() {
 
     // uncomment this to test the prefs window
     // but also, should probably have a command line option to open it
-    openPrefsWindow();
+    //openPrefsWindow();
 
     // Create the browser window.
     var saverWindow = null;
@@ -92,7 +92,8 @@ app.on('ready', function() {
         };
 
         var saver = global.savers.getCurrentData();
-        var url = saver.getUrl(url_opts);   
+        console.log("SAVER OPTS", saver);
+        var url = saver.getUrl(url_opts);
         console.log("loading " + url);
 
         isActive = true;
@@ -107,11 +108,7 @@ app.on('ready', function() {
         saverWindow = new BrowserWindow(windowOpts);
         // Emitted when the window is closed.
         saverWindow.on('closed', function() {
-            // Dereference the window object, usually you would store windows
-            // in an array if your app supports multi windows, this is the time
-            // when you should delete the corresponding element.
-            saverWindow = null;
-            
+            saverWindow = null;           
             isActive = false;
         });
 
@@ -123,7 +120,7 @@ app.on('ready', function() {
     };
 
     var shouldLockScreen = function() {
-        return ( process.platform === 'darwin' );
+        return ( process.platform === 'darwin' && savers.getLock() == true );
     };
 
     var doLockScreen = function() {
@@ -179,10 +176,16 @@ app.on('ready', function() {
     var lastIdle = 0;
     var checkIdle = function() {
         var idle = idler.getIdleTime() / 1000;
+        var waitTime = savers.getDelay() * 60;
+
+        if ( waitTime <= 0 ) {
+            return;
+        }
+
         if ( isActive && idle < lastIdle ) {
             stopScreenSaver();
         }
-        else if ( isActive == false && idle > 120 ) {
+        else if ( isActive == false && idle > waitTime ) {
             runScreenSaver();
         }
 
