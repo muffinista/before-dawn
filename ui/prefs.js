@@ -36954,6 +36954,11 @@ $(document).ready(function() {
     var savers = remote.getGlobal('savers');
     var saverOpts = {};
 
+    $("select[name=delay] option[value=" + savers.getDelay() + "]").attr("selected", "selected");
+    if ( savers.getLock() === true ) {
+        $("input[name=lock_screen][type=checkbox]").attr("checked", "checked");
+    }
+
     var SaverList = React.createClass({displayName: "SaverList",
         getInitialState: function() {
             return {
@@ -37172,9 +37177,16 @@ $(document).ready(function() {
     });
 
     $("a.save").on("click", function(e) {
+        var delay = $("select[name=delay] option:selected").val();
+        var do_lock = $("input[name=lock_screen][type=checkbox]").is(":checked");
         var val = $("input[name=screensaver]:checked").val();
+
         console.log("set screensaver to " + val);
         savers.setCurrent(val, saverOpts);
+
+        delay = parseInt(delay, 10);
+        savers.setDelay(delay);
+        savers.setLock(do_lock);
 
         closeWindow();
     });

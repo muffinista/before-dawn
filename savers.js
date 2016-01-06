@@ -210,6 +210,23 @@ var setCurrent = function(x, opts) {
     }
 };
 
+var setDelay = function(x) {
+    setConfig('delay', x);
+};
+
+var setLock = function(x) {
+    setConfig('lock', x);
+};
+
+var getDelay = function() {
+    return nconf.get('delay') || 15;
+};
+
+var getLock = function() {
+    return nconf.get('lock') || false;
+};
+
+
 /**
  * set options for the specified screensaver
  */
@@ -338,6 +355,10 @@ exports.getSources = getSources;
 exports.getCurrentData = getCurrentData;
 exports.setCurrent = setCurrent;
 exports.setOptions = setOptions;
+exports.setDelay = setDelay;
+exports.setLock = setLock;
+exports.getDelay = getDelay;
+exports.getLock = getLock;
 exports.getOptions = getOptions;
 exports.listAll = listAll;
 exports.getCurrentUrl = getCurrentUrl;

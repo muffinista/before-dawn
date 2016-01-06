@@ -33,7 +33,7 @@ let mainWindow;
 app.on('window-all-closed', function() {
   // On OS X it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
-  if (process.platform != 'darwin') {
+  if ( process.platform != 'darwin' ) {
     app.quit();
   }
 });
@@ -75,7 +75,7 @@ app.on('ready', function() {
 
     // uncomment this to test the prefs window
     // but also, should probably have a command line option to open it
-    //openPrefsWindow();
+    openPrefsWindow();
 
     // Create the browser window.
     var saverWindow = null;
@@ -122,9 +122,29 @@ app.on('ready', function() {
         //        saverWindow.toggleDevTools();
     };
 
+    var shouldLockScreen = function() {
+        return ( process.platform === 'darwin' );
+    };
+
+    var doLockScreen = function() {
+        var exec = require('child_process').exec;
+        var cmd = "'/System/Library/CoreServices/Menu Extras/User.menu/Contents/Resources/CGSession' -suspend";
+
+        exec(cmd, function(error, stdout, stderr) {
+            console.log('stdout: ' + stdout);
+            console.log('stderr: ' + stderr);
+            if (error !== null) {
+                console.log('exec error: ' + error);
+            }
+        });
+    };
+
     var stopScreenSaver = function() {
         console.log("close it up");
         if ( saverWindow ) {
+            if ( shouldLockScreen() ) {
+                doLockScreen();
+            }
             saverWindow.close();
         }
     };
