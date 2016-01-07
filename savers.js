@@ -347,14 +347,10 @@ var getUrl = function(key) {
 };
 
 
-var write = function() {
+var write = function(cb) {
     var configPath = baseDir + "/" + config_file;
     console.log("write config to " + configPath);
-    nconf.save(function (err) {
-        //fs.readFile(config_file, function (err, data) {
-        //console.dir(JSON.parse(data));
-        //});
-    });
+    nconf.save(cb);
 };
 
 exports.init = init;

@@ -12,6 +12,25 @@ $(document).ready(function() {
     var savers = remote.getGlobal('savers');
     var saverOpts = {};
 
+    var url_opts = {
+        width: $("#preview").width(),
+        height: $("#preview").height(),
+        preview: 1
+    };
+
+    // if the preview div didn't have a height, figure one out by getting
+    // the width and making it proprtional to the main screen. at the moment,
+    // the div will never have a height at this point unless someone specifically
+    // hacks the CSS to make it work differently
+    if ( url_opts.height == 0 ) {
+        var atomScreen = window.require('screen');
+        var size = atomScreen.getPrimaryDisplay().bounds;
+        var ratio = size.height / size.width;
+        url_opts.height = url_opts.width * ratio;
+        console.log("setting preview opts to", url_opts);
+    }
+
+
     $("select[name=delay] option[value=" + savers.getDelay() + "]").attr("selected", "selected");
     if ( savers.getLock() === true ) {
         $("input[name=lock_screen][type=checkbox]").attr("checked", "checked");
@@ -53,17 +72,15 @@ $(document).ready(function() {
     var Preview = React.createClass({
         render: function() {
             var s = this.props.saver;
-            var url_opts = {
-                //  width: $("#preview").width(),
-                //  height: $("#preview").height(),
-                width: 200,
-                height: 200,
-                preview: 1
-            };
-            console.log("PREVIEW", saverOpts);
+            console.log("CURRENT", s.settings);
 
             var mergedOpts = _.merge(url_opts, s.settings);
+
+            console.log("OPTS", saverOpts);
             mergedOpts = _.merge(mergedOpts, saverOpts);
+
+            console.log("PREVIEW", mergedOpts);
+
             var previewUrl = s.getPreviewUrl(mergedOpts);
 
             return (
@@ -117,6 +134,8 @@ $(document).ready(function() {
             var ref = "option" + index;
 
             if ( o.type === "slider" ) {
+                val = parseInt(val, 10);
+                console.log("VAL", val, typeof(val));
                 guts = <SliderWithValue name={o.name} value={val} min={o.min} max={o.max} ref={ref} onChange={this.onChanged} />;
             }
             else {
@@ -148,11 +167,13 @@ $(document).ready(function() {
             
             var nodes = this.props.saver.options.map(function(o, i) {
                 var val = values[o.name];
-
+                console.log("CHECK " + o.name + " -> " + val);
                 if ( typeof(val) === "undefined" ) {
+                    console.log('use default!');
                     val = o.default;
                 }
 
+                console.log(o.name + " -> " + val);
 
                 return (
                     <div key={i}>
@@ -174,10 +195,10 @@ $(document).ready(function() {
     };
 
     var loadDetails = function(s) {
-        ReactDOM.render(
+        /*ReactDOM.render(
                 <Details saver={s} />,
             document.getElementById('details')           
-        );   
+        );*/   
     };
 
     var optionsUpdated = function(data) {
@@ -227,6 +248,7 @@ $(document).ready(function() {
         var s = savers.getByKey(val);
 
         saverOpts = s.settings;
+        console.log("EXISTING SETTINGS", saverOpts);
         redraw(s);
     });
 
@@ -246,9 +268,9 @@ $(document).ready(function() {
         savers.setDelay(delay);
         savers.setLock(do_lock);
 
-        savers.write();
-
-        closeWindow();
+        savers.write(function() {
+            closeWindow();
+        });
     });
 
     $("a.updater").on("click", function(e) {

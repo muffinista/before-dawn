@@ -62,7 +62,7 @@ app.on('ready', function() {
     
     var openPrefsWindow = function() {
         var prefsUrl = 'file://' + __dirname + '/ui/prefs.html';
-        var w = new BrowserWindow({width:800, height:600});
+        var w = new BrowserWindow({width:800, height:700});
 
         w.loadURL(prefsUrl);
         w.webContents.openDevTools();

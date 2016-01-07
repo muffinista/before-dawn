@@ -1,5 +1,5 @@
 html {
-    overflow-y: hidden;
+    //overflow-y: hidden;
 }
 .scrollable {
     overflow-y: scroll;
@@ -13,9 +13,10 @@ iframe {
     height: calc(50vh);
     width: 100%;
 }
+
 main {
     padding: 5px;
-    height: calc(100vh - 55px);
+    height: calc(90vh - 55px);
 }
 footer {
     padding: 5px;
@@ -27,4 +28,12 @@ footer .right {
 
 .entry {
     padding-left: 5px;
+}
+
+header {
+    margin-top: 3px;
+    min-height: 60px;
+}
+header h1 {
+    margin-top: 0;
 }

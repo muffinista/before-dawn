@@ -22,39 +22,49 @@
   </head>
 
   <body>
+    <header class="pure-g">
+      <div class="left pure-u-1-2">
+        <h1>Before Dark</h1>
+      </div>
+      <div class="right pure-u-1-2">
+        <a class="pure-button updater" href="#">Check for Updates</a>
+        <span class="update-results"></span>
+      </div>
+    </header>
     <main class="pure-g">
       <div class="left pure-u-1-2">
         <div class="scrollable" id="savers">
         </div>
       </div>
       <div class="right pure-u-1-2">
-        <div id="details">
+        <div id="preview">
         </div>
         <div id="options">
-        </div>
-        <div id="preview">
         </div>
       </div>
     </main>
 
     <footer class="pure-g">
       <div class="left pure-u-1-2">
-        <label>Activate after</label>
-        <select name="delay">
-          <option value="0">never</option>
-          <option value="1">1 minute</option>
-          <option value="5">5 minutes</option>
-          <option value="10">10 minutes</option>
-          <option value="15">15 minutes</option>
-          <option value="30">30 minutes</option>
-          <option value="60">1 hour</option>
-        </select>
+        <form class="pure-form">
+          <fieldset>
+            <label for="delay">Activate after</label>
+            <select name="delay">
+              <option value="0">never</option>
+              <option value="1">1 minute</option>
+              <option value="5">5 minutes</option>
+              <option value="10">10 minutes</option>
+              <option value="15">15 minutes</option>
+              <option value="30">30 minutes</option>
+              <option value="60">1 hour</option>
+            </select>
+            
+            <label for="lock_screen">
+              <input type="checkbox" name="lock_screen" id="lock_screen" value="1" />
+              lock screen
+            </label>
 
-        <label>lock screen</label>
-        <input type="checkbox" name="lock_screen" value="1" />
-
-        <a class="pure-button updater" href="#">Check for Updates</a>
-        <span class="update-results"></span>
+        </form>
       </div>
       <div class="right pure-u-1-2">
         <a class="pure-button cancel" href="#">Cancel</a>
