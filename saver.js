@@ -26,54 +26,56 @@ module.exports = function Saver(_attrs) {
     this.author = _attrs.author;
     this.license = _attrs.license;
     this.options = _attrs.options;
-    this.settings = _attrs.settings;
     this.url = _attrs.url;
+
+    // figure out the settings from any defaults for this screensaver,
+    // and combine with incoming user-specified settings
+    this.settings = _attrs.options.map(function(o, i) {
+        return [o.name, o.default];
+    }).reduce(function(o, v, i) {
+        o[v[0]] = v[1];
+        return o; 
+    }, {});;
+    this.settings = _.merge(this.settings, _attrs.settings);
+
 
     // allow for custom preview URL -- if not specified, just use the default
     if ( typeof(this.attrs.previewUrl) === "undefined" ) {
         this.previewUrl = this.url;
-        /**
-         * 
-         if ( typeof(url_params) !== "undefined" ) {
-            var opts = serialize(url_params);
-            this.previewUrl = this.previewUrl + "?" + opts;
-        }
-         */
     }
     else {
         this.previewUrl = this.attrs.previewUrl;
     }
 
-
+    /**
+     * generate a preview URL with our variables tacked on
+     */
     this.getPreviewUrl = function(opts) {
-        var joiner = "?";
-        if ( typeof(opts) === "undefined" ) {
-            return this.previewUrl;
-        }
-
-        if ( this.previewUrl.lastIndexOf("?") !== -1 ) {
-            joiner ="&";
-        }
-
-        opts = serialize(opts);
-        return this.previewUrl + joiner + opts;
+        return this.urlFor(this.previewUrl, opts);
     };
 
+    /**
+     * generate a URL with our variables tacked on
+     */
     this.getUrl = function(opts) {
+        return this.urlFor(this.url, opts);
+    };
+
+    this.urlFor = function(url, opts) {
         var joiner = "?";
         if ( typeof(opts) === "undefined" ) {
-            //return this.url;
             opts = {};
         }
 
         opts = _.merge(opts, this.settings);
 
-        if ( this.url.lastIndexOf("?") !== -1 ) {
-            joiner = "&";
+        if ( url.lastIndexOf("?") !== -1 ) {
+            joiner ="&";
         }
 
         opts = serialize(opts);
-        return this.url + joiner + opts;
+        return url + joiner + opts;
     };
+
 };
 
