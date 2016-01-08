@@ -60,16 +60,13 @@ var defaultSaversDir = function() {
  * setup some reasonable defaults
  */
 var ensureDefaults = function() {
-    var sources = nconf.get('sources');
-    if ( sources === undefined ) {
+    var source = nconf.get('source');
+    if ( source === undefined ) {
         console.log("add default source");
-        setConfig('sources', [
-            {
-                key: 'defaults',
-                url: 'http://yzzyx.xyz/screensavers.zip',
-                hash: ''
-            }
-        ]);
+        setConfig('source',{
+            url:'http://yzzyx.xyz/screensavers.zip',
+            hash: ''
+        });
     }
 
 
@@ -179,10 +176,10 @@ var getCurrentData = function() {
 
 
 /**
- * return a list of sources -- URLs we will check for updated screensaver packages
+ * return the URL of a zip file that is the source we will check to update our screensavers
  */
-var getSources = function() {
-    return nconf.get('sources');
+var getSource = function() {
+    return nconf.get('source');
 };
 
 
@@ -357,7 +354,7 @@ exports.init = init;
 exports.reload = reload;
 exports.getByKey = getByKey;
 exports.getCurrent = getCurrent;
-exports.getSources = getSources;
+exports.getSource = getSource;
 exports.getCurrentData = getCurrentData;
 exports.setCurrent = setCurrent;
 exports.setOptions = setOptions;
