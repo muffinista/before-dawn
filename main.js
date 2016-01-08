@@ -159,10 +159,10 @@ app.on('ready', function() {
             label: 'Preferences',
             click: function() { openPrefsWindow(); }
         },
-        {
-            label: 'Toggle DevTools',
-            click: function() { mainWindow.toggleDevTools(); }
-        },
+        // {
+        //     label: 'Toggle DevTools',
+        //     click: function() { mainWindow.toggleDevTools(); }
+        // },
         {
             label: 'Quit',
             selector: 'terminate:'

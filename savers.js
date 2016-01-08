@@ -20,6 +20,15 @@ var init = function(_path, cb) {
     reload(cb);
 };
 
+var updatePackage = function(cb) {
+    var Package = require("./package.js");
+
+    var source = getSource();
+
+    var p = new Package({url:source.url, etag:source.hash, dest:defaultSaversDir()});
+    p.downloadIfStale(cb);
+};
+
 var reload = function(cb) {
     var configPath = baseDir + "/" + config_file;
 
@@ -49,7 +58,37 @@ var reload = function(cb) {
     });
 
     ensureDefaults();
-    listAll(cb);
+    console.log("update package");
+    updatePackage(function(data) {
+        console.log("UPDATED!", data);
+
+        if ( data.downloaded == true ) {
+            setConfig('source',{
+                url:data.url,
+                hash: data.etag,
+                updated_at: data.updated_at
+            });           
+        }
+        
+        var current = nconf.get('saver');
+        if ( current === undefined || getCurrentData() === undefined ) {
+            console.log("creating config defaults");
+            listAll(function(data) {
+                if ( data.length > 0 ) {
+                    console.log("setting default saver to first in list " + data[0].key);
+                    setConfig('saver', data[0].key);
+                }
+
+                write(cb);
+            });
+        }
+        else {
+            write(function() {
+                listAll(cb);
+            });
+        }
+    });
+
 };
 
 var defaultSaversDir = function() {
@@ -64,11 +103,10 @@ var ensureDefaults = function() {
     if ( source === undefined ) {
         console.log("add default source");
         setConfig('source',{
-            url:'http://yzzyx.xyz/screensavers.zip',
+            url:'http://github.com/muffinista/before-dawn-screensavers/archive/master.zip',
             hash: ''
         });
     }
-
 
     //
     // copy our default set of screensavers into the app directory
@@ -89,17 +127,6 @@ var ensureDefaults = function() {
         console.log(src + " -> " + defaultSaversDir());
         wrench.copyDirSyncRecursive(src, defaultSaversDir(), {
             forceDelete: true
-        });
-    }
-
-    var current = nconf.get('saver');
-    if ( current === undefined ) {
-        console.log("creating config defaults");
-        listAll(function(data) {
-            if ( data.length > 0 ) {
-                console.log("setting default saver to first in list " + data[0].key);
-                setConfig('saver', data[0].key);
-            }
         });
     }
 };
@@ -189,11 +216,6 @@ var getSource = function() {
 var setConfig = function(k, v) {
     nconf.set(k, v);
     console.log("set "+ k + " to " + v);
-    /*nconf.save(function (err) {
-        fs.readFile(config_file, function (err, data) {
-            console.dir(JSON.parse(data));
-        });
-    });   */
 };
 
 /**

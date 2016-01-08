@@ -37001,7 +37001,8 @@ $(document).ready(function() {
                     React.createElement("h1", null, s.name), 
                     React.createElement("div", {className: "body"}, 
                     React.createElement("input", {type: "radio", name: "screensaver", value: s.key, onChange: this.onChanged, defaultChecked: is_checked}), 
-                    s.description
+                    s.description, 
+                    s.author, " //  ", React.createElement("a", {class: "external", href: s.aboutUrl}, s.aboutUrl)
                 )
                     )
                 );
@@ -37229,6 +37230,14 @@ $(document).ready(function() {
 
         updater.updateAll(didUpdate, noUpdate);
     });
+
+    const shell = window.require('electron').shell;
+
+    $(document).on('click', 'a[href^="http"]', function(event) {
+        event.preventDefault();
+        shell.openExternal(this.href);
+    });
+
 
     renderList();
 

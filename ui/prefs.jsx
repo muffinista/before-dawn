@@ -60,6 +60,7 @@ $(document).ready(function() {
                     <div className={"body"}>
                     <input type="radio" name="screensaver" value={s.key} onChange={this.onChanged} defaultChecked={is_checked} />
                     {s.description}
+                    {s.author} //  <a class="external" href={s.aboutUrl}>{s.aboutUrl}</a>
                 </div>
                     </div>
                 );
@@ -287,6 +288,14 @@ $(document).ready(function() {
 
         updater.updateAll(didUpdate, noUpdate);
     });
+
+    const shell = window.require('electron').shell;
+
+    $(document).on('click', 'a[href^="http"]', function(event) {
+        event.preventDefault();
+        shell.openExternal(this.href);
+    });
+
 
     renderList();
 

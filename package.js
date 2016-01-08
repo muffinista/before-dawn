@@ -46,6 +46,8 @@ module.exports = function Package(_attrs) {
                 extract(tempName, {dir: self.dest}, function(err) {
                     self.updated_at = _resp.headers['last-modified'];
                     self.etag = _resp.headers.etag;
+                    console.log("updated_at: ");
+                    console.log(_resp.headers);
                     console.log("new etag: " + self.etag);
                     self.downloaded = true;
                     
@@ -56,11 +58,13 @@ module.exports = function Package(_attrs) {
     };
     
     this.downloadIfStale = function(cb) {
+        console.log("ETAG:" + self.etag);
         request({
             method: 'HEAD',
             uri: self.url,
             headers: {
-                'If-Modified-Since': self.updated_at
+                //'If-Modified-Since': self.updated_at
+                'if-none-match': '"' + self.etag + '"'
             }
         }).on('response', function(response) {
             console.log(response.statusCode);

@@ -13,6 +13,7 @@
     "browserify": "^11.0.1",
     "electron-compile": "^1.0.2",
     "extract-zip": "^1.0.3",
+    "github-releases": "^0.3.2",
     "lodash": "^3.10.1",
     "nconf": "^0.8.2",
     "node-dir": ">= 0.1.9",
