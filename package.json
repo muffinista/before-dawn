@@ -12,9 +12,9 @@
   "dependencies": {
     "browserify": "^11.0.1",
     "electron-compile": "^1.0.2",
-    "extract-zip": "^1.0.3",
     "github-releases": "^0.3.2",
     "lodash": "^3.10.1",
+    "mkdirp": "^0.5.1",
     "nconf": "^0.8.2",
     "node-dir": ">= 0.1.9",
     "node-system-idle-time": "git://github.com/paulcbetts/node-system-idle-time.git#master",
@@ -24,7 +24,8 @@
     "reactify": "^1.1.1",
     "request": "^2.60.0",
     "temp": "^0.8.3",
-    "wrench": ">= 1.5.8"
+    "wrench": ">= 1.5.8",
+    "yauzl": "^2.4.1"
   },
   "devDependencies": {
     "electron-compilers": "^1.0.1",

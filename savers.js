@@ -24,9 +24,11 @@ var updatePackage = function(cb) {
     var Package = require("./package.js");
 
     var source = getSource();
+    console.log("source", source);
 
-    var p = new Package({url:source.url, etag:source.hash, dest:defaultSaversDir()});
-    p.downloadIfStale(cb);
+    
+    //var p = new Package({repo:source.repo, etag:source.hash, dest:defaultSaversDir()});
+    //p.checkLatestRelease(cb);
 };
 
 var reload = function(cb) {
@@ -58,29 +60,33 @@ var reload = function(cb) {
     });
 
     ensureDefaults();
+
     console.log("update package");
+
     updatePackage(function(data) {
         console.log("UPDATED!", data);
 
         if ( data.downloaded == true ) {
             setConfig('source',{
-                url:data.url,
                 hash: data.etag,
                 updated_at: data.updated_at
             });           
         }
         
         var current = nconf.get('saver');
+        console.log("CURRENT: " + current);
         if ( current === undefined || getCurrentData() === undefined ) {
             console.log("creating config defaults");
             listAll(function(data) {
+                console.log("listall");
+                console.log(data);
                 if ( data.length > 0 ) {
                     console.log("setting default saver to first in list " + data[0].key);
                     setConfig('saver', data[0].key);
                 }
 
                 write(cb);
-            });
+            }, true);
         }
         else {
             write(function() {
@@ -103,7 +109,7 @@ var ensureDefaults = function() {
     if ( source === undefined ) {
         console.log("add default source");
         setConfig('source',{
-            url:'http://github.com/muffinista/before-dawn-screensavers/archive/master.zip',
+            repo:'muffinista/before-dawn-screensavers',
             hash: ''
         });
     }
@@ -120,7 +126,7 @@ var ensureDefaults = function() {
         src = __dirname + "/../savers";
     }
 
-    console.log(src);
+    console.log("local screensavers are at: " + src);
 
     if ( src !== undefined && src !== defaultSaversDir() ) {
         var wrench = require("wrench");
@@ -309,7 +315,9 @@ var listAll = function(cb, reload) {
         return loadedData;
     }
 
+    console.log("let's walk " + root);
     walk(root, function(f, stat) {
+        console.log(f);
         if ( f.match(/saver.json$/) ) {
             var content = fs.readFileSync( f );
             var contents = JSON.parse(content);
