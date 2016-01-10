@@ -20,6 +20,7 @@ module.exports = function Package(_attrs) {
     this.updated_at = _attrs.updated_at;
     this.downloaded = false;
 
+    console.log("ATTRS", _attrs);
     var self = this;
 
     this.attrs = function() {
@@ -41,6 +42,7 @@ module.exports = function Package(_attrs) {
                 'User-Agent': "Before Dawn"
             }
         }, function(error, response, body) {
+            console.log( body.published_at + " --- " + self.updated_at );
             if ( body.published_at !== self.updated_at ) {
                 console.log(body.published_at);
                 console.log(body);
@@ -83,7 +85,6 @@ module.exports = function Package(_attrs) {
 
                 yauzl.open(tempName, {lazyEntries: true}, function(err, zipfile) {
                     if (err) throw err;
-                    console.log("hey", zipfile);
                     zipfile.readEntry();
                     zipfile.on("end", function() {
                         self.etag = _resp.headers.etag;
@@ -105,10 +106,8 @@ module.exports = function Package(_attrs) {
                         fullPath = parts.join("/");
 
                         fullPath = self.dest + "/" + fullPath;
-                        console.log(fullPath);
 
                         if (/\/$/.test(entry.fileName)) {
-                            console.log("mkdir");
                             // directory file names end with '/' 
                             mkdirp(fullPath, function(err) {
                                 if (err) throw err;
@@ -119,14 +118,11 @@ module.exports = function Package(_attrs) {
                             // file entry 
                             zipfile.openReadStream(entry, function(err, readStream) {
                                 if (err) throw err;
-                                console.log("ensure parent " + path.dirname(fullPath));
                                 // ensure parent directory exists 
                                 mkdirp(path.dirname(fullPath), function(err) {
                                     if (err) throw err;
-                                    console.log("pipe");
                                     readStream.pipe(fs.createWriteStream(fullPath));
                                     readStream.on("end", function() {
-                                        console.log("end");
                                         zipfile.readEntry();
                                     });
                                 });

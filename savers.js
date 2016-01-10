@@ -4,6 +4,7 @@ var fs = require('fs');
 var nconf = require('nconf');
 var path = require('path');
 var _ = require('lodash');
+var wrench = require("wrench");
 
 var Saver = require('./saver.js');
 
@@ -27,8 +28,8 @@ var updatePackage = function(cb) {
     console.log("source", source);
 
     
-    //var p = new Package({repo:source.repo, etag:source.hash, dest:defaultSaversDir()});
-    //p.checkLatestRelease(cb);
+    var p = new Package({repo:source.repo, updated_at:source.updated_at, dest:defaultSaversDir()});
+    p.checkLatestRelease(cb);
 };
 
 var reload = function(cb) {
@@ -67,10 +68,8 @@ var reload = function(cb) {
         console.log("UPDATED!", data);
 
         if ( data.downloaded == true ) {
-            setConfig('source',{
-                hash: data.etag,
-                updated_at: data.updated_at
-            });           
+//            setConfig('source:hash', data.etag);
+            setConfig('source:updated_at', data.updated_at);
         }
         
         var current = nconf.get('saver');
@@ -93,6 +92,12 @@ var reload = function(cb) {
                 listAll(cb);
             });
         }
+    });
+
+    var localSources = nconf.get('localSources') || [];
+    localSources.forEach( function ( src ) {
+        console.log("copy local content from " + src);
+        loadSaversFrom(src);
     });
 
 };
@@ -129,13 +134,17 @@ var ensureDefaults = function() {
     console.log("local screensavers are at: " + src);
 
     if ( src !== undefined && src !== defaultSaversDir() ) {
-        var wrench = require("wrench");
-        console.log(src + " -> " + defaultSaversDir());
-        wrench.copyDirSyncRecursive(src, defaultSaversDir(), {
-            forceDelete: true
-        });
+        loadSaversFrom(src);
     }
 };
+
+
+function loadSaversFrom(src) {
+    console.log(src + " -> " + defaultSaversDir());
+    wrench.copyDirSyncRecursive(src, defaultSaversDir(), {
+        forceDelete: true
+    });
+}
 
 
 //
@@ -317,7 +326,6 @@ var listAll = function(cb, reload) {
 
     console.log("let's walk " + root);
     walk(root, function(f, stat) {
-        console.log(f);
         if ( f.match(/saver.json$/) ) {
             var content = fs.readFileSync( f );
             var contents = JSON.parse(content);
