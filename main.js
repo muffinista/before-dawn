@@ -50,13 +50,38 @@ var idler = require('@paulcbetts/system-idle-time');
 app.on('ready', function() {  
     var openPrefsWindow = function() {
         var prefsUrl = 'file://' + __dirname + '/ui/prefs.html';
-        var w = new BrowserWindow({width:800, height:750, resizable:false});
+        var w = new BrowserWindow({
+            width:800,
+            height:750,
+            resizable:false,
+            icon: __dirname + '/assets/icon.png'
+        });
 
         w.loadURL(prefsUrl);
-        w.webContents.openDevTools();
+        app.dock.show();
+        //w.webContents.openDevTools();
         w.on('closed', function() {
             w = null;
             global.savers.reload();
+            app.dock.hide();
+        });
+    };
+
+    var openAboutWindow = function() {
+        var prefsUrl = 'file://' + __dirname + '/ui/about.html';
+        var w = new BrowserWindow({
+            width:450,
+            height:300,
+            resizable:false,
+            icon: __dirname + '/assets/icon.png'
+        });
+
+        w.loadURL(prefsUrl);
+        app.dock.show();
+        w.webContents.openDevTools();
+        w.on('closed', function() {
+            w = null;
+            app.dock.hide();
         });
     };
 
@@ -111,16 +136,18 @@ app.on('ready', function() {
     };
 
     var doLockScreen = function() {
-        var exec = require('child_process').exec;
-        var cmd = "'/System/Library/CoreServices/Menu Extras/User.menu/Contents/Resources/CGSession' -suspend";
-
-        exec(cmd, function(error, stdout, stderr) {
-            console.log('stdout: ' + stdout);
-            console.log('stderr: ' + stderr);
-            if (error !== null) {
-                console.log('exec error: ' + error);
-            }
-        });
+        if ( process.platform === 'darwin' ) {
+            var exec = require('child_process').exec;
+            var cmd = "'/System/Library/CoreServices/Menu Extras/User.menu/Contents/Resources/CGSession' -suspend";
+            
+            exec(cmd, function(error, stdout, stderr) {
+                console.log('stdout: ' + stdout);
+                console.log('stderr: ' + stderr);
+                if (error !== null) {
+                    console.log('exec error: ' + error);
+                }
+            });
+        }
     };
 
     var stopScreenSaver = function() {
@@ -141,6 +168,10 @@ app.on('ready', function() {
         {
             label: 'Preferences',
             click: function() { openPrefsWindow(); }
+        },
+        {
+            label: 'About Before Dawn',
+            click: function() { openAboutWindow(); }
         },
         {
             label: 'Quit',
