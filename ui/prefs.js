@@ -36972,6 +36972,8 @@ $(document).ready(function() {
         console.log("setting preview opts to", url_opts);
     }
 
+    $("input[name=repo]").val( savers.getSource()["repo"] );
+    $("input[name=localSources]").val(JSON.stringify(savers.getLocalSources()));
 
     $("select[name=delay] option[value=" + savers.getDelay() + "]").attr("selected", "selected");
     if ( savers.getLock() === true ) {
@@ -37182,11 +37184,17 @@ $(document).ready(function() {
         var do_lock = $("input[name=lock_screen][type=checkbox]").is(":checked");
         var val = $("input[name=screensaver]:checked").val();
 
+        var repo = $("input[name=repo]").val();
+        var localSources = JSON.parse($("input[name=localSources]").val()) || [];
+
         savers.setCurrent(val, saverOpts);
 
         delay = parseInt(delay, 10);
         savers.setDelay(delay);
         savers.setLock(do_lock);
+
+        savers.setSource(repo);
+        savers.setLocalSources(localSources);
 
         savers.write(function() {
             closeWindow();

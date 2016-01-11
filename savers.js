@@ -94,7 +94,7 @@ var reload = function(cb) {
         }
     });
 
-    var localSources = nconf.get('localSources') || [];
+    var localSources = getLocalSources();
     localSources.forEach( function ( src ) {
         console.log("copy local content from " + src);
         loadSaversFrom(src);
@@ -222,6 +222,23 @@ var getCurrentData = function() {
  */
 var getSource = function() {
     return nconf.get('source');
+};
+var setSource = function(x) {
+    if ( x !== getSource()["repo"] ) {
+        return nconf.set('source', {
+            repo: x
+        });
+    }
+    else { 
+        return nconf.get('source');
+    }
+};
+
+var getLocalSources = function() {
+    return nconf.get('localSources') || [];
+};
+var setLocalSources = function(x) {
+    return nconf.set('localSources', x);
 };
 
 
@@ -393,6 +410,9 @@ exports.reload = reload;
 exports.getByKey = getByKey;
 exports.getCurrent = getCurrent;
 exports.getSource = getSource;
+exports.setSource = setSource;
+exports.getLocalSources = getLocalSources;
+exports.setLocalSources = setLocalSources;
 exports.getCurrentData = getCurrentData;
 exports.setCurrent = setCurrent;
 exports.setOptions = setOptions;

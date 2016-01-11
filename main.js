@@ -50,7 +50,7 @@ var idler = require('@paulcbetts/system-idle-time');
 app.on('ready', function() {  
     var openPrefsWindow = function() {
         var prefsUrl = 'file://' + __dirname + '/ui/prefs.html';
-        var w = new BrowserWindow({width:800, height:700});
+        var w = new BrowserWindow({width:800, height:750, resizable:false});
 
         w.loadURL(prefsUrl);
         w.webContents.openDevTools();

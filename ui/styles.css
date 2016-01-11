@@ -16,7 +16,7 @@ iframe {
 
 main {
     padding: 5px;
-    height: calc(90vh - 55px);
+//    height: calc(90vh - 55px);
 }
 footer {
     padding: 5px;
@@ -28,7 +28,7 @@ footer .right {
 
 .entry {
     padding-left: 5px;
-    margin-bottom: 5px;
+    margin-bottom: 10px;
 }
 .entry input[type=radio] {
     margin-top: 10px;
@@ -70,4 +70,8 @@ header h3 {
 
 .hide {
     display: none;
+}
+
+.advanced input {
+    width: 100%;
 }
