@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>About!</title>
+
+    <link href="../bower_components/pure/pure-nr.css" rel="stylesheet" type="text/css" />
+    <link href="styles.css" rel="stylesheet" type="text/css" />
+  </head>
+
+  <body>
+    <header class="pure-g">
+      <div class="left pure-u-1-1">
+        <h1>Before Dark</h1> /// <h2>screensaver fun</h2>
+        <h3>v0.1</h3>
+      </div>
+    </header>
+    <main>
+      <section class="guts pure-g">
+        <div class="left pure-u-1-1">
+          <p>An open-source screensaver
+            project. <a href="https://github.com/muffinista/before-dawn">learn more</a></p>
+          
+          <p><a href="https://thenounproject.com/search/?q=sunrise&i=17751">App icon</a> sunset by Nicole Portantiere from the Noun Project</p>
+        </div>
+      </section>
+    </main>
+  </body>
+
+  <script>
+    const shell = window.require('electron').shell;
+    $ = jQuery = require('../bower_components/jquery/dist/jquery.min.js');
+
+    $(document).ready(function() {
+      $(document).on('click', 'a[href^="http"]', function(event) {
+        event.preventDefault();
+        shell.openExternal(this.href);
+      });
+    });
+  </script>
+</html>
