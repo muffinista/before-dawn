@@ -48,18 +48,6 @@ var idler = require('@paulcbetts/system-idle-time');
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 app.on('ready', function() {  
-
-    var openAddPackageWindow = function() {
-        var w = new BrowserWindow({width:500, height:200});
-        w.loadURL('file://' + __dirname + '/ui/add-new.html');
-        w.on('closed', function() {
-            w = null;
-            if ( mainWindow ) {
-                mainWindow.reload();
-            }
-        });
-    };
-    
     var openPrefsWindow = function() {
         var prefsUrl = 'file://' + __dirname + '/ui/prefs.html';
         var w = new BrowserWindow({width:800, height:700});
@@ -71,7 +59,6 @@ app.on('ready', function() {
             global.savers.reload();
         });
     };
-
 
     // uncomment this to test the prefs window
     // but also, should probably have a command line option to open it
@@ -152,17 +139,9 @@ app.on('ready', function() {
             click: function() { runScreenSaver(); }
         },
         {
-            label: 'Add Package',
-             click: function() { openAddPackageWindow(); }
-        },
-        {
             label: 'Preferences',
             click: function() { openPrefsWindow(); }
         },
-        // {
-        //     label: 'Toggle DevTools',
-        //     click: function() { mainWindow.toggleDevTools(); }
-        // },
         {
             label: 'Quit',
             selector: 'terminate:'

@@ -100,20 +100,6 @@ $(document).ready(function() {
         }
     });
 
-    var Details = React.createClass({
-        render: function() {
-            var s = this.props.saver;
-            return (
-                <div>
-      <h1>{s.name}</h1>
-      <h2>{s.author}</h2>
-      <p>{s.description}</p>     
-      <a href={s.aboutUrl}>{s.aboutUrl}</a>
-                    </div>
-            );
-        }
-    });
-
     var SliderWithValue = React.createClass({
       onSliderChange: function(val) {
             this.value = val;
@@ -198,13 +184,6 @@ $(document).ready(function() {
         );
     };
 
-    var loadDetails = function(s) {
-        /*ReactDOM.render(
-                <Details saver={s} />,
-            document.getElementById('details')           
-        );*/   
-    };
-
     var optionsUpdated = function(data) {
         saverOpts = data;
 
@@ -228,7 +207,6 @@ $(document).ready(function() {
     var redraw = function(s) {
         loadPreview(s);
         loadOptionsForm(s);
-        loadDetails(s);
     };
 
     var renderList = function() {

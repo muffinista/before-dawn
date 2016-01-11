@@ -37008,7 +37008,7 @@ $(document).ready(function() {
 
                 return (
                    React.createElement("div", {className: "entry", key: i}, 
-React.createElement("label", {className: "pure-g"}, 
+                        React.createElement("label", {className: "pure-g"}, 
                         React.createElement("div", {className: "pure-u-1-8"}, 
                     React.createElement("input", {type: "radio", name: "screensaver", value: s.key, onChange: this.onChanged, defaultChecked: is_checked})
                         ), 
@@ -37017,7 +37017,7 @@ React.createElement("label", {className: "pure-g"},
                     React.createElement("p", {className: "description"}, s.description), 
                     React.createElement("span", {className: authorClass}, s.author, " //"), " ", React.createElement("a", {className: aboutUrlClass, href: s.aboutUrl}, "learn more")
                     )
-)
+                        )
                     )
                 );
             });
@@ -37037,20 +37037,6 @@ React.createElement("label", {className: "pure-g"},
             return (
                 React.createElement("div", null, 
                     React.createElement("iframe", {scrolling: "no", src: previewUrl})
-                    )
-            );
-        }
-    });
-
-    var Details = React.createClass({displayName: "Details",
-        render: function() {
-            var s = this.props.saver;
-            return (
-                React.createElement("div", null, 
-      React.createElement("h1", null, s.name), 
-      React.createElement("h2", null, s.author), 
-      React.createElement("p", null, s.description), 
-      React.createElement("a", {href: s.aboutUrl}, s.aboutUrl)
                     )
             );
         }
@@ -37140,13 +37126,6 @@ React.createElement("label", {className: "pure-g"},
         );
     };
 
-    var loadDetails = function(s) {
-        /*ReactDOM.render(
-                <Details saver={s} />,
-            document.getElementById('details')           
-        );*/   
-    };
-
     var optionsUpdated = function(data) {
         saverOpts = data;
 
@@ -37170,7 +37149,6 @@ React.createElement("label", {className: "pure-g"},
     var redraw = function(s) {
         loadPreview(s);
         loadOptionsForm(s);
-        loadDetails(s);
     };
 
     var renderList = function() {
