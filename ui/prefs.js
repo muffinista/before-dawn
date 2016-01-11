@@ -36948,6 +36948,9 @@ var _ = require('lodash');
 
 $ = jQuery = require('../bower_components/jquery/dist/jquery.min.js');
 
+const shell = window.require('electron').shell;
+
+
 
 $(document).ready(function() {
     var remote = window.require('remote');
@@ -37216,8 +37219,6 @@ $(document).ready(function() {
 
         updater.updateAll(didUpdate, noUpdate);
     });
-
-    const shell = window.require('electron').shell;
 
     $(document).on('click', 'a[href^="http"]', function(event) {
         event.preventDefault();
