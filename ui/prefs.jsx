@@ -54,14 +54,28 @@ $(document).ready(function() {
             var self = this;
             var nodes = this.props.data.map(function(s, i) {
                 var is_checked = (s.key === self.state.value);
+                var authorClass = "author";
+                var aboutUrlClass = "external aboutUrl";
+
+                if ( typeof(s.author) === "undefined" || s.author === "" ) {
+                    authorClass = authorClass + " hide";
+                }
+                if ( typeof(s.aboutUrl) === "undefined" || s.aboutUrl === "" ) {
+                    aboutUrlClass = aboutUrlClass + "hide";
+                }
+
                 return (
-                    <div className={"entry"} key={i}>
-                    <h1>{s.name}</h1>
-                    <div className={"body"}>
+                   <div className={"entry"} key={i}>
+                        <label className={"pure-g"}>
+                        <div className={"pure-u-1-8"}>
                     <input type="radio" name="screensaver" value={s.key} onChange={this.onChanged} defaultChecked={is_checked} />
-                    {s.description}
-                    {s.author} //  <a class="external" href={s.aboutUrl}>{s.aboutUrl}</a>
-                </div>
+                        </div>
+                    <div className={"body pure-u-7-8"}>
+                    <h1>{s.name}</h1>
+                    <p className={"description"}>{s.description}</p>
+                    <span className={authorClass}>{s.author} //</span> <a className={aboutUrlClass} href={s.aboutUrl}>learn more</a>
+                    </div>
+                        </label>
                     </div>
                 );
             });
@@ -73,15 +87,9 @@ $(document).ready(function() {
     var Preview = React.createClass({
         render: function() {
             var s = this.props.saver;
-            console.log("CURRENT", s.settings);
-
             var mergedOpts = _.merge(url_opts, s.settings);
 
-            console.log("OPTS", saverOpts);
             mergedOpts = _.merge(mergedOpts, saverOpts);
-
-            console.log("PREVIEW", mergedOpts);
-
             var previewUrl = s.getPreviewUrl(mergedOpts);
 
             return (
@@ -107,7 +115,7 @@ $(document).ready(function() {
     });
 
     var SliderWithValue = React.createClass({
-        onSliderChange: function(val) {
+      onSliderChange: function(val) {
             this.value = val;
             this.setState({
                 name: this.name,
@@ -136,7 +144,6 @@ $(document).ready(function() {
 
             if ( o.type === "slider" ) {
                 val = parseInt(val, 10);
-                console.log("VAL", val, typeof(val));
                 guts = <SliderWithValue name={o.name} value={val} min={o.min} max={o.max} ref={ref} onChange={this.onChanged} />;
             }
             else {
@@ -168,13 +175,9 @@ $(document).ready(function() {
             
             var nodes = this.props.saver.options.map(function(o, i) {
                 var val = values[o.name];
-                console.log("CHECK " + o.name + " -> " + val);
                 if ( typeof(val) === "undefined" ) {
-                    console.log('use default!');
                     val = o.default;
                 }
-
-                console.log(o.name + " -> " + val);
 
                 return (
                     <div key={i}>
@@ -204,7 +207,6 @@ $(document).ready(function() {
 
     var optionsUpdated = function(data) {
         saverOpts = data;
-        console.log("updated!");
 
         var current = savers.getCurrent();
         var s = savers.getByKey(current);
@@ -232,7 +234,6 @@ $(document).ready(function() {
     var renderList = function() {
         savers.listAll(function(entries) {
             var current = savers.getCurrent();
-            console.log("current selection", current);
             
             ReactDOM.render(
                     <SaverList current={current} data={entries} />,
@@ -249,7 +250,6 @@ $(document).ready(function() {
         var s = savers.getByKey(val);
 
         saverOpts = s.settings;
-        console.log("EXISTING SETTINGS", saverOpts);
         redraw(s);
     });
 
@@ -262,7 +262,6 @@ $(document).ready(function() {
         var do_lock = $("input[name=lock_screen][type=checkbox]").is(":checked");
         var val = $("input[name=screensaver]:checked").val();
 
-        console.log("set screensaver to " + val);
         savers.setCurrent(val, saverOpts);
 
         delay = parseInt(delay, 10);

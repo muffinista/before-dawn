@@ -36996,14 +36996,28 @@ $(document).ready(function() {
             var self = this;
             var nodes = this.props.data.map(function(s, i) {
                 var is_checked = (s.key === self.state.value);
+                var authorClass = "author";
+                var aboutUrlClass = "external aboutUrl";
+
+                if ( typeof(s.author) === "undefined" || s.author === "" ) {
+                    authorClass = authorClass + " hide";
+                }
+                if ( typeof(s.aboutUrl) === "undefined" || s.aboutUrl === "" ) {
+                    aboutUrlClass = aboutUrlClass + "hide";
+                }
+
                 return (
-                    React.createElement("div", {className: "entry", key: i}, 
+                   React.createElement("div", {className: "entry", key: i}, 
+React.createElement("label", {className: "pure-g"}, 
+                        React.createElement("div", {className: "pure-u-1-8"}, 
+                    React.createElement("input", {type: "radio", name: "screensaver", value: s.key, onChange: this.onChanged, defaultChecked: is_checked})
+                        ), 
+                    React.createElement("div", {className: "body pure-u-7-8"}, 
                     React.createElement("h1", null, s.name), 
-                    React.createElement("div", {className: "body"}, 
-                    React.createElement("input", {type: "radio", name: "screensaver", value: s.key, onChange: this.onChanged, defaultChecked: is_checked}), 
-                    s.description, 
-                    s.author, " //  ", React.createElement("a", {class: "external", href: s.aboutUrl}, s.aboutUrl)
-                )
+                    React.createElement("p", {className: "description"}, s.description), 
+                    React.createElement("span", {className: authorClass}, s.author, " //"), " ", React.createElement("a", {className: aboutUrlClass, href: s.aboutUrl}, "learn more")
+                    )
+)
                     )
                 );
             });
@@ -37015,15 +37029,9 @@ $(document).ready(function() {
     var Preview = React.createClass({displayName: "Preview",
         render: function() {
             var s = this.props.saver;
-            console.log("CURRENT", s.settings);
-
             var mergedOpts = _.merge(url_opts, s.settings);
 
-            console.log("OPTS", saverOpts);
             mergedOpts = _.merge(mergedOpts, saverOpts);
-
-            console.log("PREVIEW", mergedOpts);
-
             var previewUrl = s.getPreviewUrl(mergedOpts);
 
             return (
@@ -37049,7 +37057,7 @@ $(document).ready(function() {
     });
 
     var SliderWithValue = React.createClass({displayName: "SliderWithValue",
-        onSliderChange: function(val) {
+      onSliderChange: function(val) {
             this.value = val;
             this.setState({
                 name: this.name,
@@ -37078,7 +37086,6 @@ $(document).ready(function() {
 
             if ( o.type === "slider" ) {
                 val = parseInt(val, 10);
-                console.log("VAL", val, typeof(val));
                 guts = React.createElement(SliderWithValue, {name: o.name, value: val, min: o.min, max: o.max, ref: ref, onChange: this.onChanged});
             }
             else {
@@ -37110,13 +37117,9 @@ $(document).ready(function() {
             
             var nodes = this.props.saver.options.map(function(o, i) {
                 var val = values[o.name];
-                console.log("CHECK " + o.name + " -> " + val);
                 if ( typeof(val) === "undefined" ) {
-                    console.log('use default!');
                     val = o.default;
                 }
-
-                console.log(o.name + " -> " + val);
 
                 return (
                     React.createElement("div", {key: i}, 
@@ -37146,7 +37149,6 @@ $(document).ready(function() {
 
     var optionsUpdated = function(data) {
         saverOpts = data;
-        console.log("updated!");
 
         var current = savers.getCurrent();
         var s = savers.getByKey(current);
@@ -37174,7 +37176,6 @@ $(document).ready(function() {
     var renderList = function() {
         savers.listAll(function(entries) {
             var current = savers.getCurrent();
-            console.log("current selection", current);
             
             ReactDOM.render(
                     React.createElement(SaverList, {current: current, data: entries}),
@@ -37191,7 +37192,6 @@ $(document).ready(function() {
         var s = savers.getByKey(val);
 
         saverOpts = s.settings;
-        console.log("EXISTING SETTINGS", saverOpts);
         redraw(s);
     });
 
@@ -37204,7 +37204,6 @@ $(document).ready(function() {
         var do_lock = $("input[name=lock_screen][type=checkbox]").is(":checked");
         var val = $("input[name=screensaver]:checked").val();
 
-        console.log("set screensaver to " + val);
         savers.setCurrent(val, saverOpts);
 
         delay = parseInt(delay, 10);

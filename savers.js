@@ -142,7 +142,7 @@ var ensureDefaults = function() {
 function loadSaversFrom(src) {
     console.log(src + " -> " + defaultSaversDir());
     wrench.copyDirSyncRecursive(src, defaultSaversDir(), {
-        forceDelete: true
+        forceDelete: false // don't delete because this would trash existing data
     });
 }
 

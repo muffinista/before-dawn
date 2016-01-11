@@ -67,7 +67,8 @@ module.exports = function Saver(_attrs) {
             opts = {};
         }
 
-        opts = _.merge(opts, this.settings);
+        console.log("urlFor", this.settings, opts);
+        opts = _.merge(this.settings, opts);
 
         if ( url.lastIndexOf("?") !== -1 ) {
             joiner ="&";
