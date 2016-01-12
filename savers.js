@@ -266,8 +266,6 @@ var listAll = function(cb) {
     var root = baseDir + '/savers/';
     var folders = [root].concat( getLocalSources() );
 
-    console.log("MY FOLDERS", folders);
-
     loadedData = [];
 
     folders.forEach( function ( src ) {
