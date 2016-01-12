@@ -55,6 +55,7 @@ module.exports = function Package(_attrs) {
             }
             else {
                 console.log("we're good!");
+                cb(self.attrs());
             }
         });
     };

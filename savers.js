@@ -4,7 +4,6 @@ var fs = require('fs');
 var nconf = require('nconf');
 var path = require('path');
 var _ = require('lodash');
-var wrench = require("wrench");
 
 var Saver = require('./saver.js');
 
@@ -93,13 +92,6 @@ var reload = function(cb) {
             });
         }
     });
-
-    var localSources = getLocalSources();
-    localSources.forEach( function ( src ) {
-        console.log("copy local content from " + src);
-        loadSaversFrom(src);
-    });
-
 };
 
 var defaultSaversDir = function() {
@@ -119,74 +111,18 @@ var ensureDefaults = function() {
         });
     }
 
-    //
-    // copy our default set of screensavers into the app directory
-    //
-    // @todo maybe only do this once or even not at all
-    var src = undefined;
-    if ( fs.existsSync(__dirname + "/savers") ) {
-        src = __dirname + "/savers";
-    }
-    else if ( fs.existsSync(__dirname + "/../savers") ) {
-        src = __dirname + "/../savers";
-    }
-
-    console.log("local screensavers are at: " + src);
-
-    if ( src !== undefined && src !== defaultSaversDir() ) {
-        loadSaversFrom(src);
-    }
+    // //
+    // // copy our default set of screensavers into the app directory
+    // //
+    // // @todo maybe only do this once or even not at all
+    // var src = undefined;
+    // if ( fs.existsSync(__dirname + "/savers") ) {
+    //     src = __dirname + "/savers";
+    // }
+    // else if ( fs.existsSync(__dirname + "/../savers") ) {
+    //     src = __dirname + "/../savers";
+    // }
 };
-
-
-function loadSaversFrom(src) {
-    console.log(src + " -> " + defaultSaversDir());
-    wrench.copyDirSyncRecursive(src, defaultSaversDir(), {
-        forceDelete: false // don't delete because this would trash existing data
-    });
-}
-
-
-//
-// http://stackoverflow.com/questions/13786160/copy-folder-recursively-in-node-js
-//
-function copyFileSync( source, target ) {
-
-    var targetFile = target;
-
-    //if target is a directory a new file with the same name will be created
-    if ( fs.existsSync( target ) ) {
-        if ( fs.lstatSync( target ).isDirectory() ) {
-            targetFile = path.join( target, path.basename( source ) );
-        }
-    }
-
-    fs.createReadStream( source ).pipe( fs.createWriteStream( targetFile ) );
-}
-
-function copyFolderRecursiveSync( source, target ) {
-    var files = [];
-
-    //check if folder needs to be created or integrated
-    var targetFolder = path.join( target, path.basename( source ) );
-    if ( !fs.existsSync( targetFolder ) ) {
-        fs.mkdirSync( targetFolder );
-    }
-
-    //copy
-    if ( fs.lstatSync( source ).isDirectory() ) {
-        files = fs.readdirSync( source );
-        files.forEach( function ( file ) {
-            var curSource = path.join( source, file );
-            if ( fs.lstatSync( curSource ).isDirectory() ) {
-                copyFolderRecursiveSync( curSource, targetFolder );
-            } else {
-                copyFileSync( curSource, targetFolder );
-            }
-        } );
-    }
-}
-
 
 
 /**
@@ -324,55 +260,79 @@ var walk = function(currentDirPath, callback) {
  * search for all screensavers we can find on the filesystem. if cb is specified,
  * call it with data when done. if reload == true, don't use cached data.
  */
-var listAll = function(cb, reload) {
+var listAll = function(cb) {
     var dir = require('node-dir');
+
     var root = baseDir + '/savers/';
+    var folders = [root].concat( getLocalSources() );
 
-    console.log("load from " + root);
+    console.log("MY FOLDERS", folders);
 
-    if ( reload === true ) {
-        loadedData = [];
-    }
+    loadedData = [];
 
-    if ( loadedData.length > 0 ) {
-        if ( typeof(cb) !== "undefined" ) {
-            cb(loadedData);
-        }
-        return loadedData;
-    }
-
-    console.log("let's walk " + root);
-    walk(root, function(f, stat) {
-        if ( f.match(/saver.json$/) ) {
-            var content = fs.readFileSync( f );
-            var contents = JSON.parse(content);
-
-            var stub = path.dirname(path.relative(root, f));
-            //console.log("STUB: " + stub);
-            contents.key = stub + "/" + contents.source;
-
-            console.log("KEY: " + contents.key);
-
-            // allow for a specified URL -- this way you could create a screensaver
-            // that pointed to a remote URL
-            if ( typeof(contents.url) === "undefined" ) {
-                contents.url = 'file://' + baseDir + '/savers/' + contents.key;
+    folders.forEach( function ( src ) {
+        console.log("let's walk " + src);
+        walk(src, function(f, stat) {
+            if ( f.match(/saver.json$/) ) {
+                var content = fs.readFileSync( f );
+                var contents = JSON.parse(content);
+                
+                var stub = path.dirname(f);
+                console.log("STUB: " + stub);
+                contents.key = stub + "/" + contents.source;
+            
+                console.log("KEY: " + contents.key);
+            
+                // allow for a specified URL -- this way you could create a screensaver
+                // that pointed to a remote URL
+                if ( typeof(contents.url) === "undefined" ) {
+                    contents.url = 'file://' + contents.key;
+                }
+                
+                contents.settings = getOptions(contents.key);
+                console.log("OPTIONS", contents.settings);
+            
+                var s = new Saver(contents);
+            
+                loadedData.push(s);
             }
-
-            contents.settings = getOptions(contents.key);
-            console.log("OPTIONS", contents.settings);
-
-            var s = new Saver(contents);
-
-            loadedData.push(s);
-        }
+        });
     });
 
     if ( typeof(cb) !== "undefined" ) {
         cb(loadedData);
     }
-    return loadedData;
 
+    return loadedData;
+};
+
+var findScreensavers = function(root) {
+    console.log("let's walk " + root);
+    walk(root, function(f, stat) {
+        if ( f.match(/saver.json$/) ) {
+            var content = fs.readFileSync( f );
+            var contents = JSON.parse(content);
+            
+            var stub = path.dirname(f);
+            console.log("STUB: " + stub);
+            contents.key = stub + "/" + contents.source;
+            
+            console.log("KEY: " + contents.key);
+            
+            // allow for a specified URL -- this way you could create a screensaver
+            // that pointed to a remote URL
+            if ( typeof(contents.url) === "undefined" ) {
+                contents.url = 'file://' + contents.key;
+            }
+            
+            contents.settings = getOptions(contents.key);
+            console.log("OPTIONS", contents.settings);
+            
+            var s = new Saver(contents);
+            
+            loadedData.push(s);
+        }
+    });
 };
 
 /**
