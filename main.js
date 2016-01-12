@@ -126,7 +126,7 @@ app.on('ready', function() {
         // and load the index.html of the app.
         // @todo - load before opening?
         saverWindow.loadURL(url);
-        //        saverWindow.toggleDevTools();
+        saverWindow.toggleDevTools();
     };
 
     var shouldLockScreen = function() {
