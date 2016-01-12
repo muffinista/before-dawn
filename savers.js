@@ -11,8 +11,6 @@ var config_file = "config.json";
 
 var baseDir;
 var loadedData = [];
-var url_opts = {};
-
 
 var init = function(_path, cb) {
     baseDir = path.resolve(_path);
@@ -63,34 +61,33 @@ var reload = function(cb) {
 
     console.log("update package");
 
+    if ( typeof(cb) === "undefined" ) {
+        cb = console.log;
+    }
+
     updatePackage(function(data) {
         console.log("UPDATED!", data);
 
         if ( data.downloaded == true ) {
-//            setConfig('source:hash', data.etag);
             setConfig('source:updated_at', data.updated_at);
         }
-        
-        var current = nconf.get('saver');
-        console.log("CURRENT: " + current);
-        if ( current === undefined || getCurrentData() === undefined ) {
-            console.log("creating config defaults");
-            listAll(function(data) {
-                console.log("listall");
-                console.log(data);
-                if ( data.length > 0 ) {
-                    console.log("setting default saver to first in list " + data[0].key);
-                    setConfig('saver', data[0].key);
-                }
 
+        console.log("creating config defaults");
+        listAll(function(data) {
+            var current = nconf.get('saver');
+            console.log("CURRENT: " + current);
+            if (
+                ( current === undefined || getCurrentData() === undefined ) && 
+                    data.length > 0
+            ) {
+                console.log("setting default saver to first in list " + data[0].key);
+                setConfig('saver', data[0].key);
                 write(cb);
-            }, true);
-        }
-        else {
-            write(function() {
-                listAll(cb);
-            });
-        }
+            }
+            else {
+                cb(data);
+            }
+        });
     });
 };
 
@@ -302,35 +299,6 @@ var listAll = function(cb) {
     }
 
     return loadedData;
-};
-
-var findScreensavers = function(root) {
-    console.log("let's walk " + root);
-    walk(root, function(f, stat) {
-        if ( f.match(/saver.json$/) ) {
-            var content = fs.readFileSync( f );
-            var contents = JSON.parse(content);
-            
-            var stub = path.dirname(f);
-            console.log("STUB: " + stub);
-            contents.key = stub + "/" + contents.source;
-            
-            console.log("KEY: " + contents.key);
-            
-            // allow for a specified URL -- this way you could create a screensaver
-            // that pointed to a remote URL
-            if ( typeof(contents.url) === "undefined" ) {
-                contents.url = 'file://' + contents.key;
-            }
-            
-            contents.settings = getOptions(contents.key);
-            console.log("OPTIONS", contents.settings);
-            
-            var s = new Saver(contents);
-            
-            loadedData.push(s);
-        }
-    });
 };
 
 /**

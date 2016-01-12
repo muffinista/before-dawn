@@ -191,8 +191,7 @@ $(document).ready(function() {
 
     var optionsUpdated = function(data) {
         saverOpts = data;
-
-        var current = savers.getCurrent();
+        var current = $("input[name=screensaver]:checked").val();
         var s = savers.getByKey(current);
         redraw(s);        
     };
@@ -232,7 +231,7 @@ $(document).ready(function() {
         var val = $("input[name=screensaver]:checked").val();
         var s = savers.getByKey(val);
 
-        saverOpts = s.settings;
+        saverOpts = {};
         redraw(s);
     });
 
@@ -248,12 +247,12 @@ $(document).ready(function() {
         var repo = $("input[name=repo]").val();
         var localSources = JSON.parse($("input[name=localSources]").val()) || [];
 
+        console.log("saverOpts", saverOpts);
         savers.setCurrent(val, saverOpts);
 
         delay = parseInt(delay, 10);
         savers.setDelay(delay);
         savers.setLock(do_lock);
-
 
         savers.setSource(repo);
         savers.setLocalSources(localSources);

@@ -57,7 +57,7 @@ app.on('ready', function() {
 
         w.loadURL(prefsUrl);
         app.dock.show();
-        //w.webContents.openDevTools();
+        w.webContents.openDevTools();
         w.on('closed', function() {
             w = null;
             global.savers.reload();
@@ -76,7 +76,6 @@ app.on('ready', function() {
 
         w.loadURL(prefsUrl);
         app.dock.show();
-        w.webContents.openDevTools();
         w.on('closed', function() {
             w = null;
             app.dock.hide();
