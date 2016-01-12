@@ -9,9 +9,7 @@ const Tray = electron.Tray;
 // Report crashes to our server.
 electron.crashReporter.start();
 
-
 // don't show app in dock
-// @todo -- show prefs window/etc
 app.dock.hide();
 
 
@@ -135,6 +133,9 @@ app.on('ready', function() {
         return ( process.platform === 'darwin' && savers.getLock() == true );
     };
 
+    /**
+     * lock the screen when the saver deactivates. currently this only works on OSX (and maybe not even there)
+     */
     var doLockScreen = function() {
         if ( process.platform === 'darwin' ) {
             var exec = require('child_process').exec;
