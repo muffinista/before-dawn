@@ -57,7 +57,7 @@ app.on('ready', function() {
 
         w.loadURL(prefsUrl);
         app.dock.show();
-        w.webContents.openDevTools();
+        //w.webContents.openDevTools();
         w.on('closed', function() {
             w = null;
             global.savers.reload();
@@ -125,7 +125,7 @@ app.on('ready', function() {
         // and load the index.html of the app.
         // @todo - load before opening?
         saverWindow.loadURL(url);
-        saverWindow.toggleDevTools();
+        //saverWindow.toggleDevTools();
     };
 
     var shouldLockScreen = function() {

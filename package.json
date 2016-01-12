@@ -5,7 +5,8 @@
   "main": "init.js",
   "scripts": {
     "start": "electron init.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "electron-packager . 'Before Dawn' --platform=darwin --arch=x64 --version=0.35.4 --out=dist/ --overwrite"
   },
   "author": "",
   "license": "ISC",
@@ -24,7 +25,6 @@
     "reactify": "^1.1.1",
     "request": "^2.60.0",
     "temp": "^0.8.3",
-    "wrench": ">= 1.5.8",
     "yauzl": "^2.4.1"
   },
   "devDependencies": {

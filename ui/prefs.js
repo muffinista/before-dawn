@@ -37200,7 +37200,7 @@ $(document).ready(function() {
         savers.setLocalSources(localSources);
 
         savers.write(function() {
-//            closeWindow();
+            closeWindow();
         });
     });
 

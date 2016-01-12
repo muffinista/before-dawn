@@ -5,6 +5,8 @@ window.urlParams = window.location.search.split(/[?&]/).slice(1).map(function(pa
     return obj;
 }, {});
 
+
+// https://davidwalsh.name/add-rules-stylesheets
 var sheet = (function() {
 	// Create the <style> tag
 	var style = document.createElement("style");
