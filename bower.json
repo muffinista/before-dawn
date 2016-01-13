@@ -1,5 +1,5 @@
 {
-  "name": "screeny",
+  "name": "before dawn",
   "version": "0.0.0",
   "homepage": "https://github.com/muffinista/before-dawn",
   "authors": [
@@ -17,7 +17,6 @@
     "tests"
   ],
   "dependencies": {
-    "handlebars": "~3.0.3",
     "jquery": "~2.1.4",
     "pure": "~0.6.0"
   }
