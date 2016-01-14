@@ -4,7 +4,7 @@ window.urlParams = window.location.search.split(/[?&]/).slice(1).map(function(pa
     obj[pairArray[0]] = pairArray[1];
     return obj;
 }, {});
-
+//console.log("set global url params to", window.urlParams);
 
 // https://davidwalsh.name/add-rules-stylesheets
 var sheet = (function() {

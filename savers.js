@@ -22,11 +22,13 @@ var updatePackage = function(cb) {
     var Package = require("./package.js");
 
     var source = getSource();
-    console.log("source", source);
-
-    
-    var p = new Package({repo:source.repo, updated_at:source.updated_at, dest:defaultSaversDir()});
-    p.checkLatestRelease(cb);
+    if ( typeof(source.repo) == "undefined" || source.repo === "" ) {
+        cb({downloaded: false});
+    }
+    else {
+        var p = new Package({repo:source.repo, updated_at:source.updated_at, dest:defaultSaversDir()});
+        p.checkLatestRelease(cb);
+    }
 };
 
 var reload = function(cb) {
