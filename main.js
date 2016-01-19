@@ -59,7 +59,7 @@ app.on('ready', function() {
             w.loadURL(prefsUrl);
             app.dock.show();
 
-            w.webContents.openDevTools();
+            //            w.webContents.openDevTools();
             w.on('closed', function() {
                 w = null;
                 global.savers.reload();
@@ -90,45 +90,51 @@ app.on('ready', function() {
     //openPrefsWindow();
 
     // Create the browser window.
-    var saverWindow = null;
+    var saverWindows = [];
 
     var runScreenSaver = function() {
-        // lets pull together some handy values that screensavers might want to know about
-        // @todo different params for preview mode
-        var atomScreen = require('screen');
-        var size = atomScreen.getPrimaryDisplay().bounds;
-        var url_opts = { 
-            width: size.width,
-            height: size.height,
-            platform: process.platform
-        };
+        var electronScreen = electron.screen;
+        var displays = electronScreen.getAllDisplays();
 
         var saver = global.savers.getCurrentData();
         console.log("SAVER OPTS", saver);
-        var url = saver.getUrl(url_opts);
-        console.log("loading " + url);
 
         isActive = true;
 
-        var windowOpts = {
-            fullscreen: true,
-            webgl: true,
-            preload: __dirname + '/global.js',
-            'auto-hide-menu-bar': true
-        };
+        for ( var i in displays ) {
+            var s = displays[i];
+            var size = s.bounds;
+            var url_opts = { 
+                width: size.width,
+                height: size.height,
+                platform: process.platform
+            };
 
-        saverWindow = new BrowserWindow(windowOpts);
-        // Emitted when the window is closed.
-        saverWindow.on('closed', function() {
-            saverWindow = null;           
-            isActive = false;
-        });
+            var url = saver.getUrl(url_opts);
+            console.log("loading " + url);
 
+            var windowOpts = {
+                fullscreen: true,
+                webgl: true,
+                preload: __dirname + '/global.js',
+                'auto-hide-menu-bar': true,
+                x: s.bounds.x,
+                y: s.bounds.y
+            };
 
-        // and load the index.html of the app.
-        // @todo - load before opening?
-        saverWindow.loadURL(url);
-        //saverWindow.toggleDevTools();
+            var w = new BrowserWindow(windowOpts);
+            // Emitted when the window is closed.
+            w.on('closed', function() {
+                w = null;           
+                isActive = false;
+            });
+
+            saverWindows.push(w);
+
+            // and load the index.html of the app.
+            w.loadURL(url);
+            //w.toggleDevTools();
+        }       
     };
 
     var shouldLockScreen = function() {
@@ -158,13 +164,20 @@ app.on('ready', function() {
     };
 
     var stopScreenSaver = function() {
-        console.log("close it up");
-        if ( saverWindow ) {
-            if ( shouldLockScreen() ) {
-                doLockScreen();
-            }
-            saverWindow.close();
+        if ( saverWindows.length <= 0 ) {
+            return;
         }
+
+        console.log("close it up");
+        if ( shouldLockScreen() ) {
+            doLockScreen();
+        }
+
+        for ( var s in saverWindows ) {
+            saverWindows[s].close();
+        }
+
+        saverWindows = [];
     };
 
     var trayMenu = Menu.buildFromTemplate([
@@ -208,5 +221,5 @@ app.on('ready', function() {
 
         lastIdle = idle;
     };
-    checkTimer = setInterval(checkIdle, 250);
+    checkTimer = setInterval(checkIdle, 2500);
 });
