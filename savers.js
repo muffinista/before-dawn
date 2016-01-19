@@ -18,19 +18,6 @@ var init = function(_path, cb) {
     reload(cb);
 };
 
-var updatePackage = function(cb) {
-    var Package = require("./package.js");
-
-    var source = getSource();
-    if ( typeof(source.repo) == "undefined" || source.repo === "" ) {
-        cb({downloaded: false});
-    }
-    else {
-        var p = new Package({repo:source.repo, updated_at:source.updated_at, dest:defaultSaversDir()});
-        p.checkLatestRelease(cb);
-    }
-};
-
 var reload = function(cb) {
     var configPath = baseDir + "/" + config_file;
 
@@ -96,6 +83,21 @@ var reload = function(cb) {
 var defaultSaversDir = function() {
     return baseDir + "/savers";
 };
+
+
+var updatePackage = function(cb) {
+    var Package = require("./package.js");
+
+    var source = getSource();
+    if ( typeof(source.repo) == "undefined" || source.repo === "" ) {
+        cb({downloaded: false});
+    }
+    else {
+        var p = new Package({repo:source.repo, updated_at:source.updated_at, dest:defaultSaversDir()});
+        p.checkLatestRelease(cb);
+    }
+};
+
 
 /**
  * setup some reasonable defaults

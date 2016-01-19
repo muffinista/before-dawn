@@ -36,12 +36,17 @@
         <div class="pure-u-1-2">
           <h1>Advanced Options</h1>
           <fieldset>
-            <legend>Repo:</legend>
-            <input type="text" name="repo" />
+            <legend>Github Repo URL:</legend>
+            github.com/<input type="text" name="repo" placeholder="muffinista/before-dawn" />
+            <span class="hint">We will download releases from this repo if specified.</span>
           </fieldset>
           <fieldset>
             <legend>Local Sources:</legend>
-            <input type="text" name="localSources" />
+            <textarea name="localSources"></textarea>
+            <span class="hint">
+              We will load screen savers from any directories listed
+              here. This needs to be a JSON array.
+            </span>
           </fieldset>
         </div>
       </section>

@@ -34,7 +34,7 @@ $(document).ready(function() {
     }
 
     $("input[name=repo]").val( savers.getSource()["repo"] );
-    $("input[name=localSources]").val(JSON.stringify(savers.getLocalSources()));
+    $("[name=localSources]").val(JSON.stringify(savers.getLocalSources()));
 
     $("select[name=delay] option[value=" + savers.getDelay() + "]").attr("selected", "selected");
     if ( savers.getLock() === true ) {
@@ -245,7 +245,7 @@ $(document).ready(function() {
         var val = $("input[name=screensaver]:checked").val();
 
         var repo = $("input[name=repo]").val();
-        var localSources = JSON.parse($("input[name=localSources]").val()) || [];
+        var localSources = JSON.parse($("[name=localSources]").val()) || [];
 
         console.log("saverOpts", saverOpts);
         savers.setCurrent(val, saverOpts);

@@ -10,8 +10,8 @@ iframe {
     display: block;
     overflow: hidden;
     border: none;
-    height: calc(50vh);
     width: 100%;
+    min-height: 250px;
 }
 
 main {
@@ -72,6 +72,16 @@ header h3 {
     display: none;
 }
 
-.advanced input {
+.advanced textarea {
     width: 100%;
+}
+
+.advanced input[name=repo] {
+    width: 75%;
+}
+
+.hint {
+    color: #bbbbbb;
+    font-size: 90%;
+    display: block;
 }

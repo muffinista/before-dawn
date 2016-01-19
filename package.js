@@ -44,8 +44,6 @@ module.exports = function Package(_attrs) {
         }, function(error, response, body) {
             console.log( body.published_at + " --- " + self.updated_at );
             if ( body.published_at !== self.updated_at ) {
-                console.log(body.published_at);
-                console.log(body);
                 console.log("let's download!");
                 console.log(body.zipball_url);
                 self.downloadFile(body.zipball_url, function() {

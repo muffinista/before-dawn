@@ -47,21 +47,24 @@ var idler = require('@paulcbetts/system-idle-time');
 // initialization and is ready to create browser windows.
 app.on('ready', function() {  
     var openPrefsWindow = function() {
-        var prefsUrl = 'file://' + __dirname + '/ui/prefs.html';
-        var w = new BrowserWindow({
-            width:800,
-            height:750,
-            resizable:false,
-            icon: __dirname + '/assets/icon.png'
-        });
+        global.savers.reload(function() {
+            var prefsUrl = 'file://' + __dirname + '/ui/prefs.html';
+            var w = new BrowserWindow({
+                width:800,
+                height:750,
+                resizable:false,
+                icon: __dirname + '/assets/icon.png'
+            });
 
-        w.loadURL(prefsUrl);
-        app.dock.show();
-        //w.webContents.openDevTools();
-        w.on('closed', function() {
-            w = null;
-            global.savers.reload();
-            app.dock.hide();
+            w.loadURL(prefsUrl);
+            app.dock.show();
+
+            w.webContents.openDevTools();
+            w.on('closed', function() {
+                w = null;
+                global.savers.reload();
+                app.dock.hide();
+            });
         });
     };
 
@@ -148,6 +151,10 @@ app.on('ready', function() {
                 }
             });
         }
+
+        // for windows:
+        // rundll32.exe user32.dll,LockWorkStation
+        // @see http://superuser.com/questions/21179/command-line-cmd-command-to-lock-a-windows-machine
     };
 
     var stopScreenSaver = function() {
