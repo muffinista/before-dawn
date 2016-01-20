@@ -221,5 +221,5 @@ app.on('ready', function() {
 
         lastIdle = idle;
     };
-    checkTimer = setInterval(checkIdle, 2500);
+    checkTimer = setInterval(checkIdle, 250);
 });

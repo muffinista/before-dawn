@@ -6,7 +6,7 @@
   "scripts": {
     "start": "electron init.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "electron-packager . 'Before Dawn' --platform=darwin --arch=x64 --version=0.35.4 --out=dist/ --overwrite"
+    "build": "electron-packager . 'Before Dawn' --platform=darwin --arch=x64 --version=0.35.4 --icon='assets/icon.icns' --out=dist/ --overwrite"
   },
   "author": "",
   "license": "ISC",
