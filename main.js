@@ -41,7 +41,7 @@ let appIcon = null;
 let checkTimer = null;
 let isActive = false;
 var idler = require('@paulcbetts/system-idle-time');
-
+var saverWindows = [];
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -85,21 +85,13 @@ app.on('ready', function() {
         });
     };
 
-    // uncomment this to test the prefs window
-    // but also, should probably have a command line option to open it
-    //openPrefsWindow();
-
-    // Create the browser window.
-    var saverWindows = [];
 
     var runScreenSaver = function() {
         var electronScreen = electron.screen;
         var displays = electronScreen.getAllDisplays();
-
         var saver = global.savers.getCurrentData();
-        console.log("SAVER OPTS", saver);
 
-        isActive = true;
+        // @todo maybe add an option to only run on a single display?
 
         for ( var i in displays ) {
             var s = displays[i];
@@ -135,6 +127,9 @@ app.on('ready', function() {
             w.loadURL(url);
             //w.toggleDevTools();
         }       
+
+
+        isActive = true;
     };
 
     var shouldLockScreen = function() {
@@ -221,5 +216,13 @@ app.on('ready', function() {
 
         lastIdle = idle;
     };
+
+    // @todo save some clock cycles by making this longer when checking to activate
+    // and shorter when checking to deactivate
     checkTimer = setInterval(checkIdle, 250);
+
+    // uncomment this to test the prefs window
+    // but also, should probably have a command line option to open it
+    //openPrefsWindow();
+
 });
