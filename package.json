@@ -6,12 +6,26 @@
   "scripts": {
     "start": "electron init.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "electron-packager . 'Before Dawn' --platform=darwin --arch=x64 --version=0.35.4 --icon='assets/icon.icns' --out=dist/ --overwrite"
+    "oldbuild": "electron-packager . 'Before Dawn' --platform=darwin --arch=x64 --version=0.35.4 --icon='assets/icon.icns' --out=dist/ --overwrite",
+
+
+    "clean": "rm -rf ./dist",
+    "clean:osx": "rm -rf ./dist/osx",
+    "clean:win": "rm -rf ./dist/win",
+ 
+    "pack": "npm run clean && npm run pack:osx && npm run pack:win",
+    "pack:osx": "npm run clean:osx && electron-packager . 'Before Dawn' --out=dist/osx --platform=darwin --arch=x64 --version=0.36.1 --icon='assets/icon.icns'  --overwrite",
+    "pack:win": "npm run clean:win && electron-packager . 'Before Dawn' --out=dist/win --platform=win32 --arch=ia32 --version=0.36.1 --icon=assets/icon.ico",
+ 
+    "build": "npm run build:osx && npm run build:win",
+    "build:osx": "npm run pack:osx && electron-builder \"dist/osx/Before Dawn-darwin-x64/Before Dawn.app\" --platform=osx --out=\"dist/osx\" --config=build.json",
+    "build:win": "npm run pack:win && electron-builder \"dist/win/Before Dawn-win32\" --platform=win --out=\"dist/win\" --config=build.json"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "browserify": "^11.0.1",
+    "electron-builder": "^2.6.0",
     "electron-compile": "^1.0.2",
     "github-releases": "^0.3.2",
     "lodash": "^3.10.1",
@@ -29,6 +43,7 @@
   },
   "devDependencies": {
     "electron-compilers": "^1.0.1",
+    "electron-packager": "^5.2.1",
     "electron-prebuilt": "^0.35.4",
     "grunt": "^0.4.5",
     "grunt-reactify": "0.0.2"
