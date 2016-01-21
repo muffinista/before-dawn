@@ -12,8 +12,12 @@ var windowOpts;
 let appIcon = null;
 let checkTimer = null;
 let isActive = false;
-var idler = require('node-system-idle-time');
-var saverWindows = [];
+let idler = require('node-system-idle-time');
+let parseArgs = require('minimist');
+let saverWindows = [];
+let argv = parseArgs(process.argv);
+
+let debugMode = false;
 
 // Report crashes to our server.
 electron.crashReporter.start();
@@ -21,6 +25,9 @@ electron.crashReporter.start();
 // don't show app in dock
 app.dock.hide();
 
+if ( argv.debug === true ) {
+    debugMode = true;
+}
 
 // load a few global variables
 require('./bootstrap.js');
@@ -56,7 +63,10 @@ app.on('ready', function() {
             w.loadURL(prefsUrl);
             app.dock.show();
 
-            //w.webContents.openDevTools();
+            if ( debugMode === true ) {
+                w.webContents.openDevTools();
+            }
+
             w.on('closed', function() {
                 w = null;
                 global.savers.reload();
@@ -76,12 +86,15 @@ app.on('ready', function() {
 
         w.loadURL(prefsUrl);
         app.dock.show();
+        
+        if ( debugMode === true ) {
+            w.webContents.openDevTools();
+        }
         w.on('closed', function() {
             w = null;
             app.dock.hide();
         });
     };
-
 
     var runScreenSaver = function() {
         var electronScreen = electron.screen;
@@ -89,6 +102,14 @@ app.on('ready', function() {
         var saver = global.savers.getCurrentData();
 
         // @todo maybe add an option to only run on a single display?
+
+        // limit to a single screen when debugging
+        if ( debugMode == true ) {
+            displays = [
+                electronScreen.getPrimaryDisplay()
+            ];
+        }
+
 
         for ( var i in displays ) {
             var s = displays[i];
@@ -103,7 +124,7 @@ app.on('ready', function() {
             console.log("loading " + url);
 
             var windowOpts = {
-                fullscreen: true,
+                fullscreen: ( debugMode !== true ),
                 webgl: true,
                 preload: __dirname + '/global.js',
                 'auto-hide-menu-bar': true,
@@ -112,6 +133,11 @@ app.on('ready', function() {
             };
 
             var w = new BrowserWindow(windowOpts);
+
+            if ( debugMode === true ) {
+                w.webContents.openDevTools();
+            }
+
             // Emitted when the window is closed.
             w.on('closed', function() {
                 w = null;           
@@ -122,7 +148,6 @@ app.on('ready', function() {
 
             // and load the index.html of the app.
             w.loadURL(url);
-            //w.toggleDevTools();
         }       
 
 
@@ -157,6 +182,10 @@ app.on('ready', function() {
 
     var stopScreenSaver = function() {
         if ( saverWindows.length <= 0 ) {
+            return;
+        }
+
+        if ( debugMode === true ) {
             return;
         }
 
@@ -218,8 +247,13 @@ app.on('ready', function() {
     // and shorter when checking to deactivate
     checkTimer = setInterval(checkIdle, 250);
 
-    // uncomment this to test the prefs window
-    // but also, should probably have a command line option to open it
-    //openPrefsWindow();
-
+    if ( argv.screen === "prefs" ) {
+        openPrefsWindow();
+    }
+    else if ( argv.screen === "about" ) {
+        openAboutWindow();
+    }
+    else if ( argv.screen === "saver" ) {
+        runScreenSaver();
+    }
 });
