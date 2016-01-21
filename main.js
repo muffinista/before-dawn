@@ -95,7 +95,7 @@ var openAboutWindow = function() {
 
 var runScreenSaver = function() {
     var electronScreen = electron.screen;
-    var displays = electronScreen.getAllDisplays();
+    var displays = [];
     var saver = global.savers.getCurrentData();
 
     // @todo maybe add an option to only run on a single display?
@@ -105,6 +105,9 @@ var runScreenSaver = function() {
         displays = [
             electronScreen.getPrimaryDisplay()
         ];
+    }
+    else {
+        displays = electronScreen.getAllDisplays();
     }
 
 
