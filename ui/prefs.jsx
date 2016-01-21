@@ -3,8 +3,8 @@ var ReactDOM = require('react-dom');
 var Slider = require('rc-slider');
 
 var _ = require('lodash');
-
-$ = jQuery = require('../bower_components/jquery/dist/jquery.min.js');
+var jQuery = require('../bower_components/jquery/dist/jquery.min.js');
+var $ = jQuery;
 
 const shell = window.require('electron').shell;
 
@@ -73,7 +73,7 @@ $(document).ready(function() {
                    <div className={"entry"} key={i}>
                         <label className={"pure-g"}>
                         <div className={"pure-u-1-8"}>
-                    <input type="radio" name="screensaver" value={s.key} onChange={this.onChanged} defaultChecked={is_checked} />
+                    <input type="radio" name="screensaver" value={s.key} onChange={self.onChanged} defaultChecked={is_checked} />
                         </div>
                     <div className={"body pure-u-7-8"}>
                     <h1>{s.name}</h1>

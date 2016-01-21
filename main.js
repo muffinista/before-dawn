@@ -6,6 +6,15 @@ const BrowserWindow = electron.BrowserWindow;  // Module to create native browse
 const Menu = electron.Menu;
 const Tray = electron.Tray;
 
+
+var windowOpts;
+
+let appIcon = null;
+let checkTimer = null;
+let isActive = false;
+var idler = require('node-system-idle-time');
+var saverWindows = [];
+
 // Report crashes to our server.
 electron.crashReporter.start();
 
@@ -21,12 +30,6 @@ global.basePath = app.getPath('appData') + "/" + global.APP_NAME;
 global.savers = require('./savers.js');
 global.savers.init(global.basePath);
 
-var windowOpts;
-
-// Keep a global reference of the window object, if you don't, the window will
-// be closed automatically when the JavaScript object is garbage collected.
-let mainWindow;
-
 // Quit when all windows are closed.
 app.on('window-all-closed', function() {
   // On OS X it is common for applications and their menu bar
@@ -36,12 +39,6 @@ app.on('window-all-closed', function() {
   }
 });
 
-
-let appIcon = null;
-let checkTimer = null;
-let isActive = false;
-var idler = require('@paulcbetts/system-idle-time');
-var saverWindows = [];
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -59,7 +56,7 @@ app.on('ready', function() {
             w.loadURL(prefsUrl);
             app.dock.show();
 
-            //            w.webContents.openDevTools();
+            //w.webContents.openDevTools();
             w.on('closed', function() {
                 w = null;
                 global.savers.reload();
