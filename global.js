@@ -6,21 +6,27 @@ window.urlParams = window.location.search.split(/[?&]/).slice(1).map(function(pa
 }, {});
 //console.log("set global url params to", window.urlParams);
 
-// https://davidwalsh.name/add-rules-stylesheets
-var sheet = (function() {
-	// Create the <style> tag
-	var style = document.createElement("style");
 
-	// WebKit hack :(
-	style.appendChild(document.createTextNode(""));
+window.addEventListener("load", function load(event){
+    window.removeEventListener("load", load, false); //remove listener, no longer needed
 
-	// Add the <style> element to the page
-	document.head.appendChild(style);
+    // https://davidwalsh.name/add-rules-stylesheets
+    var sheet = (function() {
+	      // Create the <style> tag
+	      var style = document.createElement("style");
 
-	return style.sheet;
-})();
+	      // WebKit hack :(
+	      style.appendChild(document.createTextNode(""));
+        
+	      // Add the <style> element to the page
+	      document.head.appendChild(style);
+        
+	      return style.sheet;
+    })();
 
+    
+    sheet.insertRule("body {margin:0; padding:0; cursor:none;}", 0); /* remove top and left whitespace */
+    sheet.insertRule("canvas {display:block;}", 0);    /* remove scrollbars */
+    sheet.insertRule("canvas:focus {outline:0;}", 0); /* remove blue outline around canvas */
+}, false);
 
-sheet.insertRule("body {margin:0; padding:0; cursor:none;}"); /* remove top and left whitespace */
-sheet.insertRule("canvas {display:block;}");    /* remove scrollbars */
-sheet.insertRule("canvas:focus {outline:0;}"); /* remove blue outline around canvas */
