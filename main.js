@@ -105,6 +105,7 @@ var runScreenSaver = function() {
         displays = [
             electronScreen.getPrimaryDisplay()
         ];
+        app.dock.show();
     }
     else {
         displays = electronScreen.getAllDisplays();
