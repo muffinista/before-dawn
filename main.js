@@ -47,160 +47,161 @@ app.on('window-all-closed', function() {
 });
 
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-app.on('ready', function() {  
-    var openPrefsWindow = function() {
-        global.savers.reload(function() {
-            var prefsUrl = 'file://' + __dirname + '/ui/prefs.html';
-            var w = new BrowserWindow({
-                width:800,
-                height:750,
-                resizable:false,
-                icon: __dirname + '/assets/icon.png'
-            });
-
-            w.loadURL(prefsUrl);
-            app.dock.show();
-
-            if ( debugMode === true ) {
-                w.webContents.openDevTools();
-            }
-
-            w.on('closed', function() {
-                w = null;
-                global.savers.reload();
-                app.dock.hide();
-            });
-        });
-    };
-
-    var openAboutWindow = function() {
-        var prefsUrl = 'file://' + __dirname + '/ui/about.html';
+var openPrefsWindow = function() {
+    global.savers.reload(function() {
+        var prefsUrl = 'file://' + __dirname + '/ui/prefs.html';
         var w = new BrowserWindow({
-            width:450,
-            height:300,
+            width:800,
+            height:750,
             resizable:false,
             icon: __dirname + '/assets/icon.png'
         });
-
+        
         w.loadURL(prefsUrl);
         app.dock.show();
-        
+
         if ( debugMode === true ) {
             w.webContents.openDevTools();
         }
+
         w.on('closed', function() {
             w = null;
+            global.savers.reload();
             app.dock.hide();
         });
-    };
+    });
+};
 
-    var runScreenSaver = function() {
-        var electronScreen = electron.screen;
-        var displays = electronScreen.getAllDisplays();
-        var saver = global.savers.getCurrentData();
+var openAboutWindow = function() {
+    var prefsUrl = 'file://' + __dirname + '/ui/about.html';
+    var w = new BrowserWindow({
+        width:450,
+        height:300,
+        resizable:false,
+        icon: __dirname + '/assets/icon.png'
+    });
 
-        // @todo maybe add an option to only run on a single display?
+    w.loadURL(prefsUrl);
+    app.dock.show();
+    
+    if ( debugMode === true ) {
+        w.webContents.openDevTools();
+    }
+    w.on('closed', function() {
+        w = null;
+        app.dock.hide();
+    });
+};
 
-        // limit to a single screen when debugging
-        if ( debugMode == true ) {
-            displays = [
-                electronScreen.getPrimaryDisplay()
-            ];
-        }
+var runScreenSaver = function() {
+    var electronScreen = electron.screen;
+    var displays = electronScreen.getAllDisplays();
+    var saver = global.savers.getCurrentData();
 
+    // @todo maybe add an option to only run on a single display?
 
-        for ( var i in displays ) {
-            var s = displays[i];
-            var size = s.bounds;
-            var url_opts = { 
-                width: size.width,
-                height: size.height,
-                platform: process.platform
-            };
-
-            var url = saver.getUrl(url_opts);
-            console.log("loading " + url);
-
-            var windowOpts = {
-                fullscreen: ( debugMode !== true ),
-                webgl: true,
-                preload: __dirname + '/global.js',
-                'auto-hide-menu-bar': true,
-                x: s.bounds.x,
-                y: s.bounds.y
-            };
-
-            var w = new BrowserWindow(windowOpts);
-
-            if ( debugMode === true ) {
-                w.webContents.openDevTools();
-            }
-
-            // Emitted when the window is closed.
-            w.on('closed', function() {
-                w = null;           
-                isActive = false;
-            });
-
-            saverWindows.push(w);
-
-            // and load the index.html of the app.
-            w.loadURL(url);
-        }       
+    // limit to a single screen when debugging
+    if ( debugMode == true ) {
+        displays = [
+            electronScreen.getPrimaryDisplay()
+        ];
+    }
 
 
-        isActive = true;
-    };
+    for ( var i in displays ) {
+        var s = displays[i];
+        var size = s.bounds;
+        var url_opts = { 
+            width: size.width,
+            height: size.height,
+            platform: process.platform
+        };
 
-    var shouldLockScreen = function() {
-        return ( process.platform === 'darwin' && savers.getLock() == true );
-    };
+        var url = saver.getUrl(url_opts);
+        console.log("loading " + url);
 
-    /**
-     * lock the screen when the saver deactivates. currently this only works on OSX (and maybe not even there)
-     */
-    var doLockScreen = function() {
-        if ( process.platform === 'darwin' ) {
-            var exec = require('child_process').exec;
-            var cmd = "'/System/Library/CoreServices/Menu Extras/User.menu/Contents/Resources/CGSession' -suspend";
-            
-            exec(cmd, function(error, stdout, stderr) {
-                console.log('stdout: ' + stdout);
-                console.log('stderr: ' + stderr);
-                if (error !== null) {
-                    console.log('exec error: ' + error);
-                }
-            });
-        }
+        var windowOpts = {
+            fullscreen: ( debugMode !== true ),
+            webgl: true,
+            preload: __dirname + '/global.js',
+            'auto-hide-menu-bar': true,
+            x: s.bounds.x,
+            y: s.bounds.y
+        };
 
-        // for windows:
-        // rundll32.exe user32.dll,LockWorkStation
-        // @see http://superuser.com/questions/21179/command-line-cmd-command-to-lock-a-windows-machine
-    };
-
-    var stopScreenSaver = function() {
-        if ( saverWindows.length <= 0 ) {
-            return;
-        }
+        var w = new BrowserWindow(windowOpts);
 
         if ( debugMode === true ) {
-            return;
+            w.webContents.openDevTools();
         }
 
-        console.log("close it up");
-        if ( shouldLockScreen() ) {
-            doLockScreen();
-        }
+        // Emitted when the window is closed.
+        w.on('closed', function() {
+            w = null;           
+            isActive = false;
+        });
 
-        for ( var s in saverWindows ) {
-            saverWindows[s].close();
-        }
+        saverWindows.push(w);
 
-        saverWindows = [];
-    };
+        // and load the index.html of the app.
+        w.loadURL(url);
+    }       
 
+
+    isActive = true;
+};
+
+var shouldLockScreen = function() {
+    return ( process.platform === 'darwin' && savers.getLock() == true );
+};
+
+/**
+ * lock the screen when the saver deactivates. currently this only works on OSX (and maybe not even there)
+ */
+var doLockScreen = function() {
+    if ( process.platform === 'darwin' ) {
+        var exec = require('child_process').exec;
+        var cmd = "'/System/Library/CoreServices/Menu Extras/User.menu/Contents/Resources/CGSession' -suspend";
+        
+        exec(cmd, function(error, stdout, stderr) {
+            console.log('stdout: ' + stdout);
+            console.log('stderr: ' + stderr);
+            if (error !== null) {
+                console.log('exec error: ' + error);
+            }
+        });
+    }
+
+    // for windows:
+    // rundll32.exe user32.dll,LockWorkStation
+    // @see http://superuser.com/questions/21179/command-line-cmd-command-to-lock-a-windows-machine
+};
+
+var stopScreenSaver = function() {
+    if ( saverWindows.length <= 0 ) {
+        return;
+    }
+
+    if ( debugMode === true ) {
+        return;
+    }
+
+    console.log("close it up");
+    if ( shouldLockScreen() ) {
+        doLockScreen();
+    }
+
+    for ( var s in saverWindows ) {
+        saverWindows[s].close();
+    }
+
+    saverWindows = [];
+};
+
+
+// This method will be called when Electron has finished
+// initialization and is ready to create browser windows.
+app.on('ready', function() {  
     var trayMenu = Menu.buildFromTemplate([
         {
             label: 'Run Now',
@@ -226,8 +227,8 @@ app.on('ready', function() {
 
     var lastIdle = 0;
     var checkIdle = function() {
-        var idle = idler.getIdleTime() / 1000;
-        var waitTime = savers.getDelay() * 60;
+        var idle = idler.getIdleTime();
+        var waitTime = savers.getDelay() * 60000;
 
         if ( waitTime <= 0 ) {
             return;
