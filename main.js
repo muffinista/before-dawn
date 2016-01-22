@@ -40,14 +40,15 @@ global.savers = require('./savers.js');
 global.savers.init(global.basePath);
 
 // Quit when all windows are closed.
-app.on('window-all-closed', function() {
+/**
+ * app.on('window-all-closed', function() {
   // On OS X it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
   if ( process.platform != 'darwin' ) {
     app.quit();
   }
 });
-
+*/
 
 var openPrefsWindow = function() {
     global.savers.reload(function() {
