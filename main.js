@@ -39,16 +39,6 @@ global.basePath = app.getPath('appData') + "/" + global.APP_NAME;
 global.savers = require('./savers.js');
 global.savers.init(global.basePath);
 
-// Quit when all windows are closed.
-/**
- * app.on('window-all-closed', function() {
-  // On OS X it is common for applications and their menu bar
-  // to stay active until the user quits explicitly with Cmd + Q
-  if ( process.platform != 'darwin' ) {
-    app.quit();
-  }
-});
-*/
 
 var openPrefsWindow = function() {
     global.savers.reload(function() {
@@ -169,29 +159,34 @@ var runScreenSaver = function() {
 };
 
 var shouldLockScreen = function() {
-    return ( process.platform === 'darwin' && savers.getLock() == true );
+    return ( savers.getLock() == true );
 };
 
 /**
  * lock the screen when the saver deactivates. currently this only works on OSX (and maybe not even there)
  */
 var doLockScreen = function() {
+    var exec = require('child_process').exec;
+    var cmd;
+    
     if ( process.platform === 'darwin' ) {
-        var exec = require('child_process').exec;
-        var cmd = "'/System/Library/CoreServices/Menu Extras/User.menu/Contents/Resources/CGSession' -suspend";
-        
-        exec(cmd, function(error, stdout, stderr) {
-            console.log('stdout: ' + stdout);
-            console.log('stderr: ' + stderr);
-            if (error !== null) {
-                console.log('exec error: ' + error);
-            }
-        });
+        cmd = "'/System/Library/CoreServices/Menu Extras/User.menu/Contents/Resources/CGSession' -suspend";       
+    }
+    else if ( process.platform === 'win32' ) {
+        // @see http://superuser.com/questions/21179/command-line-cmd-command-to-lock-a-windows-machine
+        cmd = "rundll32.exe user32.dll,LockWorkStation";
+    }
+    else {
+        return;
     }
 
-    // for windows:
-    // rundll32.exe user32.dll,LockWorkStation
-    // @see http://superuser.com/questions/21179/command-line-cmd-command-to-lock-a-windows-machine
+    exec(cmd, function(error, stdout, stderr) {
+        console.log('stdout: ' + stdout);
+        console.log('stderr: ' + stderr);
+        if (error !== null) {
+            console.log('exec error: ' + error);
+        }
+    });
 };
 
 var stopScreenSaver = function() {
