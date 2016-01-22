@@ -23,7 +23,9 @@ let debugMode = false;
 electron.crashReporter.start();
 
 // don't show app in dock
-app.dock.hide();
+if ( typeof(app.dock) !== "undefined" ) {
+    app.dock.hide();
+}
 
 if ( argv.debug === true ) {
     debugMode = true;
@@ -58,7 +60,9 @@ var openPrefsWindow = function() {
         });
         
         w.loadURL(prefsUrl);
-        app.dock.show();
+        if ( typeof(app.dock) !== "undefined" ) {
+            app.dock.show();
+        }
 
         if ( debugMode === true ) {
             w.webContents.openDevTools();
@@ -67,7 +71,9 @@ var openPrefsWindow = function() {
         w.on('closed', function() {
             w = null;
             global.savers.reload();
-            app.dock.hide();
+            if ( typeof(app.dock) !== "undefined" ) {
+                app.dock.hide();
+            }
         });
     });
 };
@@ -82,14 +88,18 @@ var openAboutWindow = function() {
     });
 
     w.loadURL(prefsUrl);
-    app.dock.show();
+    if ( typeof(app.dock) !== "undefined" ) {
+        app.dock.show();
+    }
     
     if ( debugMode === true ) {
         w.webContents.openDevTools();
     }
     w.on('closed', function() {
         w = null;
-        app.dock.hide();
+        if ( typeof(app.dock) !== "undefined" ) {
+            app.dock.hide();
+        }
     });
 };
 
@@ -105,7 +115,9 @@ var runScreenSaver = function() {
         displays = [
             electronScreen.getPrimaryDisplay()
         ];
-        app.dock.show();
+        if ( typeof(app.dock) !== "undefined" ) {
+            app.dock.show();
+        }
     }
     else {
         displays = electronScreen.getAllDisplays();
