@@ -1,6 +1,7 @@
 {
   "osx" : {
     "title": "Before Dawn",
+    "background": "assets/installer.png",
     "icon": "assets/icon.icns",
     "icon-size": 80,
     "contents": [
