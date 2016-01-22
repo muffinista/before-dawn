@@ -13,7 +13,7 @@
     "title" : "Before Dawn",
     "version" : "x.x.x.x",
     "publisher": "Publisher Info",
-    "icon" : "assets/win/icon.ico",
+    "icon" : "assets/icon.ico",
     "verbosity": 1
   }
 }
