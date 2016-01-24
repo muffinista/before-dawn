@@ -39,7 +39,6 @@ global.basePath = app.getPath('appData') + "/" + global.APP_NAME;
 global.savers = require('./savers.js');
 global.savers.init(global.basePath);
 
-
 var openPrefsWindow = function() {
     global.savers.reload(function() {
         var prefsUrl = 'file://' + __dirname + '/ui/prefs.html';
@@ -210,6 +209,11 @@ var stopScreenSaver = function() {
     saverWindows = [];
 };
 
+
+// seems like we need to catch this event to keep OSX from exiting app after screensaver runs?
+app.on('window-all-closed', function() {
+    console.log("window-all-closed");
+});
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
