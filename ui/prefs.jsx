@@ -163,7 +163,7 @@ $(document).ready(function() {
             var s = this.props.saver;
             var onChange = this.props.onChange;
             var values = s.settings;
-            
+
             var nodes = this.props.saver.options.map(function(o, i) {
                 var val = values[o.name];
                 if ( typeof(val) === "undefined" ) {

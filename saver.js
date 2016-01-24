@@ -25,12 +25,12 @@ module.exports = function Saver(_attrs) {
     this.aboutUrl = _attrs.aboutUrl;
     this.author = _attrs.author;
     this.license = _attrs.license;
-    this.options = _attrs.options;
     this.url = _attrs.url;
 
     if ( typeof(_attrs.options) === "undefined" ) {
         _attrs.options = [];
     }
+    this.options = _attrs.options;
 
     // figure out the settings from any defaults for this screensaver,
     // and combine with incoming user-specified settings

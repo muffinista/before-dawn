@@ -5,14 +5,13 @@ DEST="/tmp/before-dawn-packages"
 TARGET="$1"
 
 echo "== Building Packages with Electron v ${ELECTRON_VERSION}"
-
-echo "== Run Grunt =="
-grunt
+npm i
 
 echo "== REBUILD MODULES =="
 ./node_modules/.bin/electron-rebuild -w node-system-idle-time
 
-# "prep": "grunt && ./node_modules/.bin/electron-rebuild",
+echo "== Run Grunt =="
+grunt
 
 echo "== clean =="
 rm -rf "${DEST}/osx"
@@ -49,6 +48,8 @@ if [ "$TARGET" == "osx" ]; then
 fi
 
 if [ "$TARGET" == "win" ]; then
+    export PATH="$PATH:C:\Program Files (x86)\NSIS"
+
     echo "== Build Windows App =="
 
     electron-packager . 'Before Dawn' \

@@ -17,12 +17,12 @@
     "nconf": "^0.8.2",
     "node-dir": ">= 0.1.9",
     "node-system-idle-time": "muffinista/node-system-idle-time.git#master",
-    "rc-slider": "^3.3.1",
-    "react": "^0.14.3",
-    "react-dom": "^0.14.3",
     "request": "^2.60.0",
     "temp": "^0.8.3",
-    "yauzl": "^2.4.1"
+    "yauzl": "^2.4.1",
+    "rc-slider": "^3.3.1",
+    "react": "^0.14.3",
+    "react-dom": "^0.14.3"
   },
   "devDependencies": {
     "babel-preset-es2015": "^6.3.13",
