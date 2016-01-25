@@ -70,17 +70,20 @@ $(document).ready(function() {
                 }
 
                 return (
-                   <div className={"entry"} key={i}>
-                        <label className={"pure-g"}>
+                    <div className={"entry"} key={i}>
+                      <label className={"pure-g"}>
                         <div className={"pure-u-1-8"}>
-                    <input type="radio" name="screensaver" value={s.key} onChange={self.onChanged} defaultChecked={is_checked} />
+                          <input type="radio" name="screensaver" value={s.key} onChange={self.onChanged} defaultChecked={is_checked} />
                         </div>
-                    <div className={"body pure-u-7-8"}>
-                    <h1>{s.name}</h1>
-                    <p className={"description"}>{s.description}</p>
-                    <span className={authorClass}>{s.author} //</span> <a className={aboutUrlClass} href={s.aboutUrl}>learn more</a>
-                    </div>
-                        </label>
+                        <div className={"body pure-u-7-8"}>
+                          <h1>{s.name}</h1>
+                          <p className={"description"}>{s.description}</p>
+                          <span className={authorClass}>
+                            {s.author} //
+                          </span>
+                          <a className={aboutUrlClass} href={s.aboutUrl}>learn more</a>
+                        </div>
+                      </label>
                     </div>
                 );
             });
@@ -99,8 +102,8 @@ $(document).ready(function() {
 
             return (
                 <div>
-                    <iframe scrolling='no' src={previewUrl} />
-                    </div>
+                  <iframe scrolling='no' src={previewUrl} />
+                </div>
             );
         }
     });
@@ -142,9 +145,9 @@ $(document).ready(function() {
             }
 
             return (
-                    <fieldset>
-                    <legend>{o.name}</legend>
-                    {guts}
+                <fieldset>
+                  <legend>{o.name}</legend>
+                  {guts}
                 </fieldset>
             );
         },
@@ -172,7 +175,7 @@ $(document).ready(function() {
 
                 return (
                     <div key={i}>
-                    {self.renderOption(o, i, val)}
+                      {self.renderOption(o, i, val)}
                     </div>
                 );
             });
@@ -184,7 +187,7 @@ $(document).ready(function() {
 
     var loadPreview = function(s) {
         ReactDOM.render(
-                <Preview saver={s} />,
+            <Preview saver={s} />,
             document.getElementById('preview')
         );
     };
@@ -195,10 +198,10 @@ $(document).ready(function() {
         var s = savers.getByKey(current);
         redraw(s);        
     };
-
+    
     var loadOptionsForm = function(s) {
         ReactDOM.render(
-                <OptionsForm saver={s} onChange={optionsUpdated} />,
+            <OptionsForm saver={s} onChange={optionsUpdated} />,
             document.getElementById('options')
         );   
     };
@@ -218,9 +221,9 @@ $(document).ready(function() {
             var current = savers.getCurrent();
             
             ReactDOM.render(
-                    <SaverList current={current} data={entries} />,
+                <SaverList current={current} data={entries} />,
                 document.getElementById('savers')
-            );   
+            );
 
             var s = savers.getByKey(current);
             redraw(s);
@@ -281,7 +284,6 @@ $(document).ready(function() {
         event.preventDefault();
         shell.openExternal(this.href);
     });
-
 
     renderList();
 
