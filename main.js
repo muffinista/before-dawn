@@ -228,7 +228,7 @@ app.on('ready', function() {
             click: function() { openPrefsWindow(); }
         },
         {
-            label: 'About Before Dawn',
+            label: 'About ' + global.APP_NAME,
             click: function() { openAboutWindow(); }
         },
         {
@@ -238,7 +238,7 @@ app.on('ready', function() {
     ]);
 
     appIcon = new Tray(__dirname + '/assets/icon.png');
-    appIcon.setToolTip("Before Dawn");
+    appIcon.setToolTip(global.APP_NAME);
     appIcon.setContextMenu(trayMenu); 
 
     var lastIdle = 0;

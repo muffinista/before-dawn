@@ -13,6 +13,8 @@ const shell = window.require('electron').shell;
 $(document).ready(function() {
     var remote = window.require('remote');
     var savers = remote.getGlobal('savers');
+    var appName = remote.getGlobal('APP_NAME');
+    
     var saverOpts = {};
 
     var url_opts = {
@@ -21,6 +23,8 @@ $(document).ready(function() {
         preview: 1
     };
 
+    $("body > header div h1").html(appName);
+    
     // if the preview div didn't have a height, figure one out by getting
     // the width and making it proprtional to the main screen. at the moment,
     // the div will never have a height at this point unless someone specifically

@@ -41,7 +41,7 @@ module.exports = function Saver(_attrs) {
         return o; 
     }, {});;
     this.settings = _.merge(this.settings, _attrs.settings);
-
+    console.log("my settings", this.settings);
 
     // allow for custom preview URL -- if not specified, just use the default
     if ( typeof(this.attrs.previewUrl) === "undefined" ) {
