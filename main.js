@@ -19,9 +19,6 @@ let argv = parseArgs(process.argv);
 
 let debugMode = false;
 
-// Report crashes to our server.
-electron.crashReporter.start();
-
 // don't show app in dock
 if ( typeof(app.dock) !== "undefined" ) {
     app.dock.hide();
