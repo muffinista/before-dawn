@@ -1,5 +1,9 @@
 #!/bin/bash
 
+convert ./noun_172009_cc.svg -resize 20x20 icon.png
+
+convert -size 1024x1024 noun_172009_cc.svg ./Icon1024.png
+
 mkdir MyIcon.iconset
 sips -z 16 16     Icon1024.png --out MyIcon.iconset/icon_16x16.png
 sips -z 32 32     Icon1024.png --out MyIcon.iconset/icon_16x16@2x.png
