@@ -204,10 +204,12 @@ $(document).ready(function() {
     };
     
     var loadOptionsForm = function(s) {
-        ReactDOM.render(
+        // hold a ref to the form so we can get values later
+        // @todo - i assume this is a hack that doesn't match with react very well
+        window.optionsFormRef = ReactDOM.render(
             <OptionsForm saver={s} onChange={optionsUpdated} />,
             document.getElementById('options')
-        );   
+        );
     };
 
     var closeWindow = function() {
@@ -254,6 +256,8 @@ $(document).ready(function() {
         var repo = $("input[name=repo]").val();
         var localSources = JSON.parse($("[name=localSources]").val()) || [];
 
+        saverOpts = window.optionsFormRef.getValues();
+        
         console.log("saverOpts", saverOpts);
         savers.setCurrent(val, saverOpts);
 
@@ -269,26 +273,10 @@ $(document).ready(function() {
         });
     });
 
-    $("a.updater").on("click", function(e) {
-        var updater = window.require('updater.js');
-        updater.init(basePath);
-
-        var didUpdate = function(x) {
-            $(".update-results").html("Hooray for updates!");
-            renderList();
-        };
-        var noUpdate = function(x) {
-            $(".update-results").html("No updates!");
-        };
-
-        updater.updateAll(didUpdate, noUpdate);
-    });
-
     $(document).on('click', 'a[href^="http"]', function(event) {
         event.preventDefault();
         shell.openExternal(this.href);
     });
 
     renderList();
-
 });
