@@ -280,6 +280,7 @@ var listAll = function(cb) {
                 
                 var stub = path.dirname(f);
                 console.log("STUB: " + stub);
+                contents.path = stub;
                 contents.key = stub + "/" + contents.source;
             
                 console.log("KEY: " + contents.key);

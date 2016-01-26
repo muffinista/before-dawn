@@ -5,7 +5,6 @@ window.urlParams = window.location.search.split(/[?&]/).slice(1).map(function(pa
     return obj;
 }, {});
 
-
 /**
  * add some styles that will hide the cursor when the screensaver is running and 
  * do other similar things.

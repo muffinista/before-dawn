@@ -19,6 +19,7 @@ var serialize = function(obj) {
 
 module.exports = function Saver(_attrs) {
     this.attrs = _attrs;
+    this.path = _attrs.path;
     this.name = _attrs.name;
     this.key = _attrs.key;
     this.description = _attrs.description;
@@ -44,11 +45,16 @@ module.exports = function Saver(_attrs) {
     console.log("my settings", this.settings);
 
     // allow for custom preview URL -- if not specified, just use the default
+    // if it is specified, do some checks to see if it's a full URL or a filename
+    // in which case we will turn it into a full path
     if ( typeof(this.attrs.previewUrl) === "undefined" ) {
         this.previewUrl = this.url;
     }
-    else {
+    else if ( this.attrs.previewUrl.match(/:\/\//) ) {
         this.previewUrl = this.attrs.previewUrl;
+    }
+    else {
+        this.previewUrl = this.path + "/" + this.attrs.previewUrl;
     }
 
     /**
