@@ -14,6 +14,8 @@ $(document).ready(function() {
     var remote = window.require('remote');
     var savers = remote.getGlobal('savers');
     var appName = remote.getGlobal('APP_NAME');
+    var appDefaultRepo = remote.getGlobal('SAVER_REPO');
+
     
     var saverOpts = {};
 
@@ -37,7 +39,7 @@ $(document).ready(function() {
         console.log("setting preview opts to", url_opts);
     }
 
-    $("input[name=repo]").val( savers.getSource()["repo"] );
+    $("input[name=repo]").val( savers.getSource().repo ).attr("placeholder", appDefaultRepo);
     $("[name=localSources]").val(JSON.stringify(savers.getLocalSources()));
 
     $("select[name=delay] option[value=" + savers.getDelay() + "]").attr("selected", "selected");
