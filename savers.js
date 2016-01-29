@@ -107,7 +107,7 @@ var ensureDefaults = function() {
     if ( source === undefined ) {
         console.log("add default source");
         setConfig('source',{
-            repo:'muffinista/before-dawn-screensavers',
+            repo: global.SAVER_REPO,
             hash: ''
         });
     }
