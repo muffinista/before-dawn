@@ -1,12 +1,18 @@
 #!/bin/bash
 
 ELECTRON_VERSION=`npm view electron-prebuilt version`
+WORKING_DIR="/tmp/before-dawn-build"
 DEST="/tmp/before-dawn-packages"
 TARGET="$1"
 
+echo "== Checking Out Code =="
+rm -rf $WORKING_DIR
+mkdir -p $WORKING_DIR
+git clone git@github.com:muffinista/before-dawn.git $WORKING_DIR
+cd $WORKING_DIR
+
 echo "== Building Packages with Electron v ${ELECTRON_VERSION}"
 npm i
-
 
 echo "== Run Grunt =="
 grunt
@@ -51,7 +57,7 @@ fi
 if [ "$TARGET" == "win" ]; then
     echo "== REBUILD MODULES =="
     # force 32-bit because that's what we're building, but it might make sense to force 64 instead
-    ./node_modules/.bin/electron-rebuild -w node-system-idle-time --arch="ia32"
+    ./node_modules/.bin/electron-rebuild --arch="ia32" -w node-system-idle-time
 
     export PATH="$PATH:C:\Program Files (x86)\NSIS"
 
