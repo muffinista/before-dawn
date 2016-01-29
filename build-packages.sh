@@ -7,8 +7,6 @@ TARGET="$1"
 echo "== Building Packages with Electron v ${ELECTRON_VERSION}"
 npm i
 
-echo "== REBUILD MODULES =="
-./node_modules/.bin/electron-rebuild -w node-system-idle-time
 
 echo "== Run Grunt =="
 grunt
@@ -26,6 +24,9 @@ mkdir -p "${DEST}/win"
 #
 
 if [ "$TARGET" == "osx" ]; then
+  echo "== REBUILD MODULES =="
+  ./node_modules/.bin/electron-rebuild -w node-system-idle-time
+
     echo "== Build OSX App =="
     electron-packager . 'Before Dawn' \
                       --prune \
@@ -48,6 +49,10 @@ if [ "$TARGET" == "osx" ]; then
 fi
 
 if [ "$TARGET" == "win" ]; then
+    echo "== REBUILD MODULES =="
+    # force 32-bit because that's what we're building, but it might make sense to force 64 instead
+    ./node_modules/.bin/electron-rebuild -w node-system-idle-time --arch="ia32"
+
     export PATH="$PATH:C:\Program Files (x86)\NSIS"
 
     echo "== Build Windows App =="

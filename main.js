@@ -200,6 +200,7 @@ var stopScreenSaver = function() {
     }
 
     for ( var s in saverWindows ) {
+        console.log("close", s);
         saverWindows[s].close();
     }
 
@@ -230,7 +231,7 @@ app.on('ready', function() {
         },
         {
             label: 'Quit',
-            selector: 'terminate:'
+            click: function() { app.quit(); }
         }
     ]);
 
