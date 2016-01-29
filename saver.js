@@ -19,14 +19,19 @@ var serialize = function(obj) {
 
 module.exports = function Saver(_attrs) {
     this.attrs = _attrs;
+    this.path = _attrs.path;
     this.name = _attrs.name;
     this.key = _attrs.key;
     this.description = _attrs.description;
     this.aboutUrl = _attrs.aboutUrl;
     this.author = _attrs.author;
     this.license = _attrs.license;
-    this.options = _attrs.options;
     this.url = _attrs.url;
+
+    if ( typeof(_attrs.options) === "undefined" ) {
+        _attrs.options = [];
+    }
+    this.options = _attrs.options;
 
     // figure out the settings from any defaults for this screensaver,
     // and combine with incoming user-specified settings
@@ -37,14 +42,19 @@ module.exports = function Saver(_attrs) {
         return o; 
     }, {});;
     this.settings = _.merge(this.settings, _attrs.settings);
-
+    console.log("my settings", this.settings);
 
     // allow for custom preview URL -- if not specified, just use the default
+    // if it is specified, do some checks to see if it's a full URL or a filename
+    // in which case we will turn it into a full path
     if ( typeof(this.attrs.previewUrl) === "undefined" ) {
         this.previewUrl = this.url;
     }
-    else {
+    else if ( this.attrs.previewUrl.match(/:\/\//) ) {
         this.previewUrl = this.attrs.previewUrl;
+    }
+    else {
+        this.previewUrl = this.path + "/" + this.attrs.previewUrl;
     }
 
     /**

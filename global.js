@@ -4,9 +4,11 @@ window.urlParams = window.location.search.split(/[?&]/).slice(1).map(function(pa
     obj[pairArray[0]] = pairArray[1];
     return obj;
 }, {});
-//console.log("set global url params to", window.urlParams);
 
-
+/**
+ * add some styles that will hide the cursor when the screensaver is running and 
+ * do other similar things.
+ */
 window.addEventListener("load", function load(event){
     window.removeEventListener("load", load, false); //remove listener, no longer needed
 

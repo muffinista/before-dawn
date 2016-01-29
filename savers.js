@@ -270,14 +270,17 @@ var listAll = function(cb) {
     loadedData = [];
 
     folders.forEach( function ( src ) {
-        console.log("let's walk " + src);
+        console.log("loading from: " + src);
         walk(src, function(f, stat) {
-            if ( f.match(/saver.json$/) ) {
+            if ( f.match(/saver.json$/) && ! path.dirname(f).split(/\//).reverse()[0].match(/^__/) ) {
+                console.log(f);
+
                 var content = fs.readFileSync( f );
                 var contents = JSON.parse(content);
                 
                 var stub = path.dirname(f);
                 console.log("STUB: " + stub);
+                contents.path = stub;
                 contents.key = stub + "/" + contents.source;
             
                 console.log("KEY: " + contents.key);

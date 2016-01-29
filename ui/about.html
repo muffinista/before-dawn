@@ -2,7 +2,7 @@
 <html>
   <head>
     <title>About!</title>
-
+    
     <link href="../bower_components/pure/pure-nr.css" rel="stylesheet" type="text/css" />
     <link href="styles.css" rel="stylesheet" type="text/css" />
   </head>
@@ -10,7 +10,7 @@
   <body>
     <header class="pure-g">
       <div class="left pure-u-1-1">
-        <h1>Before Dark</h1> /// <h2>screensaver fun</h2>
+        <h1>Before Dawn</h1> /// <h2>screensaver fun</h2>
         <h3>v0.1</h3>
       </div>
     </header>
@@ -25,16 +25,21 @@
       </section>
     </main>
   </body>
-
+  
   <script>
-    const shell = window.require('electron').shell;
-    $ = jQuery = require('../bower_components/jquery/dist/jquery.min.js');
-
-    $(document).ready(function() {
-      $(document).on('click', 'a[href^="http"]', function(event) {
-        event.preventDefault();
-        shell.openExternal(this.href);
-      });
-    });
+   const shell = window.require('electron').shell;
+   $ = jQuery = require('../bower_components/jquery/dist/jquery.min.js');
+   
+   $(document).ready(function() {
+     
+     var remote = window.require('remote');
+     var appName = remote.getGlobal('APP_NAME');
+     $("body > header div h1").html(appName);
+     
+     $(document).on('click', 'a[href^="http"]', function(event) {
+       event.preventDefault();
+       shell.openExternal(this.href);
+     });
+   });
   </script>
 </html>

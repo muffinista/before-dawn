@@ -19,9 +19,6 @@ let argv = parseArgs(process.argv);
 
 let debugMode = false;
 
-// Report crashes to our server.
-electron.crashReporter.start();
-
 // don't show app in dock
 if ( typeof(app.dock) !== "undefined" ) {
     app.dock.hide();
@@ -38,7 +35,6 @@ require('./bootstrap.js');
 global.basePath = app.getPath('appData') + "/" + global.APP_NAME;
 global.savers = require('./savers.js');
 global.savers.init(global.basePath);
-
 
 var openPrefsWindow = function() {
     global.savers.reload(function() {
@@ -211,6 +207,11 @@ var stopScreenSaver = function() {
 };
 
 
+// seems like we need to catch this event to keep OSX from exiting app after screensaver runs?
+app.on('window-all-closed', function() {
+    console.log("window-all-closed");
+});
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 app.on('ready', function() {  
@@ -224,7 +225,7 @@ app.on('ready', function() {
             click: function() { openPrefsWindow(); }
         },
         {
-            label: 'About Before Dawn',
+            label: 'About ' + global.APP_NAME,
             click: function() { openAboutWindow(); }
         },
         {
@@ -234,7 +235,7 @@ app.on('ready', function() {
     ]);
 
     appIcon = new Tray(__dirname + '/assets/icon.png');
-    appIcon.setToolTip("Before Dawn");
+    appIcon.setToolTip(global.APP_NAME);
     appIcon.setContextMenu(trayMenu); 
 
     var lastIdle = 0;
