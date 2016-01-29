@@ -11,9 +11,9 @@
   },
   "win" : {
     "title" : "Before Dawn",
-    "version" : "x.x.x.x",
-    "publisher": "Publisher Info",
+    "version" : "0.1",
     "icon" : "assets/icon.ico",
-    "verbosity": 1
+    "verbosity": 1,
+    "bootOnStartup": true
   }
 }
