@@ -3,7 +3,7 @@ var ReactDOM = require('react-dom');
 var Slider = require('rc-slider');
 
 var _ = require('lodash');
-var jQuery = require('../bower_components/jquery/dist/jquery.min.js');
+var jQuery = require('./jquery.min.js');
 var $ = jQuery;
 
 const shell = window.require('electron').shell;
