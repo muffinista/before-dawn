@@ -27,7 +27,7 @@ window.addEventListener("load", function load(event){
     })();
 
     
-    sheet.insertRule("body {margin:0; padding:0; cursor:none;}", 0); /* remove top and left whitespace */
+    sheet.insertRule("body {margin:0; padding:0; cursor:none !important;}", 0); /* remove top and left whitespace */
     sheet.insertRule("canvas {display:block;}", 0);    /* remove scrollbars */
     sheet.insertRule("canvas:focus {outline:0;}", 0); /* remove blue outline around canvas */
 }, false);
