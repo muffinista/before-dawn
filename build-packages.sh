@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ELECTRON_VERSION="36.4" #`npm view electron-prebuilt version`
+ELECTRON_VERSION="0.36.4" #`npm view electron-prebuilt version`
 WORKING_DIR="/tmp/before-dawn-build"
 DEST="/tmp/before-dawn-packages"
 TARGET="$1"
