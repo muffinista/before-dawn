@@ -1,5 +1,7 @@
 #!/bin/bash
 
+convert ./Icon1024.png -resize 256x256 -define icon:auto-resize="256,128,96,64,48,32,16" icon.ico
+
 convert ./noun_172009_cc.svg -resize 20x20 icon.png
 
 convert -size 1024x1024 noun_172009_cc.svg ./Icon1024.png
