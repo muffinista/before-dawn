@@ -4,7 +4,7 @@ Before Dawn is a project to generate an open-source, cross-platform
 screensaver application using web-based technologies. You can generate
 screensavers with it using HTML/CSS, javascript, canvas, and any
 tools that rely on those technologies. In theory, generating a
-screensaver is as simple as writing an HTML page.
+Before Dawn screensaver is as simple as writing an HTML page.
 
 The core of the app is built on [Electron](http://electron.atom.io/),
 a system that allows you to build desktop applications that run on
@@ -25,7 +25,7 @@ I've always loved screensavers, and I spent the start of 2015 working
 on an unpublished personal project writing about some of the different
 aspects of them. As part of the project, I wanted to be able to build
 some screensavers, and for awhile I planned on just writing code and
-slapping it on a website, but eventually I decided that it would be
+publishing it on a website, but eventually I decided that it would be
 better to actually build a system for distributing functional
 screensavers.
 
@@ -34,16 +34,6 @@ making screensavers that are much better than anything I'll ever
 create, so I'd love to provide a system to make that as easy as
 possible.
 
-
-## Tools Used
-
-- [Electron](http://electron.atom.io/)
-- [Node.js](https://nodejs.org/)
-- a little bit of [jQuery](https://jquery.com/) and [lodash](https://lodash.com/)
-- most of the styling in the preferences window is via [Pure.css](http://purecss.io/)
-- Some of the form inputs are being generated with
-  [React](https://facebook.github.io/react/). This is definitely
-  subject to change.
 
 ## Status
 
@@ -87,20 +77,50 @@ The preferences window uses some React code and needs to be compiled
 if you make any changes. Running `grunt` will handle the compilation
 for you.
 
+Once it's running, there will be a sunrise icon in your system tray, with a few different options. If you click 'Preferences,' you can preview the different screensavers, set how much idle time is required before the screensaver starts to run, specify custom paths, etc.
 
-## How to write a screensaver
+Once you've set all of that up, Before Dawn will happily run in the background, and when it detects that you have been idle, it will engage your screensaver. That's all there is to it!
 
-You can also fork the repo, use your own, or just run local
-code (I'll document all this eventually).
+## Tools Used
 
+Before Dawn is built on:
+
+- [Electron](http://electron.atom.io/)
+- [Node.js](https://nodejs.org/)
+- a little bit of [jQuery](https://jquery.com/) and [lodash](https://lodash.com/)
+- most of the styling in the preferences window is via [Pure.css](http://purecss.io/)
+- Some of the form inputs are being generated with
+  [React](https://facebook.github.io/react/). This is definitely
+  subject to change.
+
+
+## How to Write a Screensaver
 
 Writing a screensaver for Before Dawn is just about as simple as building
-a web page. There are a few basic twists involved:
+a web page. There are a few small twists involved:
 
 - create a folder
 - write the HTML/etc
 - add a saver.json file
 - profit!
+
+In the preferences window, you can specify a custom directory to load screensavers from. It needs to be a JSON array and will look a little like this:
+
+```
+Local Sources:
+["/path/to/your/directory"]
+
+```
+
+Once you've created that directory, put another subdirectory in it to hold your screensaver:
+
+```
+/path/to/your/directory/flying-coffee-makers
+```
+
+This directory should hold any assets for your screensaver -- any HTML or javascript, any images, etc.
+
+**NOTE:** you can copy a starter template from the [before-dawn-screensavers](before-dawn-screensavers) repository.
 
 Finally, to get Before Dawn to recognize your work, you will need to
 create a JSON file that describes your screensaver. In the folder
@@ -110,8 +130,8 @@ content that looks something like this:
 
 ```
 {
-  "name":"Starfield",
-  "description": "Enjoy some stars flying around on your screen",
+  "name":"Flying Coffee Makers",
+  "description": "Enjoy a bunch of coffee makers flying through space",
   "aboutUrl": "http://muffinlabs.com/"
   "source": "index.html",
 }
@@ -123,18 +143,40 @@ should either point to an HTML file in your directory, or if you want
 to host your screensaver on a webserver, it should be a URL pointing
 to that location.
 
-When Before Dawn runs, it will scan the contents of any specified
+When Before Dawn loads, it will scan the contents of any specified
 directories for files named `saver.json` and will use the content of
 those files to generate the list of screensavers in the preferences window.
 
-### let's document some parameters, previews, etc
+There are a few other optional parameters that will be used if provided, and you can also specify any **options** that the user can tweak to control how the screensaver runs.
 
-### publishing your work
 
-- generate a PR to before-dawn-screensavers
-- run your own repo and point to it
-- keep it local
-- fork the entire project
+### Handy Parameters
+
+When your screensaver is loaded, Before Dawn will pass several parameters to the file or URL that you specified in saver.json. These variables include:
+
+ - width - the width of the screen
+ - height - the height of the screen
+ - platform - the platform/operating system
+ - preview -- if true, this is running as a preview in the prefs window
+
+It will pass them as query params on the URL just like so:
+
+```
+index.html?width=800&height=600&platform=darwin&preview=0
+```
+
+It is entirely possible that you won't need these parameters, but they might be handy.
+
+Before Dawn will also pass in any custom parameters that you specified.
+
+
+
+### Publishing Your Work
+
+- The screensavers for Before Dawn exist in their own repository at [before-dawn-screensavers](https://github.com/muffinista/before-dawn-screensavers). I will accept pretty much any PR to the repository given that the content you are posting is legal and appropriate.
+- Alternatively, you can run your own repository, and point to it in the preferences window. In the future Before Dawn might accept multiple repositories in this field as well.
+- You can always just run your code from a local directory without publishing it to the web.
+- Also, you can fork the entire Before Dawn project to develop your own custom screensaver tool.
 
 ## A Note About Security
 
@@ -143,22 +185,8 @@ that compromised your computer. You should keep this in mind both when
 running the tool, and when writing any screensavers.
 
 
-## Handy Parameters
+## Copyright/License
 
--- there's URL parameters with screen width/height, etc
--- document these!
+Unless otherwise stated, Copyright (c) 2016 Colin Mitchell. Before Dawn is is distributed under the MIT licence -- Please see LICENSE.txt for further details.
 
-
-
-To create a screensaver, make a subdirectory of the savers directory.
-This directory should contain the contents of your screensaver, and a
-file named `saver.json` -- Right now the app is built to scan the contents of the savers
-directory for files with that name, and it will add any matches to the
-list of screensavers. The file should look a little like this:
-
-The source key should point to an HTML file in your directory. That
-HTML file should have the code required to run your screensaver -- it
-is responsible for pulling in any JS packages, etc.
-
-At some point this might change to support pure JS/Node code, etc.
-
+http://muffinlabs.com
