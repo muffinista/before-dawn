@@ -1,7 +1,10 @@
+body {
+    font-size: 80%;
+}
 .scrollable {
     overflow-y: scroll;
-    min-height: 500px;
-    max-height: 600px;
+    min-height: 300px;
+    max-height: 390px;
 }
 iframe {
     display: block;
