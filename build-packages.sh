@@ -1,5 +1,13 @@
 #!/bin/bash
 
+die () {
+    echo >&2 "$@"
+    exit 1
+}
+
+[ "$#" -eq 1 ] || die "Please pick a target platform: osx or win"
+
+
 ELECTRON_VERSION="0.36.4" #`npm view electron-prebuilt version`
 WORKING_DIR="/tmp/before-dawn-build"
 DEST="/tmp/before-dawn-packages"
