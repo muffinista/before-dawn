@@ -216,10 +216,29 @@ app.on('window-all-closed', function() {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 app.on('ready', function() {  
+    var paused = false;
+
     var trayMenu = Menu.buildFromTemplate([
         {
             label: 'Run Now',
             click: function() { runScreenSaver(); }
+        },
+        {
+            label: 'Disable',
+            click: function() { 
+                paused = true;
+                trayMenu.items[1].visible = false;
+                trayMenu.items[2].visible = true;
+            }
+        },
+        {
+            label: 'Enable',
+            click: function() { 
+                paused = false;
+                trayMenu.items[1].visible = true;
+                trayMenu.items[2].visible = false;
+            },
+            visible: false
         },
         {
             label: 'Preferences',
@@ -241,12 +260,18 @@ app.on('ready', function() {
 
     var lastIdle = 0;
     var checkIdle = function() {
-        var idle = idler.getIdleTime();
-        var waitTime = savers.getDelay() * 60000;
+        var idle, waitTime;
 
+        if ( paused === true ) {
+            return;
+        }
+
+        waitTime = savers.getDelay() * 60000;
         if ( waitTime <= 0 ) {
             return;
         }
+
+        idle = idler.getIdleTime();
 
         if ( isActive && idle < lastIdle ) {
             stopScreenSaver();
