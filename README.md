@@ -171,9 +171,13 @@ Before Dawn will also pass in any custom parameters that you specified.
 
 
 
-### Publishing Your Work
+### Contributing/Publishing Your Work
 
-- The screensavers for Before Dawn exist in their own repository at [before-dawn-screensavers](https://github.com/muffinista/before-dawn-screensavers). I will accept pretty much any PR to the repository given that the content you are posting is legal and appropriate.
+Contributions and suggestions are eagerly accepted. Please check out code\_of\_conduct.md before contributing. If you would like to add a screensaver to the program, you can submit a PR to the [before-dawn-screensavers](https://github.com/muffinista/before-dawn-screensavers) repo. I will accept pretty much any PR to the repository given that the content you are posting is legal and appropriate. If you need help or have a suggestion, please feel free to open an issue here.
+
+
+There's a few other ways you can share you work:
+
 - Alternatively, you can run your own repository, and point to it in the preferences window. In the future Before Dawn might accept multiple repositories in this field as well.
 - You can always just run your code from a local directory without publishing it to the web.
 - Also, you can fork the entire Before Dawn project to develop your own custom screensaver tool.
@@ -187,6 +191,8 @@ running the tool, and when writing any screensavers.
 
 ## Copyright/License
 
-Unless otherwise stated, Copyright (c) 2016 Colin Mitchell. Before Dawn is is distributed under the MIT licence -- Please see LICENSE.txt for further details.
+Unless otherwise stated, Copyright (c) 2016 Colin Mitchell.
+
+Before Dawn is is distributed under the MIT licence -- Please see LICENSE.txt for further details.
 
 http://muffinlabs.com
