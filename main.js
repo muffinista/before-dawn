@@ -148,7 +148,15 @@ var runScreenSaver = function() {
 
         // and load the index.html of the app.
         w.loadURL(url);
-    }       
+
+        // windows is having some issues with putting the window behind existing
+        // stuff -- @see https://github.com/atom/electron/issues/2867
+        if ( process.platform == "win32" ) {
+            w.minimize();
+            w.focus();
+        }
+
+    }
 
 
     isActive = true;
