@@ -28,33 +28,44 @@ module.exports = function Saver(_attrs) {
     this.license = _attrs.license;
     this.url = _attrs.url;
 
-    if ( typeof(_attrs.options) === "undefined" ) {
-        _attrs.options = [];
+    this.published = _attrs.published;
+    if ( typeof(this.published) === "undefined" ) {
+        this.published = true;
     }
-    this.options = _attrs.options;
 
-    // figure out the settings from any defaults for this screensaver,
-    // and combine with incoming user-specified settings
-    this.settings = _attrs.options.map(function(o, i) {
-        return [o.name, o.default];
-    }).reduce(function(o, v, i) {
-        o[v[0]] = v[1];
-        return o; 
-    }, {});;
-    this.settings = _.merge(this.settings, _attrs.settings);
-    console.log("my settings", this.settings);
+    this.valid = typeof(this.name) !== "undefined" &&
+        typeof(this.description) !== "undefined" &&
+        this.published === true;
 
-    // allow for custom preview URL -- if not specified, just use the default
-    // if it is specified, do some checks to see if it's a full URL or a filename
-    // in which case we will turn it into a full path
-    if ( typeof(this.attrs.previewUrl) === "undefined" ) {
-        this.previewUrl = this.url;
-    }
-    else if ( this.attrs.previewUrl.match(/:\/\//) ) {
-        this.previewUrl = this.attrs.previewUrl;
-    }
-    else {
-        this.previewUrl = this.path + "/" + this.attrs.previewUrl;
+    if ( this.valid === true ) {
+        if ( typeof(_attrs.options) === "undefined" ) {
+            _attrs.options = [];
+        }
+        this.options = _attrs.options;
+
+        // figure out the settings from any defaults for this screensaver,
+        // and combine with incoming user-specified settings
+        this.settings = _attrs.options.map(function(o, i) {
+            return [o.name, o.default];
+        }).reduce(function(o, v, i) {
+            o[v[0]] = v[1];
+            return o; 
+        }, {});;
+        this.settings = _.merge(this.settings, _attrs.settings);
+        console.log("my settings", this.settings);
+
+        // allow for custom preview URL -- if not specified, just use the default
+        // if it is specified, do some checks to see if it's a full URL or a filename
+        // in which case we will turn it into a full path
+        if ( typeof(this.attrs.previewUrl) === "undefined" ) {
+            this.previewUrl = this.url;
+        }
+        else if ( this.attrs.previewUrl.match(/:\/\//) ) {
+            this.previewUrl = this.attrs.previewUrl;
+        }
+        else {
+            this.previewUrl = this.path + "/" + this.attrs.previewUrl;
+        }
     }
 
     /**

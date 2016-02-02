@@ -111,18 +111,6 @@ var ensureDefaults = function() {
             hash: ''
         });
     }
-
-    // //
-    // // copy our default set of screensavers into the app directory
-    // //
-    // // @todo maybe only do this once or even not at all
-    // var src = undefined;
-    // if ( fs.existsSync(__dirname + "/savers") ) {
-    //     src = __dirname + "/savers";
-    // }
-    // else if ( fs.existsSync(__dirname + "/../savers") ) {
-    //     src = __dirname + "/../savers";
-    // }
 };
 
 
@@ -295,8 +283,9 @@ var listAll = function(cb) {
                 console.log("OPTIONS", contents.settings);
             
                 var s = new Saver(contents);
-            
-                loadedData.push(s);
+                if ( s.valid ) {
+                    loadedData.push(s);
+                }
             }
         });
     });
