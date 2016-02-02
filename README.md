@@ -34,6 +34,10 @@ making screensavers that are much better than anything I'll ever
 create, so I'd love to provide a system to make that as easy as
 possible.
 
+If you're interested, you can get a quick preview of the screensavers
+via this
+[pretty ugly preview page](http://muffinista.github.io/before-dawn-screensavers/).
+
 
 ## Status
 
