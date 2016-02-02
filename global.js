@@ -26,9 +26,11 @@ window.addEventListener("load", function load(event){
 	      return style.sheet;
     })();
 
-    
+    // make sure the cursor doesn't show by using a blank image
+    var cursorUrl = "file://" + escape(__dirname) + "/assets/cursor.png";
+
     sheet.insertRule("body {margin:0; padding:0;}", 0); /* remove top and left whitespace */
-    sheet.insertRule("* { cursor:none !important; }", 0); /* hide the cursor */
+    sheet.insertRule("* { cursor: url(" + cursorUrl + "), none !important; }", 0); /* hide the cursor */
     sheet.insertRule("canvas {display:block;}", 0);    /* remove scrollbars */
     sheet.insertRule("canvas:focus {outline:0;}", 0); /* remove blue outline around canvas */
 }, false);
