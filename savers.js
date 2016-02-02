@@ -260,6 +260,7 @@ var listAll = function(cb) {
     folders.forEach( function ( src ) {
         console.log("loading from: " + src);
         walk(src, function(f, stat) {
+            // exclude matches from directories that start with __
             if ( f.match(/saver.json$/) && ! path.dirname(f).split(/\//).reverse()[0].match(/^__/) ) {
                 console.log(f);
 
