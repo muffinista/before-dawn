@@ -14,8 +14,12 @@ $(document).ready(function() {
     var remote = window.require('remote');
     var savers = remote.getGlobal('savers');
     var appName = remote.getGlobal('APP_NAME');
+    var appVersion = remote.getGlobal('APP_VERSION');
     var appDefaultRepo = remote.getGlobal('SAVER_REPO');
 
+
+    var temp = window.require('temp');
+    var screenshot = window.require('desktop-screenshot');
     
     var saverOpts = {};
 
@@ -26,6 +30,7 @@ $(document).ready(function() {
     };
 
     $("body > header div h1").html(appName);
+    $("body > header div .version").html(appVersion);
     
     // if the preview div didn't have a height, figure one out by getting
     // the width and making it proprtional to the main screen. at the moment,
@@ -192,10 +197,18 @@ $(document).ready(function() {
 
 
     var loadPreview = function(s) {
-        ReactDOM.render(
-            <Preview saver={s} />,
-            document.getElementById('preview')
-        );
+        var screenshot_file = temp.path({suffix: '.png'});
+        screenshot(screenshot_file, function(error, complete) {
+            if ( complete ) {
+                url_opts.screenshot = encodeURIComponent("file://" + screenshot_file);
+            }
+
+            ReactDOM.render(
+                <Preview saver={s} />,
+                document.getElementById('preview')
+            );
+
+        });
     };
 
     var optionsUpdated = function(data) {

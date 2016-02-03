@@ -19,9 +19,9 @@ let argv = parseArgs(process.argv);
 let screenshot = require('desktop-screenshot');
 let temp = require("temp").track();
 
-
-
 let debugMode = false;
+
+var screenshot_file = temp.path({suffix: '.png'});
 
 // don't show app in dock
 if ( typeof(app.dock) !== "undefined" ) {
@@ -115,7 +115,6 @@ var runScreenSaver = function() {
     }
 
 
-    var screenshot_file = temp.path({suffix: '.png'});
     screenshot(screenshot_file, function(error, complete) {
         for ( var i in displays ) {
             var s = displays[i];
