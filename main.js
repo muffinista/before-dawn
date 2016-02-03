@@ -45,7 +45,7 @@ var openPrefsWindow = function() {
         var prefsUrl = 'file://' + __dirname + '/ui/prefs.html';
         var w = new BrowserWindow({
             width:800,
-            height:750,
+            height:600,
             resizable:false,
             icon: __dirname + '/assets/icon.png'
         });
