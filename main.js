@@ -336,7 +336,7 @@ var openPrefsOnFirstLoad = function() {
     }
     console.log("should we open prefs window?", savers.firstLoad() );
     if ( savers.firstLoad() === true ) {
-        openPrefsWindow();
+        setTimeout(openPrefsWindow, 1000);
     }
 };
 
