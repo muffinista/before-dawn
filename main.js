@@ -16,6 +16,10 @@ let idler = require('node-system-idle-time');
 let parseArgs = require('minimist');
 let saverWindows = [];
 let argv = parseArgs(process.argv);
+let screenshot = require('desktop-screenshot');
+let temp = require("temp").track();
+
+
 
 let debugMode = false;
 
@@ -111,45 +115,62 @@ var runScreenSaver = function() {
     }
 
 
-    for ( var i in displays ) {
-        var s = displays[i];
-        var size = s.bounds;
-        var url_opts = { 
-            width: size.width,
-            height: size.height,
-            platform: process.platform
-        };
+    var screenshot_file = temp.path({suffix: '.png'});
+    screenshot(screenshot_file, function(error, complete) {
+        for ( var i in displays ) {
+            var s = displays[i];
+            var size = s.bounds;
+            var url_opts = { 
+                width: size.width,
+                height: size.height,
+                platform: process.platform
+            };
+            
+            var windowOpts = {
+                fullscreen: ( debugMode !== true ),
+                webgl: true,
+                preload: __dirname + '/global.js',
+                'auto-hide-menu-bar': true,
+                x: s.bounds.x,
+                y: s.bounds.y
+            };
 
-        var url = saver.getUrl(url_opts);
-        console.log("loading " + url);
+            var w = new BrowserWindow(windowOpts);
+            
+            if ( debugMode === true ) {
+                w.webContents.openDevTools();
+            }
+            
+            // Emitted when the window is closed.
+            w.on('closed', function() {
+                w = null;           
+                isActive = false;
+            });
+            
+            saverWindows.push(w);
+            
+            if ( error ) {
+                console.log("Screenshot failed", error);
+            }
+            else {
+                url_opts.screenshot = encodeURIComponent("file://" + screenshot_file);
+            }
+            
+            var url = saver.getUrl(url_opts);
+            console.log("loading " + url);
+            
+            // and load the index.html of the app.
+            w.loadURL(url);
+            
+            // windows is having some issues with putting the window behind existing
+            // stuff -- @see https://github.com/atom/electron/issues/2867
+            if ( process.platform == "win32" ) {
+                w.minimize();
+                w.focus();
+            }
 
-        var windowOpts = {
-            fullscreen: ( debugMode !== true ),
-            webgl: true,
-            preload: __dirname + '/global.js',
-            'auto-hide-menu-bar': true,
-            x: s.bounds.x,
-            y: s.bounds.y
-        };
-
-        var w = new BrowserWindow(windowOpts);
-
-        if ( debugMode === true ) {
-            w.webContents.openDevTools();
-        }
-
-        // Emitted when the window is closed.
-        w.on('closed', function() {
-            w = null;           
-            isActive = false;
-        });
-
-        saverWindows.push(w);
-
-        // and load the index.html of the app.
-        w.loadURL(url);
-    }       
-
+        } // for
+    });
 
     isActive = true;
 };
