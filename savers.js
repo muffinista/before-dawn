@@ -12,6 +12,9 @@ var config_file = "config.json";
 var baseDir;
 var loadedData = [];
 
+var _firstLoad = false;
+
+
 var init = function(_path, cb) {
     baseDir = path.resolve(_path);
     console.log("working from " + baseDir);
@@ -105,14 +108,21 @@ var updatePackage = function(cb) {
 var ensureDefaults = function() {
     var source = nconf.get('source');
     if ( source === undefined ) {
+        _firstLoad = true;
         console.log("add default source");
         setConfig('source',{
             repo: global.SAVER_REPO,
             hash: ''
         });
     }
+    else {
+        _firstLoad = false;
+    }
 };
 
+var firstLoad = function() {
+    return _firstLoad;
+};
 
 /**
  * look up a screensaver by key, and return it
@@ -349,3 +359,4 @@ exports.getCurrentUrl = getCurrentUrl;
 exports.getUrl = getUrl;
 exports.loadedData = loadedData;
 exports.write = write;
+exports.firstLoad = firstLoad;

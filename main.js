@@ -38,7 +38,6 @@ require('./bootstrap.js');
 // store our root path as a global variable so we can access it from screens
 global.basePath = app.getPath('appData') + "/" + global.APP_NAME;
 global.savers = require('./savers.js');
-global.savers.init(global.basePath);
 
 var openPrefsWindow = function() {
     global.savers.reload(function() {
@@ -235,85 +234,96 @@ app.on('window-all-closed', function() {
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
-app.on('ready', function() {  
-    var paused = false;
+var bootApp = function() {
+    app.on('ready', function() {  
+        var paused = false;
 
-    var trayMenu = Menu.buildFromTemplate([
-        {
-            label: 'Run Now',
-            click: function() { runScreenSaver(); }
-        },
-        {
-            label: 'Disable',
-            click: function() { 
-                paused = true;
-                trayMenu.items[1].visible = false;
-                trayMenu.items[2].visible = true;
-            }
-        },
-        {
-            label: 'Enable',
-            click: function() { 
-                paused = false;
-                trayMenu.items[1].visible = true;
-                trayMenu.items[2].visible = false;
+        var trayMenu = Menu.buildFromTemplate([
+            {
+                label: 'Run Now',
+                click: function() { runScreenSaver(); }
             },
-            visible: false
-        },
-        {
-            label: 'Preferences',
-            click: function() { openPrefsWindow(); }
-        },
-        {
-            label: 'About ' + global.APP_NAME,
-            click: function() { openAboutWindow(); }
-        },
-        {
-            label: 'Quit',
-            click: function() { app.quit(); }
+            {
+                label: 'Disable',
+                click: function() { 
+                    paused = true;
+                    trayMenu.items[1].visible = false;
+                    trayMenu.items[2].visible = true;
+                }
+            },
+            {
+                label: 'Enable',
+                click: function() { 
+                    paused = false;
+                    trayMenu.items[1].visible = true;
+                    trayMenu.items[2].visible = false;
+                },
+                visible: false
+            },
+            {
+                label: 'Preferences',
+                click: function() { openPrefsWindow(); }
+            },
+            {
+                label: 'About ' + global.APP_NAME,
+                click: function() { openAboutWindow(); }
+            },
+            {
+                label: 'Quit',
+                click: function() { app.quit(); }
+            }
+        ]);
+
+        appIcon = new Tray(__dirname + '/assets/icon.png');
+        appIcon.setToolTip(global.APP_NAME);
+        appIcon.setContextMenu(trayMenu); 
+
+        var lastIdle = 0;
+        var checkIdle = function() {
+            var idle, waitTime;
+
+            if ( paused === true ) {
+                return;
+            }
+
+            waitTime = savers.getDelay() * 60000;
+            if ( waitTime <= 0 ) {
+                return;
+            }
+
+            idle = idler.getIdleTime();
+
+            if ( isActive && idle < lastIdle ) {
+                stopScreenSaver();
+            }
+            else if ( isActive == false && idle > waitTime ) {
+                runScreenSaver();
+            }
+
+            lastIdle = idle;
+        };
+
+        // @todo save some clock cycles by making this longer when checking to activate
+        // and shorter when checking to deactivate
+        checkTimer = setInterval(checkIdle, 250);
+
+        if ( argv.screen === "prefs" ) {
+            openPrefsWindow();
         }
-    ]);
-
-    appIcon = new Tray(__dirname + '/assets/icon.png');
-    appIcon.setToolTip(global.APP_NAME);
-    appIcon.setContextMenu(trayMenu); 
-
-    var lastIdle = 0;
-    var checkIdle = function() {
-        var idle, waitTime;
-
-        if ( paused === true ) {
-            return;
+        else if ( argv.screen === "about" ) {
+            openAboutWindow();
         }
-
-        waitTime = savers.getDelay() * 60000;
-        if ( waitTime <= 0 ) {
-            return;
-        }
-
-        idle = idler.getIdleTime();
-
-        if ( isActive && idle < lastIdle ) {
-            stopScreenSaver();
-        }
-        else if ( isActive == false && idle > waitTime ) {
+        else if ( argv.screen === "saver" ) {
             runScreenSaver();
         }
 
-        lastIdle = idle;
-    };
+        console.log("should we open prefs window?", savers.firstLoad() );
+        if ( savers.firstLoad() === true ) {
+            openPrefsWindow();
+        }
 
-    // @todo save some clock cycles by making this longer when checking to activate
-    // and shorter when checking to deactivate
-    checkTimer = setInterval(checkIdle, 250);
+    });
+};
 
-    if ( argv.screen === "prefs" ) {
-        openPrefsWindow();
-    }
-    else if ( argv.screen === "about" ) {
-        openAboutWindow();
-    }
-    else if ( argv.screen === "saver" ) {
-        runScreenSaver();
-    }
-});
+global.savers.init(global.basePath, bootApp);
+

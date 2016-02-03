@@ -31,14 +31,16 @@ window.addEventListener("load", function load(event){
 	      return style.sheet;
     })();
 
+    var cursorUrl = "url('data:image/gif;base64,R0lGODlhAQABAPAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==')";
     sheet.insertRule("body {margin:0; padding:0; overflow: hidden}", 0); /* remove top and left whitespace */
+    sheet.insertRule("* { cursor: " + cursorUrl + ", none !important; }", 0); /* hide the cursor */
     sheet.insertRule("canvas {display:block;}", 0);    /* remove scrollbars */
     sheet.insertRule("canvas:focus {outline:0;}", 0); /* remove blue outline around canvas */
 
     // waiting for a bit before hiding the cursor seems to help in windows
     // @see http://delphic.me.uk/controllingthecursor.html for cursor url idea
     var hideCursor = function() {
-        document.getElementsByTagName('html')[0].style.cursor = "url('data:image/gif;base64,R0lGODlhAQABAPAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=='), auto";
+        document.getElementsByTagName('html')[0].style.cursor = cursorUrl + ", auto !important";
     };
     setTimeout(hideCursor, 1000);
 }, false);
