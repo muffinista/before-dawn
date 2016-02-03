@@ -3,7 +3,6 @@
 var fs = require('fs');
 var path = require('path');
 var request = require('request');
-//var extract = require('extract-zip');
 var yauzl = require("yauzl");
 var mkdirp = require("mkdirp");
 
