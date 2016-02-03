@@ -5,6 +5,7 @@ var path = require('path');
 var request = require('request');
 var yauzl = require("yauzl");
 var mkdirp = require("mkdirp");
+var remove = require('remove');
 
 /**
  * need source repo url
@@ -80,6 +81,12 @@ module.exports = function Package(_attrs) {
             }).
             on('end', function() {
                 console.log("download over, let's trigger callback");
+
+                try {
+                    remove.removeSync(self.dest);
+                } catch (err) {
+                    console.error(err);
+                }
 
                 yauzl.open(tempName, {lazyEntries: true}, function(err, zipfile) {
                     if (err) throw err;

@@ -261,7 +261,7 @@ var listAll = function(cb) {
         console.log("loading from: " + src);
         walk(src, function(f, stat) {
             // exclude matches from directories that start with __
-            if ( f.match(/saver.json$/) && ! path.dirname(f).split(/\//).reverse()[0].match(/^__/) ) {
+            if ( f.match(/saver.json$/) && ! path.dirname(f).split(path.sep).reverse()[0].match(/^__/) ) {
                 console.log(f);
 
                 var content = fs.readFileSync( f );
