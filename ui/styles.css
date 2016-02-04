@@ -18,7 +18,9 @@ main {
     padding: 5px;
 }
 footer {
-    padding: 5px;
+    padding-top: 5px;   
+    padding-left: 5px;
+    padding-right: 5px;    
     height: 32px;
 }
 footer .right {
@@ -45,7 +47,7 @@ p {
 header {
     padding-top: 3px;
     padding-left: 3px;
-    min-height: 60px;
+    min-height: 30px;
     background: #dddddd;
 }
 header h1 {
@@ -57,10 +59,14 @@ header h2 {
 }
 header h3 {
     margin-top: 3px;
-    margin-bottom: 10px;;
+    margin-bottom: 10px;
+    text-align: right;
+    padding-right: 10px;
 }
 
-
+section h1 {
+    font-size: 1.5em;
+}
 
 .rc-slider {
   position: relative;
