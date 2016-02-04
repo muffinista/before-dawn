@@ -48,12 +48,14 @@ var openPrefsWindow = function() {
         var prefsUrl = 'file://' + __dirname + '/ui/prefs.html';
         var w = new BrowserWindow({
             width:800,
-            height:650,
+            height:665,
             resizable:false,
             icon: __dirname + '/assets/icon.png'
         });
         
         w.loadURL(prefsUrl);
+        w.setMenu(null);
+
         if ( typeof(app.dock) !== "undefined" ) {
             app.dock.show();
         }
