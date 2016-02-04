@@ -28,6 +28,8 @@ var reload = function(cb) {
     if ( ! fs.existsSync(baseDir) ) {
         console.log("creating " + baseDir);
         fs.mkdirSync(baseDir);
+
+        _firstLoad = true;
     }
 
     // create a folder for the actual screensavers
@@ -37,6 +39,8 @@ var reload = function(cb) {
     if ( ! fs.existsSync(saversDir) ) {
         console.log("create: " + saversDir);
         fs.mkdirSync(saversDir);
+
+        _firstLoad = true;
     }
     else {
         console.log(saversDir + " already exists");
@@ -44,6 +48,12 @@ var reload = function(cb) {
 
     // specify config path
     console.log("load config from " + configPath);
+
+    if ( ! fs.existsSync(configPath) ) {
+        console.log("no config yet")
+        _firstLoad = true;
+    }
+
     nconf.file({
         file: configPath
     });
@@ -113,9 +123,6 @@ var ensureDefaults = function() {
             repo: global.SAVER_REPO,
             hash: ''
         });
-    }
-    else {
-        _firstLoad = false;
     }
 };
 
