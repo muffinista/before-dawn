@@ -24,7 +24,6 @@ var init = function(_path, cb) {
 var reload = function(cb) {
     var configPath = baseDir + "/" + config_file;
 
-    console.log("baseDir: " + path);
     // create our main directory
     if ( ! fs.existsSync(baseDir) ) {
         console.log("creating " + baseDir);

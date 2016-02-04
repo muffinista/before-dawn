@@ -331,7 +331,7 @@ app.on('ready', function() {
  * has been loaded before. if not, let's go ahead and open the prefs window now.
  */
 var openPrefsOnFirstLoad = function() {
-    if ( appReady === false || configLoaded == false ) {
+    if ( appReady === false || configLoaded === false ) {
         return;
     }
     console.log("should we open prefs window?", savers.firstLoad() );
