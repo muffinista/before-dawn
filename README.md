@@ -186,11 +186,15 @@ There's a few other ways you can share you work:
 - You can always just run your code from a local directory without publishing it to the web.
 - Also, you can fork the entire Before Dawn project to develop your own custom screensaver tool.
 
-## A Note About Security
 
-It is hypothetically possible that someone could write a screensaver
-that compromised your computer. You should keep this in mind both when
-running the tool, and when writing any screensavers.
+## TODO
+
+- Improve the documentation for writing screensaver code
+- Make it even easier to host a local screensaver -- maybe an option
+  to load a local file or even have an editing tool
+- Random screensaver picker
+- Auto-update tool
+
 
 
 ## Copyright/License
