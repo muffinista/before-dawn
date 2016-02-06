@@ -39,7 +39,7 @@ The actual code for the screensavers is in [a separate repo](https://github.com/
 
 The easiest way to use the tool is to install it to your computer. You
 can grab an installer from the
-[releases](https://github.com/muffinista/before-dawn/releases) page.
+[releases](https://github.com/muffinista/before-dawn/releases) page. Binaries are available for OSX and Windows, and I'll put together a Linux installer soon.
 
 Once it's running, there will be a sunrise icon in your system tray, with a few different options. If you click 'Preferences,' you can preview the different screensavers, set how much idle time is required before the screensaver starts to run, specify custom paths, etc.
 
@@ -47,7 +47,7 @@ Once you've set all of that up, Before Dawn will happily run in the background, 
 
 ## Hacking It
 
-(read the Development page in the wiki)
+If you would like to hack on Before Dawn, there's some instructions on the [Development page](https://github.com/muffinista/before-dawn/wiki/Development) in the wiki. It's pretty straightforward once you have a basic setup in place.
 
 ## Tools Used
 
@@ -64,7 +64,7 @@ Before Dawn is built on:
 
 ## How to Write a Screensaver
 
-A Before Dawn screensaver is basically just a web page. There's a bunch of specific implementation details in [the wiki](https://github.com/muffinista/before-dawn/wiki/Writing-A-Screensaver).
+A Before Dawn screensaver is basically just a web page running in fullscreen mode. That said, there's a few twists to make it run as smoothly as possible. There's a bunch of specific implementation details in [the wiki](https://github.com/muffinista/before-dawn/wiki/Writing-A-Screensaver).
 
 ## Contributing
 
@@ -74,7 +74,7 @@ If you find a bug or have a suggestion, you can open an issue or a pull request 
 
 If you would like to add a screensaver to the program, you can submit a PR to the [before-dawn-screensavers](https://github.com/muffinista/before-dawn-screensavers) repo.
 
-I will accept pretty much any PR to the repository given that the content you are posting is legal and appropriate. If you need help or have a suggestion, please feel free to open an issue here.
+I will accept pretty much any pull request to the repository given that the content you are posting is legal and appropriate. If you need help or have a suggestion, please feel free to open an issue here.
 
 
 ## TODO
