@@ -97,3 +97,7 @@ section h1 {
     font-size: 90%;
     display: block;
 }
+
+.author {
+    padding-right: 5px;
+}

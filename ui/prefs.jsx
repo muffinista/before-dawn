@@ -1,6 +1,7 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
 var Slider = require('rc-slider');
+var AutoLaunch = require('auto-launch');
 
 var _ = require('lodash');
 var jQuery = require('./jquery.min.js');
@@ -18,6 +19,10 @@ $(document).ready(function() {
     var appDefaultRepo = remote.getGlobal('SAVER_REPO');
 
 
+    var appLauncher = new AutoLaunch({
+	      name: appName
+    });
+    
     var temp = window.require('temp');
     var screenshot = window.require('desktop-screenshot');
     
@@ -29,6 +34,16 @@ $(document).ready(function() {
         preview: 1
     };
 
+
+    appLauncher.isEnabled(function(enabled){
+        console.log("auto launch enabled?: " + enabled);
+
+	      if (enabled) {
+            $("input[name=auto_start][type=checkbox]").attr("checked", "checked");            
+        }
+    });
+
+    
     $("body > header div h1").html(appName);
     $("body > header div .version").html(appVersion);
     
@@ -77,7 +92,7 @@ $(document).ready(function() {
                     authorClass = authorClass + " hide";
                 }
                 if ( typeof(s.aboutUrl) === "undefined" || s.aboutUrl === "" ) {
-                    aboutUrlClass = aboutUrlClass + "hide";
+                    aboutUrlClass = aboutUrlClass + " hide";
                 }
 
                 return (
@@ -284,7 +299,12 @@ $(document).ready(function() {
         savers.setLocalSources(localSources);
 
         savers.write(function() {
-            closeWindow();
+            if ( $("input[name=auto_start][type=checkbox]:checked").length > 0 ) {
+	              appLauncher.enable(closeWindow);
+            }
+            else {
+	              appLauncher.disable(closeWindow);
+            }
         });
     });
 
