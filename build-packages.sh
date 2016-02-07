@@ -9,15 +9,20 @@ die () {
 
 
 ELECTRON_VERSION="0.36.4" #`npm view electron-prebuilt version`
-WORKING_DIR="/tmp/before-dawn-build"
 DEST="/tmp/before-dawn-packages"
 TARGET="$1"
 
-echo "== Checking Out Code =="
-rm -rf $WORKING_DIR
-mkdir -p $WORKING_DIR
-git clone git@github.com:muffinista/before-dawn.git $WORKING_DIR
-cd $WORKING_DIR
+if [ "$LOCAL_BUILD" == "1" ]; then
+    echo "== Building from local copy =="
+else
+    WORKING_DIR="/tmp/before-dawn-build"
+
+    echo "== Checking Out Code =="
+    rm -rf $WORKING_DIR
+    mkdir -p $WORKING_DIR
+    git clone git@github.com:muffinista/before-dawn.git $WORKING_DIR
+    cd $WORKING_DIR   
+fi
 
 echo "== Building Packages with Electron v ${ELECTRON_VERSION}"
 npm i
