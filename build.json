@@ -13,7 +13,6 @@
     "title" : "Before Dawn",
     "version" : "0.1",
     "icon" : "assets/icon.ico",
-    "verbosity": 1,
-    "bootOnStartup": true
+    "verbosity": 1
   }
 }
