@@ -477,7 +477,6 @@ app.on('ready', function() {
 
     appReady = true;
 
-    userName = getCurrentUser();
     openPrefsOnFirstLoad();
 });
 
