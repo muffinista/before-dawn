@@ -444,10 +444,6 @@ app.on('ready', function() {
             return;
         }
 
-        if ( userName !== getCurrentUser() ) {
-            return;
-        }
-
         waitTime = savers.getDelay() * 60000;
         if ( waitTime <= 0 ) {
             return;
