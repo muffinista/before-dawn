@@ -381,24 +381,13 @@ app.on('window-all-closed', function() {
     console.log("window-all-closed");
 });
 
-var userName;
-var getCurrentUser = function() {
-    var path = require('path');
-    return process.env['USERPROFILE'].split(path.sep)[2];
-}
 
 var shouldQuit = app.makeSingleInstance(function(commandLine, workingDirectory) {
-  // Someone tried to run a second instance, we should focus our window.
-  // if (myWindow) {
-  //   if (myWindow.isMinimized()) myWindow.restore();
-  //   myWindow.focus();
-  // }
-  return true;
+    return true;
 });
 
 if (shouldQuit) {
-  app.quit();
-  return;
+    app.quit();
 }
 
 
