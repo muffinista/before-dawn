@@ -1,3 +1,4 @@
+// these don't seem to work? i'm guessing they get overwritten
 body {margin:0; padding:0; overflow: hidden}
 * { cursor: url('data:image/gif;base64,R0lGODlhAQABAPAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=='), none !important; }
 canvas {display:block;}

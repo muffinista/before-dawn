@@ -249,8 +249,6 @@ var runScreenSaver = function() {
     var displays = [];
     var saver = global.savers.getCurrentData();
     var globalJSCode = fs.readFileSync( path.join(__dirname, 'global-js-handlers.js'), 'ascii');
-    var globalCSS = fs.readFileSync( path.join(__dirname, 'global.css'), 'ascii');
-
 
     // @todo maybe add an option to only run on a single display?
 
@@ -323,7 +321,6 @@ var runScreenSaver = function() {
 
             // inject our custom JS and CSS here
             w.webContents.executeJavaScript(globalJSCode);
-            w.webContents.insertCSS(globalCSS);
 
         } // for
     });
