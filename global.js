@@ -43,5 +43,28 @@ window.addEventListener("load", function load(event){
         document.getElementsByTagName('html')[0].style.cursor = cursorUrl + ", auto !important";
     };
     setTimeout(hideCursor, 1000);
+
+
+    var firstMouseMove = false;
+
+    var exitScreenSaver = function() {
+        var ipcRenderer;
+
+        // seems like you get a mousemove event even without moving the mouse, i'm
+        // guessing to establish initial position/etc. anyway, we can skip that event
+        if ( firstMouseMove == false ) {
+            firstMouseMove = true;
+            return;
+        }
+        ipcRenderer = require('electron').ipcRenderer;
+        ipcRenderer.send('asynchronous-message', 'stopScreenSaver');
+    };
+
+    var body = document.getElementsByTagName("body")[0];
+
+    body.addEventListener("mousemove", exitScreenSaver, false);
+    body.addEventListener("mousewheel", exitScreenSaver, false);
+    body.addEventListener("keydown", exitScreenSaver, false);
+    
 }, false);
 

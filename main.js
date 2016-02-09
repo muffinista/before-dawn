@@ -5,6 +5,7 @@ const app = electron.app;  // Module to control application life.
 const BrowserWindow = electron.BrowserWindow;  // Module to create native browser window.
 const Menu = electron.Menu;
 const Tray = electron.Tray;
+const ipcMain = require('electron').ipcMain;
 
 
 var windowOpts;
@@ -376,12 +377,6 @@ var stopScreenSaver = function() {
 };
 
 
-// seems like we need to catch this event to keep OSX from exiting app after screensaver runs?
-app.on('window-all-closed', function() {
-    console.log("window-all-closed");
-});
-
-
 var shouldQuit = app.makeSingleInstance(function(commandLine, workingDirectory) {
     return true;
 });
@@ -389,6 +384,22 @@ var shouldQuit = app.makeSingleInstance(function(commandLine, workingDirectory) 
 if (shouldQuit) {
     app.quit();
 }
+
+
+
+//
+// listen for a message from global.js that we should stop running the screensaver
+//
+ipcMain.on('asynchronous-message', function(event, arg) {
+    if ( arg === "stopScreenSaver" ) {
+        stopScreenSaver();
+    }
+});
+
+// seems like we need to catch this event to keep OSX from exiting app after screensaver runs?
+app.on('window-all-closed', function() {
+    console.log("window-all-closed");
+});
 
 
 // This method will be called when Electron has finished
@@ -440,7 +451,7 @@ app.on('ready', function() {
     var checkIdle = function() {
         var idle, waitTime;
 
-        if ( paused === true ) {
+        if ( paused === true || isActive === true ) {
             return;
         }
 
@@ -450,20 +461,13 @@ app.on('ready', function() {
         }
         
         idle = idler.getIdleTime();
-
-        if ( isActive && idle < lastIdle ) {
-            stopScreenSaver();
-        }
-        else if ( isActive == false && idle > waitTime ) {
+         if ( idle > waitTime ) {
             runScreenSaver();
         }
         
         lastIdle = idle;
     };
-    
-    // @todo save some clock cycles by making this longer when checking to activate
-    // and shorter when checking to deactivate
-    checkTimer = setInterval(checkIdle, 250);
+    checkTimer = setInterval(checkIdle, 2500);
 
     if ( argv.screen === "prefs" ) {
         openPrefsWindow();
@@ -488,7 +492,6 @@ var openPrefsOnFirstLoad = function() {
     if ( appReady === false || configLoaded === false ) {
         return;
     }
-    console.log("should we open prefs window?", savers.firstLoad() );
     if ( savers.firstLoad() === true ) {
         setTimeout(openPrefsWindow, 1000);
     }
