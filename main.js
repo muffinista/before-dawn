@@ -7,6 +7,7 @@ const Menu = electron.Menu;
 const Tray = electron.Tray;
 const ipcMain = require('electron').ipcMain;
 const fs = require('fs');
+const path = require('path');
 
 var windowOpts;
 
@@ -224,7 +225,7 @@ var openAboutWindow = function() {
         width:450,
         height:300,
         resizable:false,
-        icon: __dirname + '/assets/icon.png'
+        icon: path.join(__dirname, 'assets', 'icon.png')
     });
 
     w.loadURL(prefsUrl);
@@ -247,8 +248,8 @@ var runScreenSaver = function() {
     var electronScreen = electron.screen;
     var displays = [];
     var saver = global.savers.getCurrentData();
-    var globalJSCode = fs.readFileSync( 'global-js-handlers.js', 'ascii');
-    var globalCSS = fs.readFileSync( 'global.css', 'ascii');
+    var globalJSCode = fs.readFileSync( path.join(__dirname, 'global-js-handlers.js'), 'ascii');
+    var globalCSS = fs.readFileSync( path.join(__dirname, 'global.css'), 'ascii');
 
 
     // @todo maybe add an option to only run on a single display?
