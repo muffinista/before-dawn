@@ -50,7 +50,7 @@ module.exports = function Saver(_attrs) {
         }).reduce(function(o, v, i) {
             o[v[0]] = v[1];
             return o; 
-        }, {});;
+        }, {});
         this.settings = _.merge(this.settings, _attrs.settings);
         console.log("my settings", this.settings);
 

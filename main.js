@@ -6,7 +6,7 @@ const BrowserWindow = electron.BrowserWindow;  // Module to create native browse
 const Menu = electron.Menu;
 const Tray = electron.Tray;
 const ipcMain = require('electron').ipcMain;
-
+const fs = require('fs');
 
 var windowOpts;
 
@@ -247,11 +247,14 @@ var runScreenSaver = function() {
     var electronScreen = electron.screen;
     var displays = [];
     var saver = global.savers.getCurrentData();
+    var globalJSCode = fs.readFileSync( 'global-js-handlers.js', 'ascii');
+    var globalCSS = fs.readFileSync( 'global.css', 'ascii');
+
 
     // @todo maybe add an option to only run on a single display?
 
     // limit to a single screen when debugging
-    if ( debugMode == true ) {
+    if ( debugMode === true ) {
         displays = [
             electronScreen.getPrimaryDisplay()
         ];
@@ -317,6 +320,10 @@ var runScreenSaver = function() {
                 w.focus();
             }
 
+            // inject our custom JS and CSS here
+            w.webContents.executeJavaScript(globalJSCode);
+            w.webContents.insertCSS(globalCSS);
+
         } // for
     });
 
@@ -324,7 +331,7 @@ var runScreenSaver = function() {
 };
 
 var shouldLockScreen = function() {
-    return ( savers.getLock() == true );
+    return ( savers.getLock() === true );
 };
 
 /**
@@ -355,6 +362,8 @@ var doLockScreen = function() {
 };
 
 var stopScreenSaver = function() {
+    console.log("received stopScreenSaver call");
+
     if ( saverWindows.length <= 0 ) {
         return;
     }
@@ -363,7 +372,6 @@ var stopScreenSaver = function() {
         return;
     }
 
-    console.log("close it up");
     if ( shouldLockScreen() ) {
         doLockScreen();
     }

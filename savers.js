@@ -50,7 +50,7 @@ var reload = function(cb) {
     console.log("load config from " + configPath);
 
     if ( ! fs.existsSync(configPath) ) {
-        console.log("no config yet")
+        console.log("no config yet");
         _firstLoad = true;
     }
 
@@ -69,7 +69,7 @@ var reload = function(cb) {
     updatePackage(function(data) {
         console.log("UPDATED!", data);
 
-        if ( data.downloaded == true ) {
+        if ( data.downloaded === true ) {
             setConfig('source:updated_at', data.updated_at);
         }
 
