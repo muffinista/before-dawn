@@ -5,6 +5,7 @@
   "main": "init.js",
   "scripts": {
     "start": "electron init.js",
+    "rebuild": "./node_modules/.bin/electron-rebuild -w node-system-idle-time",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
