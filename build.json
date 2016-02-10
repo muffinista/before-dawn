@@ -5,8 +5,8 @@
     "icon": "assets/icon.icns",
     "icon-size": 80,
     "contents": [
-      { "x": 338, "y": 44, "type": "link", "path": "/Applications" },
-      { "x": 192, "y": 44, "type": "file" }
+      { "x": 338, "y": 14, "type": "link", "path": "/Applications" },
+      { "x": 192, "y": 14, "type": "file" }
     ]
   },
   "win" : {
