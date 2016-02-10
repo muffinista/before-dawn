@@ -267,9 +267,16 @@ var walk = function(currentDirPath, callback) {
  */
 var listAll = function(cb) {
     var dir = require('node-dir');
-
     var root = baseDir + '/savers/';
-    var folders = [root].concat( getLocalSources() );
+    var folders = [];
+
+    var source = getSource();
+
+    if ( typeof(source.repo) !== "undefined" && source.repo !== "" ) {
+        folders.push(root);
+    }
+    
+    folders = folders.concat( getLocalSources() );
 
     loadedData = [];
 

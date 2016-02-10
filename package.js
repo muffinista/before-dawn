@@ -83,6 +83,7 @@ module.exports = function Package(_attrs) {
                 console.log("download over, let's trigger callback");
 
                 try {
+                    console.log("remove stuff from " + self.dest);
                     remove.removeSync(self.dest);
                 } catch (err) {
                     console.error(err);
