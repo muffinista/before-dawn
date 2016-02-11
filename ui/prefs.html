@@ -47,13 +47,19 @@
             <span class="hint">We will download releases from this repo if specified.</span>
           </fieldset>
         </div>
-        <div class="pure-u-1-2">        
+        <div class="pure-u-1-2">
           <fieldset>
             <legend>Local Sources:</legend>
-            <textarea name="localSources"></textarea>
+            <div class="pure-g">
+              <div class="pure-u-7-8">
+                <textarea name="localSources"></textarea>
+              </div>
+              <div class="pure-u-1-8">        
+                <a class="pure-button pick" href="#">...</a>
+              </div>
+            </div>
             <span class="hint">
-              We will load screen savers from any directories listed
-              here. This needs to be a JSON array.
+              We will load screen savers from any directories listed here.
             </span>
           </fieldset>
         </div>

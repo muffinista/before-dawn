@@ -278,6 +278,23 @@ $(document).ready(function() {
         closeWindow();
     });
 
+    $("a.pick").on("click", function(e) {
+        var dialog = remote.require('dialog');
+        dialog.showOpenDialog({
+            properties: [ 'openDirectory', 'createDirectory' ]
+        },
+            function(result) {
+                console.log("****", result);
+
+                if ( result === undefined ) {
+                    $("[name=localSources]").val('[]');
+                }
+                else {
+                    $("[name=localSources]").val(JSON.stringify(result));
+                }
+            });
+    });
+
     $("a.save").on("click", function(e) {
         var delay = $("select[name=delay] option:selected").val();
         var do_lock = $("input[name=lock_screen][type=checkbox]").is(":checked");
