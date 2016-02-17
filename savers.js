@@ -287,28 +287,33 @@ var listAll = function(cb) {
             if ( f.match(/saver.json$/) && ! path.dirname(f).split(path.sep).reverse()[0].match(/^__/) ) {
                 console.log(f);
 
-                var content = fs.readFileSync( f );
-                var contents = JSON.parse(content);
+                try {
+                    var content = fs.readFileSync( f );
+                    var contents = JSON.parse(content);
                 
-                var stub = path.dirname(f);
-                console.log("STUB: " + stub);
-                contents.path = stub;
-                contents.key = stub + "/" + contents.source;
+                    var stub = path.dirname(f);
+                    console.log("STUB: " + stub);
+                    contents.path = stub;
+                    contents.key = stub + "/" + contents.source;
             
-                console.log("KEY: " + contents.key);
+                    console.log("KEY: " + contents.key);
             
-                // allow for a specified URL -- this way you could create a screensaver
-                // that pointed to a remote URL
-                if ( typeof(contents.url) === "undefined" ) {
-                    contents.url = 'file://' + contents.key;
+                    // allow for a specified URL -- this way you could create a screensaver
+                    // that pointed to a remote URL
+                    if ( typeof(contents.url) === "undefined" ) {
+                        contents.url = 'file://' + contents.key;
+                    }
+                
+                    contents.settings = getOptions(contents.key);
+                    console.log("OPTIONS", contents.settings);
+                    
+                    var s = new Saver(contents);
+                    if ( s.valid ) {
+                        loadedData.push(s);
+                    }
                 }
-                
-                contents.settings = getOptions(contents.key);
-                console.log("OPTIONS", contents.settings);
-            
-                var s = new Saver(contents);
-                if ( s.valid ) {
-                    loadedData.push(s);
+                catch(e) {
+                    console.log(e);
                 }
             }
         });
