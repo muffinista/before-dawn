@@ -20,6 +20,7 @@ let saverWindows = [];
 let argv = parseArgs(process.argv);
 let screenshot = require('desktop-screenshot');
 let temp = require("temp").track();
+let releaseChecker = require('./release_check.js');
 
 let debugMode = false;
 
@@ -44,6 +45,8 @@ require('./bootstrap.js');
 // store our root path as a global variable so we can access it from screens
 global.basePath = app.getPath('appData') + "/" + global.APP_NAME;
 global.savers = require('./savers.js');
+
+
 
 var openPrefsWindow = function() {
     global.savers.reload(function() {
@@ -407,47 +410,54 @@ app.on('window-all-closed', function() {
     console.log("window-all-closed");
 });
 
+var trayMenu = Menu.buildFromTemplate([
+    {
+        label: 'Run Now',
+        click: function() { runScreenSaver(); }
+    },
+    {
+        label: 'Disable',
+        click: function() { 
+            paused = true;
+            trayMenu.items[1].visible = false;
+            trayMenu.items[2].visible = true;
+        }
+    },
+    {
+        label: 'Enable',
+        click: function() { 
+            paused = false;
+            trayMenu.items[1].visible = true;
+            trayMenu.items[2].visible = false;
+        },
+        visible: false
+    },
+    {
+        label: 'Update Available!',
+        click: function() { 
+            require('electron').shell.openExternal('https://github.com/' + global.APP_REPO + '/releases/latest');
+        },
+        visible: (global.NEW_RELEASE_AVAILABLE === true)
+    },
+    {
+        label: 'Preferences',
+        click: function() { openPrefsWindow(); }
+    },
+    {
+        label: 'About ' + global.APP_NAME,
+        click: function() { openAboutWindow(); }
+    },
+    {
+        label: 'Quit',
+        click: function() { app.quit(); }
+    }
+]);
+
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 app.on('ready', function() {  
     var paused = false;
-
-    var trayMenu = Menu.buildFromTemplate([
-        {
-            label: 'Run Now',
-            click: function() { runScreenSaver(); }
-        },
-        {
-            label: 'Disable',
-            click: function() { 
-                paused = true;
-                trayMenu.items[1].visible = false;
-                trayMenu.items[2].visible = true;
-            }
-        },
-        {
-            label: 'Enable',
-            click: function() { 
-                paused = false;
-                trayMenu.items[1].visible = true;
-                trayMenu.items[2].visible = false;
-            },
-            visible: false
-        },
-        {
-            label: 'Preferences',
-            click: function() { openPrefsWindow(); }
-        },
-        {
-            label: 'About ' + global.APP_NAME,
-            click: function() { openAboutWindow(); }
-        },
-        {
-            label: 'Quit',
-            click: function() { app.quit(); }
-        }
-    ]);
 
     appIcon = new Tray(__dirname + '/assets/icon.png');
     appIcon.setToolTip(global.APP_NAME);
@@ -504,8 +514,19 @@ var openPrefsOnFirstLoad = function() {
 };
 
 
-global.savers.init(global.basePath, function() {
-    configLoaded = true;
-    openPrefsOnFirstLoad();
-});
+var bootApp = function() {
+    trayMenu.items[3].visible = global.NEW_RELEASE_AVAILABLE;
+
+    global.savers.init(global.basePath, function() {
+        configLoaded = true;
+        openPrefsOnFirstLoad();
+    });
+};
+
+
+releaseChecker.checkLatestRelease(global.APP_REPO, global.APP_VERSION, function() {
+    global.NEW_RELEASE_AVAILABLE = true;
+    bootApp();
+}, bootApp);
+
 

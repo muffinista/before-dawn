@@ -2,6 +2,7 @@ var React = require('react');
 var ReactDOM = require('react-dom');
 var Slider = require('rc-slider');
 var AutoLaunch = require('auto-launch');
+var path = require('path');
 
 var _ = require('lodash');
 var jQuery = require('./jquery.min.js');
@@ -9,16 +10,16 @@ var $ = jQuery;
 
 const shell = window.require('electron').shell;
 
-
-
 $(document).ready(function() {
     var remote = window.require('remote');
     var savers = remote.getGlobal('savers');
     var appName = remote.getGlobal('APP_NAME');
     var appVersion = remote.getGlobal('APP_VERSION');
-    var appDefaultRepo = remote.getGlobal('SAVER_REPO');
-
-
+    var defaultSaverRepo = remote.getGlobal('SAVER_REPO');
+    var appRepo = remote.getGlobal('APP_REPO');
+    var updateAvailable = remote.getGlobal('NEW_RELEASE_AVAILABLE');
+    var dialog = remote.require('dialog');
+    
     var appLauncher = new AutoLaunch({
 	      name: appName
     });
@@ -59,7 +60,7 @@ $(document).ready(function() {
         console.log("setting preview opts to", url_opts);
     }
 
-    $("input[name=repo]").val( savers.getSource().repo ).attr("placeholder", appDefaultRepo);
+    $("input[name=repo]").val( savers.getSource().repo ).attr("placeholder", defaultSaverRepo);
     $("[name=localSources]").val(JSON.stringify(savers.getLocalSources()));
 
     $("select[name=delay] option[value=" + savers.getDelay() + "]").attr("selected", "selected");
@@ -331,4 +332,24 @@ $(document).ready(function() {
     });
 
     renderList();
+
+    if ( updateAvailable === true ) {
+        dialog.showMessageBox({
+            type: "info",
+            title: "Update Available!",
+            message: "There's a new update available! Would you like to download it?",
+            buttons: ["No", "Yes"],
+            defaultId: 0,
+            icon: path.join(__dirname, '..', 'assets', 'Icon1024.png')
+        },
+            function(result) {
+                console.log(result);
+                if ( result === 1 ) {
+                    shell.openExternal('https://github.com/' + appRepo + '/releases/latest');
+                }
+            }
+        );
+    }
+    
+
 });
