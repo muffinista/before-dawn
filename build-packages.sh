@@ -95,3 +95,31 @@ if [ "$TARGET" == "win" ]; then
     rm -rf "${DEST}/osx/Before Dawn-darwin-x64"
     rm -rf "${DEST}/win/Before Dawn-win32-ia32"
 fi
+
+
+
+
+if [ "$TARGET" == "deb" ]; then
+  echo "== REBUILD MODULES =="
+  ./node_modules/.bin/electron-rebuild -w node-system-idle-time
+
+    echo "== Build Linux App =="
+    electron-packager . 'before-dawn' \
+                      --prune \
+                      --out=${DEST}/linux \
+                      --platform=linux \
+                      --arch=x64 \
+                      --version=${ELECTRON_VERSION} \
+                      --icon='assets/icon.ico'  \
+                      --overwrite
+    
+    echo "== Build deb package =="
+    
+    #
+    # npm install -g electron-builder
+    #
+    electron-builder "${DEST}/linux/before-dawn-linux-x64/" \
+                     --platform=linux \
+                     --out="/${DEST}/linux" \
+                     --config=build.json
+fi

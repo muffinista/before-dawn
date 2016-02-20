@@ -14,5 +14,14 @@
     "version" : "0.1",
     "icon" : "assets/icon.ico",
     "verbosity": 1
+  },
+  "linux": {
+    "arch": 64,
+    "target": "deb",
+    "version": "0.1",
+    "title": "Before Dawn",
+    "executable": "Before Dawn",
+    "comment": "Before Dawn",
+    "maintainer": "Colin Mitchell <colin@muffinlabs.com>"
   }
 }
