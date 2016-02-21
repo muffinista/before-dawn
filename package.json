@@ -1,6 +1,6 @@
 {
   "name": "before-dawn",
-  "version": "0.4",
+  "version": "0.4.0",
   "description": "screensaver fun",
   "main": "init.js",
   "scripts": {
