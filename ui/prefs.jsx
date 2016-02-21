@@ -339,8 +339,9 @@ $(document).ready(function() {
             title: "Update Available!",
             message: "There's a new update available! Would you like to download it?",
             buttons: ["No", "Yes"],
-            defaultId: 0,
-            icon: path.join(__dirname, '..', 'assets', 'Icon1024.png')
+            defaultId: 0
+            //,
+            //icon: path.join(__dirname, '..', 'assets', 'Icon1024.png')
         },
             function(result) {
                 console.log(result);
