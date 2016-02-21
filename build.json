@@ -30,7 +30,7 @@
         "target": "deb",
         "version": "0.4",
         "title": "Before Dawn",
-        "executable": "Before Dawn",
+        "executable": "before-dawn",
         "comment": "Before Dawn",
         "maintainer": "Colin Mitchell <colin@muffinlabs.com>"
     }
