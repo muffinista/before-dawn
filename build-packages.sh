@@ -37,6 +37,12 @@ mkdir -p "${DEST}/osx"
 rm -rf "${DEST}/win"
 mkdir -p "${DEST}/win"
 
+rm -rf "${DEST}/linux"
+mkdir -p "${DEST}/linux"
+
+echo "== Update build.json =="
+node update-build-version.js
+
 
 #
 # sudo npm install electron-packager -g
@@ -99,7 +105,7 @@ fi
 
 
 
-if [ "$TARGET" == "deb" ]; then
+if [ "$TARGET" == "linux" ]; then
   echo "== REBUILD MODULES =="
   ./node_modules/.bin/electron-rebuild -w node-system-idle-time
 
@@ -113,7 +119,7 @@ if [ "$TARGET" == "deb" ]; then
                       --icon='assets/icon.ico'  \
                       --overwrite
     
-    echo "== Build deb package =="
+    echo "== Build linux deb package =="
     
     #
     # npm install -g electron-builder
