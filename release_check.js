@@ -1,6 +1,7 @@
 "use strict";
 
 var request = require('request');
+var semver = require('semver');
 
 exports.checkLatestRelease = function(repo, version, yes_cb, no_cb) {
     var url = "https://api.github.com/repos/" + repo + "/releases/latest";
@@ -13,7 +14,13 @@ exports.checkLatestRelease = function(repo, version, yes_cb, no_cb) {
         }
     }, function(error, response, body) {
         var tag = body.tag_name;
-        if ( tag !== version ) {
+
+        // our first few tags in git aren't semver compatible so fix that
+        if ( tag === "v0.3" || tag === "v0.2" || tag === "v0.1" ) {
+            tag = tag + ".0";
+        }
+
+        if ( semver.gt(semver.clean(tag), semver.clean(version)) ) {
             console.log("tags dont match");
             yes_cb(body);
         }
