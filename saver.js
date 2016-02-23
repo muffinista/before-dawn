@@ -51,7 +51,7 @@ module.exports = function Saver(_attrs) {
             o[v[0]] = v[1];
             return o; 
         }, {});
-        this.settings = _.merge(this.settings, _attrs.settings);
+        this.settings = _.merge({}, this.settings, _attrs.settings);
         console.log("my settings", this.settings);
 
         // allow for custom preview URL -- if not specified, just use the default
@@ -89,7 +89,7 @@ module.exports = function Saver(_attrs) {
         }
 
         console.log("urlFor", this.settings, opts);
-        opts = _.merge(this.settings, opts);
+        opts = _.merge({}, this.settings, opts);
 
         if ( url.lastIndexOf("?") !== -1 ) {
             joiner ="&";
