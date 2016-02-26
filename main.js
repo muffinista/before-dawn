@@ -24,7 +24,6 @@ let releaseChecker = require('./release_check.js');
 
 let debugMode = false;
 
-var screenshot_file = temp.path({suffix: '.png'});
 
 var appReady = false;
 var configLoaded = false;
@@ -269,6 +268,7 @@ var runScreenSaver = function() {
     }
 
 
+    var screenshot_file = temp.path({suffix: '.png'});
     screenshot(screenshot_file, function(error, complete) {
         for ( var i in displays ) {
             var s = displays[i];
@@ -308,7 +308,7 @@ var runScreenSaver = function() {
             else {
                 url_opts.screenshot = encodeURIComponent("file://" + screenshot_file);
             }
-            
+
             var url = saver.getUrl(url_opts);
             console.log("loading " + url);
             
@@ -522,7 +522,6 @@ var bootApp = function() {
         openPrefsOnFirstLoad();
     });
 };
-
 
 releaseChecker.checkLatestRelease(global.APP_REPO, global.APP_VERSION, function() {
     global.NEW_RELEASE_AVAILABLE = true;
