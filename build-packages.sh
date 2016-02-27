@@ -20,7 +20,7 @@ else
     echo "== Checking Out Code =="
     rm -rf $WORKING_DIR
     mkdir -p $WORKING_DIR
-    git clone git@github.com:muffinista/before-dawn.git $WORKING_DIR
+    git clone https://github.com/muffinista/before-dawn.git $WORKING_DIR
     cd $WORKING_DIR   
 fi
 
