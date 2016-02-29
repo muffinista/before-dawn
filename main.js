@@ -362,6 +362,7 @@ var runScreenSaver = function() {
     grabber.webContents.send('screengrab-request', displays);
 
     isActive = true;
+    wakeupTimer = setInterval(checkForWakeup, 100);
 };
 
 var shouldLockScreen = function() {
@@ -397,6 +398,9 @@ var doLockScreen = function() {
 
 var stopScreenSaver = function() {
     console.log("received stopScreenSaver call");
+
+    clearInterval(wakeupTimer);
+    lastIdle = 0;
 
     if ( saverWindows.length <= 0 ) {
         return;
@@ -487,13 +491,48 @@ var trayMenu = Menu.buildFromTemplate([
     }
 ]);
 
+var checkForWakeup = function() {
+    var idle;
+
+    if ( paused === true || isActive !== true ) {
+        return;
+    }
+
+    idle = idler.getIdleTime();
+    if ( idle < lastIdle ) {
+        console.log("wake up!");
+        stopScreenSaver();
+    }
+};
+var wakeupTimer;
+
+var paused = false;
+var lastIdle = 0;
+
+var checkIdle = function() {
+    var idle, waitTime;
+
+    if ( paused === true || isActive === true ) {
+        return;
+    }
+
+    waitTime = savers.getDelay() * 60000;
+    if ( waitTime <= 0 ) {
+        return;
+    }
+        
+    idle = idler.getIdleTime();
+    if ( idle > waitTime ) {
+        runScreenSaver();
+    }
+    
+    lastIdle = idle;
+};
+
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 app.on('ready', function() {  
-    var checkIdle;
-    var paused = false;
-    var lastIdle = 0;
     appIcon = new Tray(__dirname + '/assets/icon.png');
     appIcon.setToolTip(global.APP_NAME);
     appIcon.setContextMenu(trayMenu); 
@@ -501,25 +540,6 @@ app.on('ready', function() {
 
     openScreenGrabber();
 
-    checkIdle = function() {
-        var idle, waitTime;
-
-        if ( paused === true || isActive === true ) {
-            return;
-        }
-
-        waitTime = savers.getDelay() * 60000;
-        if ( waitTime <= 0 ) {
-            return;
-        }
-        
-        idle = idler.getIdleTime();
-         if ( idle > waitTime ) {
-            runScreenSaver();
-        }
-        
-        lastIdle = idle;
-    };
     checkTimer = setInterval(checkIdle, 2500);
 
     if ( argv.screen === "prefs" ) {
