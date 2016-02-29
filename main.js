@@ -250,7 +250,7 @@ var grabber;
 var openScreenGrabber = function() {
     var grabberUrl = 'file://' + __dirname + '/ui/grabber.html';
     grabber = new BrowserWindow({
-        show: false,
+        show: debugMode === true,
         width:800,
         height:600
     });
@@ -265,11 +265,77 @@ var openScreenGrabber = function() {
     });
 };
 
+var runScreenSaverOnDisplay = function(saver, s) {
+    var globalJSCode = fs.readFileSync( path.join(__dirname, 'global-js-handlers.js'), 'ascii');
+
+    var size = s.bounds;
+    var url_opts = { 
+        width: size.width,
+        height: size.height,
+        platform: process.platform
+    };
+            
+    var windowOpts = {
+        fullscreen: ( debugMode !== true ),
+        webgl: true,
+        preload: __dirname + '/global.js',
+        'auto-hide-menu-bar': true,
+        x: s.bounds.x,
+        y: s.bounds.y
+    };
+
+    // listen for an event that we have an image of the display we will run on before completing setup
+    ipcMain.once("screenshot-" + s.id, function(e, message) {
+        var w = new BrowserWindow(windowOpts);       
+        if ( debugMode === true ) {
+            w.webContents.openDevTools();
+        }
+        
+        // Emitted when the window is closed.
+        w.on('closed', function() {
+            w = null;           
+            isActive = false;
+        });
+        
+        saverWindows.push(w);
+        
+        url_opts.screenshot = encodeURIComponent("file://" + message.url);
+
+        var url = saver.getUrl(url_opts);
+        console.log("loading " + url);
+                
+        // and load the index.html of the app.
+        w.loadURL(url);
+                
+        // windows is having some issues with putting the window behind existing
+        // stuff -- @see https://github.com/atom/electron/issues/2867
+        if ( process.platform == "win32" ) {
+            w.minimize();
+            w.focus();
+        }
+                
+        // inject our custom JS and CSS here
+        w.webContents.executeJavaScript(globalJSCode);
+
+        // reload the screengrabber window to keep it from churning
+        // CPU, until I can figure out why that is even happening
+        if ( saverWindows.length >= totalDisplays ) {
+            console.log("Reloading screengrabber");
+            grabber.reload();
+        }
+
+    });
+};
+       
+
+// track total displays so that when the screensaver is
+// running everywhere we can handle some background work
+var totalDisplays = 0;
+
 var runScreenSaver = function() {
     var electronScreen = electron.screen;
     var displays = [];
     var saver = global.savers.getCurrentData();
-    var globalJSCode = fs.readFileSync( path.join(__dirname, 'global-js-handlers.js'), 'ascii');
 
     // @todo maybe add an option to only run on a single display?
 
@@ -284,72 +350,12 @@ var runScreenSaver = function() {
     }
     else {
         displays = electronScreen.getAllDisplays();
+        totalDisplays = displays.length;
     }
 
 
     for ( var i in displays ) {
-        (function() {
-            var s = displays[i];
-
-            var size = s.bounds;
-            var url_opts = { 
-                width: size.width,
-                height: size.height,
-                platform: process.platform
-            };
-            
-            var windowOpts = {
-                fullscreen: ( debugMode !== true ),
-                webgl: true,
-                preload: __dirname + '/global.js',
-                'auto-hide-menu-bar': true,
-                x: s.bounds.x,
-                y: s.bounds.y
-            };
-            
-            ipcMain.once("screenshot-" + s.id, function(e, message) {
-                console.log("RETURN");
-                console.log(message);
-
-                var w = new BrowserWindow(windowOpts);       
-                if ( debugMode === true ) {
-                    w.webContents.openDevTools();
-                }
-                
-                // Emitted when the window is closed.
-                w.on('closed', function() {
-                    w = null;           
-                    isActive = false;
-                });
-                
-                saverWindows.push(w);
-                
-                //if ( error ) {
-                //console.log("Screenshot failed", error);
-                //}
-                //else {
-                url_opts.screenshot = encodeURIComponent("file://" + message.url);
-                //url_opts.screenshot = encodeURIComponent(message.url);
-                //}
-                
-                var url = saver.getUrl(url_opts);
-                console.log("loading " + url);
-                
-                // and load the index.html of the app.
-                w.loadURL(url);
-                
-                // windows is having some issues with putting the window behind existing
-                // stuff -- @see https://github.com/atom/electron/issues/2867
-                if ( process.platform == "win32" ) {
-                    w.minimize();
-                    w.focus();
-                }
-                
-                // inject our custom JS and CSS here
-                w.webContents.executeJavaScript(globalJSCode);
-            });
-        })();
-       
+        runScreenSaverOnDisplay(saver, displays[i]);
     } // for
 
     console.log("send event screengrab-request");
@@ -410,8 +416,6 @@ var stopScreenSaver = function() {
     }
 
     saverWindows = [];
-
-    grabber.reload();
 };
 
 
@@ -429,18 +433,10 @@ if (shouldQuit) {
 // listen for a message from global.js that we should stop running the screensaver
 //
 ipcMain.on('asynchronous-message', function(event, arg) {
-    console.log("someone loves us!");
-    console.log(event);
     if ( arg === "stopScreenSaver" ) {
         stopScreenSaver();
     }
 });
-
-ipcMain.on('screenshot', function(event, arg) {
-    console.log("someone loves us!");
-    console.log(event);
-});
-
 
 
 // seems like we need to catch this event to keep OSX from exiting app after screensaver runs?

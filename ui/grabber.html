@@ -11,7 +11,7 @@
    const ipcRenderer = require('electron').ipcRenderer;
    const temp = require("temp");
 
-   function findOrCreate(type, screen_id) {
+   var findOrCreate = function(type, screen_id) {
      var el, id;
      id = type + screen_id;
 
@@ -19,91 +19,91 @@
      if ( el === null ) {
        el = document.createElement(type);
        el.id = id;
+
+       document.body.appendChild(el);
      }
 
      return el;    
-   }
+   };
+
+   var captureScreen = function(opts) {
+     var video = findOrCreate('video', opts.id);
+     var canvas = findOrCreate('canvas', opts.id);
+     var photo = findOrCreate('photo', opts.id);
+         
+     var screen_opts = {
+       audio: false,
+       video: {
+         mandatory: {
+           // fun fact -- you need to use max here
+           // @see https://groups.google.com/a/chromium.org/forum/#!topic/chromium-apps/TP_rsnYVQWg
+           maxWidth: opts.bounds.width,
+           maxHeight: opts.bounds.height,
+           chromeMediaSource: 'desktop',
+           chromeMediaSourceId: "screen:" + opts.id
+         }
+       }
+     };
+         
+     console.log("WASSUP", screen_opts);
+     navigator.webkitGetUserMedia(screen_opts, function(s) {
+       console.log("GOT MEDIA", s);
+
+       video = findOrCreate('video', opts.id);
+       canvas = findOrCreate('canvas', opts.id);
+       photo = findOrCreate('photo', opts.id);
+         
+       video.src = URL.createObjectURL(s);
+       video.play();
+
+       video.addEventListener('canplay', function render(ev){
+         video.removeEventListener("canplay", render, false); //remove listener, no longer needed
+
+         console.log("VIDEO", video);
+         var width = video.videoWidth;
+         var height = video.videoHeight;
+
+         canvas.setAttribute('width', video.videoWidth);
+         canvas.setAttribute('height', video.videoHeight);
+             
+         var context = canvas.getContext('2d');
+         canvas.width = video.videoWidth;
+         canvas.height = video.videoHeight;
+         context.drawImage(video, 0, 0, width, height);
+           
+         var data = canvas.toDataURL('image/png');
+
+         context.clearRect(0, 0, canvas.width, canvas.height);
+         
+         photo.setAttribute('src', data);
+
+         var tempName = temp.path({suffix:'.png'});
+         var fs = require('fs');
+         var buffer = new Buffer(data.split(",")[1], 'base64');
+         fs.writeFileSync(tempName, buffer);
+
+         // https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Using_HTML5_audio_and_video
+         video.pause();
+         video.src = "";
+
+         photo.src = "";
+             
+         video.remove();
+         canvas.remove();
+         photo.remove();
+         
+         console.log('screenshot-' + opts.id);
+         ipcRenderer.send('screenshot-' + opts.id, {url:tempName});
+       });
+
+     }, getUserMediaError);
+   };
+
    
    ipcRenderer.on('screengrab-request', function(event, displays) {
      console.log("got screengrab request");
      for ( var i = 0; i < displays.length; i++ ) {
-       (function() {
-         var opts = displays[i];
-         
-         var video = findOrCreate('video', opts.id);
-         var canvas = findOrCreate('canvas', opts.id);
-         var photo = findOrCreate('photo', opts.id);
-         
-         document.body.appendChild(video);
-         document.body.appendChild(canvas);
-         document.body.appendChild(photo);
-
-         var screen_opts = {
-           audio: false,
-           video: {
-             mandatory: {
-               // fun fact -- you need to use max here
-               // @see https://groups.google.com/a/chromium.org/forum/#!topic/chromium-apps/TP_rsnYVQWg
-               maxWidth: opts.bounds.width,
-               maxHeight: opts.bounds.height,
-               chromeMediaSource: 'desktop',
-               chromeMediaSourceId: "screen:" + opts.id
-             }
-           }
-         };
-         
-         console.log("WASSUP", screen_opts);
-         navigator.webkitGetUserMedia(screen_opts, function(s) {
-           console.log("GOT MEDIA", s);
-
-           video = findOrCreate('video', opts.id);
-           canvas = findOrCreate('canvas', opts.id);
-           photo = findOrCreate('photo', opts.id);
-         
-           video.src = URL.createObjectURL(s);
-           video.play();
-
-           video.addEventListener('canplay', function render(ev){
-             video.removeEventListener("canplay", render, false); //remove listener, no longer needed
-
-             console.log("VIDEO", video);
-             var width = video.videoWidth;
-             var height = video.videoHeight;
-           
-             console.log("WIDTH: " + video.videoWidth);
-             console.log("HEIGHT: " + video.videoHeight);
-             canvas.setAttribute('width', video.videoWidth);
-             canvas.setAttribute('height', video.videoHeight);
-             
-             var context = canvas.getContext('2d');
-             canvas.width = video.videoWidth;
-             canvas.height = video.videoHeight;
-             context.drawImage(video, 0, 0, width, height);
-           
-             var data = canvas.toDataURL('image/png');
-           
-             photo.setAttribute('src', data);
-
-             var tempName = temp.path({suffix:'.png'});
-             var fs = require('fs');
-             var buffer = new Buffer(data.split(",")[1], 'base64');
-             fs.writeFileSync(tempName, buffer);
-
-             // https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Using_HTML5_audio_and_video
-             video.pause();
-             video.src = "";
-
-             photo.src = "";
-             
-             video.remove();
-             canvas.remove();
-             photo.remove();
-             
-             console.log('screenshot-' + opts.id);
-             ipcRenderer.send('screenshot-' + opts.id, {url:tempName});
-           });
-         }, getUserMediaError);
-       })();
+       captureScreen(displays[i]);
      }
    });
 
