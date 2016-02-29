@@ -19,7 +19,6 @@ let parseArgs = require('minimist');
 let saverWindows = [];
 let argv = parseArgs(process.argv);
 let screenshot = require('desktop-screenshot');
-let temp = require("temp").track();
 let releaseChecker = require('./release_check.js');
 
 let debugMode = false;
@@ -246,6 +245,26 @@ var openAboutWindow = function() {
     });
 };
 
+
+var grabber;
+var openScreenGrabber = function() {
+    var grabberUrl = 'file://' + __dirname + '/ui/grabber.html';
+    grabber = new BrowserWindow({
+        show: false,
+        width:800,
+        height:600
+    });
+
+    grabber.loadURL(grabberUrl);
+    
+    if ( debugMode === true ) {
+        grabber.webContents.openDevTools();
+    }
+    grabber.on('closed', function() {
+        grabber = null;
+    });
+};
+
 var runScreenSaver = function() {
     var electronScreen = electron.screen;
     var displays = [];
@@ -268,10 +287,10 @@ var runScreenSaver = function() {
     }
 
 
-    var screenshot_file = temp.path({suffix: '.png'});
-    screenshot(screenshot_file, function(error, complete) {
-        for ( var i in displays ) {
+    for ( var i in displays ) {
+        (function() {
             var s = displays[i];
+
             var size = s.bounds;
             var url_opts = { 
                 width: size.width,
@@ -287,46 +306,54 @@ var runScreenSaver = function() {
                 x: s.bounds.x,
                 y: s.bounds.y
             };
+            
+            ipcMain.once("screenshot-" + s.id, function(e, message) {
+                console.log("RETURN");
+                console.log(message);
 
-            var w = new BrowserWindow(windowOpts);
-            
-            if ( debugMode === true ) {
-                w.webContents.openDevTools();
-            }
-            
-            // Emitted when the window is closed.
-            w.on('closed', function() {
-                w = null;           
-                isActive = false;
+                var w = new BrowserWindow(windowOpts);       
+                if ( debugMode === true ) {
+                    w.webContents.openDevTools();
+                }
+                
+                // Emitted when the window is closed.
+                w.on('closed', function() {
+                    w = null;           
+                    isActive = false;
+                });
+                
+                saverWindows.push(w);
+                
+                //if ( error ) {
+                //console.log("Screenshot failed", error);
+                //}
+                //else {
+                url_opts.screenshot = encodeURIComponent("file://" + message.url);
+                //url_opts.screenshot = encodeURIComponent(message.url);
+                //}
+                
+                var url = saver.getUrl(url_opts);
+                console.log("loading " + url);
+                
+                // and load the index.html of the app.
+                w.loadURL(url);
+                
+                // windows is having some issues with putting the window behind existing
+                // stuff -- @see https://github.com/atom/electron/issues/2867
+                if ( process.platform == "win32" ) {
+                    w.minimize();
+                    w.focus();
+                }
+                
+                // inject our custom JS and CSS here
+                w.webContents.executeJavaScript(globalJSCode);
             });
-            
-            saverWindows.push(w);
-            
-            if ( error ) {
-                console.log("Screenshot failed", error);
-            }
-            else {
-                url_opts.screenshot = encodeURIComponent("file://" + screenshot_file);
-            }
+        })();
+       
+    } // for
 
-            var url = saver.getUrl(url_opts);
-            console.log("loading " + url);
-            
-            // and load the index.html of the app.
-            w.loadURL(url);
-            
-            // windows is having some issues with putting the window behind existing
-            // stuff -- @see https://github.com/atom/electron/issues/2867
-            if ( process.platform == "win32" ) {
-                w.minimize();
-                w.focus();
-            }
-
-            // inject our custom JS and CSS here
-            w.webContents.executeJavaScript(globalJSCode);
-
-        } // for
-    });
+    console.log("send event screengrab-request");
+    grabber.webContents.send('screengrab-request', displays);
 
     isActive = true;
 };
@@ -383,6 +410,8 @@ var stopScreenSaver = function() {
     }
 
     saverWindows = [];
+
+    grabber.reload();
 };
 
 
@@ -400,10 +429,19 @@ if (shouldQuit) {
 // listen for a message from global.js that we should stop running the screensaver
 //
 ipcMain.on('asynchronous-message', function(event, arg) {
+    console.log("someone loves us!");
+    console.log(event);
     if ( arg === "stopScreenSaver" ) {
         stopScreenSaver();
     }
 });
+
+ipcMain.on('screenshot', function(event, arg) {
+    console.log("someone loves us!");
+    console.log(event);
+});
+
+
 
 // seems like we need to catch this event to keep OSX from exiting app after screensaver runs?
 app.on('window-all-closed', function() {
@@ -457,14 +495,17 @@ var trayMenu = Menu.buildFromTemplate([
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 app.on('ready', function() {  
+    var checkIdle;
     var paused = false;
-
+    var lastIdle = 0;
     appIcon = new Tray(__dirname + '/assets/icon.png');
     appIcon.setToolTip(global.APP_NAME);
     appIcon.setContextMenu(trayMenu); 
 
-    var lastIdle = 0;
-    var checkIdle = function() {
+
+    openScreenGrabber();
+
+    checkIdle = function() {
         var idle, waitTime;
 
         if ( paused === true || isActive === true ) {
