@@ -35,3 +35,5 @@ node_modules
 bower_components
 
 *.map
+
+ui/prefs.js
