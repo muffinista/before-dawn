@@ -2,9 +2,9 @@
   "name": "before-dawn",
   "version": "0.6.0",
   "description": "screensaver fun",
-  "main": "init.js",
+  "main": "main.js",
   "scripts": {
-    "start": "electron init.js",
+    "start": "electron main.js",
     "rebuild": "./node_modules/.bin/electron-rebuild -w node-system-idle-time",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
