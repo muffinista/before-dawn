@@ -6,7 +6,7 @@
   "scripts": {
     "start": "electron main.js",
     "rebuild": "./node_modules/.bin/electron-rebuild -w node-system-idle-time",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "electron-mocha tests/"
   },
   "author": "",
   "license": "ISC",
@@ -35,6 +35,7 @@
     "electron-compilers": "^1.0.1",
     "electron-prebuilt": "0.36.4",
     "electron-rebuild": "^1.1.1",
+    "electron-mocha": "^0.8.0",
     "grunt": "^0.4.5",
     "grunt-babel": "^6.0.0"
   }
