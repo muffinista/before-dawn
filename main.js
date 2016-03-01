@@ -18,7 +18,6 @@ let idler = require('node-system-idle-time');
 let parseArgs = require('minimist');
 let saverWindows = [];
 let argv = parseArgs(process.argv);
-let screenshot = require('desktop-screenshot');
 let releaseChecker = require('./release_check.js');
 
 let debugMode = false;
