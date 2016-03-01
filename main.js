@@ -18,7 +18,7 @@ let idler = require('node-system-idle-time');
 let parseArgs = require('minimist');
 let saverWindows = [];
 let argv = parseArgs(process.argv);
-let releaseChecker = require('./release_check.js');
+let releaseChecker = require('./lib/release_check.js');
 
 let debugMode = false;
 
@@ -41,7 +41,7 @@ require('./bootstrap.js');
 
 // store our root path as a global variable so we can access it from screens
 global.basePath = app.getPath('appData') + "/" + global.APP_NAME;
-global.savers = require('./savers.js');
+global.savers = require('./lib/savers.js');
 
 
 
@@ -265,7 +265,7 @@ var openScreenGrabber = function() {
 };
 
 var runScreenSaverOnDisplay = function(saver, s) {
-    var globalJSCode = fs.readFileSync( path.join(__dirname, 'global-js-handlers.js'), 'ascii');
+    var globalJSCode = fs.readFileSync( path.join(__dirname, 'assets', 'global-js-handlers.js'), 'ascii');
 
     var size = s.bounds;
     var url_opts = { 
@@ -277,7 +277,7 @@ var runScreenSaverOnDisplay = function(saver, s) {
     var windowOpts = {
         fullscreen: ( debugMode !== true ),
         webgl: true,
-        preload: __dirname + '/global.js',
+        preload: path.join(__dirname, 'assets', 'global.js'),
         'auto-hide-menu-bar': true,
         x: s.bounds.x,
         y: s.bounds.y
