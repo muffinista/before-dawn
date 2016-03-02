@@ -44,7 +44,6 @@ global.basePath = app.getPath('appData') + "/" + global.APP_NAME;
 global.savers = require('./lib/savers.js');
 
 
-
 var openPrefsWindow = function() {
     global.savers.reload(function() {
         var prefsUrl = 'file://' + __dirname + '/ui/prefs.html';
@@ -570,7 +569,11 @@ var openPrefsOnFirstLoad = function() {
 };
 
 
-var bootApp = function() {
+var bootApp = function(_basePath) {
+    if ( typeof(_basePath) !== "undefined" ) {
+        global.basePath = _basePath;
+    }
+
     trayMenu.items[3].visible = global.NEW_RELEASE_AVAILABLE;
 
     global.savers.init(global.basePath, function() {
@@ -579,9 +582,16 @@ var bootApp = function() {
     });
 };
 
-releaseChecker.checkLatestRelease(global.APP_REPO, global.APP_VERSION, function() {
-    global.NEW_RELEASE_AVAILABLE = true;
-    bootApp();
-}, bootApp);
+releaseChecker.checkLatestRelease(global.APP_REPO, global.APP_VERSION, 
+                                  function() {
+                                      global.NEW_RELEASE_AVAILABLE = true;
+                                      bootApp();
+                                  }, 
+                                  function() {
+                                      bootApp();
+                                  });
 
 
+
+exports.bootApp = bootApp;
+exports.openPrefsWindow = openPrefsWindow;

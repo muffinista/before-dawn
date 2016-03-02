@@ -152,7 +152,6 @@ describe('Saver', function() {
             });
 
             assert.equal("http://yahoo.com/?foo=bar", s.getUrl({foo:"bar"}));
-           
         });
     });
 });
