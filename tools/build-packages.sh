@@ -41,7 +41,7 @@ rm -rf "${DEST}/linux"
 mkdir -p "${DEST}/linux"
 
 echo "== Update build.json =="
-node update-build-version.js
+node tools/update-build-version.js
 
 
 #

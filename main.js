@@ -535,7 +535,6 @@ app.on('ready', function() {
     appIcon.setToolTip(global.APP_NAME);
     appIcon.setContextMenu(trayMenu); 
 
-
     openScreenGrabber();
 
     checkTimer = setInterval(checkIdle, 2500);
@@ -553,6 +552,7 @@ app.on('ready', function() {
     appReady = true;
 
     openPrefsOnFirstLoad();
+
 });
 
 /**
