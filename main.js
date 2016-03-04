@@ -20,21 +20,23 @@ let saverWindows = [];
 let argv = parseArgs(process.argv);
 let releaseChecker = require('./lib/release_check.js');
 
-let debugMode = false;
+let debugMode = ( argv.debug === true );
 
 
 var appReady = false;
 var configLoaded = false;
 
+var grabber;
 
-// don't show app in dock
-if ( typeof(app.dock) !== "undefined" ) {
-    app.dock.hide();
-}
+// track total displays so that when the screensaver is
+// running everywhere we can handle some background work
+var totalDisplays = 0;
 
-if ( argv.debug === true ) {
-    debugMode = true;
-}
+var wakeupTimer;
+
+var paused = false;
+var lastIdle = 0;
+
 
 // load a few global variables
 require('./bootstrap.js');
@@ -44,159 +46,20 @@ global.basePath = app.getPath('appData') + "/" + global.APP_NAME;
 global.savers = require('./lib/savers.js');
 
 
+/**
+ * Open the preferences window
+ */
 var openPrefsWindow = function() {
+    // call savers.reload to make sure our data is properly refreshed
+    // and check for any system updates
     global.savers.reload(function() {
         var prefsUrl = 'file://' + __dirname + '/ui/prefs.html';
         var w = new BrowserWindow({
             width:800,
             height:675,
             resizable:false,
-            icon: __dirname + '/assets/icon.png'
+            icon: path.join(__dirname, 'assets', 'icon.png')
         });
-
-        var menuTemplate = [
-            {
-                label: 'Edit',
-                submenu: [
-                    {
-                        label: 'Undo',
-                        accelerator: 'CmdOrCtrl+Z',
-                        role: 'undo'
-                    },
-                    {
-                        label: 'Redo',
-                        accelerator: 'Shift+CmdOrCtrl+Z',
-                        role: 'redo'
-                    },
-                    {
-                        type: 'separator'
-                    },
-                    {
-                        label: 'Cut',
-                        accelerator: 'CmdOrCtrl+X',
-                        role: 'cut'
-                    },
-                    {
-                        label: 'Copy',
-                        accelerator: 'CmdOrCtrl+C',
-                        role: 'copy'
-                    },
-                    {
-                        label: 'Paste',
-                        accelerator: 'CmdOrCtrl+V',
-                        role: 'paste'
-                    },
-                    {
-                        label: 'Select All',
-                        accelerator: 'CmdOrCtrl+A',
-                        role: 'selectall'
-                    }
-                ]
-            },
-            {
-                label: 'View',
-                submenu: [
-                    {
-                        label: 'Reload',
-                        accelerator: 'CmdOrCtrl+R',
-                        click: function(item, focusedWindow) {
-                            if (focusedWindow)
-                                focusedWindow.reload();
-                        }
-                    },
-                    {
-                        label: 'Toggle Developer Tools',
-                        accelerator: (function() {
-                            if (process.platform == 'darwin')
-                                return 'Alt+Command+I';
-                            else
-                                return 'Ctrl+Shift+I';
-                        })(),
-                        click: function(item, focusedWindow) {
-                            if (focusedWindow)
-                                focusedWindow.toggleDevTools();
-                        }
-                    }
-                ]
-            },
-            {
-                label: 'Window',
-                role: 'window',
-                submenu: [
-                    {
-                        label: 'Minimize',
-                        accelerator: 'CmdOrCtrl+M',
-                        role: 'minimize'
-                    },
-                    {
-                        label: 'Close',
-                        accelerator: 'CmdOrCtrl+W',
-                        role: 'close'
-                    }
-                ]
-            },
-            {
-                label: 'Help',
-                role: 'help',
-                submenu: [
-                    {
-                        label: 'Learn More',
-                        click: function() {
-                            require('electron').shell.openExternal('https://github.com/muffinista/before-dawn');
-                        }
-                    }
-                ]
-            }
-        ];
-
-        if (process.platform == 'darwin') {
-            var name = require('electron').app.getName();
-            menuTemplate.unshift({
-                label: name,
-                submenu: [
-                    {
-                        label: 'About ' + name,
-                        role: 'about'
-                    },
-                    {
-                        type: 'separator'
-                    },
-                    {
-                        label: 'Services',
-                        role: 'services',
-                        submenu: []
-                    },
-                    {
-                        type: 'separator'
-                    },
-                    {
-                        label: 'Hide ' + name,
-                        accelerator: 'Command+H',
-                        role: 'hide'
-                    },
-                    {
-                        label: 'Hide Others',
-                        accelerator: 'Command+Alt+H',
-                        role: 'hideothers'
-                    },
-                    {
-                        label: 'Show All',
-                        role: 'unhide'
-                    },
-                    {
-                        type: 'separator'
-                    },
-                    {
-                        label: 'Quit',
-                        accelerator: 'Command+Q',
-                        click: function() { app.quit(); }
-                    }
-                ]
-            });
-        }
-
-        var menu = Menu.buildFromTemplate(menuTemplate);
-        Menu.setApplicationMenu(menu);
         
         w.loadURL(prefsUrl);
 
@@ -218,6 +81,9 @@ var openPrefsWindow = function() {
     });
 };
 
+/**
+ * Open the (very simple) About window for the app
+ */
 var openAboutWindow = function() {
     var prefsUrl = 'file://' + __dirname + '/ui/about.html';
     var w = new BrowserWindow({
@@ -243,8 +109,10 @@ var openAboutWindow = function() {
     });
 };
 
-
-var grabber;
+/**
+ * open our screen grabber tool. this should run in the background,
+ * waiting to take screenshots.
+ */
 var openScreenGrabber = function() {
     var grabberUrl = 'file://' + __dirname + '/ui/grabber.html';
     grabber = new BrowserWindow({
@@ -263,6 +131,9 @@ var openScreenGrabber = function() {
     });
 };
 
+/**
+ * run the specified screensaver on the specified screen
+ */
 var runScreenSaverOnDisplay = function(saver, s) {
     var globalJSCode = fs.readFileSync( path.join(__dirname, 'assets', 'global-js-handlers.js'), 'ascii');
 
@@ -326,10 +197,9 @@ var runScreenSaverOnDisplay = function(saver, s) {
 };
        
 
-// track total displays so that when the screensaver is
-// running everywhere we can handle some background work
-var totalDisplays = 0;
-
+/**
+ * run the user's chosen screensaver on any available screens
+ */
 var runScreenSaver = function() {
     var electronScreen = electron.screen;
     var displays = [];
@@ -363,12 +233,15 @@ var runScreenSaver = function() {
     wakeupTimer = setInterval(checkForWakeup, 100);
 };
 
+/**
+ * should we lock the user's screen when returning from running the saver?
+ */
 var shouldLockScreen = function() {
     return ( savers.getLock() === true );
 };
 
 /**
- * lock the screen when the saver deactivates. currently this only works on OSX (and maybe not even there)
+ * lock the screen when the saver deactivates. currently this only works on OSX and Windows
  */
 var doLockScreen = function() {
     var exec = require('child_process').exec;
@@ -394,6 +267,9 @@ var doLockScreen = function() {
     });
 };
 
+/**
+ * stop the running screensaver
+ */
 var stopScreenSaver = function() {
     console.log("received stopScreenSaver call");
 
@@ -419,32 +295,6 @@ var stopScreenSaver = function() {
 
     saverWindows = [];
 };
-
-
-var shouldQuit = app.makeSingleInstance(function(commandLine, workingDirectory) {
-    return true;
-});
-
-if (shouldQuit) {
-    app.quit();
-}
-
-
-
-//
-// listen for a message from global.js that we should stop running the screensaver
-//
-ipcMain.on('asynchronous-message', function(event, arg) {
-    if ( arg === "stopScreenSaver" ) {
-        stopScreenSaver();
-    }
-});
-
-
-// seems like we need to catch this event to keep OSX from exiting app after screensaver runs?
-app.on('window-all-closed', function() {
-    console.log("window-all-closed");
-});
 
 var trayMenu = Menu.buildFromTemplate([
     {
@@ -502,10 +352,6 @@ var checkForWakeup = function() {
         stopScreenSaver();
     }
 };
-var wakeupTimer;
-
-var paused = false;
-var lastIdle = 0;
 
 var checkIdle = function() {
     var idle, waitTime;
@@ -526,6 +372,32 @@ var checkIdle = function() {
     
     lastIdle = idle;
 };
+
+
+
+/**
+ * make sure we're only running a single instance
+ */
+var shouldQuit = app.makeSingleInstance(function(commandLine, workingDirectory) {
+    return true;
+});
+
+if (shouldQuit) {
+    app.quit();
+}
+
+
+// don't show app in dock
+if ( typeof(app.dock) !== "undefined" ) {
+    app.dock.hide();
+}
+
+
+
+// seems like we need to catch this event to keep OSX from exiting app after screensaver runs?
+app.on('window-all-closed', function() {
+    console.log("window-all-closed");
+});
 
 
 // This method will be called when Electron has finished
@@ -555,6 +427,17 @@ app.on('ready', function() {
 
 });
 
+
+//
+// listen for a message from global.js that we should stop running the screensaver
+//
+ipcMain.on('asynchronous-message', function(event, arg) {
+    if ( arg === "stopScreenSaver" ) {
+        stopScreenSaver();
+    }
+});
+
+
 /**
  * once the app is ready and our config is loaded, check to see if the app
  * has been loaded before. if not, let's go ahead and open the prefs window now.
@@ -569,6 +452,9 @@ var openPrefsOnFirstLoad = function() {
 };
 
 
+/**
+ * handle initial startup of app
+ */
 var bootApp = function(_basePath) {
     if ( typeof(_basePath) !== "undefined" ) {
         global.basePath = _basePath;
@@ -582,16 +468,19 @@ var bootApp = function(_basePath) {
     });
 };
 
-releaseChecker.checkLatestRelease(global.APP_REPO, global.APP_VERSION, 
-                                  function() {
-                                      global.NEW_RELEASE_AVAILABLE = true;
-                                      bootApp();
-                                  }, 
-                                  function() {
-                                      bootApp();
-                                  });
+/**
+ * check for a release and then boot!
+ */
+releaseChecker.checkLatestRelease(
+    global.APP_REPO, global.APP_VERSION, 
+    function() {
+        global.NEW_RELEASE_AVAILABLE = true;
+        bootApp();
+    }, 
+    function() {
+        bootApp();
+    });
 
 
-
-exports.bootApp = bootApp;
-exports.openPrefsWindow = openPrefsWindow;
+//exports.bootApp = bootApp;
+//exports.openPrefsWindow = openPrefsWindow;
