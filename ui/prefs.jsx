@@ -10,10 +10,6 @@ var $ = jQuery;
 
 const shell = window.require('electron').shell;
 
-const Menu = remote.Menu;
-const MenuItem = remote.MenuItem;
-
-
 $(document).ready(function() {
     var remote = window.require('remote');
     var savers = remote.getGlobal('savers');
@@ -23,6 +19,10 @@ $(document).ready(function() {
     var appRepo = remote.getGlobal('APP_REPO');
     var updateAvailable = remote.getGlobal('NEW_RELEASE_AVAILABLE');
     var dialog = remote.require('dialog');
+
+    var Menu = remote.Menu;
+    var MenuItem = remote.MenuItem;
+
     
     var appLauncher = new AutoLaunch({
 	      name: appName
