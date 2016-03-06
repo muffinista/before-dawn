@@ -29,7 +29,6 @@ $(document).ready(function() {
     });
     
     var temp = window.require('temp');
-    var screenshot = window.require('desktop-screenshot');
     
     var saverOpts = {};
 
@@ -39,6 +38,14 @@ $(document).ready(function() {
         preview: 1
     };
 
+    var urlParams = window.location.search.split(/[?&]/).slice(1).map(function(paramPair) {
+        return paramPair.split(/=(.+)?/).slice(0, 2);
+    }).reduce(function (obj, pairArray) {            
+        obj[pairArray[0]] = pairArray[1];
+        return obj;
+    }, {});
+    console.log("URL PARAMS", urlParams);
+    
     var menuTemplate = [
         {
             label: 'Edit',
@@ -361,18 +368,11 @@ $(document).ready(function() {
 
 
     var loadPreview = function(s) {
-        var screenshot_file = temp.path({suffix: '.png'});
-        screenshot(screenshot_file, function(error, complete) {
-            if ( complete ) {
-                url_opts.screenshot = encodeURIComponent("file://" + screenshot_file);
-            }
-
-            ReactDOM.render(
-                <Preview saver={s} />,
-                document.getElementById('preview')
-            );
-
-        });
+        url_opts.screenshot = decodeURIComponent(urlParams.screenshot);
+        ReactDOM.render(
+            <Preview saver={s} />,
+            document.getElementById('preview')
+        );
     };
 
     var optionsUpdated = function(data) {
@@ -433,8 +433,6 @@ $(document).ready(function() {
             properties: [ 'openDirectory', 'createDirectory' ]
         },
             function(result) {
-                console.log("****", result);
-
                 if ( result === undefined ) {
                     $("[name=localSources]").val('[]');
                 }
@@ -454,7 +452,6 @@ $(document).ready(function() {
 
         saverOpts = window.optionsFormRef.getValues();
         
-        console.log("saverOpts", saverOpts);
         savers.setCurrent(val, saverOpts);
 
         delay = parseInt(delay, 10);

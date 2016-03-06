@@ -50,35 +50,51 @@ global.savers = require('./lib/savers.js');
  * Open the preferences window
  */
 var openPrefsWindow = function() {
-    // call savers.reload to make sure our data is properly refreshed
-    // and check for any system updates
-    global.savers.reload(function() {
-        var prefsUrl = 'file://' + __dirname + '/ui/prefs.html';
-        var w = new BrowserWindow({
-            width:800,
-            height:675,
-            resizable:false,
-            icon: path.join(__dirname, 'assets', 'icon.png')
-        });
-        
-        w.loadURL(prefsUrl);
+    var electronScreen = electron.screen;
+    var primary = electronScreen.getPrimaryDisplay();
+    var displays = [
+        primary
+    ];
 
-        if ( typeof(app.dock) !== "undefined" ) {
-            app.dock.show();
-        }
+    ipcMain.once("screenshot-" + primary.id, function(e, message) {
+        grabber.reload();
 
-        if ( debugMode === true ) {
-            w.webContents.openDevTools();
-        }
+        // call savers.reload to make sure our data is properly refreshed
+        // and check for any system updates
+        global.savers.reload(function() {
+            var prefsUrl = 'file://' + __dirname + '/ui/prefs.html';
+            var w = new BrowserWindow({
+                width:800,
+                height:675,
+                resizable:false,
+                icon: path.join(__dirname, 'assets', 'icon.png')
+            });
 
-        w.on('closed', function() {
-            w = null;
-            global.savers.reload();
+            prefsUrl = prefsUrl + "?screenshot=" + encodeURIComponent("file://" + message.url);
+            
+            w.loadURL(prefsUrl);
+            
             if ( typeof(app.dock) !== "undefined" ) {
-                app.dock.hide();
+                app.dock.show();
             }
+
+            if ( debugMode === true ) {
+                w.webContents.openDevTools();
+            }
+
+            w.on('closed', function() {
+                w = null;
+                global.savers.reload();
+                if ( typeof(app.dock) !== "undefined" ) {
+                    app.dock.hide();
+                }
+            });
         });
     });
+
+
+    grabber.webContents.send('screengrab-request', displays);
+
 };
 
 /**

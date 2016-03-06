@@ -45,10 +45,7 @@
        }
      };
          
-     console.log("WASSUP", screen_opts);
      navigator.webkitGetUserMedia(screen_opts, function(s) {
-       console.log("GOT MEDIA", s);
-
        video = findOrCreate('video', opts.id);
        canvas = findOrCreate('canvas', opts.id);
        photo = findOrCreate('photo', opts.id);
@@ -101,12 +98,14 @@
 
    
    ipcRenderer.on('screengrab-request', function(event, displays) {
-     console.log("got screengrab request");
+     console.log("got screengrab request", event);
      for ( var i = 0; i < displays.length; i++ ) {
        captureScreen(displays[i]);
      }
    });
 
+
+   
    function getUserMediaError(e) {
      console.log('getUserMediaError');
      console.log(e);
