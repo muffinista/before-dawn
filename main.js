@@ -94,7 +94,6 @@ var openPrefsWindow = function() {
 
 
     grabber.webContents.send('screengrab-request', displays);
-
 };
 
 /**
@@ -430,8 +429,6 @@ app.on('ready', function() {
     appIcon = new Tray(__dirname + '/assets/icon.png');
     appIcon.setToolTip(global.APP_NAME);
     appIcon.setContextMenu(trayMenu); 
-
-    var tmp = getDisplays();
 
     openScreenGrabber();
 
