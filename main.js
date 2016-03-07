@@ -57,7 +57,7 @@ var openPrefsWindow = function() {
     ];
 
     ipcMain.once("screenshot-" + primary.id, function(e, message) {
-        grabber.reload();
+//        grabber.reload();
 
         // call savers.reload to make sure our data is properly refreshed
         // and check for any system updates
@@ -211,32 +211,40 @@ var runScreenSaverOnDisplay = function(saver, s) {
 
     });
 };
+
+var getDisplays = function() {
+    var electronScreen = electron.screen;
+    var displays = [];
+    if ( debugMode === true ) {
+        displays = [
+            electronScreen.getPrimaryDisplay()
+        ];
+    }
+    else {
+        displays = electronScreen.getAllDisplays();
+    }
+
+    return displays;
+};
        
 
 /**
  * run the user's chosen screensaver on any available screens
  */
 var runScreenSaver = function() {
-    var electronScreen = electron.screen;
-    var displays = [];
+    var displays = getDisplays();
     var saver = global.savers.getCurrentData();
 
     // @todo maybe add an option to only run on a single display?
 
     // limit to a single screen when debugging
     if ( debugMode === true ) {
-        displays = [
-            electronScreen.getPrimaryDisplay()
-        ];
         if ( typeof(app.dock) !== "undefined" ) {
             app.dock.show();
         }
     }
-    else {
-        displays = electronScreen.getAllDisplays();
-        totalDisplays = displays.length;
-    }
 
+    totalDisplays = displays.length;
 
     for ( var i in displays ) {
         runScreenSaverOnDisplay(saver, displays[i]);
@@ -423,6 +431,11 @@ app.on('ready', function() {
     appIcon.setToolTip(global.APP_NAME);
     appIcon.setContextMenu(trayMenu); 
 
+    console.log("************************************************");
+    var tmp = getDisplays();
+    console.log(tmp);
+
+
     openScreenGrabber();
 
     checkTimer = setInterval(checkIdle, 2500);
@@ -440,7 +453,6 @@ app.on('ready', function() {
     appReady = true;
 
     openPrefsOnFirstLoad();
-
 });
 
 

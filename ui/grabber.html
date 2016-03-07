@@ -30,6 +30,7 @@
      var video = findOrCreate('video', opts.id);
      var canvas = findOrCreate('canvas', opts.id);
      var photo = findOrCreate('photo', opts.id);
+     var screen_id;
          
      var screen_opts = {
        audio: false,
@@ -39,72 +40,97 @@
            // @see https://groups.google.com/a/chromium.org/forum/#!topic/chromium-apps/TP_rsnYVQWg
            maxWidth: opts.bounds.width,
            maxHeight: opts.bounds.height,
-           chromeMediaSource: 'desktop',
-           chromeMediaSourceId: "screen:" + opts.id
+           chromeMediaSource: 'desktop'
          }
        }
      };
+
+     console.log(screen_opts);
+
+     var desktopCapturer = require('electron').desktopCapturer;
+     desktopCapturer.getSources({types: ['screen']}, function(error, sources) {     
+       if ( sources.length > 1 ) {
+         screen_id = opts.id;
+       }
+       else {
+         screen_id = sources[0].id;
+       }
+
+
+       if ( typeof(screen_id) !== "string" || screen_id.indexOf("screen:") === -1 ) {
+         screen_id = "screen:" + opts.id;
+       }
+
+       screen_opts.video.mandatory.chromeMediaSourceId = screen_id;
+
+       
+       navigator.webkitGetUserMedia(screen_opts, function(s) {
+         video = findOrCreate('video', opts.id);
+         canvas = findOrCreate('canvas', opts.id);
+         photo = findOrCreate('photo', opts.id);
          
-     navigator.webkitGetUserMedia(screen_opts, function(s) {
-       video = findOrCreate('video', opts.id);
-       canvas = findOrCreate('canvas', opts.id);
-       photo = findOrCreate('photo', opts.id);
-         
-       video.src = URL.createObjectURL(s);
-       video.play();
+         video.src = URL.createObjectURL(s);
+         video.play();
 
-       video.addEventListener('canplay', function render(ev){
-         video.removeEventListener("canplay", render, false); //remove listener, no longer needed
+         video.addEventListener('canplay', function render(ev){
+           video.removeEventListener("canplay", render, false); //remove listener, no longer needed
 
-         console.log("VIDEO", video);
-         var width = video.videoWidth;
-         var height = video.videoHeight;
+           console.log("VIDEO", video);
+           var width = video.videoWidth;
+           var height = video.videoHeight;
 
-         canvas.setAttribute('width', video.videoWidth);
-         canvas.setAttribute('height', video.videoHeight);
+           canvas.setAttribute('width', video.videoWidth);
+           canvas.setAttribute('height', video.videoHeight);
              
-         var context = canvas.getContext('2d');
-         canvas.width = video.videoWidth;
-         canvas.height = video.videoHeight;
-         context.drawImage(video, 0, 0, width, height);
+           var context = canvas.getContext('2d');
+           canvas.width = video.videoWidth;
+           canvas.height = video.videoHeight;
+           context.drawImage(video, 0, 0, width, height);
            
-         var data = canvas.toDataURL('image/png');
+           var data = canvas.toDataURL('image/png');
 
-         context.clearRect(0, 0, canvas.width, canvas.height);
+           context.clearRect(0, 0, canvas.width, canvas.height);
          
-         photo.setAttribute('src', data);
+           photo.setAttribute('src', data);
 
-         var tempName = temp.path({suffix:'.png'});
-         var fs = require('fs');
-         var buffer = new Buffer(data.split(",")[1], 'base64');
-         fs.writeFileSync(tempName, buffer);
+           var tempName = temp.path({suffix:'.png'});
+           var fs = require('fs');
+           var buffer = new Buffer(data.split(",")[1], 'base64');
+           fs.writeFileSync(tempName, buffer);
 
-         // https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Using_HTML5_audio_and_video
-         video.pause();
-         video.src = "";
+           // https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Using_HTML5_audio_and_video
+           video.pause();
+           video.src = "";
 
-         photo.src = "";
+           photo.src = "";
              
-         video.remove();
-         canvas.remove();
-         photo.remove();
+           video.remove();
+           canvas.remove();
+           photo.remove();
          
-         console.log('screenshot-' + opts.id);
-         ipcRenderer.send('screenshot-' + opts.id, {url:tempName});
-       });
+           console.log('screenshot-' + opts.id);
+           ipcRenderer.send('screenshot-' + opts.id, {url:tempName});
+         });
 
-     }, getUserMediaError);
+       }, getUserMediaError);
+     });
    };
 
    
    ipcRenderer.on('screengrab-request', function(event, displays) {
      console.log("got screengrab request", event);
      for ( var i = 0; i < displays.length; i++ ) {
-       captureScreen(displays[i]);
+       captureScreen(displays[i], displays.length > 1);
      }
    });
 
 
+   var desktopCapturer = require('electron').desktopCapturer;
+   desktopCapturer.getSources({types: ['screen']}, function(error, sources) {
+     console.log("SOURCES", sources);
+
+   });
+   
    
    function getUserMediaError(e) {
      console.log('getUserMediaError');
