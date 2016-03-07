@@ -57,7 +57,7 @@ var openPrefsWindow = function() {
     ];
 
     ipcMain.once("screenshot-" + primary.id, function(e, message) {
-//        grabber.reload();
+        grabber.reload();
 
         // call savers.reload to make sure our data is properly refreshed
         // and check for any system updates
@@ -431,10 +431,7 @@ app.on('ready', function() {
     appIcon.setToolTip(global.APP_NAME);
     appIcon.setContextMenu(trayMenu); 
 
-    console.log("************************************************");
     var tmp = getDisplays();
-    console.log(tmp);
-
 
     openScreenGrabber();
 
