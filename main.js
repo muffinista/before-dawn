@@ -195,8 +195,8 @@ var runScreenSaverOnDisplay = function(saver, s) {
         // stuff -- @see https://github.com/atom/electron/issues/2867
         if ( process.platform == "win32" ) {
             w.minimize();
-            w.focus();
         }
+        w.focus();
                 
         // inject our custom JS and CSS here
         w.webContents.executeJavaScript(globalJSCode);
@@ -299,11 +299,7 @@ var stopScreenSaver = function() {
     clearInterval(wakeupTimer);
     lastIdle = 0;
 
-    if ( saverWindows.length <= 0 ) {
-        return;
-    }
-
-    if ( debugMode === true ) {
+    if ( saverWindows.length <= 0 || debugMode === true ) {
         return;
     }
 
@@ -312,12 +308,46 @@ var stopScreenSaver = function() {
     }
 
     for ( var s in saverWindows ) {
-        console.log("close", s);
         saverWindows[s].close();
     }
 
     saverWindows = [];
 };
+
+var checkForWakeup = function() {
+    var idle;
+
+    if ( paused === true || isActive !== true ) {
+        return;
+    }
+
+    idle = idler.getIdleTime();
+    if ( idle < lastIdle ) {
+        console.log("wake up!");
+        stopScreenSaver();
+    }
+};
+
+var checkIdle = function() {
+    var idle, waitTime;
+
+    if ( paused === true || isActive === true ) {
+        return;
+    }
+
+    waitTime = savers.getDelay() * 60000;
+    if ( waitTime <= 0 ) {
+        return;
+    }
+        
+    idle = idler.getIdleTime();
+    if ( idle > waitTime ) {
+        runScreenSaver();
+    }
+    
+    lastIdle = idle;
+};
+
 
 var trayMenu = Menu.buildFromTemplate([
     {
@@ -362,41 +392,6 @@ var trayMenu = Menu.buildFromTemplate([
     }
 ]);
 
-var checkForWakeup = function() {
-    var idle;
-
-    if ( paused === true || isActive !== true ) {
-        return;
-    }
-
-    idle = idler.getIdleTime();
-    if ( idle < lastIdle ) {
-        console.log("wake up!");
-        stopScreenSaver();
-    }
-};
-
-var checkIdle = function() {
-    var idle, waitTime;
-
-    if ( paused === true || isActive === true ) {
-        return;
-    }
-
-    waitTime = savers.getDelay() * 60000;
-    if ( waitTime <= 0 ) {
-        return;
-    }
-        
-    idle = idler.getIdleTime();
-    if ( idle > waitTime ) {
-        runScreenSaver();
-    }
-    
-    lastIdle = idle;
-};
-
-
 
 /**
  * make sure we're only running a single instance
@@ -414,7 +409,6 @@ if (shouldQuit) {
 if ( typeof(app.dock) !== "undefined" ) {
     app.dock.hide();
 }
-
 
 
 // seems like we need to catch this event to keep OSX from exiting app after screensaver runs?
