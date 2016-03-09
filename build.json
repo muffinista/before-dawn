@@ -17,18 +17,18 @@
                 "type": "file"
             }
         ],
-        "version": "0.6.1"
+        "version": "0.6.3"
     },
     "win": {
         "title": "Before Dawn",
-        "version": "0.6.1",
+        "version": "0.6.3",
         "icon": "assets/icon.ico",
         "verbosity": 1
     },
     "linux": {
         "arch": 64,
         "target": "deb",
-        "version": "0.6.1",
+        "version": "0.6.3",
         "title": "Before Dawn",
         "executable": "before-dawn",
         "comment": "Before Dawn",
