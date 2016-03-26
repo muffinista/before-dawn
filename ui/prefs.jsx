@@ -35,17 +35,16 @@ $(document).ready(function() {
         preview: 1
     };
 
+    // parse incoming URL params -- we'll get a link to the current screen images for previews here
     var urlParams = window.location.search.split(/[?&]/).slice(1).map(function(paramPair) {
         return paramPair.split(/=(.+)?/).slice(0, 2);
     }).reduce(function (obj, pairArray) {            
         obj[pairArray[0]] = pairArray[1];
         return obj;
     }, {});
-    console.log("URL PARAMS", urlParams);
     
     appLauncher.isEnabled(function(enabled){
         console.log("auto launch enabled?: " + enabled);
-
 	      if (enabled) {
             $("input[name=auto_start][type=checkbox]").attr("checked", "checked");            
         }
@@ -67,7 +66,7 @@ $(document).ready(function() {
         console.log("setting preview opts to", url_opts);
     }
 
-    $("input[name=repo]").val( savers.getSource().repo ).attr("placeholder", defaultSaverRepo);
+    $("[name=repo]").val( savers.getSource().repo ).attr("placeholder", defaultSaverRepo);
     $("[name=localSources]").val(JSON.stringify(savers.getLocalSources()));
 
     $("select[name=delay] option[value=" + savers.getDelay() + "]").attr("selected", "selected");
