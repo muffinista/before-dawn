@@ -419,10 +419,15 @@ app.on('window-all-closed', function() {
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
-app.on('ready', function() {  
+app.once('ready', function() {  
     appIcon = new Tray(__dirname + '/assets/icon.png');
     appIcon.setToolTip(global.APP_NAME);
     appIcon.setContextMenu(trayMenu); 
+
+    //var menuTemplate = [];
+    var menuTemplate = require("./ui/menu_template.js").buildMenuTemplate(app);
+    var menu = Menu.buildFromTemplate(menuTemplate);
+    Menu.setApplicationMenu(menu);
 
     openScreenGrabber();
 

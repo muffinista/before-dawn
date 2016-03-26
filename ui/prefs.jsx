@@ -27,8 +27,6 @@ $(document).ready(function() {
 	      name: appName
     });
     
-    var temp = window.require('temp');
-    
     var saverOpts = {};
 
     var url_opts = {
@@ -44,10 +42,6 @@ $(document).ready(function() {
         return obj;
     }, {});
     console.log("URL PARAMS", urlParams);
-    
-    var menuTemplate = require("./menu_template.js").buildMenuTemplate();
-    var menu = Menu.buildFromTemplate(menuTemplate);
-    Menu.setApplicationMenu(menu);
     
     appLauncher.isEnabled(function(enabled){
         console.log("auto launch enabled?: " + enabled);

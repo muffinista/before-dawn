@@ -1,5 +1,5 @@
-exports.buildMenuTemplate = function() {
-    var remote = window.require('remote');
+exports.buildMenuTemplate = function(a) {
+    var app = a;
     var base = [
         {
             label: 'Edit',
@@ -97,7 +97,7 @@ exports.buildMenuTemplate = function() {
 
 
     if (process.platform == 'darwin') {
-        var name = remote.app.getName();
+        var name = app.getName();
         base.unshift({
             label: name,
             submenu: [
@@ -136,12 +136,11 @@ exports.buildMenuTemplate = function() {
                 {
                     label: 'Quit',
                     accelerator: 'Command+Q',
-                    click: function() { remote.app.quit(); }
+                    click: function() { app.quit(); }
                 }
             ]
         });
     }
-
 
 
     return base;
