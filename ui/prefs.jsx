@@ -1,6 +1,5 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
-var Slider = require('rc-slider');
 var AutoLaunch = require('auto-launch');
 var path = require('path');
 
@@ -144,21 +143,23 @@ $(document).ready(function() {
     });
 
     var SliderWithValue = React.createClass({
-      onSliderChange: function(val) {
-            this.value = val;
-            this.setState({
-                name: this.name,
-                value: val
-            });
+      onSliderChange: function(evt) {
+        var val = evt.target.value;
+        this.value = val;
+        this.setState({
+          name: this.name,
+          value: val
+        });
 
-            this.props.onChange({
-                name: this.props.name,
-                value: val
-            });
-        },
-        render: function() {
-            return <Slider defaultValue={this.props.value} onChange={this.onSliderChange} />;
-        }
+        this.props.onChange({
+          name: this.props.name,
+          value: val
+        });
+      },
+      render: function() {
+        //            return <Slider defaultValue={this.props.value} onChange={this.onSliderChange} />;
+        return <input type="range" defaultValue={this.props.value} min={this.props.min} max={this.props.max} onChange={this.onSliderChange} className="slider slider-square-inverted" />
+      }
     });
 
     var OptionsForm = React.createClass({
@@ -172,8 +173,8 @@ $(document).ready(function() {
             var ref = "option" + index;
 
             if ( o.type === "slider" ) {
-                val = parseInt(val, 10);
-                guts = <SliderWithValue name={o.name} value={val} min={o.min} max={o.max} ref={ref} onChange={this.onChanged} />;
+              val = parseInt(val, 10);
+              guts = <SliderWithValue name={o.name} value={val} min={o.min} max={o.max} ref={ref} onChange={this.onChanged} />;             
             }
             else {
                 guts = <input type="text" name={o.name} defaultValue={val} ref={ref} onChange={this.onChanged} />;
@@ -236,14 +237,13 @@ $(document).ready(function() {
     };
     
   var loadOptionsForm = function(s) {
-    console.log("load options");
-        // hold a ref to the form so we can get values later
-        // @todo - i assume this is a hack that doesn't match with react very well
-        window.optionsFormRef = ReactDOM.render(
-            <OptionsForm saver={s} onChange={optionsUpdated} />,
-            document.getElementById('options')
-        );
-    };
+    // hold a ref to the form so we can get values later
+    // @todo - i assume this is a hack that doesn't match with react very well
+    window.optionsFormRef = ReactDOM.render(
+      <OptionsForm saver={s} onChange={optionsUpdated} />,
+      document.getElementById('options')
+    );
+  };
 
     var closeWindow = function() {
         var window = remote.getCurrentWindow();

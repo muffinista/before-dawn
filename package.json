@@ -19,7 +19,6 @@
     "nconf": "^0.8.2",
     "node-dir": ">= 0.1.9",
     "node-system-idle-time": "muffinista/node-system-idle-time.git#master",
-    "rc-slider": "^3.3.1",
     "react": "^0.14.3",
     "react-dom": "^0.14.3",
     "remove": "^0.1.5",
