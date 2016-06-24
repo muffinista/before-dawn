@@ -11,15 +11,17 @@ var $ = jQuery;
 const shell = window.require('electron').shell;
 
 $(document).ready(function() {
-    var remote = window.require('remote');
+    var electron = window.require('electron');
+    var remote = window.require('electron').remote;
     var savers = remote.getGlobal('savers');
     var appName = remote.getGlobal('APP_NAME');
     var appVersion = remote.getGlobal('APP_VERSION');
     var defaultSaverRepo = remote.getGlobal('SAVER_REPO');
     var appRepo = remote.getGlobal('APP_REPO');
     var updateAvailable = remote.getGlobal('NEW_RELEASE_AVAILABLE');
-    var dialog = remote.require('dialog');
 
+    const {dialog} = require('electron').remote;
+  
     var Menu = remote.Menu;
     var MenuItem = remote.MenuItem;
     
@@ -59,7 +61,7 @@ $(document).ready(function() {
     // the div will never have a height at this point unless someone specifically
     // hacks the CSS to make it work differently
     if ( url_opts.height == 0 ) {
-        var atomScreen = window.require('screen');
+        var atomScreen = electron.screen;
         var size = atomScreen.getPrimaryDisplay().bounds;
         var ratio = size.height / size.width;
         url_opts.height = url_opts.width * ratio;
