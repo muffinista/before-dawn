@@ -105,13 +105,12 @@ $(document).ready(function() {
                 }
 
                 return (
-                    <div className={"entry"} key={i}>
-                      <label className={"pure-g"}>
-                        <div className={"pure-u-1-8"}>
+                  <li className={"list-group-item entry"} key={i}>
+                    <div className={"media-body"}>
+                      <label>
+                        <div className={"body"}>
                           <input type="radio" name="screensaver" value={s.key} onChange={self.onChanged} defaultChecked={is_checked} />
-                        </div>
-                        <div className={"body pure-u-7-8"}>
-                          <h1>{s.name}</h1>
+                          <b>{s.name}</b>
                           <p className={"description"}>{s.description}</p>
                           <span className={authorClass}>
                             {s.author} //
@@ -120,10 +119,11 @@ $(document).ready(function() {
                         </div>
                       </label>
                     </div>
+                    </li>
                 );
             });
 
-            return(<div>{nodes}</div>);
+            return(<ul className={"list-group"}>{nodes}</ul>);
         }
     });
 
@@ -235,7 +235,8 @@ $(document).ready(function() {
         redraw(s);        
     };
     
-    var loadOptionsForm = function(s) {
+  var loadOptionsForm = function(s) {
+    console.log("load options");
         // hold a ref to the form so we can get values later
         // @todo - i assume this is a hack that doesn't match with react very well
         window.optionsFormRef = ReactDOM.render(

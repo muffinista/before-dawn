@@ -6,16 +6,16 @@ body {
     overflow: hidden;
 }
 .scrollable {
-    overflow-y: scroll;
-    min-height: 300px;
-    max-height: 390px;
+  overflow-y: scroll;
+  min-height: 300px;
+  max-height: 390px;
 }
 iframe {
-    display: block;
-    overflow: hidden;
-    border: none;
-    width: 100%;
-    min-height: 250px;
+  display: block;
+  overflow: hidden;
+  border: none;
+  width: 100%;
+  min-height: 250px;
 }
 
 main {
