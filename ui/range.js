@@ -8,6 +8,7 @@ window.addEventListener("load", function() {
     slidersVertical[i].style.marginBottom = slidersVertical[i].offsetWidth + "px";
   }
 }, false);
+
 function sliderHighlightArea(e) {
   if (e.min == "") {
     e.min = 0;
