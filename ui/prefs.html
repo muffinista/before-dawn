@@ -19,27 +19,38 @@
        min-height: 250px;
      }
 
+     .hide {
+       display: none;
+     }
+     
     </style>
 
     <!--
     <link href="styles.css" rel="stylesheet" type="text/css" />
     <link href="slider.css" rel="stylesheet" type="text/css" />
 -->
-
-    <script src="range.js"></script>
-    <script src="prefs.js"></script>
   </head>
 
   <body>
     <div class="window">
-      <!-- 
-      <header class="toolbar toolbar-header">
-        <h1 class="title">Before Dawn</h1>
-      </header>
-      -->
-      <div class="window-content">
-        <div class="pane-group">
 
+      <div class="tab-group">
+        <div class="tab-item active">
+          <span class="icon"></span>
+          <a href="main">Screensaver</a>
+        </div>
+        <div class="tab-item">
+          <span class="icon"></span>
+          <a href="preferences" >Preferences</a>
+        </div>
+        <div class="tab-item">
+          <span class="icon"></span>
+          <a href="advanced" >Advanced Options</a>
+        </div>
+      </div>
+
+      <div class="window-content">
+        <div class="main pane-group">
           <!-- left pane -->
           <div class="pane">
             <div class="scrollable" id="savers">
@@ -89,7 +100,20 @@
             </div>
           </div>
         </div>
-      </div>
+
+        <div class="preferences pane-group hide">
+          prefs!
+        </div>
+        <div class="advanced pane-group hide">
+          advanced!
+        </div>
+
+      </div> <!-- window-content -->
+
+
+
+
+
       <footer class="toolbar toolbar-footer">
         <div class="pull-right">
           <button class="btn btn-default">Cancel</button>
@@ -97,6 +121,11 @@
         </div>
       </footer>
     </div> <!-- window -->
+
+    <script src="tabs.js"></script>
+    <script src="range.js"></script>
+    <script src="prefs.js"></script>
+
     
   </body>
 </html>
