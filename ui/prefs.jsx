@@ -313,7 +313,7 @@ const shell = window.require('electron').shell;
 
 
   var updatePrefs = function() {
-    var delay = document.querySelector("select[name=delay] option:selected").value;
+    var delay = document.querySelector("select[name=delay]").value;
     var do_lock = document.querySelector("input[name=lock_screen]").checked;
     var val = getCurrentScreensaver();
     
