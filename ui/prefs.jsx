@@ -4,238 +4,250 @@ var AutoLaunch = require('auto-launch');
 var path = require('path');
 
 var _ = require('lodash');
-var jQuery = require('./jquery.min.js');
-var $ = jQuery;
 
 const shell = window.require('electron').shell;
 
-$(document).ready(function() {
-    var electron = window.require('electron');
-    var remote = window.require('electron').remote;
-    var savers = remote.getGlobal('savers');
-    var appName = remote.getGlobal('APP_NAME');
-    var appVersion = remote.getGlobal('APP_VERSION');
-    var defaultSaverRepo = remote.getGlobal('SAVER_REPO');
-    var appRepo = remote.getGlobal('APP_REPO');
-    var updateAvailable = remote.getGlobal('NEW_RELEASE_AVAILABLE');
 
-    const {dialog} = require('electron').remote;
+(function() {
+
+  var electron = window.require('electron');
+  var remote = window.require('electron').remote;
+  var savers = remote.getGlobal('savers');
+  var appName = remote.getGlobal('APP_NAME');
+  var appVersion = remote.getGlobal('APP_VERSION');
+  var defaultSaverRepo = remote.getGlobal('SAVER_REPO');
+  var appRepo = remote.getGlobal('APP_REPO');
+  var updateAvailable = remote.getGlobal('NEW_RELEASE_AVAILABLE');
+
+  const {dialog} = require('electron').remote;
   
-    var Menu = remote.Menu;
-    var MenuItem = remote.MenuItem;
+  var Menu = remote.Menu;
+  var MenuItem = remote.MenuItem;
     
-    var appLauncher = new AutoLaunch({
-	      name: appName
-    });
+  var appLauncher = new AutoLaunch({
+	  name: appName
+  });
     
-    var saverOpts = {};
+  var saverOpts = {};
 
-    var url_opts = {
-        width: $("#preview").width(),
-        height: $("#preview").height(),
-        preview: 1
-    };
+  var url_opts = {
+    width: document.querySelector("#preview").offsetWidth,
+    height: document.querySelector("#preview").offsetHeight,
+    preview: 1
+  };
 
-    // parse incoming URL params -- we'll get a link to the current screen images for previews here
-    var urlParams = window.location.search.split(/[?&]/).slice(1).map(function(paramPair) {
-        return paramPair.split(/=(.+)?/).slice(0, 2);
-    }).reduce(function (obj, pairArray) {            
-        obj[pairArray[0]] = pairArray[1];
-        return obj;
-    }, {});
-    
-    appLauncher.isEnabled(function(enabled){
-        console.log("auto launch enabled?: " + enabled);
-	      if (enabled) {
-            $("input[name=auto_start][type=checkbox]").attr("checked", "checked");            
-        }
-    });
-
-    
-    $("body > header div h1").html(appName);
-    $("body > header div .version").html(appVersion);
-    
-    // if the preview div didn't have a height, figure one out by getting
-    // the width and making it proprtional to the main screen. at the moment,
-    // the div will never have a height at this point unless someone specifically
-    // hacks the CSS to make it work differently
-    if ( url_opts.height == 0 ) {
-        var atomScreen = electron.screen;
-        var size = atomScreen.getPrimaryDisplay().bounds;
-        var ratio = size.height / size.width;
-        url_opts.height = url_opts.width * ratio;
-        console.log("setting preview opts to", url_opts);
+  // parse incoming URL params -- we'll get a link to the current screen images for previews here
+  var urlParams = window.location.search.split(/[?&]/).slice(1).map(function(paramPair) {
+    return paramPair.split(/=(.+)?/).slice(0, 2);
+  }).reduce(function (obj, pairArray) {            
+    obj[pairArray[0]] = pairArray[1];
+    return obj;
+  }, {});
+  
+  appLauncher.isEnabled(function(enabled){
+    console.log("auto launch enabled?: " + enabled);
+	  if (enabled) {
+      document.querySelector("input[name=auto_start][type=checkbox]").setAttribute("checked", "checked");
     }
+  });
+  
+  var el = document.querySelector("body > header div h1");
+  if ( el ) {
+    el.innerHTML = appName;
+  }
+  el = document.querySelector("body > header div .version");
+  if ( el ) {
+    el.innerHTML = appVersion;
+  }
+  
+  // if the preview div didn't have a height, figure one out by getting
+  // the width and making it proprtional to the main screen. at the moment,
+  // the div will never have a height at this point unless someone specifically
+  // hacks the CSS to make it work differently
+  if ( url_opts.height == 0 ) {
+    var atomScreen = electron.screen;
+    var size = atomScreen.getPrimaryDisplay().bounds;
+    var ratio = size.height / size.width;
+    url_opts.height = url_opts.width * ratio;
+    console.log("setting preview opts to", url_opts);
+  }
 
-    $("[name=repo]").val( savers.getSource().repo ).attr("placeholder", defaultSaverRepo);
-    $("[name=localSources]").val(JSON.stringify(savers.getLocalSources()));
+  el = document.querySelector("[name=repo]");
+  el.value = savers.getSource().repo;
+  el.setAttribute("placeholder", defaultSaverRepo);
 
-    $("select[name=delay] option[value=" + savers.getDelay() + "]").attr("selected", "selected");
-    if ( savers.getLock() === true ) {
-        $("input[name=lock_screen][type=checkbox]").attr("checked", "checked");
-    }
 
-    var SaverList = React.createClass({
-        getInitialState: function() {
-            return {
-                value: this.props.current
-            };
-        },
-        onChanged: function (e) {
-            this.setState({
-                key: e.currentTarget.value
-            });
-        },
-        handleChange: function(event) {
-            this.setState({value: event.target.value});
-        },
-        render: function() {
-            var self = this;
-            var nodes = this.props.data.map(function(s, i) {
-                var is_checked = (s.key === self.state.value);
-                var authorClass = "author";
-                var aboutUrlClass = "external aboutUrl";
+  document.querySelector("[name=localSources]").value = JSON.stringify(savers.getLocalSources());
+  document.querySelector("select[name='delay'] option[value='" + savers.getDelay() + "']").setAttribute("selected", "selected");
+  
+  if ( savers.getLock() === true ) {
+    document.querySelector("input[name=lock_screen][type=checkbox]").setAttribute("checked", "checked");
+  }
 
-                if ( typeof(s.author) === "undefined" || s.author === "" ) {
-                    authorClass = authorClass + " hide";
-                }
-                if ( typeof(s.aboutUrl) === "undefined" || s.aboutUrl === "" ) {
-                    aboutUrlClass = aboutUrlClass + " hide";
-                }
-
-                return (
-                  <li className={"list-group-item entry"} key={i}>
-                    <div className={"media-body"}>
-                      <label>
-                        <div className={"body"}>
-                          <input type="radio" name="screensaver" value={s.key} onChange={self.onChanged} defaultChecked={is_checked} />
-                          <b>{s.name}</b>
-                          <p className={"description"}>{s.description}</p>
-                          <span className={authorClass}>
-                            {s.author} //
-                          </span>
-                          <a className={aboutUrlClass} href={s.aboutUrl}>learn more</a>
-                        </div>
-                      </label>
-                    </div>
-                    </li>
-                );
-            });
-
-            return(<ul className={"list-group"}>{nodes}</ul>);
+  var SaverList = React.createClass({
+    getInitialState: function() {
+      return {
+        value: this.props.current
+      };
+    },
+    onChanged: function (e) {
+      this.setState({
+        key: e.currentTarget.value
+      });
+    },
+    handleChange: function(event) {
+      this.setState({value: event.target.value});
+    },
+    render: function() {
+      var self = this;
+      var nodes = this.props.data.map(function(s, i) {
+        var is_checked = (s.key === self.state.value);
+        var authorClass = "author";
+        var aboutUrlClass = "external aboutUrl";
+        
+        if ( typeof(s.author) === "undefined" || s.author === "" ) {
+          authorClass = authorClass + " hide";
         }
-    });
-
-    var Preview = React.createClass({
-        render: function() {
-            var s = this.props.saver;
-            var mergedOpts = _.merge(url_opts, s.settings);
-
-            mergedOpts = _.merge(mergedOpts, saverOpts);
-            var previewUrl = s.getPreviewUrl(mergedOpts);
-
-            return (
-                <div>
-                  <iframe scrolling='no' src={previewUrl} />
+        if ( typeof(s.aboutUrl) === "undefined" || s.aboutUrl === "" ) {
+          aboutUrlClass = aboutUrlClass + " hide";
+        }
+        
+        return (
+          <li className={"list-group-item entry"} key={i}>
+            <div className={"media-body"}>
+              <label>
+                <div className={"body"}>
+                  <input type="radio" name="screensaver" value={s.key} onChange={self.onChanged} defaultChecked={is_checked} />
+                  <b>{s.name}</b>
+                  <p className={"description"}>{s.description}</p>
+                  <span className={authorClass}>
+                    {s.author} //
+                  </span>
+                  <a className={aboutUrlClass} href={s.aboutUrl}>learn more</a>
                 </div>
-            );
-        }
-    });
-
-    var SliderWithValue = React.createClass({
-      onSliderChange: function(evt) {
-        var val = evt.target.value;
-        this.value = val;
-        this.setState({
-          name: this.name,
-          value: val
-        });
-
-        this.props.onChange({
-          name: this.props.name,
-          value: val
-        });
-      },
-      render: function() {
-        //            return <Slider defaultValue={this.props.value} onChange={this.onSliderChange} />;
-        return <input type="range" defaultValue={this.props.value} min={this.props.min} max={this.props.max} onChange={this.onSliderChange} className="slider slider-square-inverted" />
-      }
-    });
-
-    var OptionsForm = React.createClass({
-        values: {},
-        onChanged: function(e) {
-            this.props.onChange(this.getValues());
-        },
-        renderOption: function(o, index, val) {
-            var guts;
-            var self = this;
-            var ref = "option" + index;
-
-            if ( o.type === "slider" ) {
-              val = parseInt(val, 10);
-              guts = <SliderWithValue name={o.name} value={val} min={o.min} max={o.max} ref={ref} onChange={this.onChanged} />;             
-            }
-            else {
-                guts = <input type="text" name={o.name} defaultValue={val} ref={ref} onChange={this.onChanged} />;
-            }
-
-            return (
-                <fieldset>
-                  <legend>{o.name}</legend>
-                  {guts}
-                </fieldset>
-            );
-        },
-        getValues: function() {
-            var self = this;
-            var data = {};
-            _.each(this.props.saver.options, function(o, i) {
-                var ref = "option" + i;
-                data[o.name] = self.refs[ref].value;
-            });
-
-            return data;
-        },
-        render: function() {
-            var self = this;
-            var s = this.props.saver;
-            var onChange = this.props.onChange;
-            var values = s.settings;
-
-            var nodes = this.props.saver.options.map(function(o, i) {
-                var val = values[o.name];
-                if ( typeof(val) === "undefined" ) {
-                    val = o.default;
-                }
-
-                return (
-                    <div key={i}>
-                      {self.renderOption(o, i, val)}
-                    </div>
-                );
-            });
-
-            return(<div>{nodes}</div>);
-        }
-    });
-
-
-    var loadPreview = function(s) {
-        url_opts.screenshot = decodeURIComponent(urlParams.screenshot);
-        ReactDOM.render(
-            <Preview saver={s} />,
-            document.getElementById('preview')
+              </label>
+            </div>
+          </li>
         );
-    };
+      });
 
-    var optionsUpdated = function(data) {
-        saverOpts = data;
-        var current = $("input[name=screensaver]:checked").val();
-        var s = savers.getByKey(current);
-        redraw(s);        
-    };
-    
+      return(<ul className={"list-group"}>{nodes}</ul>);
+    }
+  });
+
+  var Preview = React.createClass({
+    render: function() {
+      var s = this.props.saver;
+      var mergedOpts = _.merge(url_opts, s.settings);
+      
+      mergedOpts = _.merge(mergedOpts, saverOpts);
+      var previewUrl = s.getPreviewUrl(mergedOpts);
+
+      return (
+        <div>
+          <iframe scrolling='no' src={previewUrl} />
+        </div>
+      );
+    }
+  });
+
+  var SliderWithValue = React.createClass({
+    onSliderChange: function(evt) {
+      var val = evt.target.value;
+      this.value = val;
+      this.setState({
+        name: this.name,
+        value: val
+      });
+
+      this.props.onChange({
+        name: this.props.name,
+        value: val
+      });
+    },
+    render: function() {
+      return <input type="range" defaultValue={this.props.value} min={this.props.min} max={this.props.max} onChange={this.onSliderChange} className="slider slider-square-inverted" />
+    }
+  });
+
+  var OptionsForm = React.createClass({
+    values: {},
+    onChanged: function(e) {
+      this.props.onChange(this.getValues());
+    },
+    renderOption: function(o, index, val) {
+      var guts;
+      var self = this;
+      var ref = "option" + index;
+      
+      if ( o.type === "slider" ) {
+        val = parseInt(val, 10);
+        guts = <SliderWithValue name={o.name} value={val} min={o.min} max={o.max} ref={ref} onChange={this.onChanged} />;             
+      }
+      else {
+        guts = <input type="text" name={o.name} defaultValue={val} ref={ref} onChange={this.onChanged} />;
+      }
+
+      return (
+        <fieldset>
+          <legend>{o.name}</legend>
+          {guts}
+        </fieldset>
+      );
+    },
+    getValues: function() {
+      var self = this;
+      var data = {};
+      _.each(this.props.saver.options, function(o, i) {
+        var ref = "option" + i;
+        data[o.name] = self.refs[ref].value;
+      });
+      
+      return data;
+    },
+    render: function() {
+      var self = this;
+      var s = this.props.saver;
+      var onChange = this.props.onChange;
+      var values = s.settings;
+      
+      var nodes = this.props.saver.options.map(function(o, i) {
+        var val = values[o.name];
+        if ( typeof(val) === "undefined" ) {
+          val = o.default;
+        }
+
+        return (
+          <div key={i}>
+            {self.renderOption(o, i, val)}
+          </div>
+        );
+      });
+
+      return(<div>{nodes}</div>);
+    }
+  });
+
+
+  var loadPreview = function(s) {
+    url_opts.screenshot = decodeURIComponent(urlParams.screenshot);
+    ReactDOM.render(
+      <Preview saver={s} />,
+      document.getElementById('preview')
+    );
+  };
+
+  var getCurrentScreensaver = function() {
+    return document.querySelector("input[name=screensaver]:checked").value;
+  };
+  
+  var optionsUpdated = function(data) {
+    saverOpts = data;
+    var current = getCurrentScreensaver();
+    var s = savers.getByKey(current);
+    redraw(s);        
+  };
+  
   var loadOptionsForm = function(s) {
     // hold a ref to the form so we can get values later
     // @todo - i assume this is a hack that doesn't match with react very well
@@ -244,111 +256,133 @@ $(document).ready(function() {
       document.getElementById('options')
     );
   };
+  
+  var closeWindow = function() {
+    var window = remote.getCurrentWindow();
+    window.close();
+  };
 
-    var closeWindow = function() {
-        var window = remote.getCurrentWindow();
-        window.close();
+  var redraw = function(s) {
+    loadPreview(s);
+    loadOptionsForm(s);
+  };
+
+  var renderList = function() {
+    savers.listAll(function(entries) {
+      var current = savers.getCurrent();
+      
+      ReactDOM.render(
+        <SaverList current={current} data={entries} />,
+        document.getElementById('savers')
+      );
+      
+      var s = savers.getByKey(current);
+      redraw(s);
+
+
+      var radios = document.querySelectorAll('input[name=screensaver]');
+      for ( var i = 0; i < radios.length; i++ ) {
+        radios[i].addEventListener('click', screensaverChanged, false);
+      }
+
+    });
+  };
+
+
+  var showPathChooser = function() {
+    var handleResult = function(result) {
+      var data;
+      if ( result === undefined ) {
+        // this kind of stinks
+        data = [];
+      }
+      else {
+        data = result;
+      }
+
+      document.querySelector("[name=localSources]").value = JSON.stringify(data);
     };
 
-    var redraw = function(s) {
-        loadPreview(s);
-        loadOptionsForm(s);
-    };
+    dialog.showOpenDialog(
+      {
+        properties: [ 'openDirectory', 'createDirectory' ]
+      },
+      handleResult );
+  };
 
-    var renderList = function() {
-        savers.listAll(function(entries) {
-            var current = savers.getCurrent();
-            
-            ReactDOM.render(
-                <SaverList current={current} data={entries} />,
-                document.getElementById('savers')
-            );
 
-            var s = savers.getByKey(current);
-            redraw(s);
-        });
-    };
 
-    $("body").on("change", "input[name=screensaver]", function() {
-        var val = $("input[name=screensaver]:checked").val();
-        var s = savers.getByKey(val);
-
-        saverOpts = {};
-        redraw(s);
-    });
-
-    $("a.cancel").on("click", function(e) {
-        closeWindow();
-    });
-
-    $("a.pick").on("click", function(e) {
-      dialog.showOpenDialog({
-            properties: [ 'openDirectory', 'createDirectory' ]
-        },
-            function(result) {
-                if ( result === undefined ) {
-                    $("[name=localSources]").val('[]');
-                }
-                else {
-                    $("[name=localSources]").val(JSON.stringify(result));
-                }
-            });
-    });
-
-    $("a.save").on("click", function(e) {
-        var delay = $("select[name=delay] option:selected").val();
-        var do_lock = $("input[name=lock_screen][type=checkbox]").is(":checked");
-        var val = $("input[name=screensaver]:checked").val();
-
-        var repo = $("input[name=repo]").val();
-        var localSources = JSON.parse($("[name=localSources]").val()) || [];
-
-        saverOpts = window.optionsFormRef.getValues();
-        
-        savers.setCurrent(val, saverOpts);
-
-        delay = parseInt(delay, 10);
-        savers.setDelay(delay);
-        savers.setLock(do_lock);
-
-        savers.setSource(repo);
-        savers.setLocalSources(localSources);
-
-        savers.write(function() {
-            if ( $("input[name=auto_start][type=checkbox]:checked").length > 0 ) {
-	              appLauncher.enable(closeWindow);
-            }
-            else {
-	              appLauncher.disable(closeWindow);
-            }
-        });
-    });
-
-    $(document).on('click', 'a[href^="http"]', function(event) {
-        event.preventDefault();
-        shell.openExternal(this.href);
-    });
-
-    renderList();
-
-    if ( updateAvailable === true ) {
-        dialog.showMessageBox({
-            type: "info",
-            title: "Update Available!",
-            message: "There's a new update available! Would you like to download it?",
-            buttons: ["No", "Yes"],
-            defaultId: 0
-            //,
-            //icon: path.join(__dirname, '..', 'assets', 'Icon1024.png')
-        },
-            function(result) {
-                console.log(result);
-                if ( result === 1 ) {
-                    shell.openExternal('https://github.com/' + appRepo + '/releases/latest');
-                }
-            }
-        );
-    }
+  var updatePrefs = function() {
+    var delay = document.querySelector("select[name=delay] option:selected").value;
+    var do_lock = document.querySelector("input[name=lock_screen]").checked;
+    var val = getCurrentScreensaver();
     
+    var repo = document.querySelector("input[name=repo]").value;
+    var localSources = JSON.parse(document.querySelector("[name=localSources]").value) || [];
+    
+    saverOpts = window.optionsFormRef.getValues();
+    
+    savers.setCurrent(val, saverOpts);
 
-});
+    delay = parseInt(delay, 10);
+    savers.setDelay(delay);
+    savers.setLock(do_lock);
+
+    savers.setSource(repo);
+    savers.setLocalSources(localSources);
+
+    savers.write(function() {
+      if ( document.querySelector("input[name=auto_start][type=checkbox]").checked === true ) {
+	      appLauncher.enable(closeWindow);
+      }
+      else {
+	      appLauncher.disable(closeWindow);
+      }
+    });
+  };
+
+  document.querySelector(".cancel").addEventListener('click', closeWindow, false);
+  document.querySelector(".pick").addEventListener('click', showPathChooser, false);
+  document.querySelector(".save").addEventListener('click', updatePrefs, false);
+
+  var screensaverChanged = function() {
+    var val = getCurrentScreensaver();
+    var s = savers.getByKey(val);
+    
+    saverOpts = {};
+    redraw(s);
+  };
+
+
+  /* var handleLinkClick = function() {
+     shell.openExternal(this.href);
+     };
+     var links = document.querySelectorAll('a[href^="http"]');
+     for ( var i = 0; i < links.length; i++ ) {
+     link[i].addEventListener('click', handleLinkClick, false);
+     }
+   */
+
+  renderList();
+
+  
+  if ( updateAvailable === true ) {
+    dialog.showMessageBox({
+      type: "info",
+      title: "Update Available!",
+      message: "There's a new update available! Would you like to download it?",
+      buttons: ["No", "Yes"],
+      defaultId: 0
+      //,
+      //icon: path.join(__dirname, '..', 'assets', 'Icon1024.png')
+    },
+                          function(result) {
+                            console.log(result);
+                            if ( result === 1 ) {
+                              shell.openExternal('https://github.com/' + appRepo + '/releases/latest');
+                            }
+                          }
+    );
+  }
+
+})();

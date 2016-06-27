@@ -29,18 +29,16 @@
   
   <script>
    const shell = window.require('electron').shell;
-   $ = jQuery = require('./jquery.min.js');
+   var remote = window.require('electron').remote;
+   var appName = remote.getGlobal('APP_NAME');
+   document.querySelector("body > header div h1").innerHTML = appName;
    
-   $(document).ready(function() {
-     
-     var remote = window.require('remote');
-     var appName = remote.getGlobal('APP_NAME');
-     $("body > header div h1").html(appName);
-     
-     $(document).on('click', 'a[href^="http"]', function(event) {
-       event.preventDefault();
-       shell.openExternal(this.href);
-     });
-   });
+   var handleLinkClick = function() {
+     shell.openExternal(this.href);
+   };
+   var links = document.querySelectorAll('a');
+   for ( var i = 0; i < links.length; i++ ) {
+     links[i].addEventListener('click', handleLinkClick, false);
+   }
   </script>
 </html>

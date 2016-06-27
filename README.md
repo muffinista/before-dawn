@@ -82,7 +82,7 @@ Before Dawn is built on:
 
 - [Electron](http://electron.atom.io/)
 - [Node.js](https://nodejs.org/)
-- a little bit of [jQuery](https://jquery.com/) and [lodash](https://lodash.com/)
+- a little bit of [lodash](https://lodash.com/)
 - most of the styling in the preferences window is via [Pure.css](http://purecss.io/)
 - Some of the form inputs are being generated with
   [React](https://facebook.github.io/react/). This is definitely
