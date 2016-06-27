@@ -289,25 +289,28 @@ const shell = window.require('electron').shell;
   };
 
 
-  var showPathChooser = function() {
-    var handleResult = function(result) {
-      var data;
-      if ( result === undefined ) {
-        // this kind of stinks
-        data = [];
-      }
-      else {
-        data = result;
-      }
+  var handlePathChoice = function(result) {
+    var data;
+    console.log("****", result);
+    if ( result === undefined ) {
+      // this kind of stinks
+      data = [];
+    }
+    else {
+      data = result;
+    }
 
-      document.querySelector("[name=localSources]").value = JSON.stringify(data);
-    };
+    document.querySelector("[name=localSources]").value = JSON.stringify(data);
+  };
 
+  var showPathChooser = function(e) {
+    e.preventDefault();
     dialog.showOpenDialog(
       {
         properties: [ 'openDirectory', 'createDirectory' ]
       },
-      handleResult );
+      handlePathChoice );
+
   };
 
 
