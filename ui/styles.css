@@ -11,7 +11,6 @@ iframe {
 }
 
 .form-control[name=repo] {
-  display: block;
   width: 80%;
 }
 
@@ -37,4 +36,17 @@ p.description {
 .tab-item a {
   color: black;
   text-decoration: none;
+}
+
+fieldset {
+  border: none;
+}
+
+textarea[name=localSources] {
+  width: 60%;
+  display: inline-block;
+}
+.pick {
+  display: inline-block;
+  vertical-align: top;
 }
