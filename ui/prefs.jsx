@@ -282,8 +282,7 @@ $(document).ready(function() {
     });
 
     $("a.pick").on("click", function(e) {
-        var dialog = remote.require('dialog');
-        dialog.showOpenDialog({
+      dialog.showOpenDialog({
             properties: [ 'openDirectory', 'createDirectory' ]
         },
             function(result) {

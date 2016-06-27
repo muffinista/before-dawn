@@ -7,9 +7,7 @@
     <link href="range.css" rel="stylesheet" type="text/css" />
     <style>
      .scrollable {
-       overflow-y: scroll;
-       min-height: 300px;
-       max-height: 390px;
+       //       overflow-y: scroll;
      }
      iframe {
        display: block;
@@ -21,6 +19,15 @@
 
      .hide {
        display: none;
+     }
+
+     .form-control[name=repo] {
+       display: block;
+       width: 80%;
+     }
+
+     input[type=range] {
+       width: 100%;
      }
      
     </style>
@@ -55,41 +62,6 @@
           <div class="pane">
             <div class="scrollable" id="savers">
             </div>
-
-            <section>
-              <h2>Options!</h2>
-              <form>
-                <fieldset>
-                  <div class="form-group">
-                    <label for="delay">Activate after</label>
-                    <select name="delay" class="form-control">
-                      <option value="0">never</option>
-                      <option value="1">1 minute</option>
-                      <option value="5">5 minutes</option>
-                      <option value="10">10 minutes</option>
-                      <option value="15">15 minutes</option>
-                      <option value="30">30 minutes</option>
-                      <option value="60">1 hour</option>
-                    </select>
-                  </div>
-                  
-                  <div class="form-group">
-                    <label for="lock_screen">
-                      <input type="checkbox" name="lock_screen" id="lock_screen" value="1" />
-                      lock screen?
-                    </label>
-                  </div>
-                  
-                  <div class="form-group">
-                    <label for="auto_start">
-                      <input type="checkbox" name="auto_start" id="auto_start" value="1" />
-                      auto start on login?
-                    </label>
-                  </div>
-                </fieldset>
-              </form>
-            </section>
-
           </div>
 
           <!-- right pane -->
@@ -102,10 +74,65 @@
         </div>
 
         <div class="preferences pane-group hide">
-          prefs!
+          <section class="pane">
+            <h2>Options!</h2>
+            <form>
+              <fieldset>
+                <div class="form-group">
+                  <label for="delay">Activate after</label>
+                  <select name="delay" class="form-control">
+                    <option value="0">never</option>
+                    <option value="1">1 minute</option>
+                    <option value="5">5 minutes</option>
+                    <option value="10">10 minutes</option>
+                    <option value="15">15 minutes</option>
+                    <option value="30">30 minutes</option>
+                    <option value="60">1 hour</option>
+                  </select>
+                </div>
+                
+                <div class="form-group">
+                  <label for="lock_screen">
+                    <input type="checkbox" name="lock_screen" id="lock_screen" value="1" />
+                    lock screen?
+                  </label>
+                </div>
+                
+                <div class="form-group">
+                  <label for="auto_start">
+                    <input type="checkbox" name="auto_start" id="auto_start" value="1" />
+                    auto start on login?
+                  </label>
+                </div>
+              </fieldset>
+            </form>
+          </section>
+
         </div>
         <div class="advanced pane-group hide">
-          advanced!
+          <section class="pane">
+            <h2>Advanced Options</h2>
+            <form>
+              <fieldset>
+                <div class="form-group">
+                  <legend>Github Repo URL:</legend>
+                  github.com/<input type="text" name="repo" class="form-control"  placeholder="muffinista/before-dawn-screensavers" />
+                </div>
+                <div class="hint">We will download releases from this repo if specified.</div>
+
+
+                <div class="form-group">
+                  <legend>Local Sources:</legend>
+                  <textarea name="localSources" class="form-control"></textarea>
+                  <a class="pure-button pick" href="#">...</a>
+                </div>
+                <div class="hint">
+                  We will load screen savers from any directories listed here.
+                </div>
+
+              </fieldset>
+            </form>
+          </section>
         </div>
 
       </div> <!-- window-content -->
