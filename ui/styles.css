@@ -34,4 +34,7 @@ p.description {
     font-size: 90%;
     display: block;
 }
-
+.tab-item a {
+  color: black;
+  text-decoration: none;
+}
