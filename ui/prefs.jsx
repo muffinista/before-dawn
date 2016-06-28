@@ -24,6 +24,7 @@ const shell = window.require('electron').shell;
   var Menu = remote.Menu;
   var MenuItem = remote.MenuItem;
     
+
   var appLauncher = new AutoLaunch({
 	  name: appName
   });
@@ -43,12 +44,15 @@ const shell = window.require('electron').shell;
     obj[pairArray[0]] = pairArray[1];
     return obj;
   }, {});
-  
-  appLauncher.isEnabled(function(enabled){
+
+  console.log("appLauncher " + appName);
+  appLauncher.isEnabled().then(function(enabled){
     console.log("auto launch enabled?: " + enabled);
 	  if (enabled) {
-      document.querySelector("input[name=auto_start][type=checkbox]").setAttribute("checked", "checked");
+      document.querySelector("input[name=auto_start]").setAttribute("checked", "checked");
     }
+  }).then(function(err) {
+    console.log("appLauncher error", err);
   });
   
   var el = document.querySelector("body > header div h1");
@@ -265,7 +269,7 @@ const shell = window.require('electron').shell;
   var redraw = function(s) {
     loadPreview(s);
     loadOptionsForm(s);
-  };
+1  };
 
   var renderList = function() {
     savers.listAll(function(entries) {
@@ -291,7 +295,7 @@ const shell = window.require('electron').shell;
 
   var handlePathChoice = function(result) {
     var data;
-    console.log("****", result);
+
     if ( result === undefined ) {
       // this kind of stinks
       data = [];
@@ -335,12 +339,17 @@ const shell = window.require('electron').shell;
     savers.setLocalSources(localSources);
 
     savers.write(function() {
-      if ( document.querySelector("input[name=auto_start][type=checkbox]").checked === true ) {
-	      appLauncher.enable(closeWindow);
+      if ( document.querySelector("input[name=auto_start]").checked === true ) {
+        console.log("set auto_start == true");
+	      appLauncher.enable().then(function(x) { console.log("YAHOO!!!!", x); }).then(function(err){
+          console.log("ERR", err);
+        });
       }
       else {
-	      appLauncher.disable(closeWindow);
+        console.log("set auto start == false");
+	      appLauncher.disable().then(function(x) { console.log("YAHOO 22222!!!!", x); });
       }
+      closeWindow();
     });
   };
 

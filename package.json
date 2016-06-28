@@ -11,7 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "auto-launch": "^1.1.1",
+    "auto-launch": "^2.0.1",
     "github-releases": "^0.3.2",
     "lodash": "^4.0.0",
     "minimist": "^1.2.0",
