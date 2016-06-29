@@ -12,6 +12,8 @@
   "license": "ISC",
   "dependencies": {
     "auto-launch": "^2.0.1",
+    "linux-battery": "^3.0.1",
+    "osx-battery": "^4.0.0",
     "github-releases": "^0.3.2",
     "lodash": "^4.0.0",
     "minimist": "^1.2.0",

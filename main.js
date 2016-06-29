@@ -19,6 +19,7 @@ let parseArgs = require('minimist');
 let saverWindows = [];
 let argv = parseArgs(process.argv);
 let releaseChecker = require('./lib/release_check.js');
+let power = require('./lib/power.js');
 
 let debugMode = ( argv.debug === true );
 
@@ -36,6 +37,7 @@ var wakeupTimer;
 
 var paused = false;
 var lastIdle = 0;
+
 
 
 // load a few global variables
@@ -336,18 +338,34 @@ var checkForWakeup = function() {
 var checkIdle = function() {
   var idle, waitTime;
 
+  // check if we're already running, or paused
   if ( paused === true || isActive === true ) {
     return;
   }
 
+  // check that we are actually supposed to be running
   waitTime = savers.getDelay() * 60000;
   if ( waitTime <= 0 ) {
     return;
   }
+
+
   
+  // are we past our idle time
   idle = idler.getIdleTime();
   if ( idle > waitTime ) {
-    runScreenSaver();
+    console.log("we're idle");
+    // check if we are on battery, and if we should be running in that case
+    if ( savers.getDisableOnBattery() ) {
+      power.charging().then((is_powered) => {
+        if ( is_powered ) {
+          runScreenSaver();
+        }
+      });
+    }
+    else {
+      runScreenSaver();
+    }
   }
   
   lastIdle = idle;

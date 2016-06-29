@@ -88,6 +88,10 @@ const shell = window.require('electron').shell;
     document.querySelector("input[name=lock_screen][type=checkbox]").setAttribute("checked", "checked");
   }
 
+  if ( savers.getDisableOnBattery() === true ) {
+    document.querySelector("input[name=disable_on_battery]").setAttribute("checked", "checked");
+  }
+
   var SaverList = React.createClass({
     getInitialState: function() {
       return {
@@ -322,6 +326,7 @@ const shell = window.require('electron').shell;
   var updatePrefs = function() {
     var delay = document.querySelector("select[name=delay]").value;
     var do_lock = document.querySelector("input[name=lock_screen]").checked;
+    var disable_on_battery = document.querySelector("input[name=disable_on_battery]").checked;
     var val = getCurrentScreensaver();
     
     var repo = document.querySelector("input[name=repo]").value;
@@ -334,7 +339,8 @@ const shell = window.require('electron').shell;
     delay = parseInt(delay, 10);
     savers.setDelay(delay);
     savers.setLock(do_lock);
-
+    savers.setDisableOnBattery(disable_on_battery);
+    
     savers.setSource(repo);
     savers.setLocalSources(localSources);
 
