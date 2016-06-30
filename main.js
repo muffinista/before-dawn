@@ -354,7 +354,6 @@ var checkIdle = function() {
   // are we past our idle time
   idle = idler.getIdleTime();
   if ( idle > waitTime ) {
-    console.log("we're idle");
     // check if we are on battery, and if we should be running in that case
     if ( savers.getDisableOnBattery() ) {
       power.charging().then((is_powered) => {
