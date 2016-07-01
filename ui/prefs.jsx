@@ -218,6 +218,7 @@ const shell = window.require('electron').shell;
       var s = this.props.saver;
       var onChange = this.props.onChange;
       var values = s.settings;
+      var head;
       
       var nodes = this.props.saver.options.map(function(o, i) {
         var val = values[o.name];
@@ -232,7 +233,14 @@ const shell = window.require('electron').shell;
         );
       });
 
-      return(<div>{nodes}</div>);
+      if ( nodes.length > 0 ) {
+        head = "Options";
+      }
+      else {
+        head = "";
+      }
+      
+      return(<div><h1>{head}</h1>{nodes}</div>);
     }
   });
 

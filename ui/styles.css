@@ -29,9 +29,12 @@ p.description {
   white-space: initial;
 }
 .hint {
-    color: #bbbbbb;
-    font-size: 90%;
-    display: block;
+    color: #888888;
+    font-size: 95%;
+}
+
+h1 .hint {
+  font-size: 60%;
 }
 .tab-item a {
   color: black;
@@ -49,4 +52,21 @@ textarea[name=localSources] {
 .pick {
   display: inline-block;
   vertical-align: top;
+}
+
+.wrapper {
+  margin-right: 5px;
+  margin-left: 5px;
+}
+.pane h1 {
+  margin-top: 0px;
+  font-size: 1.5em;
+}
+
+.window > footer {
+  padding: 5px;
+}
+
+form label {
+  font-weight: bold;
 }
