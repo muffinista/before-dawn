@@ -8,7 +8,7 @@ die () {
 [ "$#" -eq 1 ] || die "Please pick a target platform: osx or win"
 
 
-ELECTRON_VERSION="0.36.10" #`npm view electron-prebuilt version`
+ELECTRON_VERSION="1.2.6" #`npm view electron-prebuilt version`
 DEST="/tmp/before-dawn-packages"
 TARGET="$1"
 
