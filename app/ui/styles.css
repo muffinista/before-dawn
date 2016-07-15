@@ -70,3 +70,20 @@ textarea[name=localSources] {
 form label {
   font-weight: bold;
 }
+
+
+.about {
+  margin-left: 5px;
+  text-align: center;
+}
+.about h1, .about h2, .about h3, about p {
+  overflow: visible;
+  margin-top: 5px;
+  margin-bottom: 5px;  
+}
+.about h2 {
+  font-size: 175%;
+}
+.about p {
+  font-size: 120%;
+}

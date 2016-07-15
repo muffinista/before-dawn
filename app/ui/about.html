@@ -2,38 +2,35 @@
 <html>
   <head>
     <title>About!</title>
-    
-    <link href="pure-nr.css" rel="stylesheet" type="text/css" />
+    <link href="photon.min.css" rel="stylesheet" type="text/css" />
     <link href="styles.css" rel="stylesheet" type="text/css" />
   </head>
 
   <body>
-    <header class="pure-g">
-      <div class="left pure-u-1-1">
-        <h1>Before Dawn</h1> /// <h2>screensaver fun</h2>
-        <h3>v0.1</h3>
-      </div>
-    </header>
-    <main>
-      <section class="guts pure-g">
-        <div class="left pure-u-1-1">
-          <p>An open-source screensaver
-            project. <a href="https://github.com/muffinista/before-dawn">learn more</a></p>
-          
-          <p><a href="https://thenounproject.com/search/?q=sunrise&i=172009">App
-              icon</a> Sun by Ale Estrada from the Noun Project</p>
-        </div>
-      </section>
-    </main>
+    <div class="window about">
+      <h1>Before Dawn</h1>
+      <h2>// screensaver fun //</h2>
+      <h3>v0.1</h3>
+
+      <p>An open-source screensaver
+        project. <a href="https://github.com/muffinista/before-dawn">learn more</a></p>
+      
+      <p><a href="https://thenounproject.com/search/?q=sunrise&i=172009">App
+        icon</a> Sun by Ale Estrada from the Noun Project</p>
+    </div>
   </body>
   
   <script>
    const shell = window.require('electron').shell;
    var remote = window.require('electron').remote;
    var appName = remote.getGlobal('APP_NAME');
-   document.querySelector("body > header div h1").innerHTML = appName;
+   var appVersion = remote.getGlobal('APP_VERSION');
+
+   document.querySelector("body h1").innerHTML = appName;
+   document.querySelector("body h3").innerHTML = appVersion;
    
-   var handleLinkClick = function() {
+   var handleLinkClick = function(e) {
+     e.preventDefault();
      shell.openExternal(this.href);
    };
    var links = document.querySelectorAll('a');
