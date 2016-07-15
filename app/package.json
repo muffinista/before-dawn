@@ -39,6 +39,7 @@
     "electron-rebuild": "^1.1.4",
     "electron-builder": "5.12.1",
     "grunt": "^0.4.5",
-    "grunt-babel": "^6.0.0"
+    "grunt-babel": "^6.0.0",
+    "electron-prebuilt": "1.2.5"
   }
 }
