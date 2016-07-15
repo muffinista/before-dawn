@@ -49,6 +49,9 @@ node tools/update-build-version.js
 #
 
 if [ "$TARGET" == "osx" ]; then
+  echo "== install electron-packager (might need password) =="
+  sudo npm install electron-packager@7.3.0 -g
+
   echo "== REBUILD MODULES =="
   ./node_modules/.bin/electron-rebuild -w node-system-idle-time
 
@@ -59,8 +62,17 @@ if [ "$TARGET" == "osx" ]; then
                       --platform=darwin \
                       --arch=x64 \
                       --version=${ELECTRON_VERSION} \
-                      --icon='assets/icon.icns'  \
+                      --icon='./assets/icon.icns'  \
                       --overwrite
+
+    echo "electron-packager . 'Before Dawn' \
+                      --prune \
+                      --out=${DEST}/osx \
+                      --platform=darwin \
+                      --arch=x64 \
+                      --version=${ELECTRON_VERSION} \
+                      --icon='./assets/icon.icns'  \
+                      --overwrite"
     
     echo "== Build OSX Installer =="
     
@@ -88,7 +100,7 @@ if [ "$TARGET" == "win" ]; then
                       --platform=win32 \
                       --arch=ia32 \
                       --version=${ELECTRON_VERSION} \
-                      --icon=assets/icon.ico
+                      --icon=./assets/icon.ico
 
     echo "== Build Windows Installer =="
     electron-builder "${DEST}/win/Before Dawn-win32-ia32" \
@@ -116,7 +128,7 @@ if [ "$TARGET" == "linux" ]; then
                       --platform=linux \
                       --arch=x64 \
                       --version=${ELECTRON_VERSION} \
-                      --icon='assets/icon.ico'  \
+                      --icon='./assets/icon.ico'  \
                       --overwrite
     
     echo "== Build linux deb package =="
