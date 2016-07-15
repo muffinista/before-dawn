@@ -49,11 +49,11 @@ node tools/update-build-version.js
 #
 
 if [ "$TARGET" == "osx" ]; then
-  echo "== install electron-packager (might need password) =="
-  sudo npm install electron-packager@7.3.0 -g
+    echo "== install electron-packager (might need password) =="
+    sudo npm install electron-packager@7.3.0 -g
 
-  echo "== REBUILD MODULES =="
-  ./node_modules/.bin/electron-rebuild -w node-system-idle-time
+    echo "== REBUILD MODULES =="
+    ./node_modules/.bin/electron-rebuild -w node-system-idle-time
 
     echo "== Build OSX App =="
     electron-packager . 'Before Dawn' \
@@ -64,7 +64,7 @@ if [ "$TARGET" == "osx" ]; then
                       --version=${ELECTRON_VERSION} \
                       --icon='./assets/icon.icns'  \
                       --overwrite
-
+    
     echo "electron-packager . 'Before Dawn' \
                       --prune \
                       --out=${DEST}/osx \
@@ -79,14 +79,19 @@ if [ "$TARGET" == "osx" ]; then
     #
     # npm install -g electron-builder
     #
-    electron-builder "${DEST}/osx/Before Dawn-darwin-x64/Before Dawn.app" \
+    node_modules/.bin/build "${DEST}/osx/Before Dawn-darwin-x64/Before Dawn.app" \
                      --platform=osx \
                      --out="/${DEST}/osx" \
                      --config=build.json
 fi
 
 if [ "$TARGET" == "win" ]; then
+
+    echo "== install electron-packager  =="
+    npm install electron-packager@7.3.0 -g
+
     echo "== REBUILD MODULES =="
+
     # force 32-bit because that's what we're building, but it might make sense to force 64 instead
     ./node_modules/.bin/electron-rebuild --arch="ia32" -w node-system-idle-time
 
