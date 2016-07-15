@@ -2,14 +2,15 @@
   "name": "before-dawn",
   "version": "0.7.0",
   "description": "screensaver fun",
+  "author": "",
+  "license": "ISC",
+  "homepage": "http://muffinlabs.com/",
   "main": "main.js",
   "scripts": {
     "start": "electron main.js",
     "rebuild": "./node_modules/.bin/electron-rebuild -w node-system-idle-time",
     "test": "electron-mocha tests/"
   },
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "auto-launch": "^2.0.1",
     "linux-battery": "^3.0.1",
