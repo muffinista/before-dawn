@@ -36,7 +36,6 @@
     "electron-compile": "^1.0.2",
     "electron-compilers": "^1.0.1",
     "electron-mocha": "^0.8.0",
-    "electron-prebuilt": "1.2.5",
     "electron-rebuild": "^1.1.4",
     "electron-builder": "5.12.1",
     "grunt": "^0.4.5",
