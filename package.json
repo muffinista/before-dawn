@@ -1,0 +1,50 @@
+{
+  "name": "before-dawn",
+  "productName": "Before Dawn",
+  "version": "0.7.0",
+  "description": "screensaver fun",
+  "author": "Colin Mitchell",
+  "scripts": {
+    "postinstall": "install-app-deps",
+    "pack": "build --dir",
+    "dist": "build"
+  },
+  "devDependencies": {
+    "electron-builder": "5.12.1"
+  },
+  "build": {
+    "appId": "Before Dawn",
+    "app-category-type": "public.app-category.entertainment",
+    "win": {
+      "iconUrl": "https://raw.githubusercontent.com/muffinista/before-dawn/master/assets/icon.ico"
+    },
+    "asar": "false",
+    "dmg": {
+      "contents": [
+        {
+          "x": 338,
+          "y": 14,
+          "type": "link",
+          "path": "/Applications"
+        },
+        {
+          "x": 192,
+          "y": 14,
+          "type": "file"
+        }
+      ]
+    },
+    "win": {
+      "verbosity": 1,
+      "perMachine": "false"
+    },
+    "linux": {
+      "arch": 64,
+      "target": "deb",
+      "title": "Before Dawn",
+      "executable": "before-dawn",
+      "comment": "Before Dawn",
+      "maintainer": "Colin Mitchell <colin@muffinlabs.com>"
+    }
+  }
+}
