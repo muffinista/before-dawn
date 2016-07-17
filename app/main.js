@@ -148,6 +148,12 @@ var openScreenGrabber = function() {
   });
 };
 
+var updateActiveState = function() {
+  if ( saverWindows.length <= 0 ) {
+    isActive = false;
+  }
+};
+
 /**
  * run the specified screensaver on the specified screen
  */
@@ -172,17 +178,21 @@ var runScreenSaverOnDisplay = function(saver, s) {
   // listen for an event that we have an image of the display we will run on before completing setup
   ipcMain.once("screenshot-" + s.id, function(e, message) {
     var w = new BrowserWindow(windowOpts);       
+
+    saverWindows.push(w);
+
     if ( debugMode === true ) {
       w.webContents.openDevTools();
     }
     
     // Emitted when the window is closed.
     w.on('closed', function() {
-      w = null;           
-      isActive = false;
+      var index = saverWindows.indexOf(w);
+      saverWindows.splice(index, 1);
+      w = null;
+      updateActiveState();
     });
-    
-    saverWindows.push(w);
+   
     
     url_opts.screenshot = encodeURIComponent("file://" + message.url);
 
@@ -236,7 +246,6 @@ var runScreenSaver = function() {
   var saver = global.savers.getCurrentData();
 
   // @todo maybe add an option to only run on a single display?
-
   
   // limit to a single screen when debugging
   if ( debugMode === true ) {
@@ -310,6 +319,7 @@ var stopScreenSaver = function() {
     return;
   }
 
+  // trigger lock screen before actually closing anything
   if ( shouldLockScreen() ) {
     doLockScreen();
   }
@@ -317,8 +327,6 @@ var stopScreenSaver = function() {
   for ( var s in saverWindows ) {
     saverWindows[s].close();
   }
-
-  saverWindows = [];
 };
 
 var checkForWakeup = function() {
