@@ -149,7 +149,12 @@ var openScreenGrabber = function() {
 };
 
 var updateActiveState = function() {
-  if ( saverWindows.length <= 0 ) {
+  var openWindows = saverWindows.filter(function(w) {
+    return (typeof(w) !== "undefined" && w.isClosed !== true);
+  });
+
+  if ( openWindows.length == 0 ) {
+    saverWindows = [];
     isActive = false;
   }
 };
@@ -187,12 +192,10 @@ var runScreenSaverOnDisplay = function(saver, s) {
     
     // Emitted when the window is closed.
     w.on('closed', function() {
-      var index = saverWindows.indexOf(w);
-      saverWindows.splice(index, 1);
-      w = null;
+      w.isClosed = true;
       updateActiveState();
     });
-   
+    
     
     url_opts.screenshot = encodeURIComponent("file://" + message.url);
 
@@ -244,7 +247,7 @@ var getDisplays = function() {
 var runScreenSaver = function() {
   var displays = getDisplays();
   var saver = global.savers.getCurrentData();
-
+  
   // @todo maybe add an option to only run on a single display?
   
   // limit to a single screen when debugging
@@ -266,6 +269,11 @@ var runScreenSaver = function() {
   }
   catch (e) {
     console.log(e);
+  }
+
+  // set the idle timer to something > 0
+  if ( lastIdle < 99 ) {
+    lastIdle = 99;
   }
 
   isActive = true;
@@ -324,21 +332,22 @@ var stopScreenSaver = function() {
     doLockScreen();
   }
 
+  console.log("closing " + saverWindows.length + " windows");
   for ( var s in saverWindows ) {
+    console.log("close", s);
     saverWindows[s].close();
   }
 };
 
 var checkForWakeup = function() {
   var idle;
-
+  
   if ( paused === true || isActive !== true ) {
     return;
   }
 
   idle = idler.getIdleTime();
   if ( idle < lastIdle ) {
-    console.log("wake up!");
     stopScreenSaver();
   }
 };
@@ -531,7 +540,3 @@ releaseChecker.checkLatestRelease(
   function() {
     bootApp();
   });
-
-
-//exports.bootApp = bootApp;
-//exports.openPrefsWindow = openPrefsWindow;
