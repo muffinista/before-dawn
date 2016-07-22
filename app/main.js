@@ -335,7 +335,7 @@ var stopScreenSaver = function() {
   console.log("closing " + saverWindows.length + " windows");
   for ( var s in saverWindows ) {
     console.log("close", s);
-    saverWindows[s].close();
+    saverWindows[s].destroy();
   }
 };
 
