@@ -5,7 +5,7 @@ const app = electron.app;  // Module to control application life.
 const BrowserWindow = electron.BrowserWindow;  // Module to create native browser window.
 const Menu = electron.Menu;
 const Tray = electron.Tray;
-const ipcMain = require('electron').ipcMain;
+const {ipcMain} = require('electron')
 const fs = require('fs');
 const path = require('path');
 
@@ -98,6 +98,7 @@ var openPrefsWindow = function() {
   grabber.webContents.send('screengrab-request', displays);
 };
 
+
 /**
  * Open the (very simple) About window for the app
  */
@@ -125,6 +126,7 @@ var openAboutWindow = function() {
     }
   });
 };
+
 
 /**
  * open our screen grabber tool. this should run in the background,
@@ -456,6 +458,7 @@ app.on('window-all-closed', function() {
 });
 
 
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 app.once('ready', function() {  
@@ -463,9 +466,9 @@ app.once('ready', function() {
   appIcon.setToolTip(global.APP_NAME);
   appIcon.setContextMenu(trayMenu); 
 
-  //var menuTemplate = [];
   var menuTemplate = require("./ui/menu_template.js").buildMenuTemplate(app);
   var menu = Menu.buildFromTemplate(menuTemplate);
+
   Menu.setApplicationMenu(menu);
 
   openScreenGrabber();

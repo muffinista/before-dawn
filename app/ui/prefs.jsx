@@ -21,9 +21,8 @@ const shell = window.require('electron').shell;
 
   const {dialog} = require('electron').remote;
   
-  var Menu = remote.Menu;
-  var MenuItem = remote.MenuItem;
-    
+  //  var Menu = remote.Menu;
+  //  var MenuItem = remote.MenuItem;
 
   var appLauncher = new AutoLaunch({
 	  name: appName
@@ -281,7 +280,7 @@ const shell = window.require('electron').shell;
   var redraw = function(s) {
     loadPreview(s);
     loadOptionsForm(s);
-1  };
+  };
 
   var renderList = function() {
     savers.listAll(function(entries) {
