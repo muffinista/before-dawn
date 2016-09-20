@@ -6,10 +6,9 @@ var path = require('path');
 var _ = require('lodash');
 
 const shell = window.require('electron').shell;
-
+const {BrowserWindow} = window.require('electron').remote;
 
 (function() {
-
   var electron = window.require('electron');
   var remote = window.require('electron').remote;
   var savers = remote.getGlobal('savers');
@@ -19,6 +18,8 @@ const shell = window.require('electron').shell;
   var appRepo = remote.getGlobal('APP_REPO');
   var updateAvailable = remote.getGlobal('NEW_RELEASE_AVAILABLE');
 
+
+  
   const {dialog} = require('electron').remote;
   
   //  var Menu = remote.Menu;
@@ -44,6 +45,9 @@ const shell = window.require('electron').shell;
     return obj;
   }, {});
 
+  // the main app will pass us a screenshot URL, here it is
+  var screenshot = decodeURIComponent(urlParams.screenshot);
+  
   console.log("appLauncher " + appName);
   appLauncher.isEnabled().then(function(enabled){
     console.log("auto launch enabled?: " + enabled);
@@ -131,6 +135,7 @@ const shell = window.require('electron').shell;
                     {s.author} //
                   </span>
                   <a className={aboutUrlClass} href={s.aboutUrl}>learn more</a>
+                  <a className="watcher" href={s.key}>edit!</a>
                 </div>
               </label>
             </div>
@@ -245,7 +250,7 @@ const shell = window.require('electron').shell;
 
 
   var loadPreview = function(s) {
-    url_opts.screenshot = decodeURIComponent(urlParams.screenshot);
+    url_opts.screenshot = screenshot;
     ReactDOM.render(
       <Preview saver={s} />,
       document.getElementById('preview')
@@ -300,6 +305,12 @@ const shell = window.require('electron').shell;
         radios[i].addEventListener('click', screensaverChanged, false);
       }
 
+      var links = document.querySelectorAll('a.watcher');
+      for ( var i = 0; i < links.length; i++ ) {
+        links[i].addEventListener('click', openSaverInWatcher, false);
+      }
+
+      
     });
   };
 
@@ -328,7 +339,23 @@ const shell = window.require('electron').shell;
 
   };
 
+  var openSaverInWatcher = function(e) {
+    var key = e.target.href;
+    e.preventDefault();
+    console.log(key);
 
+    var windowOpts = {
+
+    };
+    var w = new BrowserWindow(windowOpts);
+    //    prefsUrl = prefsUrl + "?screenshot=" + encodeURIComponent("file://" + message.url);
+
+    var target = 'file://' + __dirname + "/watcher.html?" +
+                 "src=" + encodeURIComponent(key) +
+                 "&screenshot=" + encodeURIComponent("file://" + screenshot);
+    console.log(target);
+    w.loadURL(target);
+  };
 
   var updatePrefs = function() {
     var delay = document.querySelector("select[name=delay]").value;
