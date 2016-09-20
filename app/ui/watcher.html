@@ -18,19 +18,37 @@
       <div id="wrapper"></div>
     </div>
     <script>
+     var remote = window.require('electron').remote;
+     var savers = remote.getGlobal('savers');
+     var _ = require('lodash');
+
+     var fs = require('fs');
+     var path = require('path');
+     const url = require('url');
 
      // the main app will pass us a screenshot URL, here it is
      var screenshot = decodeURIComponent(urlParams.screenshot);
      var src = decodeURIComponent(urlParams.src);
 
-     var resizeIframe = function() {
+     // load screensaver object
+     var s = savers.getByKey(src);
+    
+     var reloadPreview = function() {
        var iframe = document.querySelector("iframe");
        var main = document.querySelector(".window");
        iframe.width = main.offsetWidth;
        iframe.height = main.offsetHeight;
 
-       // need to add width/height params here too
-       iframe.src = src;
+       var url_opts = {
+         width: iframe.width,
+         height: iframe.height,
+         screenshot: screenshot
+       };
+
+       var mergedOpts = _.merge(url_opts, s.settings);
+       var previewUrl = s.getUrl(mergedOpts);
+
+       iframe.src = previewUrl;
      }
 
      var holder = document.getElementById("wrapper");
@@ -38,8 +56,15 @@
 
      holder.appendChild(iframe);
 
-     resizeIframe();
-     window.addEventListener('resize', resizeIframe, true);
+     reloadPreview();
+     window.addEventListener('resize', reloadPreview, true);
+
+     var filePath = path.dirname(url.parse(src).path);
+     fs.watch(filePath, (eventType, filename) => {
+       if (filename) {
+         reloadPreview();
+       }
+     });
     
     </script>
   </body>
