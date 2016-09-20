@@ -135,7 +135,7 @@ const {BrowserWindow} = window.require('electron').remote;
                     {s.author} //
                   </span>
                   <a className={aboutUrlClass} href={s.aboutUrl}>learn more</a>
-                  <a className="watcher" href={s.key}>edit!</a>
+                  <a className="watcher" href="#" data-key={s.key}>edit!</a>
                 </div>
               </label>
             </div>
@@ -340,7 +340,7 @@ const {BrowserWindow} = window.require('electron').remote;
   };
 
   var openSaverInWatcher = function(e) {
-    var key = e.target.href;
+    var key = e.target.dataset.key;
     e.preventDefault();
     console.log(key);
 
@@ -348,13 +348,11 @@ const {BrowserWindow} = window.require('electron').remote;
 
     };
     var w = new BrowserWindow(windowOpts);
-    //    prefsUrl = prefsUrl + "?screenshot=" + encodeURIComponent("file://" + message.url);
-
     var target = 'file://' + __dirname + "/watcher.html?" +
                  "src=" + encodeURIComponent(key) +
                  "&screenshot=" + encodeURIComponent("file://" + screenshot);
-    console.log(target);
     w.loadURL(target);
+    w.webContents.openDevTools();    
   };
 
   var updatePrefs = function() {
