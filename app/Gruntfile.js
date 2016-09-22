@@ -7,8 +7,18 @@ module.exports = function(grunt) {
         presets: ['es2015', 'react']
       },
       dist: {
-        files: {
-          'ui/prefs.js': 'ui/prefs.jsx'
+        files: [
+          {
+            expand: true,
+            cwd: 'ui/',
+            src: ['*.jsx'],
+            ext: '.js',
+            dest: 'ui/'
+          }
+        ],
+        oldfiles: {
+          'ui/prefs.js': 'ui/prefs.jsx',
+          'ui/components.js': 'ui/components.jsx'
         }
       }
     }

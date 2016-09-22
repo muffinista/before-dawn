@@ -5,6 +5,12 @@ var path = require('path');
 
 var _ = require('lodash');
 
+var SliderWithValue = require('./slider-with-value');
+var Preview = require('./preview');
+var OptionsForm = require('./options-form');
+var SaverList = require('./saver-list');
+
+
 const shell = window.require('electron').shell;
 const {BrowserWindow} = window.require('electron').remote;
 
@@ -92,175 +98,11 @@ const {BrowserWindow} = window.require('electron').remote;
     document.querySelector("input[name=disable_on_battery]").setAttribute("checked", "checked");
   }
 
-  var SaverList = React.createClass({
-    getInitialState: function() {
-      return {
-        value: this.props.current
-      };
-    },
-    onChanged: function (e) {
-      this.setState({
-        key: e.currentTarget.value
-      });
-    },
-    handleChange: function(event) {
-      this.setState({value: event.target.value});
-    },
-    render: function() {
-      var self = this;
-      var nodes = this.props.data.map(function(s, i) {
-        var is_checked = (s.key === self.state.value);
-        var authorClass = "author";
-        var aboutUrlClass = "external aboutUrl";
-        
-        if ( typeof(s.author) === "undefined" || s.author === "" ) {
-          authorClass = authorClass + " hide";
-        }
-        if ( typeof(s.aboutUrl) === "undefined" || s.aboutUrl === "" ) {
-          aboutUrlClass = aboutUrlClass + " hide";
-        }
-        
-        return (
-          <li className={"list-group-item entry"} key={i}>
-            <div className={"media-body"}>
-              <label>
-                <div className={"body"}>
-                  <input type="radio" name="screensaver" value={s.key} onChange={self.onChanged} defaultChecked={is_checked} />
-                  <b>{s.name}</b>
-                  <p className={"description"}>{s.description}</p>
-                  <span className={authorClass}>
-                    {s.author} //
-                  </span>
-                  <a className={aboutUrlClass} href={s.aboutUrl}>learn more</a>
-                  <a className="watcher" href="#" data-key={s.key}>edit!</a>
-                </div>
-              </label>
-            </div>
-          </li>
-        );
-      });
-
-      return(<ul className={"list-group"}>{nodes}</ul>);
-    }
-  });
-
-  var Preview = React.createClass({
-    render: function() {
-      var s = this.props.saver;
-      var mergedOpts = _.merge(url_opts, s.settings);
-      
-      mergedOpts = _.merge(mergedOpts, saverOpts);
-      var previewUrl = s.getPreviewUrl(mergedOpts);
-
-      return (
-        <div>
-          <iframe scrolling='no' class='mini' src={previewUrl} />
-        </div>
-      );
-    }
-  });
-
-  var SliderWithValue = React.createClass({
-    onSliderChange: function(evt) {
-      var val = evt.target.value;
-      this.value = val;
-      this.setState({
-        name: this.name,
-        value: val
-      });
-
-      this.props.onChange({
-        name: this.props.name,
-        value: val
-      });
-    },
-    render: function() {
-      return <input type="range" defaultValue={this.props.value}
-                    min={this.props.min} max={this.props.max}
-                    onChange={this.onSliderChange}
-                    className="slider slider-square-inverted" />
-    }
-  });
-
-  var OptionsForm = React.createClass({
-    values: {},
-    onChanged: function(e) {
-      this.props.onChange(this.getValues());
-    },
-    renderOption: function(o, index, val) {
-      var guts;
-      var self = this;
-      var ref = "option" + index;
-      
-      if ( o.type === "slider" ) {
-        val = parseInt(val, 10);
-        guts = <SliderWithValue name={o.name}
-                                value={val}
-                                min={o.min}
-                                max={o.max}
-                                ref={ref}
-                                onChange={this.onChanged} />;             
-      }
-      else {
-        guts = <input type="text" name={o.name}
-                      defaultValue={val}
-                      ref={ref}
-                      onChange={this.onChanged} />;
-      }
-
-      return (
-        <fieldset>
-          <legend>{o.name}</legend>
-          {guts}
-        </fieldset>
-      );
-    },
-    getValues: function() {
-      var self = this;
-      var data = {};
-      _.each(this.props.saver.options, function(o, i) {
-        var ref = "option" + i;
-        data[o.name] = self.refs[ref].value;
-      });
-      
-      return data;
-    },
-    render: function() {
-      var self = this;
-      var s = this.props.saver;
-      var onChange = this.props.onChange;
-      var values = s.settings;
-      var head;
-      
-      var nodes = this.props.saver.options.map(function(o, i) {
-        var val = values[o.name];
-        if ( typeof(val) === "undefined" ) {
-          val = o.default;
-        }
-
-        return (
-          <div key={i}>
-            {self.renderOption(o, i, val)}
-          </div>
-        );
-      });
-
-      if ( nodes.length > 0 ) {
-        head = "Options";
-      }
-      else {
-        head = "";
-      }
-      
-      return(<div><h1>{head}</h1>{nodes}</div>);
-    }
-  });
-
 
   var loadPreview = function(s) {
     url_opts.screenshot = screenshot;
     ReactDOM.render(
-      <Preview saver={s} />,
+      <Preview saver={s} url_opts={url_opts} saver_opts={saverOpts} />,
       document.getElementById('preview')
     );
   };
