@@ -18,12 +18,8 @@ const {BrowserWindow} = window.require('electron').remote;
   var appRepo = remote.getGlobal('APP_REPO');
   var updateAvailable = remote.getGlobal('NEW_RELEASE_AVAILABLE');
 
-
   
   const {dialog} = require('electron').remote;
-  
-  //  var Menu = remote.Menu;
-  //  var MenuItem = remote.MenuItem;
 
   var appLauncher = new AutoLaunch({
 	  name: appName
@@ -62,6 +58,7 @@ const {BrowserWindow} = window.require('electron').remote;
   if ( el ) {
     el.innerHTML = appName;
   }
+
   el = document.querySelector("body > header div .version");
   if ( el ) {
     el.innerHTML = appVersion;
@@ -157,7 +154,7 @@ const {BrowserWindow} = window.require('electron').remote;
 
       return (
         <div>
-          <iframe scrolling='no' src={previewUrl} />
+          <iframe scrolling='no' class='mini' src={previewUrl} />
         </div>
       );
     }
@@ -178,7 +175,10 @@ const {BrowserWindow} = window.require('electron').remote;
       });
     },
     render: function() {
-      return <input type="range" defaultValue={this.props.value} min={this.props.min} max={this.props.max} onChange={this.onSliderChange} className="slider slider-square-inverted" />
+      return <input type="range" defaultValue={this.props.value}
+                    min={this.props.min} max={this.props.max}
+                    onChange={this.onSliderChange}
+                    className="slider slider-square-inverted" />
     }
   });
 
@@ -194,10 +194,18 @@ const {BrowserWindow} = window.require('electron').remote;
       
       if ( o.type === "slider" ) {
         val = parseInt(val, 10);
-        guts = <SliderWithValue name={o.name} value={val} min={o.min} max={o.max} ref={ref} onChange={this.onChanged} />;             
+        guts = <SliderWithValue name={o.name}
+                                value={val}
+                                min={o.min}
+                                max={o.max}
+                                ref={ref}
+                                onChange={this.onChanged} />;             
       }
       else {
-        guts = <input type="text" name={o.name} defaultValue={val} ref={ref} onChange={this.onChanged} />;
+        guts = <input type="text" name={o.name}
+                      defaultValue={val}
+                      ref={ref}
+                      onChange={this.onChanged} />;
       }
 
       return (
@@ -339,20 +347,24 @@ const {BrowserWindow} = window.require('electron').remote;
 
   };
 
+  /**
+   * open the screensaver in preview window
+   */
   var openSaverInWatcher = function(e) {
     var key = e.target.dataset.key;
-    e.preventDefault();
-    console.log(key);
+    var w = new BrowserWindow();
 
-    var windowOpts = {
-
-    };
-    var w = new BrowserWindow(windowOpts);
+    // pass the key of the screensaver we want to load
+    // as well as the URL to our screenshot image
     var target = 'file://' + __dirname + "/watcher.html?" +
                  "src=" + encodeURIComponent(key) +
                  "&screenshot=" + encodeURIComponent("file://" + screenshot);
     w.loadURL(target);
-    w.webContents.openDevTools();    
+
+    // @todo -- make this a configurable option?
+    //w.webContents.openDevTools();    
+
+    e.preventDefault();
   };
 
   var updatePrefs = function() {
@@ -402,16 +414,6 @@ const {BrowserWindow} = window.require('electron').remote;
     saverOpts = {};
     redraw(s);
   };
-
-
-  /* var handleLinkClick = function() {
-     shell.openExternal(this.href);
-     };
-     var links = document.querySelectorAll('a[href^="http"]');
-     for ( var i = 0; i < links.length; i++ ) {
-     link[i].addEventListener('click', handleLinkClick, false);
-     }
-   */
 
   renderList();
 
