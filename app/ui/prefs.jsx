@@ -6,8 +6,9 @@ var path = require('path');
 var _ = require('lodash');
 
 var SliderWithValue = require('./slider-with-value');
-var Preview = require('./preview');
 var OptionsForm = require('./options-form');
+
+var Preview = require('./preview');
 var SaverList = require('./saver-list');
 
 
@@ -200,7 +201,7 @@ const {BrowserWindow} = window.require('electron').remote;
     // as well as the URL to our screenshot image
     var target = 'file://' + __dirname + "/watcher.html?" +
                  "src=" + encodeURIComponent(key) +
-                 "&screenshot=" + encodeURIComponent("file://" + screenshot);
+                 "&screenshot=" + encodeURIComponent(screenshot);
     w.loadURL(target);
 
     // @todo -- make this a configurable option?

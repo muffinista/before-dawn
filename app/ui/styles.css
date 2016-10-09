@@ -1,7 +1,10 @@
-iframe.mini {
-  display: block;
+iframe {
   overflow: hidden;
   border: none;
+}
+
+iframe.mini {
+  display: block;
   width: 100%;
   min-height: 250px;
 }

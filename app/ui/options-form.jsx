@@ -1,6 +1,7 @@
 'use strict'
 
 var React = require('react');
+var SliderWithValue = require('./slider-with-value');
 
 module.exports = React.createClass({
   values: {},
@@ -51,9 +52,10 @@ module.exports = React.createClass({
     var onChange = this.props.onChange;
     var values = s.settings;
     var head;
-    
+
     var nodes = this.props.saver.options.map(function(o, i) {
       var val = values[o.name];
+      console.log(o, val);
       if ( typeof(val) === "undefined" ) {
         val = o.default;
       }

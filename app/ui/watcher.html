@@ -7,6 +7,24 @@
 
   <body>
     <div class="window">
+      <header class="toolbar toolbar-header">
+        <div class="toolbar-actions">
+          <div class="btn-group">
+            <button class="btn btn-default open">
+              <span class="icon"><img src="folder.svg" width="14" height="14" /></span>
+            </button>
+            <button class="btn btn-default save">
+              <span class="icon"><img src="save.svg" width="14" height="14" /></span>
+            </button>
+            <button class="btn btn-default reload">
+              <span class="icon"><img src="cycle.svg" width="14" height="14" /></span>
+            </button>
+            <button class="btn btn-default console">
+              <span class="icon"><img src="bug.svg" width="14" height="14" /></span>
+            </button>
+        </div>
+      </header>
+
       <div class="tab-group">
         <div class="tab-item active">
           <span class="icon"></span>
@@ -19,14 +37,15 @@
       </div>
 
       <div class="window-content">
-        <div class="main pane-group">
+        <div class="main pane-group hide">
           <div id="wrapper"></div>
         </div>
-        <div class="settings pane-group hide">
+        <div class="settings pane-group">
+          <div id="attributes"></div>
+          <div id="options"></div>
         </div>
       </div> <!-- window-content -->
-
-    </div>
+    </div> <!-- window -->
     <script src="tabs.js"></script>
     <script src="watcher.js"></script>
   </body>
