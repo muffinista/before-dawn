@@ -21,10 +21,20 @@ module.exports = function(grunt) {
           'ui/components.js': 'ui/components.jsx'
         }
       }
+    },
+    watch: {
+      scripts: {
+        files: ['**/*.jsx'],
+        tasks: ['babel'],
+        options: {
+          spawn: false,
+        },
+      },
     }
   });
   
   grunt.loadNpmTasks('grunt-babel');
   grunt.loadNpmTasks('load-grunt-tasks');
+  grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.registerTask('default', ['babel']);
 };
