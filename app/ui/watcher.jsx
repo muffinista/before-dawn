@@ -1,3 +1,6 @@
+import React from 'react';
+import AttributesForm from './attributes-form';
+
 (function() {
   const remote = window.require('electron').remote;
   const _ = require('lodash');
@@ -8,12 +11,11 @@
   const exec = require('child_process').exec;
   var savers = remote.getGlobal('savers');
 
-  var React = require('react');
+  //var React = require('react');
   var ReactDOM = require('react-dom');
   
   var OptionsForm = require('./options-form');
-  var AttributesForm = require('./attributes-form');
-  
+
   // parse incoming URL params -- we'll get a link to the current screen images for previews here
   window.urlParams = window.location.search.split(/[?&]/).slice(1).map(function(paramPair) {
     return paramPair.split(/=(.+)?/).slice(0, 2);
@@ -57,10 +59,14 @@
     reloadPreview();
   };
 
-  var optionsFormRef = ReactDOM.render(
-    <OptionsForm saver={s} onChange={optionsUpdated} />,
-    document.getElementById('options')
-  );
+
+  console.log('***', AttributesForm);
+  console.log('!!!', OptionsForm);
+  
+//  var optionsFormRef = ReactDOM.render(
+//    <OptionsForm saver={s} onChange={optionsUpdated} />,
+//    document.getElementById('options')
+//  );
   var attrFormRef = ReactDOM.render(
     <AttributesForm saver={s} onChange={optionsUpdated} />,
     document.getElementById('attributes')

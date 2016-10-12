@@ -70,9 +70,9 @@ textarea[name=localSources] {
   padding: 5px;
 }
 
-form label {
-  font-weight: bold;
-}
+//form label {
+//  font-weight: bold;
+//}
 
 
 .about {
@@ -89,4 +89,16 @@ form label {
 }
 .about p {
   font-size: 120%;
+}
+
+#attributes .list-group * {
+  white-space: normal;
+}
+
+.only-for-slider {
+  display: none;
+}
+
+.slider .only-for-slider {
+  display: block;
 }

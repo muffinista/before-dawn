@@ -1,7 +1,9 @@
 'use strict';
 var React = require('react');
-var SaverOptionInputItem = require('./saver-option-input-item');
-//var update = require('react-addons-update');
+
+//var SaverOptionInputItem = require('./saver-option-input-item');
+
+import SaverOptionInputItem from './saver-option-input-item';
 
 const _ = require('lodash');
 
@@ -10,13 +12,14 @@ module.exports = React.createClass({
   getInitialState: function() {
     // re-map incoming options to add an index value we can
     // use to update/remove options according to user input
-    var src = this.props.options.map(function(opt, i) {
+    var src = this.addIndexes(this.props.options, true);
+    /* .map(function(opt, i) {
       if ( typeof(opt.index) === "undefined" ) {
         opt.index = self.currentIndex;
         self.currentIndex = self.currentIndex + 1;
       }
       return opt;
-    });
+    });*/
 
     return {
       options: src
@@ -24,8 +27,17 @@ module.exports = React.createClass({
   },
   indexOfOption: function(vals) {
     return _.findIndex(this.state.options, function(o) {
-      console.log(o.index, "vs", vals.index);
       return o.index == vals.index;
+    });
+  },
+  addIndexes: function(arr, force) {
+    var self = this;
+    return arr.map(function(opt, i) {
+      if ( force === true || typeof(opt.index) === "undefined" ) {
+        opt.index = self.currentIndex;
+      }
+      self.currentIndex = self.currentIndex + 1;
+      return opt;
     });
   },
   onDelete: function(item) {
@@ -35,17 +47,17 @@ module.exports = React.createClass({
     var foo = this.state.options;
     foo.splice(index, 1);
     this.setState({
-      options: foo //update(this.state.options, {$splice: [[index, 1]]})
+      options: foo
     });
   },
-  onChanged: function(item) {
-    var newVals = item.state.value;
+  onChanged: function(newVals) {
     var index = this.indexOfOption(newVals);
-    this.state.options[index] = newVals;   
+    this.state.options[index] = newVals;
+    this.props.onChange(this, this.state.options);
   },
   onAddNew: function() {
-    console.log("add new!");
     var tmp = this.state.options;
+    console.log("add new", this.currentIndex);
     tmp.push(
       {
         "index": this.currentIndex,
@@ -66,15 +78,19 @@ module.exports = React.createClass({
   },
   render: function() {
     var self = this;
+    console.log("!!!!");
     var els = this.state.options.map(function(opt, i) {
-      if ( typeof(opt.index) === "undefined" ) {
+      /*if ( typeof(opt.index) === "undefined" ) {
         opt.index = self.currentIndex;
-        self.currentIndex = self.currentIndex + 1;
       }
-
+      self.currentIndex = self.currentIndex + 1;
+      */
+      console.log("INDEX", opt.index);
       return (<SaverOptionInputItem option={opt} onChange={self.onChanged} onDelete={self.onDelete} key={opt.index} />);
     });
 
+    console.log("SaverOptionInput render");
+    
     return(<ul className={"list-group"}>
       {els}
       <li key={"add-new-option"}>

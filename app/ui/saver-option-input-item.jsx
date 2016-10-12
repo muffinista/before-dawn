@@ -1,13 +1,15 @@
 'use strict';
-var React = require('react');
 
-module.exports = React.createClass({
-  getInitialState: function() {
-    return {
-      value: this.props.option
-    };
-  },
-  onTypeChange: function(ev) {
+import React from 'react';
+
+export default class SaverOptionInputItem extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { option: this.props.option };
+    this.handleChange = this.handleChange.bind(this);
+  }
+
+  onTypeChange(ev) {
     var root = document.querySelector("select").parentNode.parentNode;
 
     if ( ev.target.value === "slider" ) {
@@ -18,9 +20,9 @@ module.exports = React.createClass({
     }
 
     this.handleChange(ev);
-  },
-  handleChange: function() {
-    console.log("CHANGE", this.refs);
+  }
+  handleChange() {
+    //console.log("CHANGE", this.refs);
     var newVals = {
       "index": this.props.option.index,
       "name": this.refs.name.value,
@@ -34,45 +36,86 @@ module.exports = React.createClass({
       option: newVals
     });
 
-    this.props.onChange(this, newVals);
-  },
-  render: function() {
+    this.props.onChange(newVals);
+  }
+  render() {
     var self = this;
-    var opt = this.props.option;
+    //console.log("hey", this.state);
 
+    var className = "list-group-item entry";
+    if ( this.state.option.type === "slider" ) {
+      className = className + " slider";
+    }
+    
     return (
-      <li className={"list-group-item entry"} key={opt.name}>
+      <li className={className} key={this.state.option.index}>
         <div className="form-group">
-          <input type="text" ref="name" name="name" className="form-control" initialValue={opt.name} onChange={this.handleChange} />
+          <label>Name</label>
+          <input type="text"
+                 ref="name" name="name" className="form-control"
+                 placeholder="Pick a name for this option"
+                 value={this.state.option.name}
+                 onChange={this.handleChange} />
         </div>
 
         <div className="form-group">
-          <input type="text" ref="description" name="description" className="form-control" initialValue={opt.description} onChange={this.handleChange} />
+          <label>Description</label>
+          <input type="text"
+                 ref="description"
+                 name="description"
+                 placeholder="Describe what this option does"
+                 className="form-control"
+                 value={this.state.option.description}
+                 onChange={this.handleChange} />
         </div>
 
         <div className="form-group">
-          <select ref="type" name="type" className="form-control" initialInitialValue={opt.type} onChange={this.onTypeChange}>
-            <option initialValue="slider">slider</option>
-            <option initialValue="text">text</option>
+          <label>Type</label>
+          <select ref="type" name="type" className="form-control" initialInitialValue={this.state.option.type} onChange={this.onTypeChange}>
+            <option value="slider">slider</option>
+            <option value="text">text</option>
           </select>
         </div>
 
         <span className="only-for-slider">
           <div className="form-group">
-            <input ref="min" type="text" name="min" className="form-control" initialValue={opt.min} onChange={this.handleChange} />
-            <input ref="max" type="text" name="max" className="form-control" initialValue={opt.max} onChange={this.handleChange} />
+            <label>Min</label>
+            <input ref="min"
+                   type="number"
+                   name="min"
+                   className="form-control"
+                   value={this.state.option.min}
+                   onChange={this.handleChange} />
+          </div>
+          <div className="form-group">
+            <label>Max</label>
+            <input ref="max"
+                   type="number"
+                   name="max"
+                   className="form-control"
+                   value={this.state.option.max}
+                   onChange={this.handleChange} />
           </div>
         </span>
 
 
         <div className="form-group">
-          <input ref="default" type="text" name="default" className="form-control" initialValue={opt.default} onChange={this.handleChange} />
+          <label>Default</label>
+          <input ref="default"
+                 type="text"
+                 name="default"
+                 placeholder="Default value of this option"
+                 className="form-control"
+                 value={this.state.option.default}
+                 onChange={this.handleChange} />
         </div>
 
         <div className="form-actions">
-          <button data-name={opt.name} className={"remove-option"} onClick={() => this.props.onDelete(this)}>x</button>
+          <button className={"remove-option"} onClick={() => this.props.onDelete(this)}>x</button>
         </div>
       </li>
     );
   }
-});
+
+//});
+}
