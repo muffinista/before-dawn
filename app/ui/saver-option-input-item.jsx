@@ -48,7 +48,7 @@ export default class SaverOptionInputItem extends React.Component {
     }
     
     return (
-      <li className={className} key={this.state.option.index}>
+      <fieldset className={className} key={this.state.option.index}>
         <div className="form-group">
           <label>Name</label>
           <input type="text"
@@ -113,7 +113,7 @@ export default class SaverOptionInputItem extends React.Component {
         <div className="form-actions">
           <button className={"remove-option"} onClick={() => this.props.onDelete(this)}>x</button>
         </div>
-      </li>
+      </fieldset>
     );
   }
 

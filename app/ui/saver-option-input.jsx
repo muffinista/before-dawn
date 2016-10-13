@@ -13,13 +13,6 @@ module.exports = React.createClass({
     // re-map incoming options to add an index value we can
     // use to update/remove options according to user input
     var src = this.addIndexes(this.props.options, true);
-    /* .map(function(opt, i) {
-      if ( typeof(opt.index) === "undefined" ) {
-        opt.index = self.currentIndex;
-        self.currentIndex = self.currentIndex + 1;
-      }
-      return opt;
-    });*/
 
     return {
       options: src
@@ -78,24 +71,15 @@ module.exports = React.createClass({
   },
   render: function() {
     var self = this;
-    console.log("!!!!");
     var els = this.state.options.map(function(opt, i) {
-      /*if ( typeof(opt.index) === "undefined" ) {
-        opt.index = self.currentIndex;
-      }
-      self.currentIndex = self.currentIndex + 1;
-      */
-      console.log("INDEX", opt.index);
       return (<SaverOptionInputItem option={opt} onChange={self.onChanged} onDelete={self.onDelete} key={opt.index} />);
     });
 
-    console.log("SaverOptionInput render");
-    
-    return(<ul className={"list-group"}>
+    return(<div>
       {els}
-      <li key={"add-new-option"}>
+      <div key={"add-new-option"}>
         <button onClick={() => this.onAddNew()}>add new option</button>
-      </li>
-    </ul>);
+      </div>
+    </div>);
   }
 });
