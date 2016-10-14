@@ -51,6 +51,8 @@ global.savers = require('./lib/savers.js');
 /**
  * Open the preferences window
  */
+
+var prefsWindowHandle = null;
 var openPrefsWindow = function() {
   var electronScreen = electron.screen;
   var primary = electronScreen.getPrimaryDisplay();
@@ -58,6 +60,7 @@ var openPrefsWindow = function() {
     primary
   ];
 
+  
   ipcMain.once("screenshot-" + primary.id, function(e, message) {
     grabber.reload();
 
@@ -65,7 +68,7 @@ var openPrefsWindow = function() {
     // and check for any system updates
     global.savers.reload(function() {
       var prefsUrl = 'file://' + __dirname + '/ui/prefs.html';
-      var w = new BrowserWindow({
+      prefsWindowHandle = new BrowserWindow({
         width:800,
         height:675,
         resizable:false,
@@ -74,18 +77,18 @@ var openPrefsWindow = function() {
 
       prefsUrl = prefsUrl + "?screenshot=" + encodeURIComponent("file://" + message.url);
       
-      w.loadURL(prefsUrl);
+      prefsWindowHandle.loadURL(prefsUrl);
       
       if ( typeof(app.dock) !== "undefined" ) {
         app.dock.show();
       }
 
       if ( debugMode === true ) {
-        w.webContents.openDevTools();
+        prefsWindowHandle.webContents.openDevTools();
       }
 
-      w.on('closed', function() {
-        w = null;
+      prefsWindowHandle.on('closed', function() {
+        prefsWindowHandle = null;
         global.savers.reload();
         if ( typeof(app.dock) !== "undefined" ) {
           app.dock.hide();
@@ -499,6 +502,19 @@ ipcMain.on('asynchronous-message', function(event, arg) {
     stopScreenSaver();
   }
 });
+
+
+//
+// if the user has updated one of their screensavers, we can let
+// the prefs window know that it needs to reload
+//
+ipcMain.on('savers-updated', (event, arg) => {
+  console.log("SAVER UPDATED", arg);
+  if ( prefsWindowHandle !== null ) {
+    prefsWindowHandle.send('savers-updated', arg);
+  }
+});
+
 
 
 /**

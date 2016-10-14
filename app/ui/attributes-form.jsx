@@ -11,8 +11,11 @@ export default class AttributesForm extends React.Component {
     super(props);
     this.state = { saver: this.props.saver };
 
-
-    this.handleNameChange = this.handleOptionChange.bind(this);
+    if ( this.state.saver.options === null ) {
+      this.state.saver.options = [];
+    }
+        
+    this.handleNameChange = this.handleNameChange.bind(this);
     this.handleDescriptionChange = this.handleDescriptionChange.bind(this);
     this.handleAboutUrlChange = this.handleAboutUrlChange.bind(this);
     this.handleAuthorChange = this.handleAuthorChange.bind(this);
@@ -21,22 +24,27 @@ export default class AttributesForm extends React.Component {
 
   handleNameChange(event) {
     this.state.saver.name = event.target.value;
+    this.props.onChanged(this.state.saver);
   }
 
   handleDescriptionChange(event) {
     this.state.saver.description = event.target.value;
+    this.props.onChanged(this.state.saver);
   }
 
   handleAboutUrlChange(event) {
     this.state.saver.aboutUrl = event.target.value;
+    this.props.onChanged(this.state.saver);
   }
 
   handleAuthorChange(event) {
     this.state.saver.author = event.target.value;
+    this.props.onChanged(this.state.saver);
   }
 
   handleOptionChange(event, vals) {
     this.state.saver.options = vals;
+    this.props.onChanged(this.state.saver);
   }
 
   render() {
@@ -47,22 +55,22 @@ export default class AttributesForm extends React.Component {
       <div>
         <div className="form-group">
           <label htmlFor="name">Name:</label>
-          <input type="text" name="name" className="form-control" value={this.state.saver.name} onChange={this.handleNameChange} />
+          <input type="text" name="name" ref="name" className="form-control" defaultValue={this.props.saver.name} onChange={this.handleNameChange} />
           <div className="hint">The name of your screensaver.</div>
         </div>
         <div className="form-group">
           <label htmlFor="name">Description:</label>
-          <input type="text" name="description" className="form-control" value={this.state.saver.description} onChange={this.handleDescriptionChange} />
+          <input type="text" name="description" ref="description" className="form-control" defaultValue={this.state.saver.description} onChange={this.handleDescriptionChange} />
           <div className="hint">A brief description of your screensaver.</div>
         </div>
         <div className="form-group">
           <label htmlFor="aboutUrl">About URL:</label>
-          <input type="text" name="aboutUrl" className="form-control" value={this.state.saver.aboutUrl} onChange={this.handleAboutUrlChange} />
+          <input type="text" name="aboutUrl" ref="aboutUrl" className="form-control" defaultValue={this.state.saver.aboutUrl} onChange={this.handleAboutUrlChange} />
           <div className="hint">If you have a URL with more details about your work, put it here!</div>
         </div>
         <div className="form-group">
           <label htmlFor="author">Author:</label>
-          <input type="text" name="author" className="form-control" value={this.state.saver.author} onChange={this.handleAuthorChange} />
+          <input type="text" name="author" ref="author" className="form-control" defaultValue={this.state.saver.author} onChange={this.handleAuthorChange} />
           <div className="hint">The author of this screensaver.</div>
         </div>
       </div>

@@ -7,8 +7,10 @@ module.exports = React.createClass({
     var s = this.props.saver;
     var url_opts = this.props.url_opts;
     var saver_opts = this.props.saver_opts;
-    
-    var mergedOpts = _.merge(url_opts, s.settings);
+    var mergedOpts;
+
+    console.log("PREVIEW", s);
+    mergedOpts = _.merge(url_opts, s.settings);
     
     mergedOpts = _.merge(mergedOpts, saver_opts);
     var previewUrl = s.getPreviewUrl(mergedOpts);

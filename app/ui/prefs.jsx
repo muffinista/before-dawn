@@ -17,6 +17,7 @@ const {BrowserWindow} = window.require('electron').remote;
 
 (function() {
   var electron = window.require('electron');
+  const {ipcRenderer} = window.require('electron')
   var remote = window.require('electron').remote;
   var savers = remote.getGlobal('savers');
   var appName = remote.getGlobal('APP_NAME');
@@ -25,6 +26,16 @@ const {BrowserWindow} = window.require('electron').remote;
   var appRepo = remote.getGlobal('APP_REPO');
   var updateAvailable = remote.getGlobal('NEW_RELEASE_AVAILABLE');
 
+
+  ipcRenderer.on('savers-updated', (event, arg) => {
+    renderList();
+
+    var val = getCurrentScreensaver();
+    var s = savers.getByKey(val);
+    
+    redraw(s);
+
+  });
   
   const {dialog} = require('electron').remote;
 
@@ -149,7 +160,6 @@ const {BrowserWindow} = window.require('electron').remote;
       
       var s = savers.getByKey(current);
       redraw(s);
-
 
       var radios = document.querySelectorAll('input[name=screensaver]');
       for ( var i = 0; i < radios.length; i++ ) {

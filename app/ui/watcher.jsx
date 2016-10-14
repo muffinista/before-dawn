@@ -3,6 +3,7 @@ import AttributesForm from './attributes-form';
 
 (function() {
   const remote = window.require('electron').remote;
+  const {ipcRenderer} = window.require('electron');
   const _ = require('lodash');
 
   const fs = require('fs');
@@ -11,7 +12,6 @@ import AttributesForm from './attributes-form';
   const exec = require('child_process').exec;
   var savers = remote.getGlobal('savers');
 
-  //var React = require('react');
   var ReactDOM = require('react-dom');
   
   var OptionsForm = require('./options-form');
@@ -31,7 +31,8 @@ import AttributesForm from './attributes-form';
 
   // load screensaver object
   var s = savers.getByKey(src);
-
+  var saverAttrs = s.toHash();
+    
   var reloadPreview = function() {
     var iframe = document.querySelector("iframe");
 
@@ -58,17 +59,22 @@ import AttributesForm from './attributes-form';
     saverOpts = data;
     reloadPreview();
   };
-
-
-  console.log('***', AttributesForm);
-  console.log('!!!', OptionsForm);
   
+  var attrsUpdated = function(data) {
+    saverAttrs = data;
+    //reloadPreview();
+  };
+
+
+
+  // do we need this?
 //  var optionsFormRef = ReactDOM.render(
 //    <OptionsForm saver={s} onChange={optionsUpdated} />,
 //    document.getElementById('options')
 //  );
+
   var attrFormRef = ReactDOM.render(
-    <AttributesForm saver={s} onChange={optionsUpdated} />,
+    <AttributesForm saver={saverAttrs} onChanged={attrsUpdated} />,
     document.getElementById('attributes')
   );
   
@@ -122,15 +128,28 @@ import AttributesForm from './attributes-form';
     openFolderInOS(filePath);
   };
 
-  var saveSettings = function() {
+  var closeWindow = function() {
+    var window = remote.getCurrentWindow();
+    window.close();
+  };
 
+  var saveSettings = function() {
+    console.log("SAVE", saverAttrs);
+    s.write(saverAttrs);
+    ipcRenderer.send('savers-updated', s.key);
   };
   var openConsole = function() {
     remote.getCurrentWindow().toggleDevTools();
   };
   
   document.querySelector(".open").addEventListener('click', openFolder, false);
-  document.querySelector(".save").addEventListener('click', saveSettings, false);
+  document.querySelector(".cancel").addEventListener('click', closeWindow, false);
+  var saveButtons = document.querySelectorAll(".save");
+
+  for ( var i = 0; i < saveButtons.length; i++ ) {
+    saveButtons[i].addEventListener('click', saveSettings, false);
+  }
+
   document.querySelector(".reload").addEventListener('click', reloadPreview, false);
   document.querySelector(".console").addEventListener('click', openConsole, false);
   
