@@ -1,29 +1,28 @@
 'use strict';
-var React = require('react');
 
-//var SaverOptionInputItem = require('./saver-option-input-item');
-
+import React from 'react';
 import SaverOptionInputItem from './saver-option-input-item';
 
 const _ = require('lodash');
 
-module.exports = React.createClass({
-  currentIndex: 0,
-  getInitialState: function() {
-    // re-map incoming options to add an index value we can
-    // use to update/remove options according to user input
-    var src = this.addIndexes(this.props.options, true);
+export default class SaverOptionInput extends React.Component {
+  constructor(props) {
+    super(props);
 
-    return {
-      options: src
-    };
-  },
-  indexOfOption: function(vals) {
+    this.currentIndex = 0;
+    this.state = { options: this.addIndexes(props.options, true) };
+
+    
+    this.onChanged = this.onChanged.bind(this);
+  }
+
+  indexOfOption(vals) {
     return _.findIndex(this.state.options, function(o) {
       return o.index == vals.index;
     });
-  },
-  addIndexes: function(arr, force) {
+  }
+
+  addIndexes(arr, force) {
     var self = this;
     return arr.map(function(opt, i) {
       if ( force === true || typeof(opt.index) === "undefined" ) {
@@ -32,8 +31,9 @@ module.exports = React.createClass({
       self.currentIndex = self.currentIndex + 1;
       return opt;
     });
-  },
-  onDelete: function(item) {
+  }
+
+  onDelete(item) {
     var newVals = item.state.value;
     var index = this.indexOfOption(newVals);
 
@@ -42,34 +42,39 @@ module.exports = React.createClass({
     this.setState({
       options: foo
     });
-  },
-  onChanged: function(newVals) {
-    var index = this.indexOfOption(newVals);
-    this.state.options[index] = newVals;
-    this.props.onChange(this, this.state.options);
-  },
-  onAddNew: function() {
-    var tmp = this.state.options;
-    console.log("add new", this.currentIndex);
-    tmp.push(
-      {
-        "index": this.currentIndex,
-        "name": "Option",
-        "type": "slider",
-        "description": "Description",
-        "min": "1",
-        "max": "100",
-        "default": "75"
-      }
-    );
+  }
 
+  onChanged(newVals) {
+    var index = this.indexOfOption(newVals);
+
+    this.state.options[index] = newVals;
+    this.props.onChange(this.state.options);
+  }
+
+  onAddNew() {
+    var tmp = _.cloneDeep(this.state.options);
+
+    var newOpt = {
+      "index": this.currentIndex,
+      "name": "New Option",
+      "type": "slider",
+      "description": "Description",
+      "min": "1",
+      "max": "100",
+      "default": "75"
+    };
+
+    tmp.push(newOpt);
     this.currentIndex = this.currentIndex + 1;
-    
+       
     this.setState({
       options: tmp
     });
-  },
-  render: function() {
+
+    this.props.onChange(tmp);
+  }
+
+  render() {
     var self = this;
     var els = this.state.options.map(function(opt, i) {
       return (<SaverOptionInputItem option={opt} onChange={self.onChanged} onDelete={self.onDelete} key={opt.index} />);
@@ -82,4 +87,4 @@ module.exports = React.createClass({
       </div>
     </div>);
   }
-});
+}

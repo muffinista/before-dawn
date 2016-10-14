@@ -55,23 +55,22 @@ import AttributesForm from './attributes-form';
   var holder = document.getElementById("wrapper");
   var iframe = document.createElement('iframe');
   var saverOpts;
+
   var optionsUpdated = function(data) {
     saverOpts = data;
     reloadPreview();
   };
   
   var attrsUpdated = function(data) {
+    console.log("ATTRS UPDATED", data);
     saverAttrs = data;
-    //reloadPreview();
   };
 
-
-
   // do we need this?
-//  var optionsFormRef = ReactDOM.render(
-//    <OptionsForm saver={s} onChange={optionsUpdated} />,
-//    document.getElementById('options')
-//  );
+  var optionsFormRef = ReactDOM.render(
+    <OptionsForm saver={s} onChange={optionsUpdated} />,
+    document.getElementById('options')
+  );
 
   var attrFormRef = ReactDOM.render(
     <AttributesForm saver={saverAttrs} onChanged={attrsUpdated} />,

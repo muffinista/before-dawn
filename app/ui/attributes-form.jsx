@@ -3,7 +3,7 @@
 import React from 'react';
 var ReactDOM = require('react-dom');
 var SliderWithValue = require('./slider-with-value');
-var SaverOptionInput = require('./saver-option-input');
+import SaverOptionInput from './saver-option-input';
 
 
 export default class AttributesForm extends React.Component {
@@ -14,7 +14,7 @@ export default class AttributesForm extends React.Component {
     if ( this.state.saver.options === null ) {
       this.state.saver.options = [];
     }
-        
+    
     this.handleNameChange = this.handleNameChange.bind(this);
     this.handleDescriptionChange = this.handleDescriptionChange.bind(this);
     this.handleAboutUrlChange = this.handleAboutUrlChange.bind(this);
@@ -42,7 +42,7 @@ export default class AttributesForm extends React.Component {
     this.props.onChanged(this.state.saver);
   }
 
-  handleOptionChange(event, vals) {
+  handleOptionChange(vals) {
     this.state.saver.options = vals;
     this.props.onChanged(this.state.saver);
   }
@@ -77,7 +77,7 @@ export default class AttributesForm extends React.Component {
     );
 
     var opts = React.createElement(
-      'fieldset', null,
+      'div', null,
       <SaverOptionInput options={this.state.saver.options} onChange={this.handleOptionChange}/>);
     
     return React.createElement('div', null, guts, opts);   

@@ -22,7 +22,6 @@ export default class SaverOptionInputItem extends React.Component {
     this.handleChange(ev);
   }
   handleChange() {
-    //console.log("CHANGE", this.refs);
     var newVals = {
       "index": this.props.option.index,
       "name": this.refs.name.value,
@@ -40,7 +39,6 @@ export default class SaverOptionInputItem extends React.Component {
   }
   render() {
     var self = this;
-    //console.log("hey", this.state);
 
     var className = "list-group-item entry";
     if ( this.state.option.type === "slider" ) {
