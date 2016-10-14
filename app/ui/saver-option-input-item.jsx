@@ -7,6 +7,7 @@ export default class SaverOptionInputItem extends React.Component {
     super(props);
     this.state = { option: this.props.option };
     this.handleChange = this.handleChange.bind(this);
+    this.onTypeChange = this.onTypeChange.bind(this);    
   }
 
   onTypeChange(ev) {
