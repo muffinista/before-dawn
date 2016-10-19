@@ -1,49 +1,60 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
+    <meta charset="utf-8">
     <title>Before Dawn -- screensaver fun</title>
-
-    <link href="photon.min.css" rel="stylesheet" type="text/css" />
-    <link href="range.css" rel="stylesheet" type="text/css" />
+    <!-- 
+         <link href="photon.min.css" rel="stylesheet" type="text/css" />
+         <link href="range.css" rel="stylesheet" type="text/css" />
+       -->
+    <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.css" />
+    <link rel="image/svg+xml" href="../node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.eot" />
     <link href="styles.css" rel="stylesheet" type="text/css" />
   </head>
 
   <body>
-    <div class="window">
-      <div class="tab-group">
-        <div class="tab-item active">
-          <span class="icon"></span>
-          <a href="main">Screensavers</a>
-        </div>
-        <div class="tab-item">
-          <span class="icon"></span>
-          <a href="preferences" >Preferences</a>
-        </div>
+    <div class="container" >
+      <div class="navbar-header">
+        <ul class="nav nav-tabs" role="tablist">
+          <li role="presentation" class="nav-item">
+            <a data-toggle="tab" role="tab" class="nav-link active" href="#main">Screensavers</a>
+          </li>
+          <li role="presentation" class="nav-item">
+            <a data-toggle="tab" role="tab" class="nav-link" href="#preferences">Preferences</a>
+          </li>
+        </ul>
       </div>
+    </div>
+    
+      <div class="container-fluid">
+        <div class="row">
+          <div class="tab-content">
+          <div role="tabpanel" class="tab-pane active" id="main">
+            <div class="container-fluid">
+              <div class="row no-padding">
+                <!-- left pane -->
+                <div class="col-md-6">
+                  <div class="scrollable" id="savers">
 
-      <div class="window-content">
-        <div class="main pane-group">
-          <!-- left pane -->
-          <div class="pane">
-            <div class="scrollable" id="savers">
+                  </div>
+                </div>
+                
+                <!-- right pane -->
+                <div class="col-md-6">
+                  <div class="wrapper" >
+                    <div id="preview">
+                    </div>
+                    <div id="options">
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
+          
+          <div role="tabpanel" class="tab-pane" id="preferences">
+            <div class="container-fluid">
 
-          <!-- right pane -->
-          <div class="pane">
-            <div class="wrapper" >
-              <h1>Preview</h1>
-              <div id="preview">
-              </div>
-              <div id="options">
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="preferences pane-group hide">
-          <section class="pane">
-            <div class="wrapper">
               <h1>Options</h1>
               <form>
                 <fieldset>
@@ -58,83 +69,112 @@
                       <option value="30">30 minutes</option>
                       <option value="60">1 hour</option>
                     </select>
-                    <div class="hint">The screensaver will activate once your computer has been idle for this amount of time.</div>
+                    <small class="form-text text-muted">
+                      The screensaver will activate once your computer has been idle for this amount of time.
+                    </small>
                   </div>
                   
                   <div class="form-group">
-                    <label for="lock_screen">
-                      <input type="checkbox" name="lock_screen" id="lock_screen" value="1" />
+                    <label for="lock_screen" class="form-check-label">
+                      <input type="checkbox" name="lock_screen" id="lock_screen" class="form-check-input" value="1" />
                       Lock screen after running?
                     </label>
-                    <div class="hint">When the screen saver turns off, the user will need to enter their password</div>
+                    <small class="form-text text-muted">
+                      When the screen saver turns off, the user will need to enter their password.
+                    </small>
                   </div>
 
                   <div class="form-group">
-                    <label for="disable_on_battery">
-                      <input type="checkbox" name="disable_on_battery" id="disable_on_battery" value="1" />
+                    <label for="disable_on_battery" class="form-check-label">
+                      <input type="checkbox" name="disable_on_battery" id="disable_on_battery" class="form-check-input" value="1" />
                       Disable when on battery?
                     </label>
-                    <div class="hint">If checked, Before Dawn won't
+                    <small class="form-text text-muted">
+                      If checked, Before Dawn won't
                       activate when you're not plugged in -- your
                       computer's power settings can blank the screen
-                      instead.</div>
-                    
+                      instead.
+                    </small>                     
                   </div>
-
+                  
                   <div class="form-group">
-                    <label for="auto_start">
-                      <input type="checkbox" name="auto_start" id="auto_start" value="1" />
+                    <label for="auto_start" class="form-check-label">
+                      <input type="checkbox" name="auto_start" id="auto_start" class="form-check-input" value="1" />
                       Auto start on login?
                     </label>
-                    <div class="hint">If checked, Before Dawn will start when your computer starts</div>
+                    <small class="form-text text-muted">
+                      If checked, Before Dawn will start when your computer starts.
+                    </small>
                   </div>
                 </fieldset>
               </form>
 
-              <h1>Advanced Options <span class="hint">Be careful with these!</span></h1>
-              
+              <h1>Advanced Options <small>Be careful with these!</small></h1>
+               
               <form>
                 <fieldset>
                   <div class="form-group">
                     <label for="repo">Github Repo URL:</label>
-                    <div>
-                      github.com/<input type="text" name="repo" class="form-control" placeholder="muffinista/before-dawn-screensavers" />
+                    <div class="input-group">
+                      <div class="input-group-addon">github.com/</div>
+                      <input type="text" name="repo" class="form-control" placeholder="muffinista/before-dawn-screensavers" />
                     </div>
-                    <div class="hint">We will download releases from this repository instead of the default repo if specified.</div>
+                    <small class="form-text text-muted">
+                      We will download releases from this repository instead of the default repo if specified.
+                    </small>
                   </div>
-
-                  <div class="form-group">
+                  
+                  <div class="form-group container-fluid">
                     <label for="localSources">Local Sources:</label>
-                    <div>
-                      <textarea name="localSources" class="form-control"></textarea>
-                      <button class="btn btn-default pick">...</button>
+                    <div class="input-group row no-padding">
+                      <div class="col-xs-9">
+                        <textarea name="localSources" class="form-control"></textarea>
+                      </div>
+                      <div class="col-xs-2">
+                        <button class="btn btn-secondary pick">...</button>
+                      </div>
                     </div>
-                    <div class="hint">
+                    
+                    <small class="form-text text-muted">
                       We will load screensavers from any directories listed here. Use this to add your own screensavers!
-                    </div>
+                    </small>
                   </div>
-
-
                 </fieldset>
               </form>
-            </div>
-          </section>
+
+            </div> <!-- container-fluid -->
+
+          </div> <!-- window-content -->
         </div>
+        
+      </div>
+    </div> <!-- window -->
 
-      </div> <!-- window-content -->
-
-
-      <footer class="toolbar toolbar-footer">
-        <div class="pull-right">
+    <footer class="footer">
+      <div class="container-fluid">
+        <div class="row pull-xs-right">
           <button class="btn btn-large btn-default cancel">Cancel</button>
           <button class="btn btn-large btn-positive save">Save</button>
         </div>
-      </footer>
-    </div> <!-- window -->
-
-    <script src="tabs.js"></script>
-    <script src="range.js"></script>
-    <script src="prefs.js"></script>
+      </div>
+    </footer>
     
+    <script src="../node_modules/tether/dist/js/tether.min.js" ></script>
+    <script>
+     var $ = require('jquery');
+     var jQuery = $;
+     window.$ = $;
+     require('bootstrap');
+    </script>
+    
+<!--    <script src="tabs.js"></script>
+    <script src="range.js"></script>
+-->
+
+    <script src="prefs.js"></script>
+
+    <script>
+//     $(".nav-tabs").tab();
+    </script>
   </body>
 </html>

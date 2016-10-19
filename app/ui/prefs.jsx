@@ -149,6 +149,11 @@ const {BrowserWindow} = window.require('electron').remote;
     loadOptionsForm(s);
   };
 
+  var handleLinkClick = function(event) {
+    event.preventDefault();
+    shell.openExternal(this.href);
+  };
+  
   var renderList = function() {
     savers.listAll(function(entries) {
       var current = savers.getCurrent();
@@ -171,7 +176,10 @@ const {BrowserWindow} = window.require('electron').remote;
         links[i].addEventListener('click', openSaverInWatcher, false);
       }
 
-      
+      links = document.querySelectorAll('a[href^="http"]');
+      for ( var i = 0; i < links.length; i++ ) {
+        links[i].addEventListener('click', handleLinkClick, false);
+      }
     });
   };
 

@@ -38,6 +38,7 @@ export default class SaverOptionInputItem extends React.Component {
 
     this.props.onChange(newVals);
   }
+
   render() {
     var self = this;
 

@@ -19,7 +19,7 @@ module.exports = React.createClass({
     var self = this;
     var nodes = this.props.data.map(function(s, i) {
       var is_checked = (s.key === self.state.value);
-      var authorClass = "author";
+      var authorClass = "external author";
       var aboutUrlClass = "external aboutUrl";
       
       if ( typeof(s.author) === "undefined" || s.author === "" ) {
@@ -41,7 +41,7 @@ module.exports = React.createClass({
                   {s.author} //
                 </span>
                 <a className={aboutUrlClass} href={s.aboutUrl}>learn more</a>
-                <a className="watcher" href="#" data-key={s.key}>edit!</a>
+                <a className={"watcher"} href="#" data-key={s.key}>edit!</a>
               </div>
             </label>
           </div>
@@ -52,3 +52,4 @@ module.exports = React.createClass({
     return(<ul className={"list-group"}>{nodes}</ul>);
   }
 });
+
