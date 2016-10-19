@@ -22,10 +22,11 @@ iframe {
   border: none;
 }
 
+
 iframe.mini {
   display: block;
   width: 100%;
-  min-height: 250px;
+  min-height: 40vh;
 }
 
 .hide {

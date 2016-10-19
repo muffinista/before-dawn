@@ -3,17 +3,13 @@
   <head>
     <meta charset="utf-8">
     <title>Before Dawn -- screensaver fun</title>
-    <!-- 
-         <link href="photon.min.css" rel="stylesheet" type="text/css" />
-         <link href="range.css" rel="stylesheet" type="text/css" />
-       -->
     <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.css" />
     <link rel="image/svg+xml" href="../node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.eot" />
     <link href="styles.css" rel="stylesheet" type="text/css" />
   </head>
 
   <body>
-    <div class="container" >
+    <div class="container-fluid">
       <div class="navbar-header">
         <ul class="nav nav-tabs" role="tablist">
           <li role="presentation" class="nav-item">
@@ -24,23 +20,20 @@
           </li>
         </ul>
       </div>
-    </div>
-    
-      <div class="container-fluid">
-        <div class="row">
-          <div class="tab-content">
+
+      <div class="row">
+        <div class="tab-content">
           <div role="tabpanel" class="tab-pane active" id="main">
             <div class="container-fluid">
               <div class="row no-padding">
                 <!-- left pane -->
-                <div class="col-md-6">
+                <div class="col-sm-6 col-md-4">
                   <div class="scrollable" id="savers">
-
                   </div>
                 </div>
                 
                 <!-- right pane -->
-                <div class="col-md-6">
+                <div class="col-sm-6 col-md-8">
                   <div class="wrapper" >
                     <div id="preview">
                     </div>
@@ -110,7 +103,7 @@
               </form>
 
               <h1>Advanced Options <small>Be careful with these!</small></h1>
-               
+              
               <form>
                 <fieldset>
                   <div class="form-group">
@@ -166,15 +159,6 @@
      window.$ = $;
      require('bootstrap');
     </script>
-    
-<!--    <script src="tabs.js"></script>
-    <script src="range.js"></script>
--->
-
     <script src="prefs.js"></script>
-
-    <script>
-//     $(".nav-tabs").tab();
-    </script>
   </body>
 </html>

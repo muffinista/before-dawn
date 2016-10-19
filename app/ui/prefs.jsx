@@ -44,13 +44,8 @@ const {BrowserWindow} = window.require('electron').remote;
   });
     
   var saverOpts = {};
-
-  var url_opts = {
-    width: document.querySelector("#preview").offsetWidth,
-    height: document.querySelector("#preview").offsetHeight,
-    preview: 1
-  };
-
+  var url_opts = {};
+  
   // parse incoming URL params -- we'll get a link to the current screen images for previews here
   var urlParams = window.location.search.split(/[?&]/).slice(1).map(function(paramPair) {
     return paramPair.split(/=(.+)?/).slice(0, 2);
@@ -86,13 +81,6 @@ const {BrowserWindow} = window.require('electron').remote;
   // the width and making it proprtional to the main screen. at the moment,
   // the div will never have a height at this point unless someone specifically
   // hacks the CSS to make it work differently
-  if ( url_opts.height == 0 ) {
-    var atomScreen = electron.screen;
-    var size = atomScreen.getPrimaryDisplay().bounds;
-    var ratio = size.height / size.width;
-    url_opts.height = url_opts.width * ratio;
-    console.log("setting preview opts to", url_opts);
-  }
 
   el = document.querySelector("[name=repo]");
   el.value = savers.getSource().repo;
@@ -110,9 +98,29 @@ const {BrowserWindow} = window.require('electron').remote;
     document.querySelector("input[name=disable_on_battery]").setAttribute("checked", "checked");
   }
 
+  
+  var getPreviewUrlOpts = function() {
+    var tmp = {
+      width: document.querySelector("#preview").offsetWidth,
+      height: document.querySelector("#preview").offsetHeight,
+      screenshot: screenshot,
+      preview: 1
+    };
+
+    if ( tmp.height == 0 ) {
+      var atomScreen = electron.screen;
+      var size = atomScreen.getPrimaryDisplay().bounds;
+      var ratio = size.height / size.width;
+      tmp.height = tmp.width * ratio;
+      console.log("setting preview opts to", url_opts);
+    }
+
+
+    return tmp;
+  };
 
   var loadPreview = function(s) {
-    url_opts.screenshot = screenshot;
+    url_opts = getPreviewUrlOpts();
     ReactDOM.render(
       <Preview saver={s} url_opts={url_opts} saver_opts={saverOpts} />,
       document.getElementById('preview')
@@ -145,10 +153,20 @@ const {BrowserWindow} = window.require('electron').remote;
   };
 
   var redraw = function(s) {
+    if ( typeof(s) === "undefined" ) {
+      var current = getCurrentScreensaver();
+      s = savers.getByKey(current);
+      console.log(current, s);
+    }
+
     loadPreview(s);
     loadOptionsForm(s);
   };
 
+  var onResize = function() {
+    redraw();
+  };
+  
   var handleLinkClick = function(event) {
     event.preventDefault();
     shell.openExternal(this.href);
@@ -268,6 +286,9 @@ const {BrowserWindow} = window.require('electron').remote;
   document.querySelector(".pick").addEventListener('click', showPathChooser, false);
   document.querySelector(".save").addEventListener('click', updatePrefs, false);
 
+  window.addEventListener('resize', onResize, true);
+  
+  
   var screensaverChanged = function() {
     var val = getCurrentScreensaver();
     var s = savers.getByKey(val);

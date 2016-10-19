@@ -9,10 +9,11 @@ module.exports = React.createClass({
     var saver_opts = this.props.saver_opts;
     var mergedOpts;
 
-    console.log("PREVIEW", s);
-    mergedOpts = _.merge(url_opts, s.settings);
-    
+
+    mergedOpts = _.merge(url_opts, s.settings);   
     mergedOpts = _.merge(mergedOpts, saver_opts);
+
+    console.log("PREVIEW", mergedOpts);
     var previewUrl = s.getPreviewUrl(mergedOpts);
 
     return (

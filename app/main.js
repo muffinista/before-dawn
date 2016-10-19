@@ -71,7 +71,7 @@ var openPrefsWindow = function() {
       prefsWindowHandle = new BrowserWindow({
         width:800,
         height:675,
-        resizable:false,
+        resizable:true,
         icon: path.join(__dirname, 'assets', 'icon.png')
       });
 
