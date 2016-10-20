@@ -2,45 +2,48 @@
 <html>
   <head>
     <title>About!</title>
-    <link href="photon.min.css" rel="stylesheet" type="text/css" />
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.css" />
+    <link rel="image/svg+xml" href="../node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.eot" />
     <link href="styles.css" rel="stylesheet" type="text/css" />
   </head>
 
   <body>
-    <div class="window new">
-      <div class="window-content">
-        <form>
-          <fieldset>
-            <div class="form-group">
-              <label for="name">Name:</label>
-              <input type="text" name="name" class="form-control" placeholder="" />
-              <div class="hint">The name of your screensaver.</div>
-            </div>
-            <div class="form-group">
-              <label for="name">Description:</label>
-              <input type="text" name="description" class="form-control" placeholder="" />
-              <div class="hint">A brief description of your screensaver.</div>
-            </div>
-            <div class="form-group">
-              <label for="aboutUrl">About URL:</label>
-              <input type="text" name="aboutUrl" class="form-control" placeholder="" />
-              <div class="hint">If you have a URL with more details about your work, put it here!</div>
-            </div>
-            <div class="form-group">
-              <label for="author">Author:</label>
-              <input type="text" name="author" class="form-control" placeholder="" />
-              <div class="hint">The author of this screensaver.</div>
-            </div>
-          </fieldset>
-        </form>
-      </div>
-      <footer class="toolbar toolbar-footer">
-        <div class="pull-right">
+    <div class="container-fluid new">
+      <form>
+        <fieldset>
+          <div class="form-group">
+            <label for="name">Name:</label>
+            <input type="text" name="name" class="form-control" placeholder="" />
+            <div class="hint">The name of your screensaver.</div>
+          </div>
+          <div class="form-group">
+            <label for="name">Description:</label>
+            <input type="text" name="description" class="form-control" placeholder="" />
+            <div class="hint">A brief description of your screensaver.</div>
+          </div>
+          <div class="form-group">
+            <label for="aboutUrl">About URL:</label>
+            <input type="text" name="aboutUrl" class="form-control" placeholder="" />
+            <div class="hint">If you have a URL with more details about your work, put it here!</div>
+          </div>
+          <div class="form-group">
+            <label for="author">Author:</label>
+            <input type="text" name="author" class="form-control" placeholder="" />
+            <div class="hint">The author of this screensaver.</div>
+          </div>
+        </fieldset>
+      </form>
+    </div>
+
+    <footer class="footer">
+      <div class="container-fluid">
+        <div class="row pull-xs-right">
           <button class="btn btn-large btn-default cancel">Cancel</button>
           <button class="btn btn-large btn-positive save">Save</button>
         </div>
-      </footer>
-    </div>
+      </div>
+    </footer>
   </body>
   
   <script>
