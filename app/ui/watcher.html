@@ -1,60 +1,76 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <link href="photon.min.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.css" />
+    <link rel="image/svg+xml" href="../node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.eot" />
     <link href="styles.css" rel="stylesheet" type="text/css" />
   </head>
 
-  <body>
-    <div class="window">
-      <header class="toolbar toolbar-header">
-        <div class="toolbar-actions">
-          <div class="btn-group">
-            <button class="btn btn-default open">
-              <span class="icon"><img src="folder.svg" width="14" height="14" /></span>
-            </button>
-            <button class="btn btn-default save">
-              <span class="icon"><img src="save.svg" width="14" height="14" /></span>
-            </button>
-            <button class="btn btn-default reload">
-              <span class="icon"><img src="cycle.svg" width="14" height="14" /></span>
-            </button>
-            <button class="btn btn-default console">
-              <span class="icon"><img src="bug.svg" width="14" height="14" /></span>
-            </button>
-        </div>
-      </header>
+  <body class="watcher">
+    <div class="container-fluid">
+      <div class="row">
+          <nav class="navbar-header bg-faded">
+            <ul class="nav nav-pills" role="tablist">
+              <li role="presentation" class="nav-item">
+                <a data-toggle="tab" role="tab" class="nav-link" href="#main">Preview</a>
+              </li>
+              <li role="presentation" class="nav-item">
+                <a data-toggle="tab" role="tab" class="nav-link active" href="#settings">Settings</a>
+              </li>
+              <li>
+                <form class="form-inline">
+                  <div class="btn-group">
+                    <button class="btn btn-default open">
+                      <span class="icon"><img src="folder.svg" width="14" height="14" /></span>
+                    </button>
+                    <button class="btn btn-default save">
+                      <span class="icon"><img src="save.svg" width="14" height="14" /></span>
+                    </button>
+                    <button class="btn btn-default reload">
+                      <span class="icon"><img src="cycle.svg" width="14" height="14" /></span>
+                    </button>
+                    <button class="btn btn-default console">
+                      <span class="icon"><img src="bug.svg" width="14" height="14" /></span>
+                    </button>
+                  </div>
+                </form>
 
-      <div class="tab-group">
-        <div class="tab-item active">
-          <span class="icon"></span>
-          <a href="main">Preview</a>
-        </div>
-        <div class="tab-item">
-          <span class="icon"></span>
-          <a href="settings">Settings</a>
+              </li>
+            </ul>
+          </nav>
+
+
+      </div>
+      
+      <div class="row">
+        <div class="tab-content">
+          <div role="tabpanel" class="tab-pane" id="main">
+            <div id="wrapper"></div>
+          </div>
+          <div role="tabpanel" class="tab-pane active" id="settings">
+            <div id="attributes"></div>
+            <div id="options"></div>
+          </div>
         </div>
       </div>
+    </div> <!-- container -->
 
-      <div class="window-content">
-        <div class="main pane-group hide">
-          <div id="wrapper"></div>
-        </div>
-        <div class="settings pane-group">
-          <div id="attributes"></div>
-          <div id="options"></div>
-        </div>
-      </div> <!-- window-content -->
-
-      <footer class="toolbar toolbar-footer">
-        <div class="pull-right">
+    <footer class="footer">
+      <div class="container-fluid">
+        <div class="row pull-xs-right">
           <button class="btn btn-large btn-default cancel">Cancel</button>
           <button class="btn btn-large btn-positive save">Save</button>
         </div>
-      </footer>
-      
-    </div> <!-- window -->
-    <script src="tabs.js"></script>
+      </div>
+    </footer>
+    
+    <script src="../node_modules/tether/dist/js/tether.min.js" ></script>
+    <script>
+     var $ = require('jquery');
+     var jQuery = $;
+     window.$ = $;
+     require('bootstrap');
+    </script>
     <script src="watcher.js"></script>
   </body>
 </html>

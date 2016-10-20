@@ -25,6 +25,8 @@ import AttributesForm from './attributes-form';
   }, {});
 
 
+  console.log("PARAMS", window.urlParams);
+  
   // the main app will pass us a screenshot URL, here it is
   var screenshot = decodeURIComponent(urlParams.screenshot);
   var src = decodeURIComponent(urlParams.src);
@@ -33,10 +35,10 @@ import AttributesForm from './attributes-form';
   var s = savers.getByKey(src);
   var saverAttrs = s.toHash();
     
-  var reloadPreview = function() {
+  var reloadPreview = function(ev) {
     var iframe = document.querySelector("iframe");
 
-    var main = document.querySelector(".window .main");
+    var main = document.querySelector("#main");
     iframe.width = main.offsetWidth - 3;
     iframe.height = main.offsetHeight - 3;
 
@@ -49,7 +51,12 @@ import AttributesForm from './attributes-form';
     var mergedOpts = _.merge(url_opts, s.settings);
     var previewUrl = s.getUrl(mergedOpts);
 
+    console.log("LOAD URL", previewUrl);
     iframe.src = previewUrl;
+
+    if ( typeof(ev) !== "undefined" ) {
+      ev.preventDefault();
+    }
   };
 
   var holder = document.getElementById("wrapper");
@@ -123,33 +130,47 @@ import AttributesForm from './attributes-form';
   };
 
   
-  var openFolder = function() {
+  var openFolder = function(ev) {
+    ev.preventDefault();
     openFolderInOS(filePath);
   };
 
-  var closeWindow = function() {
+  var closeWindow = function(ev) {
     var window = remote.getCurrentWindow();
     window.close();
+
+    ev.preventDefault();
   };
 
-  var saveSettings = function() {
+  var saveSettings = function(ev) {
+    ev.preventDefault();
+
     console.log("SAVE", saverAttrs);
     s.write(saverAttrs);
     ipcRenderer.send('savers-updated', s.key);
   };
-  var openConsole = function() {
+  var openConsole = function(ev) {
+    ev.preventDefault();
     remote.getCurrentWindow().toggleDevTools();
   };
+
+  // we need to make sure the preview iframe is the right size
+  // when we open that tab. this bit of jQuery handles that
+  $('a[href="#main"]').on('shown.bs.tab', function (e) {
+    reloadPreview();
+  })
+  
   
   document.querySelector(".open").addEventListener('click', openFolder, false);
   document.querySelector(".cancel").addEventListener('click', closeWindow, false);
+  document.querySelector(".reload").addEventListener('click', reloadPreview, false);
+  document.querySelector(".console").addEventListener('click', openConsole, false);
+  
   var saveButtons = document.querySelectorAll(".save");
 
   for ( var i = 0; i < saveButtons.length; i++ ) {
     saveButtons[i].addEventListener('click', saveSettings, false);
   }
 
-  document.querySelector(".reload").addEventListener('click', reloadPreview, false);
-  document.querySelector(".console").addEventListener('click', openConsole, false);
   
 })();

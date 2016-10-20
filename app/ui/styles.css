@@ -17,11 +17,35 @@
   background-color: #f5f5f5;
 }
 
+.watcher .navbar-header {
+  height: 42px;
+}
+
+#main, #settings {
+  height: calc(100vh - 82px);
+}
+
+#settings {
+  overflow-y: scroll;
+}
+
+#wrapper {
+  height: inherit;
+}
+
+
 iframe {
   overflow: hidden;
   border: none;
 }
 
+#main iframe {
+  height: 100%;
+}
+
+.fieldset-padding fieldset {
+  margin-bottom: 5px;
+}
 
 iframe.mini {
   display: block;

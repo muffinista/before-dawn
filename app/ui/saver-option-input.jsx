@@ -82,9 +82,9 @@ export default class SaverOptionInput extends React.Component {
 
     return(<div>
       {els}
-      <div key={"add-new-option"}>
-        <button onClick={() => this.onAddNew()}>add new option</button>
-      </div>
+      <fieldset>
+        <button onClick={() => this.onAddNew()} className="btn btn-default">Add New Option</button>
+      </fieldset>
     </div>);
   }
 }
