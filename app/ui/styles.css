@@ -92,11 +92,6 @@ fieldset {
   border: none;
 }
 
-textarea[name=localSources] {
-  width: 60%;
-  display: inline-block;
-}
-
 .wrapper {
   margin-right: 5px;
   margin-left: 5px;

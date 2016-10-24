@@ -28,6 +28,7 @@ const {BrowserWindow} = window.require('electron').remote;
 
 
   ipcRenderer.on('savers-updated', (event, arg) => {
+    console.log("handle savers-updated event");
     renderList();
 
     var val = getCurrentScreensaver();
@@ -87,7 +88,7 @@ const {BrowserWindow} = window.require('electron').remote;
   el.setAttribute("placeholder", defaultSaverRepo);
 
 
-  document.querySelector("[name=localSources]").value = JSON.stringify(savers.getLocalSources());
+  document.querySelector("[name=localSource]").value = savers.getLocalSource();
   document.querySelector("select[name='delay'] option[value='" + savers.getDelay() + "']").setAttribute("selected", "selected");
   
   if ( savers.getLock() === true ) {
@@ -112,7 +113,7 @@ const {BrowserWindow} = window.require('electron').remote;
       var size = atomScreen.getPrimaryDisplay().bounds;
       var ratio = size.height / size.width;
       tmp.height = tmp.width * ratio;
-      console.log("setting preview opts to", url_opts);
+      //console.log("setting preview opts to", url_opts);
     }
 
 
@@ -156,7 +157,7 @@ const {BrowserWindow} = window.require('electron').remote;
     if ( typeof(s) === "undefined" ) {
       var current = getCurrentScreensaver();
       s = savers.getByKey(current);
-      console.log(current, s);
+      //console.log(current, s);
     }
 
     loadPreview(s);
@@ -175,7 +176,7 @@ const {BrowserWindow} = window.require('electron').remote;
   var renderList = function() {
     savers.listAll(function(entries) {
       var current = savers.getCurrent();
-      
+
       ReactDOM.render(
         <SaverList current={current} data={entries} />,
         document.getElementById('savers')
@@ -207,15 +208,28 @@ const {BrowserWindow} = window.require('electron').remote;
 
     if ( result === undefined ) {
       // this kind of stinks
-      data = [];
+      data = "";
     }
     else {
       data = result;
     }
 
-    document.querySelector("[name=localSources]").value = JSON.stringify(data);
+    document.querySelector("[name=localSource]").value = data;
   };
 
+  var addNewSaver = function(e) {
+    var prefsUrl = 'file://' + __dirname + '/new.html';
+    var w = new BrowserWindow({
+      width:450,
+      height:500,
+      resizable:true
+    });
+
+    w.loadURL(prefsUrl);
+    e.preventDefault();
+  };
+
+  
   var showPathChooser = function(e) {
     e.preventDefault();
     dialog.showOpenDialog(
@@ -253,7 +267,7 @@ const {BrowserWindow} = window.require('electron').remote;
     var val = getCurrentScreensaver();
     
     var repo = document.querySelector("input[name=repo]").value;
-    var localSources = JSON.parse(document.querySelector("[name=localSources]").value) || [];
+    var localSource = document.querySelector("[name=localSource]").value;
     
     saverOpts = window.optionsFormRef.getValues();
     
@@ -265,23 +279,25 @@ const {BrowserWindow} = window.require('electron').remote;
     savers.setDisableOnBattery(disable_on_battery);
     
     savers.setSource(repo);
-    savers.setLocalSources(localSources);
+    savers.setLocalSource(localSource);
 
     savers.write(function() {
       if ( document.querySelector("input[name=auto_start]").checked === true ) {
         console.log("set auto_start == true");
-	      appLauncher.enable().then(function(x) { console.log("YAHOO!!!!", x); }).then(function(err){
+	      appLauncher.enable().then(function(x) { }).then(function(err){
           console.log("ERR", err);
         });
       }
       else {
         console.log("set auto start == false");
-	      appLauncher.disable().then(function(x) { console.log("YAHOO 22222!!!!", x); });
+	      appLauncher.disable().then(function(x) { });
       }
       closeWindow();
     });
   };
 
+
+  document.querySelector(".create").addEventListener('click', addNewSaver, false);
   document.querySelector(".cancel").addEventListener('click', closeWindow, false);
   document.querySelector(".pick").addEventListener('click', showPathChooser, false);
   document.querySelector(".save").addEventListener('click', updatePrefs, false);

@@ -21,12 +21,21 @@ module.exports = React.createClass({
       var is_checked = (s.key === self.state.value);
       var authorClass = "external author";
       var aboutUrlClass = "external aboutUrl";
+      var watcherClass = "watcher";
       
       if ( typeof(s.author) === "undefined" || s.author === "" ) {
         authorClass = authorClass + " hide";
       }
       if ( typeof(s.aboutUrl) === "undefined" || s.aboutUrl === "" ) {
         aboutUrlClass = aboutUrlClass + " hide";
+      }
+
+      console.log(s.editable);
+      if ( s.editable === true ) {
+        
+      }
+      else {
+        watcherClass = watcherClass = " hide";
       }
       
       return (
@@ -41,7 +50,7 @@ module.exports = React.createClass({
                   {s.author} //
                 </span>
                 <a className={aboutUrlClass} href={s.aboutUrl}>learn more</a>
-                <a className={"watcher"} href="#" data-key={s.key}>edit!</a>
+                <a className={watcherClass} href="#" data-key={s.key}>edit!</a>
               </div>
             </label>
           </div>

@@ -50,7 +50,8 @@
    var remote = window.require('electron').remote;
    var exec = require('child_process').exec;
    var savers = remote.getGlobal('savers');
-   
+   const {ipcRenderer} = window.require('electron');
+
    var closeWindow = function() {
      var window = remote.getCurrentWindow();
      window.close();
@@ -70,7 +71,11 @@
      });
 
      openFolderInOS(dest);
+
+     ipcRenderer.send('savers-updated', name);
+
      closeWindow();
+
    };
 
    var openFolderInOS = function(f) {

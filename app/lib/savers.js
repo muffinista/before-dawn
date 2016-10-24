@@ -16,13 +16,13 @@ var _firstLoad = false;
 
 var init = function(_path, cb) {
   baseDir = path.resolve(_path);
-  console.log("working from " + baseDir);
   reload(cb);
 };
 
 var reload = function(cb) {
   var configPath = baseDir + "/" + config_file;
 
+  
   // create our main directory
   if ( ! fs.existsSync(baseDir) ) {
     console.log("creating " + baseDir);
@@ -64,7 +64,6 @@ var reload = function(cb) {
   }
 
   updatePackage(function(data) {
-
     if ( data.downloaded === true ) {
       setConfig('source:updated_at', data.updated_at);
     }
@@ -167,11 +166,11 @@ var setSource = function(x) {
   }
 };
 
-var getLocalSources = function() {
-  return nconf.get('localSources') || [];
+var getLocalSource = function() {
+  return nconf.get('localSource') || "";
 };
-var setLocalSources = function(x) {
-  return nconf.set('localSources', x);
+var setLocalSource = function(x) {
+  return nconf.set('localSource', x);
 };
 
 
@@ -268,16 +267,22 @@ var listAll = function(cb) {
   var folders = [];
 
   var source = getSource();
-
+  var local = getLocalSource();
+  
   if ( typeof(source.repo) !== "undefined" && source.repo !== "" ) {
     folders.push(root);
   }
-  
-  folders = folders.concat( getLocalSources() );
+
+  if ( local !== "" ) {
+    folders = folders.concat( local );
+  }
+
+
   loadedData = [];
 
   folders.forEach( function ( src ) {
-    console.log("loading from: " + src);
+    var editable = (src == local );
+    
     walk(src, function(f, stat) {
       // exclude matches from directories that start with __
       if ( f.match(/saver.json$/) && ! path.dirname(f).split(path.sep).reverse()[0].match(/^__/) ) {
@@ -296,6 +301,8 @@ var listAll = function(cb) {
           }
           
           contents.settings = getOptions(contents.key);
+
+          contents.editable = editable;
           
           var s = new Saver(contents);
           if ( s.valid ) {
@@ -309,6 +316,7 @@ var listAll = function(cb) {
     });
   });
 
+  
   if ( typeof(cb) !== "undefined" ) {
     cb(loadedData);
   }
@@ -356,7 +364,7 @@ var getTemplatePath = function() {
  */
 var generateScreensaver = function(opts) {
   var src = getTemplatePath();
-  var destDir = getLocalSources()[0];
+  var destDir = getLocalSource();
 
   var contents = fs.readdirSync(src);
   var defaults = {
@@ -385,8 +393,6 @@ var generateScreensaver = function(opts) {
   var configDest = path.join(dest, "saver.json");
   var content = fs.readFileSync( configDest );
   var contents = _.merge({}, JSON.parse(content), opts);
-  console.log(contents);
- 
 
   fs.writeFileSync(configDest, JSON.stringify(contents, null, 2));
 
@@ -399,8 +405,8 @@ exports.getByKey = getByKey;
 exports.getCurrent = getCurrent;
 exports.getSource = getSource;
 exports.setSource = setSource;
-exports.getLocalSources = getLocalSources;
-exports.setLocalSources = setLocalSources;
+exports.getLocalSource = getLocalSource;
+exports.setLocalSource = setLocalSource;
 exports.getCurrentData = getCurrentData;
 exports.setCurrent = setCurrent;
 exports.setOptions = setOptions;

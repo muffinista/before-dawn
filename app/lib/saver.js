@@ -31,11 +31,17 @@ module.exports = function Saver(_attrs) {
   this.license = _attrs.license;
   this.url = _attrs.url;
 
+  
   this.published = _attrs.published;
   if ( typeof(this.published) === "undefined" ) {
     this.published = true;
   }
 
+  this.editable = _attrs.editable;
+  if ( typeof(this.editable) === "undefined" ) {
+    this.editable = false;
+  }
+  
   this.valid = typeof(this.name) !== "undefined" &&
                typeof(this.description) !== "undefined" &&
                this.published === true;
