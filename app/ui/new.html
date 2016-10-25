@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>About!</title>
+    <title>Add New Screensaver!</title>
     <meta charset="utf-8">
     <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.css" />
     <link rel="image/svg+xml" href="../node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.eot" />
@@ -36,6 +36,10 @@
       </form>
     </div>
 
+    <div class="container-fluid need-setup hide">
+      Hey, before you can create a new screensaver, you'll need to set a local directory in the preferences window!
+    </div>
+    
     <footer class="footer">
       <div class="container-fluid">
         <div class="row pull-xs-right">
@@ -75,7 +79,6 @@
      ipcRenderer.send('savers-updated', name);
 
      closeWindow();
-
    };
 
    var openFolderInOS = function(f) {
@@ -113,5 +116,10 @@
    
    document.querySelector(".cancel").addEventListener('click', closeWindow, false);
    document.querySelector(".save").addEventListener('click', handleSave, false);
+
+   if ( typeof(savers.getLocalSource()) === "undefined" || savers.getLocalSource() === "" ) {
+     document.querySelector(".new").classList.add("hide");
+     document.querySelector(".need-setup").classList.remove("hide");     
+   }
   </script>
 </html>
