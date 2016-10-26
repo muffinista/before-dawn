@@ -59,7 +59,6 @@ var openPrefsWindow = function() {
   var displays = [
     primary
   ];
-
   
   ipcMain.once("screenshot-" + primary.id, function(e, message) {
     grabber.reload();
@@ -214,8 +213,8 @@ var runScreenSaverOnDisplay = function(saver, s) {
     // stuff -- @see https://github.com/atom/electron/issues/2867
     if ( process.platform == "win32" ) {
       w.minimize();
+      w.focus();
     }
-    w.focus();
     
     // inject our custom JS and CSS here
     w.webContents.executeJavaScript(globalJSCode);
@@ -252,6 +251,10 @@ var getDisplays = function() {
 var runScreenSaver = function() {
   var displays = getDisplays();
   var saver = global.savers.getCurrentData();
+
+  if ( typeof(saver) === "undefined" ) {
+    return;
+  }
   
   // @todo maybe add an option to only run on a single display?
   

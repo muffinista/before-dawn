@@ -9,37 +9,34 @@
   <body class="watcher">
     <div class="container-fluid">
       <div class="row">
-          <nav class="navbar-header bg-faded">
-            <ul class="nav nav-pills" role="tablist">
-              <li role="presentation" class="nav-item">
-                <a data-toggle="tab" role="tab" class="nav-link" href="#main">Preview</a>
-              </li>
-              <li role="presentation" class="nav-item">
-                <a data-toggle="tab" role="tab" class="nav-link active" href="#settings">Settings</a>
-              </li>
-              <li>
-                <form class="form-inline">
-                  <div class="btn-group">
-                    <button class="btn btn-default open">
-                      <span class="icon"><img src="folder.svg" width="14" height="14" /></span>
-                    </button>
-                    <button class="btn btn-default save">
-                      <span class="icon"><img src="save.svg" width="14" height="14" /></span>
-                    </button>
-                    <button class="btn btn-default reload">
-                      <span class="icon"><img src="cycle.svg" width="14" height="14" /></span>
-                    </button>
-                    <button class="btn btn-default console">
-                      <span class="icon"><img src="bug.svg" width="14" height="14" /></span>
-                    </button>
-                  </div>
-                </form>
-
-              </li>
-            </ul>
-          </nav>
-
-
+        <nav class="navbar-header bg-faded">
+          <ul class="nav nav-pills" role="tablist">
+            <li role="presentation" class="nav-item">
+              <a data-toggle="tab" role="tab" class="nav-link" href="#main">Preview</a>
+            </li>
+            <li role="presentation" class="nav-item">
+              <a data-toggle="tab" role="tab" class="nav-link active" href="#settings">Settings</a>
+            </li>
+            <li>
+              <form class="form-inline">
+                <div class="btn-group">
+                  <button class="btn btn-default open" data-toggle="tooltip" data-placement="bottom" title="Open screensaver folder">
+                    <span class="icon"><img src="folder.svg" width="14" height="14" /></span>
+                  </button>
+                  <button class="btn btn-default save" data-toggle="tooltip" data-placement="bottom" title="Save changes">
+                    <span class="icon"><img src="save.svg" width="14" height="14" /></span>
+                  </button>
+                  <button class="btn btn-default reload" data-toggle="tooltip" data-placement="bottom" title="Reload preview">
+                    <span class="icon"><img src="cycle.svg" width="14" height="14" /></span>
+                  </button>
+                  <button class="btn btn-default console" data-toggle="tooltip" data-placement="bottom" title="View Developer Console">
+                    <span class="icon"><img src="bug.svg" width="14" height="14" /></span>
+                  </button>
+                </div>
+              </form>
+            </li>
+          </ul>
+        </nav>
       </div>
       
       <div class="row">

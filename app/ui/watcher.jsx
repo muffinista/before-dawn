@@ -154,11 +154,18 @@ import AttributesForm from './attributes-form';
     remote.getCurrentWindow().toggleDevTools();
   };
 
-  // we need to make sure the preview iframe is the right size
-  // when we open that tab. this bit of jQuery handles that
-  $('a[href="#main"]').on('shown.bs.tab', function (e) {
-    reloadPreview();
+  // here's a little jQuery for bootstrap stuff
+  $(function () {
+    // we need to make sure the preview iframe is the right size
+    // when we open that tab. this bit of jQuery handles that
+    $('a[href="#main"]').on('shown.bs.tab', function (e) {
+      reloadPreview();
+    })
+
+    // activate tooltips
+    $('[data-toggle="tooltip"]').tooltip();
   })
+
   
   
   document.querySelector(".open").addEventListener('click', openFolder, false);
@@ -172,5 +179,6 @@ import AttributesForm from './attributes-form';
     saveButtons[i].addEventListener('click', saveSettings, false);
   }
 
+  
   
 })();
