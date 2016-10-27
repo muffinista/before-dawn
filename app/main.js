@@ -379,7 +379,7 @@ var checkIdle = function() {
     return;
   }
 
-
+  // pmset displaysleepnow
   
   // are we past our idle time
   idle = idler.getIdleTime();

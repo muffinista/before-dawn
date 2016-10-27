@@ -90,6 +90,8 @@ const {BrowserWindow} = window.require('electron').remote;
 
   document.querySelector("[name=localSource]").value = savers.getLocalSource();
   document.querySelector("select[name='delay'] option[value='" + savers.getDelay() + "']").setAttribute("selected", "selected");
+console.log("SLEEEEP", savers.getSleep());
+  document.querySelector("select[name='sleep'] option[value='" + savers.getSleep() + "']").setAttribute("selected", "selected");  
   
   if ( savers.getLock() === true ) {
     document.querySelector("input[name=lock_screen][type=checkbox]").setAttribute("checked", "checked");
@@ -262,6 +264,7 @@ const {BrowserWindow} = window.require('electron').remote;
 
   var updatePrefs = function() {
     var delay = document.querySelector("select[name=delay]").value;
+    var sleep = document.querySelector("select[name=sleep]").value;    
     var do_lock = document.querySelector("input[name=lock_screen]").checked;
     var disable_on_battery = document.querySelector("input[name=disable_on_battery]").checked;
     var val = getCurrentScreensaver();
@@ -273,8 +276,12 @@ const {BrowserWindow} = window.require('electron').remote;
     
     savers.setCurrent(val, saverOpts);
 
-    delay = parseInt(delay, 10);
+    delay = parseInt(delay, 10);   
     savers.setDelay(delay);
+
+    sleep = parseInt(sleep, 10);
+    savers.setSleep(sleep);
+    
     savers.setLock(do_lock);
     savers.setDisableOnBattery(disable_on_battery);
     

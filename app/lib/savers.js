@@ -198,7 +198,24 @@ var setDelay = function(x) {
 };
 
 var getDelay = function() {
-  return nconf.get('delay') || 15;
+  var val = nconf.get('delay');
+  if ( typeof(val) === "undefined" ) {
+    val = 15;
+  }
+  return val;
+};
+
+
+var setSleep = function(x) {
+  setConfig('sleep', x);
+};
+
+var getSleep = function() {
+  var val = nconf.get('sleep');
+  if ( typeof(val) === "undefined" ) {
+    val = 15;
+  }
+  return val;
 };
 
 var setLock = function(x) {
@@ -412,6 +429,8 @@ exports.setCurrent = setCurrent;
 exports.setOptions = setOptions;
 exports.setDelay = setDelay;
 exports.getDelay = getDelay;
+exports.setSleep = setSleep;
+exports.getSleep = getSleep;
 exports.setLock = setLock;
 exports.getLock = getLock;
 exports.setDisableOnBattery = setDisableOnBattery;
