@@ -15,6 +15,9 @@
   /* Set the fixed height of the footer here */
   height: 40px;
   background-color: #f5f5f5;
+
+  /* this should solve some input/footer overlap issues on prefs form */
+  z-index: 1000;
 }
 
 .watcher .navbar-header {
