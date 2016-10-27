@@ -168,6 +168,8 @@ var updateActiveState = function() {
  */
 var runScreenSaverOnDisplay = function(saver, s) {
   var globalJSCode = fs.readFileSync( path.join(__dirname, 'assets', 'global-js-handlers.js'), 'ascii');
+  var globalCSSCode = fs.readFileSync( path.join(__dirname, 'assets', 'global.css'), 'ascii');  
+  
 
   var size = s.bounds;
   var url_opts = { 
@@ -178,7 +180,6 @@ var runScreenSaverOnDisplay = function(saver, s) {
   
   var windowOpts = {
     fullscreen: ( debugMode !== true ),
-    preload: path.join(__dirname, 'assets', 'global.js'),
     'auto-hide-menu-bar': true,
     x: s.bounds.x,
     y: s.bounds.y
@@ -213,12 +214,16 @@ var runScreenSaverOnDisplay = function(saver, s) {
     // stuff -- @see https://github.com/atom/electron/issues/2867
     if ( process.platform == "win32" ) {
       w.minimize();
-      w.focus();
     }
+    w.focus();
     
     // inject our custom JS and CSS here
-    w.webContents.executeJavaScript(globalJSCode);
+    w.webContents.on('did-finish-load', function() {
+      w.webContents.insertCSS(globalCSSCode);      
+      w.webContents.executeJavaScript(globalJSCode);
+    });
 
+    
     // reload the screengrabber window to keep it from churning
     // CPU, until I can figure out why that is even happening
     if ( saverWindows.length >= totalDisplays ) {
