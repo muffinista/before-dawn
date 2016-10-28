@@ -1,5 +1,19 @@
 'use strict';
 
+/***
+
+   Welcome to....
+
+   ____        __                  ____                       
+   | __ )  ___ / _| ___  _ __ ___  |  _ \  __ ___      ___ __  
+   |  _ \ / _ \ |_ / _ \| '__/ _ \ | | | |/ _` \ \ /\ / / '_ \ 
+   | |_) |  __/  _| (_) | | |  __/ | |_| | (_| |\ V  V /| | | |
+   |____/ \___|_|  \___/|_|  \___| |____/ \__,_| \_/\_/ |_| |_|
+
+   a screensaver package built on the tools of the web. Enjoy!
+   
+ */
+
 const electron = require('electron');
 const app = electron.app;  // Module to control application life.
 const BrowserWindow = electron.BrowserWindow;  // Module to create native browser window.
@@ -16,8 +30,9 @@ let checkTimer = null;
 let isActive = false;
 let idler = require('node-system-idle-time');
 let parseArgs = require('minimist');
-let saverWindows = [];
 let argv = parseArgs(process.argv);
+
+let saverWindows = [];
 let releaseChecker = require('./lib/release_check.js');
 let power = require('./lib/power.js');
 
@@ -37,8 +52,11 @@ var wakeupTimer;
 
 var paused = false;
 var lastIdle = 0;
+var sleptAt = -1;
 
+var globalJSCode, globalCSSCode;
 
+var prefsWindowHandle = null;
 
 // load a few global variables
 require('./bootstrap.js');
@@ -47,12 +65,14 @@ require('./bootstrap.js');
 global.basePath = app.getPath('appData') + "/" + global.APP_NAME;
 global.savers = require('./lib/savers.js');
 
+// some global JS/CSS we'll inject into running screensavers
+globalJSCode = fs.readFileSync( path.join(__dirname, 'assets', 'global-js-handlers.js'), 'ascii');
+globalCSSCode = fs.readFileSync( path.join(__dirname, 'assets', 'global.css'), 'ascii');  
+
 
 /**
  * Open the preferences window
  */
-
-var prefsWindowHandle = null;
 var openPrefsWindow = function() {
   var electronScreen = electron.screen;
   var primary = electronScreen.getPrimaryDisplay();
@@ -102,7 +122,7 @@ var openPrefsWindow = function() {
 
 
 /**
- * Open the (very simple) About window for the app
+ * Open the About window for the app
  */
 var openAboutWindow = function() {
   var prefsUrl = 'file://' + __dirname + '/ui/about.html';
@@ -132,7 +152,7 @@ var openAboutWindow = function() {
 
 /**
  * open our screen grabber tool. this should run in the background,
- * waiting to take screenshots.
+ * waiting to take screenshots when needed.
  */
 var openScreenGrabber = function() {
   var grabberUrl = 'file://' + __dirname + '/ui/grabber.html';
@@ -167,10 +187,6 @@ var updateActiveState = function() {
  * run the specified screensaver on the specified screen
  */
 var runScreenSaverOnDisplay = function(saver, s) {
-  var globalJSCode = fs.readFileSync( path.join(__dirname, 'assets', 'global-js-handlers.js'), 'ascii');
-  var globalCSSCode = fs.readFileSync( path.join(__dirname, 'assets', 'global.css'), 'ascii');  
-  
-
   var size = s.bounds;
   var url_opts = { 
     width: size.width,
@@ -234,6 +250,9 @@ var runScreenSaverOnDisplay = function(saver, s) {
   });
 };
 
+/**
+ * get a list of displays connected to the computer.
+ */
 var getDisplays = function() {
   var electronScreen = electron.screen;
   var displays = [];
@@ -257,6 +276,7 @@ var runScreenSaver = function() {
   var displays = getDisplays();
   var saver = global.savers.getCurrentData();
 
+  // make sure we have something to display
   if ( typeof(saver) === "undefined" ) {
     return;
   }
@@ -277,7 +297,7 @@ var runScreenSaver = function() {
       runScreenSaverOnDisplay(saver, displays[i]);
     } // for
 
-    console.log("send event screengrab-request");
+    // console.log("send event screengrab-request");
     grabber.webContents.send('screengrab-request', displays);
   }
   catch (e) {
@@ -287,6 +307,7 @@ var runScreenSaver = function() {
   // set the idle timer to something > 0
   if ( lastIdle < 99 ) {
     lastIdle = 99;
+    sleptAt = -1;
   }
 
   isActive = true;
@@ -327,6 +348,33 @@ var doLockScreen = function() {
   });
 };
 
+
+/**
+ * put the display to sleep
+ */
+var doSleep = function() {
+  var exec = require('child_process').exec;
+  var cmd;
+  
+  if ( process.platform === 'darwin' ) {
+    cmd = "pmset displaysleepnow";
+  }
+  else {
+    return;
+  }
+
+  exec(cmd, function(error, stdout, stderr) {
+    console.log('stdout: ' + stdout);
+    console.log('stderr: ' + stderr);
+    if (error !== null) {
+      console.log('exec error: ' + error);
+    }
+  });
+ 
+}
+
+
+
 /**
  * stop the running screensaver
  */
@@ -345,41 +393,74 @@ var stopScreenSaver = function() {
     doLockScreen();
   }
 
-  console.log("closing " + saverWindows.length + " windows");
+  //console.log("closing " + saverWindows.length + " windows");
   for ( var s in saverWindows ) {
-    console.log("close", s);
+    //console.log("close", s);
     saverWindows[s].destroy();
   }
 };
 
+/**
+ * If the screensaver is running, determine if we should wake up, or
+ * if we should go all the way and put the monitor to sleep.
+ */                   
 var checkForWakeup = function() {
-  var idle;
+  var idle, sleepTime, waitTime;
   
-  if ( paused === true || isActive !== true ) {
+  if ( paused === true || isActive !== true || sleptAt > -1 ) {
     return;
   }
 
   idle = idler.getIdleTime();
+  console.log("IDLE: " + idle + " SLEPT AT " + sleptAt);
+  
+
   if ( idle < lastIdle ) {
+    sleptAt = -1;
     stopScreenSaver();
+  }
+
+  sleepTime = savers.getSleep() * 60000;
+  if ( sleepTime <= 0 ) {
+    return;
+  }
+
+  waitTime = savers.getDelay() * 60000;
+  if ( waitTime == 0 ) {
+    return;
+  }
+
+  //
+  // should we stop running and blank the screens?
+  //
+  if ( idle >= sleepTime + waitTime ) {
+
+    sleptAt = idle;
+
+    console.log("going to sleep! nite nite!");
+    stopScreenSaver();
+    doSleep();
   }
 };
 
+/**
+ * main idle time check. once our idle time gets high enough, we
+ * activate the screensaver
+ */
 var checkIdle = function() {
-  var idle, waitTime;
+  var idle, waitTime, sleepTime;
 
   // check if we're already running, or paused
-  if ( paused === true || isActive === true ) {
+  if ( paused === true || isActive === true || sleptAt > -1 ) {
     return;
   }
 
-  // check that we are actually supposed to be running
   waitTime = savers.getDelay() * 60000;
+
+  // check that we are actually supposed to be running
   if ( waitTime <= 0 ) {
     return;
   }
-
-  // pmset displaysleepnow
   
   // are we past our idle time
   idle = idler.getIdleTime();
@@ -445,6 +526,40 @@ var trayMenu = Menu.buildFromTemplate([
 ]);
 
 
+
+/**
+ * once the app is ready and our config is loaded, check to see if the app
+ * has been loaded before. if not, let's go ahead and open the prefs window now.
+ */
+var openPrefsOnFirstLoad = function() {
+  if ( appReady === false || configLoaded === false ) {
+    return;
+  }
+  if ( savers.firstLoad() === true ) {
+    setTimeout(openPrefsWindow, 1000);
+  }
+};
+
+
+/**
+ * handle initial startup of app
+ */
+var bootApp = function(_basePath) {
+  if ( typeof(_basePath) !== "undefined" ) {
+    global.basePath = _basePath;
+  }
+
+  trayMenu.items[3].visible = global.NEW_RELEASE_AVAILABLE;
+
+  global.savers.init(global.basePath, function() {
+    configLoaded = true;
+    openPrefsOnFirstLoad();
+  });
+};
+
+
+
+
 /**
  * make sure we're only running a single instance
  */
@@ -501,7 +616,6 @@ app.once('ready', function() {
   openPrefsOnFirstLoad();
 });
 
-
 //
 // listen for a message from global.js that we should stop running the screensaver
 //
@@ -517,43 +631,12 @@ ipcMain.on('asynchronous-message', function(event, arg) {
 // the prefs window know that it needs to reload
 //
 ipcMain.on('savers-updated', (event, arg) => {
-  console.log("SAVER UPDATED", arg);
+  //console.log("SAVER UPDATED", arg);
   if ( prefsWindowHandle !== null ) {
     prefsWindowHandle.send('savers-updated', arg);
   }
 });
 
-
-
-/**
- * once the app is ready and our config is loaded, check to see if the app
- * has been loaded before. if not, let's go ahead and open the prefs window now.
- */
-var openPrefsOnFirstLoad = function() {
-  if ( appReady === false || configLoaded === false ) {
-    return;
-  }
-  if ( savers.firstLoad() === true ) {
-    setTimeout(openPrefsWindow, 1000);
-  }
-};
-
-
-/**
- * handle initial startup of app
- */
-var bootApp = function(_basePath) {
-  if ( typeof(_basePath) !== "undefined" ) {
-    global.basePath = _basePath;
-  }
-
-  trayMenu.items[3].visible = global.NEW_RELEASE_AVAILABLE;
-
-  global.savers.init(global.basePath, function() {
-    configLoaded = true;
-    openPrefsOnFirstLoad();
-  });
-};
 
 /**
  * check for a release and then boot!
