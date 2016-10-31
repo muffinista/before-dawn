@@ -4,7 +4,7 @@
 
    Welcome to....
 
-   ____        __                  ____                       
+    ____        __                  ____                       
    | __ )  ___ / _| ___  _ __ ___  |  _ \  __ ___      ___ __  
    |  _ \ / _ \ |_ / _ \| '__/ _ \ | | | |/ _` \ \ /\ / / '_ \ 
    | |_) |  __/  _| (_) | | |  __/ | |_| | (_| |\ V  V /| | | |
@@ -23,24 +23,22 @@ const {ipcMain} = require('electron')
 const fs = require('fs');
 const path = require('path');
 
-var windowOpts;
+const idler = require('node-system-idle-time');
+const parseArgs = require('minimist');
 
+const releaseChecker = require('./lib/release_check.js');
+const power = require('./lib/power.js');
+
+
+// @todo does this need to be global? i doubt it
 let appIcon = null;
-let checkTimer = null;
-let isActive = false;
-let idler = require('node-system-idle-time');
-let parseArgs = require('minimist');
+
 let argv = parseArgs(process.argv);
-
-let saverWindows = [];
-let releaseChecker = require('./lib/release_check.js');
-let power = require('./lib/power.js');
-
 let debugMode = ( argv.debug === true );
 
-
-var appReady = false;
-var configLoaded = false;
+let checkTimer = null;
+let wakeupTimer = null;
+let saverWindows = [];
 
 var grabber;
 
@@ -48,26 +46,28 @@ var grabber;
 // running everywhere we can handle some background work
 var totalDisplays = 0;
 
-var wakeupTimer;
-
-var paused = false;
 var lastIdle = 0;
 var sleptAt = -1;
+
+var appReady = false;
+var configLoaded = false;
+
+
+
+/**
+ * These are the possible states that the app can be in.
+ */
+const STATE_IDLE = Symbol('idle'); // not running, waiting
+const STATE_RUNNING = Symbol('running'); // running a screensaver
+const STATE_CLOSING = Symbol('closing'); // closing the screensaver process
+const STATE_BLANKED = Symbol('blanked'); // long idle, screen is blanked
+const STATE_PAUSED = Symbol('paused'); // screensaver is paused
+
+var currentState = STATE_IDLE;
 
 var globalJSCode, globalCSSCode;
 
 var prefsWindowHandle = null;
-
-// load a few global variables
-require('./bootstrap.js');
-
-// store our root path as a global variable so we can access it from screens
-global.basePath = app.getPath('appData') + "/" + global.APP_NAME;
-global.savers = require('./lib/savers.js');
-
-// some global JS/CSS we'll inject into running screensavers
-globalJSCode = fs.readFileSync( path.join(__dirname, 'assets', 'global-js-handlers.js'), 'ascii');
-globalCSSCode = fs.readFileSync( path.join(__dirname, 'assets', 'global.css'), 'ascii');  
 
 
 /**
@@ -173,13 +173,22 @@ var openScreenGrabber = function() {
 };
 
 var updateActiveState = function() {
+  var idle = idler.getIdleTime();
   var openWindows = saverWindows.filter(function(w) {
     return (typeof(w) !== "undefined" && w.isClosed !== true);
   });
 
   if ( openWindows.length == 0 ) {
     saverWindows = [];
-    isActive = false;
+
+    console.log("updateActiveState", sleptAt, idle);
+    if ( sleptAt < 0 || idle < sleptAt ) {
+      currentState = STATE_IDLE;
+      sleptAt = -1;
+    }
+    else {
+      currentState = STATE_BLANKED;
+    }
   }
 };
 
@@ -214,6 +223,7 @@ var runScreenSaverOnDisplay = function(saver, s) {
     // Emitted when the window is closed.
     w.on('closed', function() {
       w.isClosed = true;
+      currentState = STATE_CLOSING;
       updateActiveState();
     });
     
@@ -280,7 +290,7 @@ var runScreenSaver = function() {
   if ( typeof(saver) === "undefined" ) {
     return;
   }
-  
+
   // @todo maybe add an option to only run on a single display?
   
   // limit to a single screen when debugging
@@ -310,7 +320,7 @@ var runScreenSaver = function() {
     sleptAt = -1;
   }
 
-  isActive = true;
+  currentState = STATE_RUNNING;
   wakeupTimer = setInterval(checkForWakeup, 100);
 };
 
@@ -388,6 +398,8 @@ var stopScreenSaver = function() {
     return;
   }
 
+  currentState = STATE_CLOSING;
+  
   // trigger lock screen before actually closing anything
   if ( shouldLockScreen() ) {
     doLockScreen();
@@ -407,40 +419,59 @@ var stopScreenSaver = function() {
 var checkForWakeup = function() {
   var idle, sleepTime, waitTime;
   
-  if ( paused === true || isActive !== true || sleptAt > -1 ) {
+  if ( currentState !== STATE_RUNNING || sleptAt > -1 ) {
     return;
   }
-
+  
   idle = idler.getIdleTime();
   console.log("IDLE: " + idle + " SLEPT AT " + sleptAt);
   
-
   if ( idle < lastIdle ) {
     sleptAt = -1;
     stopScreenSaver();
-  }
-
-  sleepTime = savers.getSleep() * 60000;
-  if ( sleepTime <= 0 ) {
-    return;
-  }
-
-  waitTime = savers.getDelay() * 60000;
-  if ( waitTime == 0 ) {
-    return;
+    currentState = STATE_IDLE;
   }
 
   //
   // should we stop running and blank the screens?
   //
-  if ( idle >= sleepTime + waitTime ) {
+  if ( shouldSleep() ) {
 
     sleptAt = idle;
 
     console.log("going to sleep! nite nite!");
     stopScreenSaver();
     doSleep();
+
+    currentState = STATE_BLANKED;
   }
+};
+
+/**
+ * should we go to sleep?
+ */
+var shouldSleep = function() {
+  var sleepTime, waitTime;
+  var idle = idler.getIdleTime();
+
+  sleepTime = savers.getSleep() * 60000;
+  if ( sleepTime <= 0 ) {
+    return false;
+  }
+
+  waitTime = savers.getDelay() * 60000;
+  if ( waitTime == 0 ) {
+    return false;
+  }
+
+  //
+  // should we stop running and blank the screens?
+  //
+  if ( idle >= sleepTime + waitTime ) {
+    return true;
+  }
+
+  return false;
 };
 
 /**
@@ -450,8 +481,8 @@ var checkForWakeup = function() {
 var checkIdle = function() {
   var idle, waitTime, sleepTime;
 
-  // check if we're already running, or paused
-  if ( paused === true || isActive === true || sleptAt > -1 ) {
+  // don't bother checking if we're not in an idle/blank/running state
+  if ( currentState == STATE_PAUSED || currentState == STATE_CLOSING ) {
     return;
   }
 
@@ -462,9 +493,12 @@ var checkIdle = function() {
     return;
   }
   
-  // are we past our idle time
   idle = idler.getIdleTime();
-  if ( idle > waitTime ) {
+
+  console.log("checkIdle IDLE: " + idle + " SLEPT AT " + sleptAt + " state: " + String(currentState));
+
+  // are we past our idle time?
+  if ( currentState === STATE_IDLE && idle > waitTime ) {
     // check if we are on battery, and if we should be running in that case
     if ( savers.getDisableOnBattery() ) {
       power.charging().then((is_powered) => {
@@ -476,6 +510,11 @@ var checkIdle = function() {
     else {
       runScreenSaver();
     }
+  }
+  else if ( currentState === STATE_BLANKED && idle < waitTime ) {
+    // user has done something, so we should switch from blanked -> idle
+    console.log("switching to idle");
+    currentState = STATE_IDLE;
   }
   
   lastIdle = idle;
@@ -489,8 +528,8 @@ var trayMenu = Menu.buildFromTemplate([
   },
   {
     label: 'Disable',
-    click: function() { 
-      paused = true;
+    click: function() {
+      currentState = STATE_PAUSED;
       trayMenu.items[1].visible = false;
       trayMenu.items[2].visible = true;
     }
@@ -498,7 +537,7 @@ var trayMenu = Menu.buildFromTemplate([
   {
     label: 'Enable',
     click: function() { 
-      paused = false;
+      currentState = STATE_IDLE;
       trayMenu.items[1].visible = true;
       trayMenu.items[2].visible = false;
     },
@@ -557,20 +596,30 @@ var bootApp = function(_basePath) {
   });
 };
 
+var shouldQuit = false;
 
+// load a few global variables
+require('./bootstrap.js');
+
+// store our root path as a global variable so we can access it from screens
+global.basePath = app.getPath('appData') + "/" + global.APP_NAME;
+global.savers = require('./lib/savers.js');
+
+// some global JS/CSS we'll inject into running screensavers
+globalJSCode = fs.readFileSync( path.join(__dirname, 'assets', 'global-js-handlers.js'), 'ascii');
+globalCSSCode = fs.readFileSync( path.join(__dirname, 'assets', 'global.css'), 'ascii');  
 
 
 /**
  * make sure we're only running a single instance
  */
-var shouldQuit = app.makeSingleInstance(function(commandLine, workingDirectory) {
+shouldQuit = app.makeSingleInstance(function(commandLine, workingDirectory) {
   return true;
 });
 
 if (shouldQuit) {
   app.quit();
 }
-
 
 // don't show app in dock
 if ( typeof(app.dock) !== "undefined" ) {
