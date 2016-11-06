@@ -69,6 +69,13 @@ var globalJSCode, globalCSSCode;
 
 var prefsWindowHandle = null;
 
+var switchState = function(s) {
+  var idle = idler.getIdleTime();
+  console.log("switchState " +
+              String(currentState) + " -> " + String(s) +
+              " IDLE: " + idle + " SLEPT AT " + sleptAt);  
+  currentState = s;
+};
 
 /**
  * Open the preferences window
@@ -183,11 +190,11 @@ var updateActiveState = function() {
 
     console.log("updateActiveState", sleptAt, idle);
     if ( sleptAt < 0 || idle < sleptAt ) {
-      currentState = STATE_IDLE;
+      switchState(STATE_IDLE);
       sleptAt = -1;
     }
     else {
-      currentState = STATE_BLANKED;
+      switchState(STATE_BLANKED);
     }
   }
 };
@@ -223,7 +230,8 @@ var runScreenSaverOnDisplay = function(saver, s) {
     // Emitted when the window is closed.
     w.on('closed', function() {
       w.isClosed = true;
-      currentState = STATE_CLOSING;
+      console.log("window closed!");
+      switchState(STATE_CLOSING);
       updateActiveState();
     });
     
@@ -231,7 +239,7 @@ var runScreenSaverOnDisplay = function(saver, s) {
     url_opts.screenshot = encodeURIComponent("file://" + message.url);
 
     var url = saver.getUrl(url_opts);
-    console.log("loading " + url);
+    //console.log("loading " + url);
     
     // and load the index.html of the app.
     w.loadURL(url);
@@ -320,7 +328,7 @@ var runScreenSaver = function() {
     sleptAt = -1;
   }
 
-  currentState = STATE_RUNNING;
+  switchState(STATE_RUNNING);
   wakeupTimer = setInterval(checkForWakeup, 100);
 };
 
@@ -365,7 +373,8 @@ var doLockScreen = function() {
 var doSleep = function() {
   var exec = require('child_process').exec;
   var cmd;
-  
+
+  console.log("doSleep");
   if ( process.platform === 'darwin' ) {
     cmd = "pmset displaysleepnow";
   }
@@ -374,8 +383,11 @@ var doSleep = function() {
   }
 
   exec(cmd, function(error, stdout, stderr) {
-    console.log('stdout: ' + stdout);
-    console.log('stderr: ' + stderr);
+    var idle = idler.getIdleTime();
+    console.log("post sleep IDLE: " + idle);
+    
+    //console.log('stdout: ' + stdout);
+    //console.log('stderr: ' + stderr);
     if (error !== null) {
       console.log('exec error: ' + error);
     }
@@ -398,7 +410,7 @@ var stopScreenSaver = function() {
     return;
   }
 
-  currentState = STATE_CLOSING;
+  switchState(STATE_CLOSING);
   
   // trigger lock screen before actually closing anything
   if ( shouldLockScreen() ) {
@@ -424,12 +436,12 @@ var checkForWakeup = function() {
   }
   
   idle = idler.getIdleTime();
-  console.log("IDLE: " + idle + " SLEPT AT " + sleptAt);
+  //console.log("IDLE: " + idle + " SLEPT AT " + sleptAt);
   
   if ( idle < lastIdle ) {
     sleptAt = -1;
     stopScreenSaver();
-    currentState = STATE_IDLE;
+    switchState(STATE_IDLE);
   }
 
   //
@@ -443,7 +455,7 @@ var checkForWakeup = function() {
     stopScreenSaver();
     doSleep();
 
-    currentState = STATE_BLANKED;
+    switchState(STATE_BLANKED);
   }
 };
 
@@ -495,7 +507,7 @@ var checkIdle = function() {
   
   idle = idler.getIdleTime();
 
-  console.log("checkIdle IDLE: " + idle + " SLEPT AT " + sleptAt + " state: " + String(currentState));
+  //  console.log("checkIdle IDLE: " + idle + " SLEPT AT " + sleptAt + " state: " + String(currentState));
 
   // are we past our idle time?
   if ( currentState === STATE_IDLE && idle > waitTime ) {
@@ -513,57 +525,15 @@ var checkIdle = function() {
   }
   else if ( currentState === STATE_BLANKED && idle < waitTime ) {
     // user has done something, so we should switch from blanked -> idle
-    console.log("switching to idle");
-    currentState = STATE_IDLE;
+    console.log("switching to idle " + idle + " < " + waitTime);
+    switchState(STATE_IDLE);
   }
   
   lastIdle = idle;
 };
 
 
-var trayMenu = Menu.buildFromTemplate([
-  {
-    label: 'Run Now',
-    click: function() { runScreenSaver(); }
-  },
-  {
-    label: 'Disable',
-    click: function() {
-      currentState = STATE_PAUSED;
-      trayMenu.items[1].visible = false;
-      trayMenu.items[2].visible = true;
-    }
-  },
-  {
-    label: 'Enable',
-    click: function() { 
-      currentState = STATE_IDLE;
-      trayMenu.items[1].visible = true;
-      trayMenu.items[2].visible = false;
-    },
-    visible: false
-  },
-  {
-    label: 'Update Available!',
-    click: function() { 
-      require('electron').shell.openExternal('https://github.com/' + global.APP_REPO + '/releases/latest');
-    },
-    visible: (global.NEW_RELEASE_AVAILABLE === true)
-  },
-  {
-    label: 'Preferences',
-    click: function() { openPrefsWindow(); }
-  },
-  {
-    label: 'About ' + global.APP_NAME,
-    click: function() { openAboutWindow(); }
-  },
-  {
-    label: 'Quit',
-    click: function() { app.quit(); }
-  }
-]);
-
+var trayMenu;
 
 
 /**
@@ -626,11 +596,53 @@ if ( typeof(app.dock) !== "undefined" ) {
   app.dock.hide();
 }
 
-
 // seems like we need to catch this event to keep OSX from exiting app after screensaver runs?
 app.on('window-all-closed', function() {
   console.log("window-all-closed");
 });
+
+trayMenu = Menu.buildFromTemplate([
+  {
+    label: 'Run Now',
+    click: function() { runScreenSaver(); }
+  },
+  {
+    label: 'Disable',
+    click: function() {
+      switchState(STATE_PAUSED);
+      trayMenu.items[1].visible = false;
+      trayMenu.items[2].visible = true;
+    }
+  },
+  {
+    label: 'Enable',
+    click: function() { 
+      switchState(STATE_IDLE);
+      trayMenu.items[1].visible = true;
+      trayMenu.items[2].visible = false;
+    },
+    visible: false
+  },
+  {
+    label: 'Update Available!',
+    click: function() { 
+      require('electron').shell.openExternal('https://github.com/' + global.APP_REPO + '/releases/latest');
+    },
+    visible: (global.NEW_RELEASE_AVAILABLE === true)
+  },
+  {
+    label: 'Preferences',
+    click: function() { openPrefsWindow(); }
+  },
+  {
+    label: 'About ' + global.APP_NAME,
+    click: function() { openAboutWindow(); }
+  },
+  {
+    label: 'Quit',
+    click: function() { app.quit(); }
+  }
+]);
 
 
 
