@@ -572,7 +572,7 @@ var shouldQuit = false;
 require('./bootstrap.js');
 
 // store our root path as a global variable so we can access it from screens
-global.basePath = app.getPath('appData') + "/" + global.APP_NAME;
+global.basePath = app.getPath('appData') + "/" + global.APP_DIR;
 global.savers = require('./lib/savers.js');
 
 // some global JS/CSS we'll inject into running screensavers
