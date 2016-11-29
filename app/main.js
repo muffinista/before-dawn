@@ -212,7 +212,8 @@ var runScreenSaverOnDisplay = function(saver, s) {
   
   var windowOpts = {
     fullscreen: ( debugMode !== true ),
-    'auto-hide-menu-bar': true,
+    autoHideMenuBar: true,
+    alwaysOnTop: true,
     x: s.bounds.x,
     y: s.bounds.y
   };
@@ -378,6 +379,11 @@ var doSleep = function() {
   if ( process.platform === 'darwin' ) {
     cmd = "pmset displaysleepnow";
   }
+  else if ( process.platform === 'win32' ) {
+    // this uses a 3rd party library -- nircmd -- to turn off the monitor
+    // http://www.nirsoft.net/utils/nircmd.html
+    cmd = path.join(__dirname, 'bin', 'nircmd.exe') + " monitor off"
+  }
   else {
     return;
   }
@@ -493,8 +499,10 @@ var shouldSleep = function() {
 var checkIdle = function() {
   var idle, waitTime, sleepTime;
 
+  
   // don't bother checking if we're not in an idle/blank/running state
   if ( currentState == STATE_PAUSED || currentState == STATE_CLOSING ) {
+    console.log("paused or closing, bye");
     return;
   }
 
@@ -507,7 +515,7 @@ var checkIdle = function() {
   
   idle = idler.getIdleTime();
 
-  //  console.log("checkIdle IDLE: " + idle + " SLEPT AT " + sleptAt + " state: " + String(currentState));
+//  console.log("checkIdle IDLE: " + idle + " SLEPT AT " + sleptAt + "WAIT AT: " + waitTime + " state: " + String(currentState));
 
   // are we past our idle time?
   if ( currentState === STATE_IDLE && idle > waitTime ) {
@@ -698,6 +706,8 @@ ipcMain.on('savers-updated', (event, arg) => {
   }
 });
 
+
+console.log("PLATFORM", process.platform);
 
 /**
  * check for a release and then boot!
