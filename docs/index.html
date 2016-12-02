@@ -1,11 +1,26 @@
 ---
-layout: default
+layout: page
+title: Hello!
 ---
 
 <div class="home">
+  <h1 class="page-heading">Hello!</h1>
 
-  <h1 class="page-heading">Posts</h1>
+  <p>Welcome to the help website for Before Dawn. You can
+    <a href="{{ 'about' | prepend: site.baseurl }}">learn more</a> about
+    the application, find out how to install it, and learn about
+    writing your own screensaver.
+  </p>
 
+  <ul>
+    <li><a href="{{ 'about' | prepend: site.baseurl }}">How to Install</a></li>
+    <li><a href="{{ 'about' | prepend: site.baseurl }}">Options</a></li>
+    <li><a href="{{ 'about' | prepend: site.baseurl }}">How to Add Your Own Screensaver</a></li>
+    <li><a href="{{ 'about' | prepend: site.baseurl }}">Contributing</a></li>
+  </ul>
+  
+  
+  <!-- 
   <ul class="post-list">
     {% for post in site.posts %}
       <li>
@@ -19,5 +34,6 @@ layout: default
   </ul>
 
   <p class="rss-subscribe">subscribe <a href="{{ "/feed.xml" | prepend: site.baseurl }}">via RSS</a></p>
-
+  -->
+  
 </div>
