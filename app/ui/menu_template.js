@@ -117,6 +117,12 @@ exports.buildMenuTemplate = function(a) {
           click: function() {
             require('electron').shell.openExternal('https://github.com/muffinista/before-dawn');
           }
+        },
+        {
+          label: 'Help',
+          click: function() {
+            require('electron').shell.openExternal(global.HELP_URL);
+          }
         }
       ]
     }

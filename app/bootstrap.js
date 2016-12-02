@@ -10,4 +10,4 @@ global.SAVER_REPO = "muffinista/before-dawn-screensavers";
 global.APP_REPO = "muffinista/before-dawn";
 global.APP_VERSION = "v" + version;
 global.NEW_RELEASE_AVAILABLE = false;
-
+global.HELP_URL = "https://muffinista.github.io/before-dawn/";

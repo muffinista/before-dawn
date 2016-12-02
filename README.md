@@ -68,6 +68,11 @@ Once you've set all of that up, Before Dawn will happily run in the
 background, and when it detects that you have been idle, it will
 engage your screensaver. That's all there is to it!
 
+## Building It
+
+npm run dist
+
+
 ## Hacking It
 
 If you would like to hack on Before Dawn, there's some instructions on
@@ -83,10 +88,7 @@ Before Dawn is built on:
 - [Electron](http://electron.atom.io/)
 - [Node.js](https://nodejs.org/)
 - a little bit of [lodash](https://lodash.com/)
-- most of the styling in the preferences window is via [Pure.css](http://purecss.io/)
-- Some of the form inputs are being generated with
-  [React](https://facebook.github.io/react/). This is definitely
-  subject to change.
+- [React](https://facebook.github.io/react/)
 
 
 ## How to Write a Screensaver

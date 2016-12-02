@@ -156,6 +156,10 @@ var openAboutWindow = function() {
   });
 };
 
+var openHelpUrl = function() {
+  require('electron').shell.openExternal(global.HELP_URL);
+};
+
 
 /**
  * open our screen grabber tool. this should run in the background,
@@ -645,6 +649,10 @@ trayMenu = Menu.buildFromTemplate([
   {
     label: 'About ' + global.APP_NAME,
     click: function() { openAboutWindow(); }
+  },
+  {
+    label: 'Help',
+    click: function() { openHelpUrl(); }
   },
   {
     label: 'Quit',
