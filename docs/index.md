@@ -1,5 +1,0 @@
-# docs #
-
-hi!
-
-testing something
