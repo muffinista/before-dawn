@@ -506,7 +506,7 @@ var checkIdle = function() {
   
   // don't bother checking if we're not in an idle/blank/running state
   if ( currentState == STATE_PAUSED || currentState == STATE_CLOSING ) {
-    console.log("paused or closing, bye");
+    //console.log("paused or closing, bye");
     return;
   }
 
