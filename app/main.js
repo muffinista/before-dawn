@@ -519,7 +519,8 @@ var checkIdle = function() {
   
   idle = idler.getIdleTime();
 
-//  console.log("checkIdle IDLE: " + idle + " SLEPT AT " + sleptAt + "WAIT AT: " + waitTime + " state: " + String(currentState));
+  //  console.log("checkIdle IDLE: " + idle + " SLEPT AT " + sleptAt +
+  // " WAIT AT: " + waitTime + " state: " + String(currentState));
 
   // are we past our idle time?
   if ( currentState === STATE_IDLE && idle > waitTime ) {
