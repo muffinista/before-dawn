@@ -36,4 +36,4 @@ bower_components
 
 *.map
 
-ui/prefs.js
+ui/*.js

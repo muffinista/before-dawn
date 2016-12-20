@@ -5,6 +5,7 @@ var semver = require('semver');
 
 exports.checkLatestRelease = function(repo, version, yes_cb, no_cb) {
   var url = "https://api.github.com/repos/" + repo + "/releases/latest";
+  console.log(`check ${url} for new release`);
   try {
     request({
       url: url,

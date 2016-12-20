@@ -10,16 +10,12 @@ module.exports = function(grunt) {
         files: [
           {
             expand: true,
-            cwd: 'ui/',
-            src: ['*.jsx'],
+            cwd: 'ui/js',
+            src: ['*.js'],
             ext: '.js',
             dest: 'ui/'
           }
-        ],
-        oldfiles: {
-          'ui/prefs.js': 'ui/prefs.jsx',
-          'ui/components.js': 'ui/components.jsx'
-        }
+        ]
       }
     },
     watch: {
