@@ -36,4 +36,4 @@ bower_components
 
 *.map
 
-ui/*.js
+app/ui/*.js
