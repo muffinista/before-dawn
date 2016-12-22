@@ -19,7 +19,7 @@ const app = electron.app;  // Module to control application life.
 const BrowserWindow = electron.BrowserWindow;  // Module to create native browser window.
 const Menu = electron.Menu;
 const Tray = electron.Tray;
-const {ipcMain} = require('electron')
+const {ipcMain} = require('electron');
 const fs = require('fs');
 const path = require('path');
 
@@ -29,8 +29,8 @@ const parseArgs = require('minimist');
 const releaseChecker = require('./lib/release_check.js');
 const power = require('./lib/power.js');
 
-
-// @todo does this need to be global? i doubt it
+// NOTE -- this needs to be global, otherwise the app icon gets
+// garbage collected and won't show up in the system tray
 let appIcon = null;
 
 let argv = parseArgs(process.argv);
@@ -51,6 +51,8 @@ var sleptAt = -1;
 
 var appReady = false;
 var configLoaded = false;
+
+var shouldQuit = false;
 
 
 
@@ -86,7 +88,8 @@ var openPrefsWindow = function() {
   var displays = [
     primary
   ];
-  
+
+  // take a screenshot of the main screen for use in previews
   ipcMain.once("screenshot-" + primary.id, function(e, message) {
     grabber.reload();
 
@@ -183,6 +186,9 @@ var openScreenGrabber = function() {
   });
 };
 
+/**
+ * handle switches to idle/blanked
+ */
 var updateActiveState = function() {
   var idle = idler.getIdleTime();
   var openWindows = saverWindows.filter(function(w) {
@@ -222,6 +228,11 @@ var runScreenSaverOnDisplay = function(saver, s) {
     y: s.bounds.y
   };
 
+  // don't do anything if we don't actually have a screensaver
+  if ( typeof(saver) === "undefined" || saver === null ) {
+    return;
+  }
+  
   // listen for an event that we have an image of the display we will run on before completing setup
   ipcMain.once("screenshot-" + s.id, function(e, message) {
     var w = new BrowserWindow(windowOpts);       
@@ -405,8 +416,6 @@ var doSleep = function() {
  
 }
 
-
-
 /**
  * stop the running screensaver
  */
@@ -579,7 +588,6 @@ var bootApp = function(_basePath) {
   });
 };
 
-var shouldQuit = false;
 
 // load a few global variables
 require('./bootstrap.js');
@@ -715,8 +723,6 @@ ipcMain.on('savers-updated', (event, arg) => {
   }
 });
 
-
-console.log("PLATFORM", process.platform);
 
 
 /**

@@ -3,7 +3,7 @@
   "version": "0.8.0",
   "description": "screensaver fun",
   "author": "Colin Mitchell",
-  "license": "ISC",
+  "license": "MIT",
   "homepage": "http://muffinlabs.com/",
   "main": "main.js",
   "scripts": {
