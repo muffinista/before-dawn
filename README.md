@@ -70,8 +70,7 @@ engage your screensaver. That's all there is to it!
 
 ## Building It
 
-npm run dist
-
+Steps for generating your own build Before Dawn are listed in [the wiki](https://github.com/muffinista/before-dawn/wiki/Building-Before-Dawn)
 
 ## Hacking It
 
@@ -133,7 +132,7 @@ help or have a suggestion, please feel free to open an issue here.
 
 ## Copyright/License
 
-Unless otherwise stated, Copyright (c) 2016 Colin Mitchell.
+Unless otherwise stated, Copyright (c) 2017 Colin Mitchell.
 
 Before Dawn is is distributed under the MIT licence -- Please see LICENSE.txt for further details.
 
