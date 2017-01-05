@@ -30,7 +30,6 @@ module.exports = React.createClass({
         aboutUrlClass = aboutUrlClass + " hide";
       }
 
-      console.log(s.editable);
       if ( s.editable === true ) {
         
       }

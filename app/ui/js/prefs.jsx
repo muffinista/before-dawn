@@ -48,15 +48,10 @@ const {BrowserWindow} = window.require('electron').remote;
   var url_opts = {};
   
   // parse incoming URL params -- we'll get a link to the current screen images for previews here
-  var urlParams = window.location.search.split(/[?&]/).slice(1).map(function(paramPair) {
-    return paramPair.split(/=(.+)?/).slice(0, 2);
-  }).reduce(function (obj, pairArray) {            
-    obj[pairArray[0]] = pairArray[1];
-    return obj;
-  }, {});
+  var tmpParams = new URLSearchParams(document.location.search);
 
   // the main app will pass us a screenshot URL, here it is
-  var screenshot = decodeURIComponent(urlParams.screenshot);
+  var screenshot = decodeURIComponent(tmpParams.get("screenshot"));
   
   console.log("appLauncher " + appName);
   appLauncher.isEnabled().then(function(enabled){

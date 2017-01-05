@@ -55,7 +55,7 @@ module.exports = React.createClass({
 
     var nodes = this.props.saver.options.map(function(o, i) {
       var val = values[o.name];
-      console.log(o, val);
+      //console.log(o, val);
       if ( typeof(val) === "undefined" ) {
         val = o.default;
       }
