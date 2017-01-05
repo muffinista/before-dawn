@@ -11,7 +11,7 @@ module.exports = function(grunt) {
           {
             expand: true,
             cwd: 'ui/js',
-            src: ['*.js'],
+            src: ['*.js', '*.jsx'],
             ext: '.js',
             dest: 'ui/'
           }
