@@ -7,7 +7,7 @@
   "scripts": {
     "postinstall": "install-app-deps",
     "pack": "build --dir",
-    "dist": "build"
+    "dist": "build --x64"
   },
   "nodeGypRebuild": true,
   "devDependencies": {
@@ -21,6 +21,10 @@
       "installerIcon": "build/icon.ico",
       "verbosity": 1,
       "perMachine": "false"
+    },
+    "win": {
+      "target": "nsis",
+      "iconUrl": "https://raw.githubusercontent.com/muffinista/before-dawn/master/assets/icon.ico"
     },
     "asar": "false",
     "dmg": {
