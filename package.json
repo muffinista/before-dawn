@@ -18,7 +18,7 @@
     "appId": "Before Dawn",
     "app-category-type": "public.app-category.entertainment",
     "nsis": {
-      "installerIcon": "build/icon.ico"
+      "installerIcon": "build/icon.ico",
       "verbosity": 1,
       "perMachine": "false"
     },
