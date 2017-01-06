@@ -1,10 +1,11 @@
 {
   "name": "before-dawn",
+  "productName": "Before Dawn",
   "version": "0.8.0",
-  "description": "screensaver fun",
+  "description": "A desktop screensaver app using web technologies",
   "author": "Colin Mitchell <colin@muffinlabs.com> (http://muffinlabs.com)",
   "license": "MIT",
-  "homepage": "http://muffinlabs.com/",
+  "homepage": "https://github.com/muffinista/before-dawn/",
   "main": "main.js",
   "scripts": {
     "start": "electron main.js",

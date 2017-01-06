@@ -1,8 +1,7 @@
 {
   "name": "before-dawn",
-  "productName": "Before Dawn",
   "version": "0.8.0",
-  "description": "screensaver fun",
+  "description": "A desktop screensaver app using web technologies",
   "author": "Colin Mitchell",
   "scripts": {
     "postinstall": "install-app-deps",
