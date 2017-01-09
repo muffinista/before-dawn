@@ -22,7 +22,7 @@ const Tray = electron.Tray;
 const {ipcMain} = require('electron');
 const fs = require('fs');
 const path = require('path');
-
+const screen = require('./lib/screen.js');
 const parseArgs = require('minimist');
 
 const releaseChecker = require('./lib/release_check.js');
@@ -299,73 +299,16 @@ var runScreenSaver = function() {
   }
 };
 
+var screenSaverIsRunning = function() {
+  return ( saverWindows.length > 0 );
+}
+
 /**
  * should we lock the user's screen when returning from running the saver?
  */
 var shouldLockScreen = function() {
   return ( savers.getLock() === true );
 };
-
-/**
- * lock the screen when the saver deactivates. currently this only works on OSX and Windows
- */
-var doLockScreen = function() {
-  var exec = require('child_process').exec;
-  var cmd;
-  
-  if ( process.platform === 'darwin' ) {
-    cmd = "'/System/Library/CoreServices/Menu Extras/User.menu/Contents/Resources/CGSession' -suspend";       
-  }
-  else if ( process.platform === 'win32' ) {
-    // @see http://superuser.com/questions/21179/command-line-cmd-command-to-lock-a-windows-machine
-    cmd = "rundll32.exe user32.dll,LockWorkStation";
-  }
-  else {
-    return;
-  }
-
-  exec(cmd, function(error, stdout, stderr) {
-    console.log('stdout: ' + stdout);
-    console.log('stderr: ' + stderr);
-    if (error !== null) {
-      console.log('exec error: ' + error);
-    }
-  });
-};
-
-
-/**
- * put the display to sleep
- */
-var doSleep = function() {
-  var exec = require('child_process').exec;
-  var cmd;
-
-  console.log("doSleep");
-  if ( process.platform === 'darwin' ) {
-    cmd = "pmset displaysleepnow";
-  }
-  else if ( process.platform === 'win32' ) {
-    // this uses a 3rd party library -- nircmd -- to turn off the monitor
-    // http://www.nirsoft.net/utils/nircmd.html
-    cmd = path.join(__dirname, 'bin', 'nircmd.exe') + " monitor off"
-  }
-  else {
-    return;
-  }
-
-  exec(cmd, function(error, stdout, stderr) {
-    //console.log('stdout: ' + stdout);
-    //console.log('stderr: ' + stderr);
-    if (error !== null) {
-      console.log('exec error: ' + error);
-    }
-  });
-}
-
-var screenSaverIsRunning = function() {
-  return ( saverWindows.length > 0 );
-}
 
 /**
  * stop the running screensaver
@@ -381,7 +324,7 @@ var stopScreenSaver = function() {
   
   // trigger lock screen before actually closing anything
   if ( shouldLockScreen() ) {
-    doLockScreen();
+    screen.doLockScreen();
   }
 
   for ( var s in saverWindows ) {
@@ -555,7 +498,7 @@ var runScreenSaverIfPowered = function() {
 var blankScreenIfNeeded = function() {
   if ( screenSaverIsRunning() ) {
     stopScreenSaver();
-    doSleep();
+    screen.doSleep();
   }
 }
 
