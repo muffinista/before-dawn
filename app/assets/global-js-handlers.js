@@ -10,7 +10,7 @@ var exitScreenSaver = function(e) {
     return;
   }
   ipcRenderer = require('electron').ipcRenderer;
-  ipcRenderer.send('asynchronous-message', 'stopScreenSaver');
+  ipcRenderer.send('stopScreenSaver');
 };
 
 var body = document.getElementsByTagName("body")[0];

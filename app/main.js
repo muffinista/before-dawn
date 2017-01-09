@@ -23,7 +23,6 @@ const {ipcMain} = require('electron');
 const fs = require('fs');
 const path = require('path');
 
-const idler = require('node-system-idle-time');
 const parseArgs = require('minimist');
 
 const releaseChecker = require('./lib/release_check.js');
@@ -36,9 +35,9 @@ let appIcon = null;
 let argv = parseArgs(process.argv);
 let debugMode = ( argv.debug === true );
 
-let checkTimer = null;
-let wakeupTimer = null;
 let saverWindows = [];
+
+let stateManager = require('./lib/state_manager.js');
 
 var grabber;
 
@@ -46,38 +45,16 @@ var grabber;
 // running everywhere we can handle some background work
 var totalDisplays = 0;
 
-var lastIdle = 0;
-var sleptAt = -1;
-
 var appReady = false;
 var configLoaded = false;
 
 var shouldQuit = false;
 
 
-
-/**
- * These are the possible states that the app can be in.
- */
-const STATE_IDLE = Symbol('idle'); // not running, waiting
-const STATE_RUNNING = Symbol('running'); // running a screensaver
-const STATE_CLOSING = Symbol('closing'); // closing the screensaver process
-const STATE_BLANKED = Symbol('blanked'); // long idle, screen is blanked
-const STATE_PAUSED = Symbol('paused'); // screensaver is paused
-
-var currentState = STATE_IDLE;
-
 var globalJSCode, globalCSSCode;
 
 var prefsWindowHandle = null;
 
-var switchState = function(s) {
-  var idle = idler.getIdleTime();
-  console.log("switchState " +
-              String(currentState) + " -> " + String(s) +
-              " IDLE: " + idle + " SLEPT AT " + sleptAt);  
-  currentState = s;
-};
 
 /**
  * Open the preferences window
@@ -119,6 +96,8 @@ var openPrefsWindow = function() {
       prefsWindowHandle.on('closed', function() {
         prefsWindowHandle = null;
         global.savers.reload();
+        updateStateManager();
+
         if ( typeof(app.dock) !== "undefined" ) {
           app.dock.hide();
         }
@@ -186,28 +165,6 @@ var openScreenGrabber = function() {
   });
 };
 
-/**
- * handle switches to idle/blanked
- */
-var updateActiveState = function() {
-  var idle = idler.getIdleTime();
-  var openWindows = saverWindows.filter(function(w) {
-    return (typeof(w) !== "undefined" && w.isClosed !== true);
-  });
-
-  if ( openWindows.length == 0 ) {
-    saverWindows = [];
-
-    console.log("updateActiveState", sleptAt, idle);
-    if ( sleptAt < 0 || idle < sleptAt ) {
-      switchState(STATE_IDLE);
-      sleptAt = -1;
-    }
-    else {
-      switchState(STATE_BLANKED);
-    }
-  }
-};
 
 /**
  * run the specified screensaver on the specified screen
@@ -247,8 +204,7 @@ var runScreenSaverOnDisplay = function(saver, s) {
     w.on('closed', function() {
       w.isClosed = true;
       console.log("window closed!");
-      switchState(STATE_CLOSING);
-      updateActiveState();
+      stateManager.reset();
     });
     
     
@@ -303,6 +259,11 @@ var getDisplays = function() {
 };
 
 
+var setStateToRunning = function() {
+  stateManager.run();
+};
+
+
 /**
  * run the user's chosen screensaver on any available screens
  */
@@ -331,21 +292,11 @@ var runScreenSaver = function() {
       runScreenSaverOnDisplay(saver, displays[i]);
     } // for
 
-    // console.log("send event screengrab-request");
     grabber.webContents.send('screengrab-request', displays);
   }
   catch (e) {
     console.log(e);
   }
-
-  // set the idle timer to something > 0
-  if ( lastIdle < 99 ) {
-    lastIdle = 99;
-    sleptAt = -1;
-  }
-
-  switchState(STATE_RUNNING);
-  wakeupTimer = setInterval(checkForWakeup, 100);
 };
 
 /**
@@ -404,16 +355,16 @@ var doSleep = function() {
   }
 
   exec(cmd, function(error, stdout, stderr) {
-    var idle = idler.getIdleTime();
-    console.log("post sleep IDLE: " + idle);
-    
     //console.log('stdout: ' + stdout);
     //console.log('stderr: ' + stderr);
     if (error !== null) {
       console.log('exec error: ' + error);
     }
   });
- 
+}
+
+var screenSaverIsRunning = function() {
+  return ( saverWindows.length > 0 );
 }
 
 /**
@@ -422,137 +373,22 @@ var doSleep = function() {
 var stopScreenSaver = function() {
   console.log("received stopScreenSaver call");
 
-  clearInterval(wakeupTimer);
-  lastIdle = 0;
-
-  if ( saverWindows.length <= 0 || debugMode === true ) {
+  if ( ! screenSaverIsRunning() || debugMode === true ) {
     return;
   }
 
-  switchState(STATE_CLOSING);
+  stateManager.reset();
   
   // trigger lock screen before actually closing anything
   if ( shouldLockScreen() ) {
     doLockScreen();
   }
 
-  //console.log("closing " + saverWindows.length + " windows");
   for ( var s in saverWindows ) {
-    //console.log("close", s);
     saverWindows[s].destroy();
   }
 };
 
-/**
- * If the screensaver is running, determine if we should wake up, or
- * if we should go all the way and put the monitor to sleep.
- */                   
-var checkForWakeup = function() {
-  var idle, sleepTime, waitTime;
-  
-  if ( currentState !== STATE_RUNNING || sleptAt > -1 ) {
-    return;
-  }
-  
-  idle = idler.getIdleTime();
-  //console.log("IDLE: " + idle + " SLEPT AT " + sleptAt);
-  
-  if ( idle < lastIdle ) {
-    sleptAt = -1;
-    stopScreenSaver();
-    switchState(STATE_IDLE);
-  }
-
-  //
-  // should we stop running and blank the screens?
-  //
-  if ( shouldSleep() ) {
-
-    sleptAt = idle;
-
-    console.log("going to sleep! nite nite!");
-    stopScreenSaver();
-    doSleep();
-
-    switchState(STATE_BLANKED);
-  }
-};
-
-/**
- * should we go to sleep?
- */
-var shouldSleep = function() {
-  var sleepTime, waitTime;
-  var idle = idler.getIdleTime();
-
-  sleepTime = savers.getSleep() * 60000;
-  if ( sleepTime <= 0 ) {
-    return false;
-  }
-
-  waitTime = savers.getDelay() * 60000;
-  if ( waitTime == 0 ) {
-    return false;
-  }
-
-  //
-  // should we stop running and blank the screens?
-  //
-  if ( idle >= sleepTime + waitTime ) {
-    return true;
-  }
-
-  return false;
-};
-
-/**
- * main idle time check. once our idle time gets high enough, we
- * activate the screensaver
- */
-var checkIdle = function() {
-  var idle, waitTime, sleepTime;
-
-  
-  // don't bother checking if we're not in an idle/blank/running state
-  if ( currentState == STATE_PAUSED || currentState == STATE_CLOSING ) {
-    //console.log("paused or closing, bye");
-    return;
-  }
-
-  waitTime = savers.getDelay() * 60000;
-
-  // check that we are actually supposed to be running
-  if ( waitTime <= 0 ) {
-    return;
-  }
-  
-  idle = idler.getIdleTime();
-
-  //  console.log("checkIdle IDLE: " + idle + " SLEPT AT " + sleptAt +
-  // " WAIT AT: " + waitTime + " state: " + String(currentState));
-
-  // are we past our idle time?
-  if ( currentState === STATE_IDLE && idle > waitTime ) {
-    // check if we are on battery, and if we should be running in that case
-    if ( savers.getDisableOnBattery() ) {
-      power.charging().then((is_powered) => {
-        if ( is_powered ) {
-          runScreenSaver();
-        }
-      });
-    }
-    else {
-      runScreenSaver();
-    }
-  }
-  else if ( currentState === STATE_BLANKED && idle < waitTime ) {
-    // user has done something, so we should switch from blanked -> idle
-    console.log("switching to idle " + idle + " < " + waitTime);
-    switchState(STATE_IDLE);
-  }
-  
-  lastIdle = idle;
-};
 
 
 var trayMenu;
@@ -584,6 +420,8 @@ var bootApp = function(_basePath) {
 
   global.savers.init(global.basePath, function() {
     configLoaded = true;
+    updateStateManager();
+
     openPrefsOnFirstLoad();
   });
 };
@@ -625,12 +463,12 @@ app.on('window-all-closed', function() {
 trayMenu = Menu.buildFromTemplate([
   {
     label: 'Run Now',
-    click: function() { runScreenSaver(); }
+    click: function() { setStateToRunning(); }
   },
   {
     label: 'Disable',
     click: function() {
-      switchState(STATE_PAUSED);
+      stateManager.pause();
       trayMenu.items[1].visible = false;
       trayMenu.items[2].visible = true;
     }
@@ -638,7 +476,7 @@ trayMenu = Menu.buildFromTemplate([
   {
     label: 'Enable',
     click: function() { 
-      switchState(STATE_IDLE);
+      stateManager.reset();
       trayMenu.items[1].visible = true;
       trayMenu.items[2].visible = false;
     },
@@ -685,8 +523,6 @@ app.once('ready', function() {
 
   openScreenGrabber();
 
-  checkTimer = setInterval(checkIdle, 2500);
-
   if ( argv.screen === "prefs" ) {
     openPrefsWindow();
   }
@@ -694,21 +530,49 @@ app.once('ready', function() {
     openAboutWindow();
   }
   else if ( argv.screen === "saver" ) {
-    runScreenSaver();
+    setStateToRunning();
   }
-
+  
   appReady = true;
 
   openPrefsOnFirstLoad();
 });
 
+var runScreenSaverIfPowered = function() {
+   // check if we are on battery, and if we should be running in that case
+  if ( global.savers.getDisableOnBattery() ) {
+    power.charging().then((is_powered) => {
+      if ( is_powered ) {
+        runScreenSaver();
+      }
+    });
+  }
+  else {
+    runScreenSaver();
+  }
+};
+
+var blankScreenIfNeeded = function() {
+  if ( screenSaverIsRunning() ) {
+    stopScreenSaver();
+    doSleep();
+  }
+}
+
+var updateStateManager = function() {
+  stateManager.setup({
+    idleTime: savers.getDelay() * 60000,
+    blankTime: savers.getSleep() * 60000,
+    onIdleTime: runScreenSaverIfPowered,
+    onBlankTime: blankScreenIfNeeded
+  });
+};
+
 //
 // listen for a message from global.js that we should stop running the screensaver
 //
-ipcMain.on('asynchronous-message', function(event, arg) {
-  if ( arg === "stopScreenSaver" ) {
-    stopScreenSaver();
-  }
+ipcMain.on("stopScreenSaver", (event, arg) => {
+  stopScreenSaver();
 });
 
 
@@ -717,7 +581,6 @@ ipcMain.on('asynchronous-message', function(event, arg) {
 // the prefs window know that it needs to reload
 //
 ipcMain.on('savers-updated', (event, arg) => {
-  //console.log("SAVER UPDATED", arg);
   if ( prefsWindowHandle !== null ) {
     prefsWindowHandle.send('savers-updated', arg);
   }
