@@ -20,6 +20,7 @@ const BrowserWindow = electron.BrowserWindow;  // Module to create native browse
 const Menu = electron.Menu;
 const Tray = electron.Tray;
 const {ipcMain} = require('electron');
+
 const fs = require('fs');
 const path = require('path');
 const screen = require('./lib/screen.js');
@@ -49,7 +50,6 @@ var appReady = false;
 var configLoaded = false;
 
 var shouldQuit = false;
-
 
 var globalJSCode, globalCSSCode;
 
@@ -204,7 +204,11 @@ var runScreenSaverOnDisplay = function(saver, s) {
     w.on('closed', function() {
       w.isClosed = true;
       console.log("window closed!");
-      stateManager.reset();
+
+      if ( ! screenSaverIsRunning() ) {
+        console.log("all windows closed, reset");
+        stateManager.reset();
+      }
     });
     
     
@@ -233,7 +237,7 @@ var runScreenSaverOnDisplay = function(saver, s) {
     // reload the screengrabber window to keep it from churning
     // CPU, until I can figure out why that is even happening
     if ( saverWindows.length >= totalDisplays ) {
-      console.log("Reloading screengrabber");
+      //console.log("Reloading screengrabber");
       grabber.reload();
     }
 
@@ -313,14 +317,17 @@ var shouldLockScreen = function() {
 /**
  * stop the running screensaver
  */
-var stopScreenSaver = function() {
+var stopScreenSaver = function(fromBlank) {
   console.log("received stopScreenSaver call");
 
   if ( ! screenSaverIsRunning() || debugMode === true ) {
     return;
   }
 
-  stateManager.reset();
+  if ( fromBlank !== true ) {
+    console.log("fromBlank", fromBlank);
+    stateManager.reset();
+  }
   
   // trigger lock screen before actually closing anything
   if ( shouldLockScreen() ) {
@@ -366,6 +373,44 @@ var bootApp = function(_basePath) {
     updateStateManager();
 
     openPrefsOnFirstLoad();
+  });
+};
+
+var runScreenSaverIfPowered = function() {
+  console.log("runScreenSaverIfPowered");
+  // check if we are on battery, and if we should be running in that case
+  if ( global.savers.getDisableOnBattery() ) {
+    power.charging().then((is_powered) => {
+      if ( is_powered ) {
+        runScreenSaver();
+      }
+      else {
+        console.log("I would run, but we're on battery :(");
+        stateManager.resetAt(savers.getDelay() * 60000);
+      }
+    });
+  }
+  else {
+    runScreenSaver();
+  }
+};
+
+var blankScreenIfNeeded = function() {
+  if ( screenSaverIsRunning() ) {
+    stopScreenSaver(true);
+    screen.doSleep();
+  }
+  else {
+    stateManager.reset();
+  }
+}
+
+var updateStateManager = function() {
+  stateManager.setup({
+    idleTime: savers.getDelay() * 60000,
+    blankTime: savers.getSleep() * 60000,
+    onIdleTime: runScreenSaverIfPowered,
+    onBlankTime: blankScreenIfNeeded
   });
 };
 
@@ -481,35 +526,6 @@ app.once('ready', function() {
   openPrefsOnFirstLoad();
 });
 
-var runScreenSaverIfPowered = function() {
-   // check if we are on battery, and if we should be running in that case
-  if ( global.savers.getDisableOnBattery() ) {
-    power.charging().then((is_powered) => {
-      if ( is_powered ) {
-        runScreenSaver();
-      }
-    });
-  }
-  else {
-    runScreenSaver();
-  }
-};
-
-var blankScreenIfNeeded = function() {
-  if ( screenSaverIsRunning() ) {
-    stopScreenSaver();
-    screen.doSleep();
-  }
-}
-
-var updateStateManager = function() {
-  stateManager.setup({
-    idleTime: savers.getDelay() * 60000,
-    blankTime: savers.getSleep() * 60000,
-    onIdleTime: runScreenSaverIfPowered,
-    onBlankTime: blankScreenIfNeeded
-  });
-};
 
 //
 // listen for a message from global.js that we should stop running the screensaver
