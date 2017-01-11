@@ -23,11 +23,12 @@ const {ipcMain} = require('electron');
 
 const fs = require('fs');
 const path = require('path');
-const screen = require('./lib/screen.js');
 const parseArgs = require('minimist');
 
+const screen = require('./lib/screen.js');
 const releaseChecker = require('./lib/release_check.js');
 const power = require('./lib/power.js');
+let stateManager = require('./lib/state_manager.js');
 
 // NOTE -- this needs to be global, otherwise the app icon gets
 // garbage collected and won't show up in the system tray
@@ -37,8 +38,6 @@ let argv = parseArgs(process.argv);
 let debugMode = ( argv.debug === true );
 
 let saverWindows = [];
-
-let stateManager = require('./lib/state_manager.js');
 
 var grabber;
 
@@ -54,6 +53,7 @@ var shouldQuit = false;
 var globalJSCode, globalCSSCode;
 
 var prefsWindowHandle = null;
+var trayMenu;
 
 
 /**
@@ -105,7 +105,6 @@ var openPrefsWindow = function() {
     });
   });
 
-
   grabber.webContents.send('screengrab-request', displays);
 };
 
@@ -138,6 +137,9 @@ var openAboutWindow = function() {
   });
 };
 
+/**
+ * open the help section in a browser
+ */
 var openHelpUrl = function() {
   require('electron').shell.openExternal(global.HELP_URL);
 };
@@ -192,6 +194,7 @@ var runScreenSaverOnDisplay = function(saver, s) {
   
   // listen for an event that we have an image of the display we will run on before completing setup
   ipcMain.once("screenshot-" + s.id, function(e, message) {
+    var url;
     var w = new BrowserWindow(windowOpts);       
 
     saverWindows.push(w);
@@ -214,8 +217,7 @@ var runScreenSaverOnDisplay = function(saver, s) {
     
     url_opts.screenshot = encodeURIComponent("file://" + message.url);
 
-    var url = saver.getUrl(url_opts);
-    //console.log("loading " + url);
+    url = saver.getUrl(url_opts);
     
     // and load the index.html of the app.
     w.loadURL(url);
@@ -227,13 +229,12 @@ var runScreenSaverOnDisplay = function(saver, s) {
     }
     w.focus();
     
-    // inject our custom JS and CSS here
+    // inject our custom JS and CSS into the screensaver window
     w.webContents.on('did-finish-load', function() {
       w.webContents.insertCSS(globalCSSCode);      
       w.webContents.executeJavaScript(globalJSCode);
     });
 
-    
     // reload the screengrabber window to keep it from churning
     // CPU, until I can figure out why that is even happening
     if ( saverWindows.length >= totalDisplays ) {
@@ -263,6 +264,9 @@ var getDisplays = function() {
 };
 
 
+/**
+ * manually trigger screensaver by setting state to run
+ */
 var setStateToRunning = function() {
   stateManager.run();
 };
@@ -303,6 +307,9 @@ var runScreenSaver = function() {
   }
 };
 
+/**
+ * check if the screensaver is still running
+ */
 var screenSaverIsRunning = function() {
   return ( saverWindows.length > 0 );
 }
@@ -341,7 +348,6 @@ var stopScreenSaver = function(fromBlank) {
 
 
 
-var trayMenu;
 
 
 /**
@@ -371,11 +377,14 @@ var bootApp = function(_basePath) {
   global.savers.init(global.basePath, function() {
     configLoaded = true;
     updateStateManager();
-
     openPrefsOnFirstLoad();
   });
 };
 
+/**
+ * activate the screensaver, but only if we're plugged in, or if the user
+ * is fine with running on battery
+ */
 var runScreenSaverIfPowered = function() {
   console.log("runScreenSaverIfPowered");
   // check if we are on battery, and if we should be running in that case
@@ -386,6 +395,7 @@ var runScreenSaverIfPowered = function() {
       }
       else {
         console.log("I would run, but we're on battery :(");
+        // check state again in a little while
         stateManager.resetAt(savers.getDelay() * 60000);
       }
     });
@@ -395,6 +405,10 @@ var runScreenSaverIfPowered = function() {
   }
 };
 
+/**
+ * if the screensaver is running, blank the screen. otherwise,
+ * reset state machine
+ */
 var blankScreenIfNeeded = function() {
   if ( screenSaverIsRunning() ) {
     stopScreenSaver(true);
@@ -443,11 +457,10 @@ if ( typeof(app.dock) !== "undefined" ) {
   app.dock.hide();
 }
 
-// seems like we need to catch this event to keep OSX from exiting app after screensaver runs?
-app.on('window-all-closed', function() {
-  console.log("window-all-closed");
-});
 
+//
+// build the tray menu
+//
 trayMenu = Menu.buildFromTemplate([
   {
     label: 'Run Now',
@@ -496,6 +509,11 @@ trayMenu = Menu.buildFromTemplate([
 ]);
 
 
+
+// seems like we need to catch this event to keep OSX from exiting app after screensaver runs?
+app.on('window-all-closed', function() {
+  console.log("window-all-closed");
+});
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.

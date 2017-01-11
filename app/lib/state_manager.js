@@ -1,7 +1,5 @@
 'use strict';
 
-
-
 /**
  * These are the possible states that the app can be in.
  */

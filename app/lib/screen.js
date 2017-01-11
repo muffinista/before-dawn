@@ -1,3 +1,5 @@
+'use strict';
+
 
 /**
  * lock the screen when the saver deactivates. currently this only works on OSX and Windows
