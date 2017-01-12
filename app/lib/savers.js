@@ -22,7 +22,6 @@ var init = function(_path, cb) {
 var reload = function(cb) {
   var configPath = baseDir + "/" + config_file;
 
-  
   // create our main directory
   if ( ! fs.existsSync(baseDir) ) {
     console.log("creating " + baseDir);
@@ -259,17 +258,27 @@ var getOptions = function(name) {
 
 
 /**
+ * skip any folder which contains a '.before-dawn-skip' file
+ * this way we can have templates and documentation and things like
+ * that which won't get loaded into the app by mistake.
+ */
+var skipFolder = function(p) {
+  return fs.existsSync(path.join(p, ".before-dawn-skip"));
+};
+
+
+/**
  * recursively parse through a directory structure
  *  @see http://stackoverflow.com/questions/2727167/getting-all-filenames-in-a-directory-with-node-js
  */
 var walk = function(currentDirPath, callback) {
-  var fs = require('fs'), path = require('path');
   fs.readdirSync(currentDirPath).forEach(function(name) {
     var filePath = path.join(currentDirPath, name);
     var stat = fs.statSync(filePath);
     if (stat.isFile()) {
       callback(filePath, stat);
-    } else if (stat.isDirectory()) {
+    }
+    else if (stat.isDirectory() && ! skipFolder(filePath)) {
       walk(filePath, callback);
     }
   });
