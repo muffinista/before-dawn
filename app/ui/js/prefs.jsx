@@ -190,6 +190,10 @@ const {BrowserWindow} = window.require('electron').remote;
       for ( var i = 0; i < links.length; i++ ) {
         links[i].addEventListener('click', openSaverInWatcher, false);
       }
+      links = document.querySelectorAll('a.delete');
+      for ( var i = 0; i < links.length; i++ ) {
+        links[i].addEventListener('click', deleteSaver, false);
+      }
 
       links = document.querySelectorAll('a[href^="http"]');
       for ( var i = 0; i < links.length; i++ ) {
@@ -254,6 +258,32 @@ const {BrowserWindow} = window.require('electron').remote;
 
   };
 
+  var deleteSaver = function(e) {
+    var key = e.target.dataset.key;
+    var s = savers.getByKey(key);
+    
+    dialog.showMessageBox(
+      {
+        type: "info",
+        title: "Are you sure?",
+        message: "Are you sure you want to delete this screensaver?",
+        detail: "Deleting screensaver " + s.name,
+        buttons: ["No", "Yes"],
+        defaultId: 0
+      },
+      function(result) {
+        console.log(result);
+        if ( result === 1 ) {
+          savers.delete(key, function() {
+            ipcRenderer.send('savers-updated', key);
+          });
+        }
+      }
+    );
+
+    e.preventDefault();
+  };
+  
   var updatePrefs = function() {
     var delay = document.querySelector("select[name=delay]").value;
     var sleep = document.querySelector("select[name=sleep]").value;    

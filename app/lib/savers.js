@@ -84,6 +84,44 @@ var reload = function(cb) {
   });
 };
 
+/**
+ * delete a screensaver -- this removes the directory that contains all files
+ * for the screensaver.
+ */
+var deleteSaver = function(k, cb) {
+  var p = path.dirname(k);
+  console.log("DELETE " + p);
+  var s = getByKey(k);
+
+  // make sure we're deleting a screensaver that exists and is
+  // actually editable
+  if ( typeof(s) !== "undefined" && s.editable === true ) {
+    deleteFolderRecursive(p);
+  }
+  reload(cb);
+};
+
+
+/**
+ * recursively delete a directory
+ * cribbed from http://stackoverflow.com/questions/18052762/remove-directory-which-is-not-empty
+ */
+var deleteFolderRecursive = function(path) {
+  var files = [];
+  if( fs.existsSync(path) ) {
+    files = fs.readdirSync(path);
+    files.forEach(function(file,index){
+      var curPath = path + "/" + file;
+      if(fs.lstatSync(curPath).isDirectory()) { // recurse
+        deleteFolderRecursive(curPath);
+      } else { // delete file
+        fs.unlinkSync(curPath);
+      }
+    });
+    fs.rmdirSync(path);
+  }
+};
+
 var defaultSaversDir = function() {
   return baseDir + "/savers";
 };
@@ -432,6 +470,8 @@ var generateScreensaver = function(opts) {
 
 exports.init = init;
 exports.reload = reload;
+exports.delete = deleteSaver;
+
 exports.getByKey = getByKey;
 exports.getCurrent = getCurrent;
 exports.getSource = getSource;
