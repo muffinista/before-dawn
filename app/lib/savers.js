@@ -302,7 +302,10 @@ var listAll = function(cb) {
     
     walk(src, function(f, stat) {
       // exclude matches from directories that start with __
-      if ( f.match(/saver.json$/) && ! path.dirname(f).split(path.sep).reverse()[0].match(/^__/) ) {
+      if (
+        f.match(/saver.json$/) &&
+        ! path.dirname(f).split(path.sep).reverse()[0].match(/^__/)
+      ) {
         try {
           var content = fs.readFileSync( f );
           var contents = JSON.parse(content);
@@ -333,6 +336,8 @@ var listAll = function(cb) {
     });
   });
 
+
+  loadedData = _.sortBy(loadedData, function(s) { return s.name; });
   
   if ( typeof(cb) !== "undefined" ) {
     cb(loadedData);

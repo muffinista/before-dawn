@@ -85,8 +85,7 @@ const {BrowserWindow} = window.require('electron').remote;
 
   document.querySelector("[name=localSource]").value = savers.getLocalSource();
   document.querySelector("select[name='delay'] option[value='" + savers.getDelay() + "']").setAttribute("selected", "selected");
-console.log("SLEEEEP", savers.getSleep());
-  document.querySelector("select[name='sleep'] option[value='" + savers.getSleep() + "']").setAttribute("selected", "selected");  
+  document.querySelector("select[name='sleep'] option[value='" + savers.getSleep() + "']").setAttribute("selected", "selected");
   
   if ( savers.getLock() === true ) {
     document.querySelector("input[name=lock_screen][type=checkbox]").setAttribute("checked", "checked");
@@ -244,6 +243,8 @@ console.log("SLEEEEP", savers.getSleep());
     var key = e.target.dataset.key;
     var w = new BrowserWindow();
 
+    e.preventDefault();
+
     // pass the key of the screensaver we want to load
     // as well as the URL to our screenshot image
     var target = 'file://' + __dirname + "/watcher.html?" +
@@ -251,10 +252,6 @@ console.log("SLEEEEP", savers.getSleep());
                  "&screenshot=" + encodeURIComponent(screenshot);
     w.loadURL(target);
 
-    // @todo -- make this a configurable option?
-    //w.webContents.openDevTools();    
-
-    e.preventDefault();
   };
 
   var updatePrefs = function() {
@@ -325,8 +322,6 @@ console.log("SLEEEEP", savers.getSleep());
       message: "There's a new update available! Would you like to download it?",
       buttons: ["No", "Yes"],
       defaultId: 0
-      //,
-      //icon: path.join(__dirname, '..', 'assets', 'Icon1024.png')
     },
                           function(result) {
                             console.log(result);
