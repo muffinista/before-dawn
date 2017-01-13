@@ -1,148 +1,36 @@
 #!/bin/bash
 
-die () {
-    echo >&2 "$@"
-    exit 1
-}
-
-[ "$#" -eq 1 ] || die "Please pick a target platform: osx or win"
-
-
-ELECTRON_VERSION="1.3.9" #`npm view electron-prebuilt version`
 DEST="/tmp/before-dawn-packages"
 TARGET="$1"
+WORKING_DIR="/tmp/before-dawn-build"
+
+rm -rf $WORKING_DIR
+mkdir -p $WORKING_DIR
 
 if [ "$LOCAL_BUILD" == "1" ]; then
     echo "== Building from local copy =="
+    cp -r . $WORKING_DIR/
 else
-    WORKING_DIR="/tmp/before-dawn-build"
-
     echo "== Checking Out Code =="
-    rm -rf $WORKING_DIR
-    mkdir -p $WORKING_DIR
     git clone https://github.com/muffinista/before-dawn.git $WORKING_DIR
-    cd $WORKING_DIR   
 fi
 
-echo "== Building Packages with Electron v ${ELECTRON_VERSION}"
-npm i
+cd $WORKING_DIR   
 
-echo "== Run Grunt =="
+echo "== Building assets =="
+cd app
+npm install --save-dev
 grunt
 
-echo "== clean =="
-rm -rf "${DEST}/osx"
-mkdir -p "${DEST}/osx"
+rm -rf node_modules
 
-rm -rf "${DEST}/win"
-mkdir -p "${DEST}/win"
+cd ..
 
-rm -rf "${DEST}/linux"
-mkdir -p "${DEST}/linux"
+echo "== Cleaning out node packages =="
+npm prune
 
-echo "== Update build.json =="
-node tools/update-build-version.js
+echo "== Installing node packages =="
+npm install
 
-
-#
-# sudo npm install electron-packager -g
-#
-
-if [ "$TARGET" == "osx" ]; then
-    echo "== install electron-packager (might need password) =="
-    sudo npm install electron-packager@7.3.0 -g
-
-    echo "== REBUILD MODULES =="
-    ./node_modules/.bin/electron-rebuild -w node-system-idle-time
-
-    echo "== Build OSX App =="
-    electron-packager . 'Before Dawn' \
-                      --prune \
-                      --out=${DEST}/osx \
-                      --platform=darwin \
-                      --arch=x64 \
-                      --version=${ELECTRON_VERSION} \
-                      --icon='./assets/icon.icns'  \
-                      --overwrite
-    
-    echo "electron-packager . 'Before Dawn' \
-                      --prune \
-                      --out=${DEST}/osx \
-                      --platform=darwin \
-                      --arch=x64 \
-                      --version=${ELECTRON_VERSION} \
-                      --icon='./assets/icon.icns'  \
-                      --overwrite"
-    
-    echo "== Build OSX Installer =="
-    
-    #
-    # npm install -g electron-builder
-    #
-    node_modules/.bin/build "${DEST}/osx/Before Dawn-darwin-x64/Before Dawn.app" \
-                     --platform=osx \
-                     --out="/${DEST}/osx" \
-                     --config=build.json
-fi
-
-if [ "$TARGET" == "win" ]; then
-
-    echo "== install electron-packager  =="
-    npm install electron-packager@7.3.0 -g
-
-    echo "== REBUILD MODULES =="
-
-    # force 32-bit because that's what we're building, but it might make sense to force 64 instead
-    ./node_modules/.bin/electron-rebuild --arch="ia32" -w node-system-idle-time
-
-    export PATH="$PATH:C:\Program Files (x86)\NSIS"
-
-    echo "== Build Windows App =="
-
-    electron-packager . 'Before Dawn' \
-                      --prune \
-                      --out=${DEST}/win \
-                      --platform=win32 \
-                      --arch=ia32 \
-                      --version=${ELECTRON_VERSION} \
-                      --icon=./assets/icon.ico
-
-    echo "== Build Windows Installer =="
-    electron-builder "${DEST}/win/Before Dawn-win32-ia32" \
-                     --platform=win \
-                     --out="${DEST}/win" \
-                     --config=build.json
-    
-
-    echo "== Cleaning Up =="
-    rm -rf "${DEST}/osx/Before Dawn-darwin-x64"
-    rm -rf "${DEST}/win/Before Dawn-win32-ia32"
-fi
-
-
-
-
-if [ "$TARGET" == "linux" ]; then
-  echo "== REBUILD MODULES =="
-  ./node_modules/.bin/electron-rebuild -w node-system-idle-time
-
-    echo "== Build Linux App =="
-    electron-packager . 'before-dawn' \
-                      --prune \
-                      --out=${DEST}/linux \
-                      --platform=linux \
-                      --arch=x64 \
-                      --version=${ELECTRON_VERSION} \
-                      --icon='./assets/icon.ico'  \
-                      --overwrite
-    
-    echo "== Build linux deb package =="
-    
-    #
-    # npm install -g electron-builder
-    #
-    electron-builder "${DEST}/linux/before-dawn-linux-x64/" \
-                     --platform=linux \
-                     --out="/${DEST}/linux" \
-                     --config=build.json
-fi
+echo "== BUILDING APP =="
+npm run dist

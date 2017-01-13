@@ -8,7 +8,6 @@
     "pack": "build --dir",
     "dist": "build --x64"
   },
-  "nodeGypRebuild": true,
   "devDependencies": {
     "electron-builder": "5.12.1",
     "electron-prebuilt": "1.4.13"
