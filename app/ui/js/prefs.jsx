@@ -59,7 +59,7 @@ const {BrowserWindow} = window.require('electron').remote;
 	  if (enabled) {
       document.querySelector("input[name=auto_start]").setAttribute("checked", "checked");
     }
-  }).then(function(err) {
+  }).catch(function(err) {
     console.log("appLauncher error", err);
   });
   
