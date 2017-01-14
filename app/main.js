@@ -224,15 +224,17 @@ var runScreenSaverOnDisplay = function(saver, s) {
     
     // windows is having some issues with putting the window behind existing
     // stuff -- @see https://github.com/atom/electron/issues/2867
-    if ( process.platform == "win32" ) {
+    //if ( process.platform == "win32" ) {
       w.minimize();
-    }
+    //}
     w.focus();
     
     // inject our custom JS and CSS into the screensaver window
     w.webContents.on('did-finish-load', function() {
       w.webContents.insertCSS(globalCSSCode);      
-      w.webContents.executeJavaScript(globalJSCode);
+      w.webContents.executeJavaScript(globalJSCode, false, function(result) {
+        console.log("Global JS executed", result);
+      });
     });
 
     // reload the screengrabber window to keep it from churning

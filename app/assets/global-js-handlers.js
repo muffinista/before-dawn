@@ -1,5 +1,9 @@
 var firstMouseMove = false;
 
+/**
+ * send a message that the user has done something and we should close
+   the screensaver
+ */
 var exitScreenSaver = function(e) {
   var ipcRenderer;
 
@@ -12,6 +16,7 @@ var exitScreenSaver = function(e) {
   ipcRenderer = require('electron').ipcRenderer;
   ipcRenderer.send('stopScreenSaver');
 };
+
 
 var body = document.getElementsByTagName("body")[0];
 var listenEvents = ["mousedown", "mousemove", "mousewheel", "keydown", "keyup", "keypress"];
@@ -30,4 +35,4 @@ window.hideCursor = function() {
   document.getElementsByTagName('html')[0].style.cursor = cursorUrl + ", none !important";
 };
 
-setTimeout(window.hideCursor, 500);
+setTimeout(window.hideCursor, 2500);
