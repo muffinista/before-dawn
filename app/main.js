@@ -116,7 +116,7 @@ var openAboutWindow = function() {
   var prefsUrl = 'file://' + __dirname + '/ui/about.html';
   var w = new BrowserWindow({
     width:450,
-    height:300,
+    height:350,
     resizable:false,
     icon: path.join(__dirname, 'assets', 'icon.png')
   });
