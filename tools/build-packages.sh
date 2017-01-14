@@ -4,6 +4,9 @@ DEST="/tmp/before-dawn-packages"
 TARGET="$1"
 WORKING_DIR="/tmp/before-dawn-build"
 
+START_DIR=`pwd`
+
+
 rm -rf $WORKING_DIR
 mkdir -p $WORKING_DIR
 
@@ -34,3 +37,8 @@ npm install
 
 echo "== BUILDING APP =="
 npm run dist
+
+echo "== Copying to $START_DIR/dist"
+
+mkdir -p "$START_DIR/dist"
+cp -r "$WORKING_DIR/dist/*" "$START_DIR/dist"
