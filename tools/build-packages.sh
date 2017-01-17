@@ -6,6 +6,7 @@ WORKING_DIR="/tmp/before-dawn-build"
 
 START_DIR=`pwd`
 
+echo "== Cleaning up $WORKING_DIR"
 
 rm -rf $WORKING_DIR
 mkdir -p $WORKING_DIR
