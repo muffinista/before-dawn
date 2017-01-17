@@ -10,6 +10,7 @@ exports.checkLatestRelease = function(repo, version, yes_cb, no_cb) {
     request({
       url: url,
       json: true,
+      timeout: 1000,
       headers: {
         'User-Agent': "Before Dawn"
       }
@@ -18,6 +19,7 @@ exports.checkLatestRelease = function(repo, version, yes_cb, no_cb) {
 
       if ( typeof(body) === "undefined" ) {
         no_cb();
+        return;
       }
       
       tag = body.tag_name;
@@ -38,7 +40,7 @@ exports.checkLatestRelease = function(repo, version, yes_cb, no_cb) {
     });
   }
   catch(ex) {
-    console.log("hey!!!!");
+    console.log("error in checkLatestRelease");
     console.log(ex);
     no_cb();
   }
