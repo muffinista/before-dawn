@@ -41,7 +41,7 @@ var setup = function(opts) {
     _onBlankTime = opts.onBlankTime;
   }
 
-  _wakeupTime = 30000;
+  _wakeupTime = 5000;
 
   if ( opts.state ) {
     switchState(opts.state);
@@ -190,8 +190,6 @@ var setBlankTimer = function() {
 var setWakeupTimer = function() {
   var idle = idler.getIdleTime();
   lastIdle = idle;
-
-  console.log("setWakeupTimer");
   
   _timer = setTimeout(checkForWakeup, _wakeupTime);
 };
@@ -238,7 +236,7 @@ var checkBlank = function() {
 var checkForWakeup = function() {
   var idle = idler.getIdleTime();
   console.log("checkForWakeup " + String(currentState) + " " + idle + " " + lastIdle);
-  if ( currentState === STATES.STATE_BLANKED && idle < lastIdle ) {
+  if ( idle < lastIdle ) {
     console.log("Woke up, reset!");
     reset();
   }
