@@ -110,7 +110,7 @@ var switchState = function(s, force) {
   var idle = idler.getIdleTime();
   console.log("switchState " + String(currentState) + " -> " + String(s) + " IDLE: " + idle);  
 
-  if ( currentState !== s || force === true ) {
+  if ( currentState !== s || s === STATES.STATE_IDLE || force === true ) {
     onEnterState(s);
   }
   currentState = s;

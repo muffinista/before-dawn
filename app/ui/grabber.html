@@ -118,19 +118,17 @@
 
    
    ipcRenderer.on('screengrab-request', function(event, displays) {
+     var desktopCapturer = require('electron').desktopCapturer;
      console.log("got screengrab request", event);
-     for ( var i = 0; i < displays.length; i++ ) {
-       captureScreen(displays[i], displays.length > 1);
-     }
+
+     desktopCapturer.getSources({types: ['screen']}, function(error, sources) {
+       //console.log("SOURCES", sources);
+       for ( var i = 0; i < displays.length; i++ ) {
+         captureScreen(displays[i], displays.length > 1);
+       }
+     });
    });
-
-
-   var desktopCapturer = require('electron').desktopCapturer;
-   desktopCapturer.getSources({types: ['screen']}, function(error, sources) {
-     console.log("SOURCES", sources);
-
-   });
-   
+  
    
    function getUserMediaError(e) {
      console.log('getUserMediaError');
