@@ -110,6 +110,10 @@ var switchState = function(s, force) {
   var idle = idler.getIdleTime();
   console.log("switchState " + String(currentState) + " -> " + String(s) + " IDLE: " + idle);  
 
+  // we run onEnterState if the state has changed or if we need to
+  // force a reload. we also run it if the new state is idle, this
+  // should help with some weird issues where timers aren't being
+  // reset properly
   if ( currentState !== s || s === STATES.STATE_IDLE || force === true ) {
     onEnterState(s);
   }
