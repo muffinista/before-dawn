@@ -42,4 +42,4 @@ npm run dist
 echo "== Copying to $START_DIR/dist"
 
 mkdir -p "$START_DIR/dist"
-cp -r "$WORKING_DIR/dist/*" "$START_DIR/dist"
+cp -r $WORKING_DIR/dist/* "$START_DIR/dist"
