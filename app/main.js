@@ -380,6 +380,9 @@ var bootApp = function(_basePath) {
     configLoaded = true;
     updateStateManager();
     openPrefsOnFirstLoad();
+
+    // check for a new release every 12 hours
+    setInterval(checkForNewRelease, 1000 * 60 * 60 * 12);
   });
 };
 
@@ -429,6 +432,22 @@ var updateStateManager = function() {
     onBlankTime: blankScreenIfNeeded
   });
 };
+
+
+var checkForNewRelease = function() {
+  console.log("checkForNewRelease");
+  releaseChecker.checkLatestRelease(
+    global.APP_REPO, global.APP_VERSION, 
+    function() {
+      global.NEW_RELEASE_AVAILABLE = true;
+      trayMenu.items[3].visible = global.NEW_RELEASE_AVAILABLE;
+    }, 
+    function() {
+      global.NEW_RELEASE_AVAILABLE = false;
+      trayMenu.items[3].visible = global.NEW_RELEASE_AVAILABLE;
+    });
+};
+
 
 
 // load a few global variables
