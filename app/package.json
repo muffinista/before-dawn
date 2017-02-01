@@ -28,6 +28,7 @@
     "mkdirp": "^0.5.1",
     "nconf": "^0.8.4",
     "node-system-idle-time": "muffinista/node-system-idle-time.git#master",
+    "nodobjc": "^2.1.0",
     "osx-battery": "^4.0.0",
     "react": "^15.3.2",
     "react-dom": "^15.3.2",

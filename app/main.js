@@ -386,6 +386,70 @@ var bootApp = function(_basePath) {
   });
 };
 
+
+var inFullscreen = function() {
+
+  var result = false;
+
+  // this is a super-hacky check to see if OSX is in fullscreen mode
+  // or not -- basically if the number of menubars matches the number
+  // of displays, we're probably not in fullscreen mode. probably
+  switch(process.platform) {
+      case 'darwin':
+  
+      var displays = getDisplays();
+
+      var _ = require('lodash');
+      var $ = require('NodObjC');
+      $.framework('Foundation');
+      $.framework('Cocoa');
+
+      var pool = $.NSAutoreleasePool('alloc')('init');
+      var windowList = $.CFBridgingRelease(
+        $.CGWindowListCopyWindowInfo(
+          $.kCGWindowListOptionOnScreenOnly, $.kCGNullWindowID
+        )
+      );
+      var error = $.alloc($.NSError).ref();
+      var jsonData = $.NSJSONSerialization(
+        "dataWithJSONObject", windowList,
+        "options", $.NSJSONWritingPrettyPrinted,
+        "error", error);
+
+      var jsonString = $.NSString("alloc")("initWithData", jsonData, "encoding", $.NSUTF8StringEncoding);
+      console.log(jsonString);
+  
+      var visibleMenubars = _.filter(JSON.parse(jsonString), function(x) {
+        return x["kCGWindowName"] == "Menubar"; // || x["kCGWindowName"] == "Backstop Menubar";
+      });
+
+      console.log("There are " + displays.length + " displays");
+      console.log("There are " + visibleMenubars.length + " menus");
+
+      result = (visibleMenubars.length < displays.length);
+
+      pool('drain');
+
+      break;
+  }
+
+  return result;
+      
+};
+
+var runScreenSaverIfNotFullscreen = function() {
+  console.log("runScreenSaverIfNotFullscreen");
+
+  if ( ! inFullscreen() ) {
+    console.log("I don't think we're in fullscreen mode");
+    runScreenSaver();
+  }
+  else {
+    console.log("Seems like we might be in fullscreen mode");
+    stateManager.resetAt(savers.getDelay() * 60000);
+  }
+};
+
 /**
  * activate the screensaver, but only if we're plugged in, or if the user
  * is fine with running on battery
@@ -396,7 +460,7 @@ var runScreenSaverIfPowered = function() {
   if ( global.savers.getDisableOnBattery() ) {
     power.charging().then((is_powered) => {
       if ( is_powered ) {
-        runScreenSaver();
+        runScreenSaverIfNotFullscreen();
       }
       else {
         console.log("I would run, but we're on battery :(");
@@ -406,7 +470,7 @@ var runScreenSaverIfPowered = function() {
     });
   }
   else {
-    runScreenSaver();
+    runScreenSaverIfNotFullscreen();
   }
 };
 
@@ -583,8 +647,6 @@ ipcMain.on('savers-updated', (event, arg) => {
     prefsWindowHandle.send('savers-updated', arg);
   }
 });
-
-
 
 /**
  * check for a release and then boot!
