@@ -330,13 +330,19 @@ var skipFolder = function(p) {
 var walk = function(currentDirPath, callback) {
   fs.readdirSync(currentDirPath).forEach(function(name) {
     var filePath = path.join(currentDirPath, name);
-    var stat = fs.statSync(filePath);
-    if (stat.isFile()) {
-      callback(filePath, stat);
+    try {
+      var stat = fs.statSync(filePath);
+      if (stat.isFile()) {
+        callback(filePath, stat);
+      }
+      else if (stat.isDirectory() && ! skipFolder(filePath)) {
+        walk(filePath, callback);
+      }
     }
-    else if (stat.isDirectory() && ! skipFolder(filePath)) {
-      walk(filePath, callback);
+    catch(e) {
+      console.log(e);
     }
+
   });
 };
 
@@ -395,7 +401,6 @@ var listAll = function(cb) {
           }
         }
         catch(e) {
-          console.log(f);
           console.log(e);
         }
       }
@@ -403,7 +408,7 @@ var listAll = function(cb) {
   });
 
 
-  loadedData = _.sortBy(loadedData, function(s) { return s.name; });
+  loadedData = _.sortBy(loadedData, function(s) { return s.name.toLowerCase(); });
   
   if ( typeof(cb) !== "undefined" ) {
     cb(loadedData);
