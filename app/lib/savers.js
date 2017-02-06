@@ -75,11 +75,10 @@ var reload = function(cb) {
       ) {
         console.log("setting default saver to first in list " + data[0].key);
         setConfig('saver', data[0].key);
-        write(cb);
       }
-      else {
-        cb(data);
-      }
+
+      writeSync();
+      cb();
     });
   });
 };
@@ -131,10 +130,21 @@ var updatePackage = function(cb) {
   var Package = require("./package.js");
 
   var source = getSource();
-  if ( typeof(source.repo) == "undefined" || source.repo === "" ) {
+  console.log("source repo: " + source);
+
+  var lastCheckAt = getUpdateCheckTimestamp();
+  var now = new Date().getTime();
+
+  var diff = now - lastCheckAt;
+
+  // don't bother checking if there's no source repo specified,
+  // or if we've pinged it in the last 15 minutes
+  if ( typeof(source.repo) == "undefined" || source.repo === "" || diff < 15 * 60 * 1000 ) {
     cb({downloaded: false});
   }
   else {
+    setUpdateCheckTimestamp(now);
+    
     var p = new Package({repo:source.repo, updated_at:source.updated_at, dest:defaultSaversDir()});
     p.checkLatestRelease(cb);
   }
@@ -192,6 +202,7 @@ var getCurrentData = function() {
 var getSource = function() {
   return nconf.get('source');
 };
+
 var setSource = function(x) {
   if ( x !== getSource()["repo"] ) {
     return nconf.set('source', {
@@ -202,6 +213,13 @@ var setSource = function(x) {
     return nconf.get('source');
   }
 };
+
+var setUpdateCheckTimestamp = function(x) {
+  return nconf.set('sourceCheckTimestamp', x);
+}
+var getUpdateCheckTimestamp = function(x) {
+  return nconf.get('sourceCheckTimestamp') || 0;
+}
 
 var getLocalSource = function() {
   return nconf.get('localSource') || "";
@@ -354,7 +372,7 @@ var listAll = function(cb) {
         ! path.dirname(f).split(path.sep).reverse()[0].match(/^__/)
       ) {
         try {
-          var content = fs.readFileSync( f );
+          var content = fs.readFileSync( f, "utf8" );
           var contents = JSON.parse(content);
           
           var stub = path.dirname(f);
@@ -377,6 +395,7 @@ var listAll = function(cb) {
           }
         }
         catch(e) {
+          console.log(f);
           console.log(e);
         }
       }
@@ -423,6 +442,12 @@ var write = function(cb) {
   nconf.save(cb);
 };
 
+var writeSync = function() {
+  var configPath = baseDir + "/" + config_file;
+  console.log("sync write config to " + configPath);
+  nconf.save();
+}
+
 
 var getTemplatePath = function() {
   return path.join(defaultSaversDir(), "__template");
@@ -465,7 +490,11 @@ var generateScreensaver = function(opts) {
 
   fs.writeFileSync(configDest, JSON.stringify(contents, null, 2));
 
-  return dest;
+  // add dest in case someone needs it
+  // but don't persist that data because that would be icky
+  opts.dest = path.join(dest, "index.html");
+  
+  return opts;
 };
 
 exports.init = init;

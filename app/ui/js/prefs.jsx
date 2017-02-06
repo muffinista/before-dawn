@@ -112,7 +112,6 @@ const {BrowserWindow} = window.require('electron').remote;
       //console.log("setting preview opts to", url_opts);
     }
 
-
     return tmp;
   };
 
@@ -219,6 +218,8 @@ const {BrowserWindow} = window.require('electron').remote;
 
   var addNewSaver = function(e) {
     var prefsUrl = 'file://' + __dirname + '/new.html';
+    prefsUrl = prefsUrl + "?screenshot=" + encodeURIComponent(screenshot);
+
     var w = new BrowserWindow({
       width:450,
       height:500,
