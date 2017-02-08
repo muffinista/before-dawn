@@ -148,6 +148,10 @@ import AttributesForm from './attributes-form';
     console.log("SAVE", saverAttrs);
     s.write(saverAttrs);
     ipcRenderer.send('savers-updated', s.key);
+
+    if ( this.classList.contains("and-close") ) {
+      closeWindow(ev);
+    }
   };
   var openConsole = function(ev) {
     ev.preventDefault();
