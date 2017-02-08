@@ -377,8 +377,11 @@ var listAll = function(cb) {
         f.match(/saver.json$/) &&
         ! path.dirname(f).split(path.sep).reverse()[0].match(/^__/)
       ) {
+
+        var content;
+
         try {
-          var content = fs.readFileSync( f, "utf8" );
+          content = fs.readFileSync( f, "utf8" );
           var contents = JSON.parse(content);
           
           var stub = path.dirname(f);
@@ -402,6 +405,9 @@ var listAll = function(cb) {
         }
         catch(e) {
           console.log(e);
+
+          console.log("file " + f);
+          console.log(content);
         }
       }
     });
