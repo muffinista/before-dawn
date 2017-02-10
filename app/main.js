@@ -417,14 +417,14 @@ var inFullscreen = function() {
         "error", error);
 
       var jsonString = $.NSString("alloc")("initWithData", jsonData, "encoding", $.NSUTF8StringEncoding);
-      console.log(jsonString);
+      //  console.log(jsonString);
   
       var visibleMenubars = _.filter(JSON.parse(jsonString), function(x) {
         return x["kCGWindowName"] == "Menubar"; // || x["kCGWindowName"] == "Backstop Menubar";
       });
 
-      console.log("There are " + displays.length + " displays");
-      console.log("There are " + visibleMenubars.length + " menus");
+      //      console.log("There are " + displays.length + " displays");
+      //console.log("There are " + visibleMenubars.length + " menus");
 
       result = (visibleMenubars.length < displays.length);
 
