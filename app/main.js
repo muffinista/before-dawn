@@ -394,12 +394,13 @@ var inFullscreen = function() {
 
   var result = false;
 
+  console.log("inFullscreen");
+  
   // this is a super-hacky check to see if OSX is in fullscreen mode
   // or not -- basically if the number of menubars matches the number
   // of displays, we're probably not in fullscreen mode. probably
   switch(process.platform) {
       case 'darwin':
-  
       var displays = getDisplays();
 
       var _ = require('lodash');
@@ -420,21 +421,22 @@ var inFullscreen = function() {
         "error", error);
 
       var jsonString = $.NSString("alloc")("initWithData", jsonData, "encoding", $.NSUTF8StringEncoding);
-      //  console.log(jsonString);
+      //console.log(jsonString);
   
       var visibleMenubars = _.filter(JSON.parse(jsonString), function(x) {
         return x["kCGWindowName"] == "Menubar"; // || x["kCGWindowName"] == "Backstop Menubar";
       });
 
-      // console.log("There are " + displays.length + " displays");
-      // console.log("There are " + visibleMenubars.length + " menus");
+      //console.log("There are " + displays.length + " displays");
+      //console.log("There are " + visibleMenubars.length + " menus");
       result = (visibleMenubars.length < displays.length);
 
       pool('drain');
 
       break;
 
-      case 'win32':
+    case 'win32':
+      console.log("windows check");
       var winctl = require('winctl');
       var fullscreenWindow = winctl.GetFullscreenWindow();
       console.log("fullscreen window " + fullscreenWindow);

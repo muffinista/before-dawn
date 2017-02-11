@@ -7,9 +7,12 @@
   "license": "MIT",
   "homepage": "https://github.com/muffinista/before-dawn/",
   "main": "main.js",
+  "#notes": [
+    "the rebuild script here is requiring these two particular modules because otherwise stuff breaks"
+  ],
   "scripts": {
     "start": "electron main.js",
-    "rebuild": "./node_modules/.bin/electron-rebuild",
+    "rebuild": "./node_modules/.bin/electron-rebuild -w nodobjc,node-system-idle-time",
     "test": "electron-mocha tests/",
     "postinstall": "npmpd"
   },
