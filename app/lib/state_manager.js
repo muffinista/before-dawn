@@ -115,7 +115,7 @@ var switchState = function(s, force) {
   // reset properly
   var callEnterState = ( currentState !== s || s === STATES.STATE_IDLE || force === true);
 
-  console.log("switchState " + String(currentState) + " -> " + String(s) + " IDLE: " + idle + "callEnterState: " + callEnterState);  
+  console.log("switchState " + String(currentState) + " -> " + String(s) + " IDLE: " + idle + " callEnterState: " + callEnterState);  
 
   currentState = s;
   
