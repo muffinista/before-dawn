@@ -431,6 +431,15 @@ var inFullscreen = function() {
       pool('drain');
 
       break;
+
+      case 'win32':
+      var winctl = require('winctl');
+      var fullscreenWindow = winctl.GetFullscreenWindow();
+      console.log("fullscreen window " + fullscreenWindow);
+
+      result = ( typeof(fullscreenWindow) !== "undefined" && fullscreenWindow !== null && fullscreenWindow.getHwnd() > 0);
+
+      break;
   }
 
   return result;
