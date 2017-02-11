@@ -387,6 +387,9 @@ var bootApp = function(_basePath) {
 };
 
 
+/**
+ * try and guess if we are in fullscreen mode or not
+ */
 var inFullscreen = function() {
 
   var result = false;
@@ -423,9 +426,8 @@ var inFullscreen = function() {
         return x["kCGWindowName"] == "Menubar"; // || x["kCGWindowName"] == "Backstop Menubar";
       });
 
-      //      console.log("There are " + displays.length + " displays");
-      //console.log("There are " + visibleMenubars.length + " menus");
-
+      // console.log("There are " + displays.length + " displays");
+      // console.log("There are " + visibleMenubars.length + " menus");
       result = (visibleMenubars.length < displays.length);
 
       pool('drain');
@@ -437,7 +439,13 @@ var inFullscreen = function() {
       var fullscreenWindow = winctl.GetFullscreenWindow();
       console.log("fullscreen window " + fullscreenWindow);
 
-      result = ( typeof(fullscreenWindow) !== "undefined" && fullscreenWindow !== null && fullscreenWindow.getHwnd() > 0);
+      // we think we're in fullscreen mode if we have a fullscreen
+      // window handle and the HWND id is > 0
+      result = (
+        typeof(fullscreenWindow) !== "undefined" &&
+        fullscreenWindow !== null &&
+        fullscreenWindow.getHwnd() > 0
+      );
 
       break;
   }
@@ -446,6 +454,9 @@ var inFullscreen = function() {
       
 };
 
+/**
+ * run the screensaver, but only if there isn't an app in fullscreen mode right now
+ */
 var runScreenSaverIfNotFullscreen = function() {
   console.log("runScreenSaverIfNotFullscreen");
 
