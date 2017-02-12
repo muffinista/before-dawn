@@ -400,11 +400,14 @@ var inFullscreen = function() {
   // or not -- basically if the number of menubars matches the number
   // of displays, we're probably not in fullscreen mode. probably
   switch(process.platform) {
-      case 'darwin':
+    case 'darwin':     
       var displays = getDisplays();
 
       var _ = require('lodash');
       var $ = require('NodObjC');
+
+      console.log("osx check");
+      
       $.framework('Foundation');
       $.framework('Cocoa');
 
@@ -421,14 +424,14 @@ var inFullscreen = function() {
         "error", error);
 
       var jsonString = $.NSString("alloc")("initWithData", jsonData, "encoding", $.NSUTF8StringEncoding);
-      //console.log(jsonString);
+      console.log(jsonString);
   
       var visibleMenubars = _.filter(JSON.parse(jsonString), function(x) {
         return x["kCGWindowName"] == "Menubar"; // || x["kCGWindowName"] == "Backstop Menubar";
       });
 
-      //console.log("There are " + displays.length + " displays");
-      //console.log("There are " + visibleMenubars.length + " menus");
+      console.log("There are " + displays.length + " displays");
+      console.log("There are " + visibleMenubars.length + " menus");
       result = (visibleMenubars.length < displays.length);
 
       pool('drain');
