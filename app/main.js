@@ -632,6 +632,13 @@ app.once('ready', function() {
   appIcon.setToolTip(global.APP_NAME);
   appIcon.setContextMenu(trayMenu); 
 
+  // show tray menu on right click
+  // @todo should this be osx only?
+  appIcon.on('right-click', () => {
+    appIcon.popUpContextMenu();
+  });
+
+  
   var menuTemplate = require("./ui/menu_template.js").buildMenuTemplate(app);
   var menu = Menu.buildFromTemplate(menuTemplate);
 
