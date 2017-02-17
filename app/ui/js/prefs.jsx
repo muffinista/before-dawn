@@ -344,22 +344,22 @@ const {BrowserWindow} = window.require('electron').remote;
   };
 
   renderList();
-
   
   if ( updateAvailable === true ) {
-    dialog.showMessageBox({
-      type: "info",
-      title: "Update Available!",
-      message: "There's a new update available! Would you like to download it?",
-      buttons: ["No", "Yes"],
-      defaultId: 0
-    },
-                          function(result) {
-                            console.log(result);
-                            if ( result === 1 ) {
-                              shell.openExternal('https://github.com/' + appRepo + '/releases/latest');
-                            }
-                          }
+    dialog.showMessageBox(
+      {
+        type: "info",
+        title: "Update Available!",
+        message: "There's a new update available! Would you like to download it?",
+        buttons: ["No", "Yes"],
+        defaultId: 0
+      },
+      function(result) {
+        console.log(result);
+        if ( result === 1 ) {
+          shell.openExternal('https://github.com/' + appRepo + '/releases/latest');
+        }
+      }
     );
   }
 
