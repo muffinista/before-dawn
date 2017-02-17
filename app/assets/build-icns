@@ -1,10 +1,16 @@
 #!/bin/bash
 
+convert -size 1024x1024 icon.svg ./Icon1024.png
 convert ./Icon1024.png -resize 256x256 -define icon:auto-resize="256,128,96,64,48,32,16" icon.ico
 
-convert ./noun_172009_cc.svg -resize 20x20 icon.png
+#convert ./icon.svg -resize 22x22 icon.png
+#convert ./icon.svg -resize 44x44 icon@2x.png
+#convert ./icon.svg -resize 66x66 icon@3x.png
 
-convert -size 1024x1024 noun_172009_cc.svg ./Icon1024.png
+#convert ./icon-paused.svg -resize 22x22 icon-paused.png
+#convert ./icon-paused.svg -resize 44x44 icon-paused@2x.png
+#convert ./icon-paused.svg -resize 66x66 icon-paused@3x.png
+
 
 mkdir MyIcon.iconset
 sips -z 16 16     Icon1024.png --out MyIcon.iconset/icon_16x16.png

@@ -260,11 +260,15 @@ var checkForWakeup = function() {
   }
 };
 
+var getCurrentState = function() {
+  return currentState;
+};
 
 
+exports.states = STATES;
 exports.setup = setup;
 exports.reset = reset;
 exports.resetAt = resetAt;
 exports.pause = pause;
 exports.run = run;
-
+exports.currentState = getCurrentState;

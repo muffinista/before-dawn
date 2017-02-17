@@ -537,6 +537,14 @@ var checkForNewRelease = function() {
     });
 };
 
+var updateTrayIcon = function() {
+  if ( stateManager.currentState() === stateManager.states.STATE_PAUSED ) {
+    appIcon.setImage(__dirname + '/assets/icon-paused.png');
+  }
+  else {
+    appIcon.setImage(__dirname + '/assets/icon.png');
+  }
+};
 
 
 // load a few global variables
@@ -580,6 +588,7 @@ trayMenu = Menu.buildFromTemplate([
     label: 'Disable',
     click: function() {
       stateManager.pause();
+      updateTrayIcon();
       trayMenu.items[1].visible = false;
       trayMenu.items[2].visible = true;
     }
@@ -588,6 +597,7 @@ trayMenu = Menu.buildFromTemplate([
     label: 'Enable',
     click: function() { 
       stateManager.reset();
+      updateTrayIcon();
       trayMenu.items[1].visible = true;
       trayMenu.items[2].visible = false;
     },
