@@ -70,7 +70,8 @@ engage your screensaver. That's all there is to it!
 
 ## Building It
 
-Steps for generating your own build Before Dawn are listed in [the wiki](https://github.com/muffinista/before-dawn/wiki/Building-Before-Dawn)
+Steps for generating your own build Before Dawn are listed in
+[the wiki](https://github.com/muffinista/before-dawn/wiki/Building-Before-Dawn)
 
 ## Hacking It
 
@@ -121,11 +122,10 @@ help or have a suggestion, please feel free to open an issue here.
 ## TODO
 
 - Improve the documentation for writing screensaver code
-- Make it even easier to host a local screensaver -- maybe an option
-  to load a local file or even have an editing tool
 - Random screensaver picker
-- Auto-update tool
-- Embedded editor
+- Screensaver collections that the user can choose from
+- An option to only run on the primary display
+- Work on a better auto-update tool
 - Do a better job of hiding the mouse
 - Catch and report errors
 
