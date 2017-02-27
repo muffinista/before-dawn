@@ -34,7 +34,7 @@ having this setting might save your CPU from running when your
 computer is idle for a long time.
 - *Lock screen after running?* -- If you want your computer to lock
 once the screensaver starts running, you can use this option.
-- *Disable when on batter?* -- You can toggle this so that Before Dawn
+- *Disable when on battery?* -- You can toggle this so that Before Dawn
 won't run if your computer is running on battery power.
 - *Auto start on login?* -- should Before Dawn start automatically
   when your computer starts?
