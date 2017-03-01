@@ -3,6 +3,7 @@
 DEST="/tmp/before-dawn-packages"
 TARGET="$1"
 WORKING_DIR="/tmp/before-dawn-build"
+REPO="https://github.com/muffinista/before-dawn.git"
 
 START_DIR=`pwd`
 
@@ -16,7 +17,7 @@ if [ "$LOCAL_BUILD" == "1" ]; then
     cp -r . $WORKING_DIR/
 else
     echo "== Checking Out Code =="
-    git clone https://github.com/muffinista/before-dawn.git $WORKING_DIR
+    git clone $REPO $WORKING_DIR
 fi
 
 cd $WORKING_DIR   

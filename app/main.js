@@ -390,74 +390,7 @@ var bootApp = function(_basePath) {
 /**
  * try and guess if we are in fullscreen mode or not
  */
-var inFullscreen = function() {
-
-  var result = false;
-
-  console.log("inFullscreen");
-  
-  // this is a super-hacky check to see if OSX is in fullscreen mode
-  // or not -- basically if the number of menubars matches the number
-  // of displays, we're probably not in fullscreen mode. probably
-  switch(process.platform) {
-    case 'darwin':     
-      var displays = getDisplays();
-
-      var _ = require('lodash');
-      var $ = require('NodObjC');
-
-      console.log("osx check");
-      
-      $.framework('Foundation');
-      $.framework('Cocoa');
-
-      var pool = $.NSAutoreleasePool('alloc')('init');
-      var windowList = $.CFBridgingRelease(
-        $.CGWindowListCopyWindowInfo(
-          $.kCGWindowListOptionOnScreenOnly, $.kCGNullWindowID
-        )
-      );
-      var error = $.alloc($.NSError).ref();
-      var jsonData = $.NSJSONSerialization(
-        "dataWithJSONObject", windowList,
-        "options", $.NSJSONWritingPrettyPrinted,
-        "error", error);
-
-      var jsonString = $.NSString("alloc")("initWithData", jsonData, "encoding", $.NSUTF8StringEncoding);
-      console.log(jsonString);
-  
-      var visibleMenubars = _.filter(JSON.parse(jsonString), function(x) {
-        return x["kCGWindowName"] == "Menubar"; // || x["kCGWindowName"] == "Backstop Menubar";
-      });
-
-      console.log("There are " + displays.length + " displays");
-      console.log("There are " + visibleMenubars.length + " menus");
-      result = (visibleMenubars.length < displays.length);
-
-      pool('drain');
-
-      break;
-
-    case 'win32':
-      console.log("windows check");
-      var winctl = require('winctl');
-      var fullscreenWindow = winctl.GetFullscreenWindow();
-      console.log("fullscreen window " + fullscreenWindow);
-
-      // we think we're in fullscreen mode if we have a fullscreen
-      // window handle and the HWND id is > 0
-      result = (
-        typeof(fullscreenWindow) !== "undefined" &&
-        fullscreenWindow !== null &&
-        fullscreenWindow.getHwnd() > 0
-      );
-
-      break;
-  }
-
-  return result;
-      
-};
+var inFullscreen = require('./lib/fullscreen.js').inFullscreen;
 
 /**
  * run the screensaver, but only if there isn't an app in fullscreen mode right now
@@ -465,7 +398,7 @@ var inFullscreen = function() {
 var runScreenSaverIfNotFullscreen = function() {
   console.log("runScreenSaverIfNotFullscreen");
 
-  if ( ! inFullscreen() ) {
+  if ( ! inFullscreen(getDisplays()) ) {
     console.log("I don't think we're in fullscreen mode");
     runScreenSaver();
   }
