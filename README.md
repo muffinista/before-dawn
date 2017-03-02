@@ -33,6 +33,8 @@ And here's what the preferences window looks like:
 
 ![preferences window](assets/prefs.png "Preferences Window")
 
+![preferences window](assets/prefs2.png "Preferences Window Part Two")
+
 
 ## Downloads
 
@@ -56,8 +58,8 @@ PR!
 The easiest way to use the tool is to install it to your computer. You
 can grab an installer from the
 [releases](https://github.com/muffinista/before-dawn/releases) page.
-Binaries are available for OSX and Windows, and I'll put together a
-Linux installer soon.
+Binaries are available for OSX and Windows, and there's an experimental 
+release for Ubuntu/Debian.
 
 Once it's running, there will be a sunrise icon in your system tray,
 with a few different options. If you click 'Preferences,' you can
@@ -83,11 +85,11 @@ in place.
 
 ## Tools Used
 
-Before Dawn is built on:
+Some of the tools used include:
 
 - [Electron](http://electron.atom.io/)
 - [Node.js](https://nodejs.org/)
-- a little bit of [lodash](https://lodash.com/)
+- [lodash](https://lodash.com/)
 - [React](https://facebook.github.io/react/)
 
 
