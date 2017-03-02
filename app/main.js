@@ -591,7 +591,9 @@ app.on('window-all-closed', function() {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 app.once('ready', function() {  
-  appIcon = new Tray(__dirname + '/assets/icon.png');
+  var icons = getIcons();
+
+  appIcon = new Tray(icons.active);
   appIcon.setToolTip(global.APP_NAME);
   appIcon.setContextMenu(trayMenu); 
 
