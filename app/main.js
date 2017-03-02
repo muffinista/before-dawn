@@ -55,6 +55,17 @@ var globalJSCode, globalCSSCode;
 var prefsWindowHandle = null;
 var trayMenu;
 
+var icons = {
+  'win32' : {
+    active: __dirname + '/assets/icon.ico',
+    paused: __dirname + '/assets/icon-paused.ico'
+  },
+  'default': {
+    active: __dirname + '/assets/icon.png',
+    paused: __dirname + '/assets/icon-paused.png'
+  }
+};
+
 
 /**
  * Open the preferences window
@@ -470,12 +481,21 @@ var checkForNewRelease = function() {
     });
 };
 
+var getIcons = function() {
+  if ( icons[process.platform] ) {
+    return icons[process.platform];
+  }
+
+  return icons.default;
+};
+
 var updateTrayIcon = function() {
+  var icons = getIcons();
   if ( stateManager.currentState() === stateManager.states.STATE_PAUSED ) {
-    appIcon.setImage(__dirname + '/assets/icon-paused.png');
+    appIcon.setImage(icons.paused);
   }
   else {
-    appIcon.setImage(__dirname + '/assets/icon.png');
+    appIcon.setImage(icons.active);
   }
 };
 
