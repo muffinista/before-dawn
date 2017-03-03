@@ -286,7 +286,7 @@ var setDisableOnBattery = function(x) {
 };
 
 var getDisableOnBattery = function() {
-  return nconf.get('disable_on_battery') || true;
+  return nconf.get('disable_on_battery') || false;
 };
 
 
