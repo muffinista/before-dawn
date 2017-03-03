@@ -25,7 +25,7 @@ var methods = {
       "error", error);
     
     var jsonString = $.NSString("alloc")("initWithData", jsonData, "encoding", $.NSUTF8StringEncoding);
-    console.log(jsonString);
+    //console.log(jsonString);
     
     var visibleMenubars = _.filter(JSON.parse(jsonString), function(x) {
       return x["kCGWindowName"] == "Menubar"; // || x["kCGWindowName"] == "Backstop Menubar";

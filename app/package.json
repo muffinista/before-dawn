@@ -13,8 +13,7 @@
   "scripts": {
     "start": "electron main.js",
     "rebuild": "./node_modules/.bin/electron-rebuild -w nodobjc,node-system-idle-time",
-    "test": "electron-mocha tests/",
-    "postinstall": "npmpd"
+    "test": "electron-mocha tests/"
   },
   "repository": {
     "type": "git",
@@ -43,10 +42,8 @@
     "tether": "^1.4.0",
     "yauzl": "^2.7.0"
   },
-  "win32Dependencies": {
-    "winctl": "muffinista/winctl"
-  },
-  "darwinDependencies": {
+  "optionalDependencies": {
+    "winctl": "muffinista/winctl",
     "nodobjc": "^2.1.0"
   },
   "devDependencies": {
