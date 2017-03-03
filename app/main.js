@@ -225,7 +225,6 @@ var runScreenSaverOnDisplay = function(saver, s) {
       }
     });
     
-    
     url_opts.screenshot = encodeURIComponent("file://" + message.url);
 
     url = saver.getUrl(url_opts);
@@ -235,9 +234,7 @@ var runScreenSaverOnDisplay = function(saver, s) {
     
     // windows is having some issues with putting the window behind existing
     // stuff -- @see https://github.com/atom/electron/issues/2867
-    //if ( process.platform == "win32" ) {
-      w.minimize();
-    //}
+    w.minimize();
     w.focus();
     
     // inject our custom JS and CSS into the screensaver window

@@ -19,6 +19,7 @@ var exitScreenSaver = function(e) {
 
 
 var body = document.getElementsByTagName("body")[0];
+
 var listenEvents = ["mousedown", "mousemove", "mousewheel", "keydown", "keyup", "keypress"];
 
 for ( var i = 0; i < listenEvents.length; i++ ) {
