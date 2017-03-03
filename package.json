@@ -1,6 +1,6 @@
 {
   "name": "before-dawn",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "description": "A desktop screensaver app using web technologies",
   "author": "Colin Mitchell",
   "scripts": {
