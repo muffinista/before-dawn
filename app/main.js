@@ -437,12 +437,12 @@ var inFullscreen = require('./lib/fullscreen.js').inFullscreen;
 var runScreenSaverIfNotFullscreen = function() {
   console.log("runScreenSaverIfNotFullscreen");
 
-  if ( ! inFullscreen(getDisplays()) ) {
-    console.log("I don't think we're in fullscreen mode");
+  if ( ! inFullscreen() ) {
+    //console.log("I don't think we're in fullscreen mode");
     runScreenSaver();
   }
   else {
-    console.log("Seems like we might be in fullscreen mode");
+    //console.log("Seems like we might be in fullscreen mode");
     stateManager.resetAt(savers.getDelay() * 60000);
   }
 };

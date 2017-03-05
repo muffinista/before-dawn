@@ -1,5 +1,6 @@
 'use strict';
 
+const electron = require('electron');
 var platform = process.platform;
 
 var _, $, pool, winctl;
@@ -22,9 +23,9 @@ else if ( platform === "win32" ) {
 }
 
 var methods = {
-  'darwin': function(displays) {
+  'darwin': function() {
     var result;
-    
+    var displays = electron.screen.getAllDisplays();
     var windowList = $.CFBridgingRelease(
       $.CGWindowListCopyWindowInfo(
         $.kCGWindowListOptionOnScreenOnly, $.kCGNullWindowID
@@ -67,14 +68,14 @@ var methods = {
 };
 
 
-var method = methods[platform];
+var _method = methods[platform];
 
-var inFullscreen = function(displays) {
+var inFullscreen = function() {
   var result = false;
 
-  if ( method ) {
+  if ( _method ) {
     try {
-      result = method(displays);
+      result = _method();
     }
     catch(e) {
       console.log(e);
