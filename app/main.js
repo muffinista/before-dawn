@@ -378,6 +378,12 @@ var openPrefsOnFirstLoad = function() {
  * handle initial startup of app
  */
 var bootApp = function(_basePath) {
+  var icons = getIcons();
+  var menuTemplate = require("./ui/menu_template.js").buildMenuTemplate(app);
+  var menu = Menu.buildFromTemplate(menuTemplate);
+
+  Menu.setApplicationMenu(menu);
+
   if ( typeof(_basePath) !== "undefined" ) {
     global.basePath = _basePath;
   }
@@ -387,10 +393,35 @@ var bootApp = function(_basePath) {
   global.savers.init(global.basePath, function() {
     configLoaded = true;
     updateStateManager();
-    openPrefsOnFirstLoad();
 
     // check for a new release every 12 hours
     setInterval(checkForNewRelease, 1000 * 60 * 60 * 12);
+
+    appIcon = new Tray(icons.active);
+    appIcon.setToolTip(global.APP_NAME);
+    appIcon.setContextMenu(trayMenu); 
+
+    // show tray menu on right click
+    // @todo should this be osx only?
+    appIcon.on('right-click', () => {
+      appIcon.popUpContextMenu();
+    });
+    
+    openScreenGrabber();
+
+    if ( argv.screen === "prefs" ) {
+      openPrefsWindow();
+    }
+    else if ( argv.screen === "about" ) {
+      openAboutWindow();
+    }
+    else if ( argv.screen === "saver" ) {
+      setStateToRunning();
+    }
+    
+    appReady = true;
+    
+    openPrefsOnFirstLoad();
   });
 };
 
@@ -588,39 +619,18 @@ app.on('window-all-closed', function() {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 app.once('ready', function() {  
-  var icons = getIcons();
-
-  appIcon = new Tray(icons.active);
-  appIcon.setToolTip(global.APP_NAME);
-  appIcon.setContextMenu(trayMenu); 
-
-  // show tray menu on right click
-  // @todo should this be osx only?
-  appIcon.on('right-click', () => {
-    appIcon.popUpContextMenu();
-  });
-
-  
-  var menuTemplate = require("./ui/menu_template.js").buildMenuTemplate(app);
-  var menu = Menu.buildFromTemplate(menuTemplate);
-
-  Menu.setApplicationMenu(menu);
-
-  openScreenGrabber();
-
-  if ( argv.screen === "prefs" ) {
-    openPrefsWindow();
-  }
-  else if ( argv.screen === "about" ) {
-    openAboutWindow();
-  }
-  else if ( argv.screen === "saver" ) {
-    setStateToRunning();
-  }
-  
-  appReady = true;
-
-  openPrefsOnFirstLoad();
+  /**
+   * check for a release and then boot!
+   */
+  releaseChecker.checkLatestRelease(
+    global.APP_REPO, global.APP_VERSION, 
+    function() {
+      global.NEW_RELEASE_AVAILABLE = true;
+      bootApp();
+    }, 
+    function() {
+      bootApp();
+    });
 });
 
 
@@ -642,15 +652,4 @@ ipcMain.on('savers-updated', (event, arg) => {
   }
 });
 
-/**
- * check for a release and then boot!
- */
-releaseChecker.checkLatestRelease(
-  global.APP_REPO, global.APP_VERSION, 
-  function() {
-    global.NEW_RELEASE_AVAILABLE = true;
-    bootApp();
-  }, 
-  function() {
-    bootApp();
-  });
+
