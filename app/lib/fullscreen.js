@@ -1,18 +1,30 @@
 'use strict';
 
+var platform = process.platform;
+
+var _, $, pool, winctl;
+
+if ( platform === "darwin" ) {
+  _ = require('lodash');
+  $ = require('NodObjC');
+
+  $.framework('Foundation');
+  $.framework('Cocoa');
+
+  pool = $.NSAutoreleasePool('alloc')('init');
+
+  process.on('beforeExit', (code) => {
+    pool('drain');
+  });
+}
+else if ( platform === "win32" ) {
+  winctl = require('winctl');
+}
+
 var methods = {
   'darwin': function(displays) {
     var result;
-
-    var _ = require('lodash');
-    var $ = require('NodObjC');
-
-    console.log("osx check");
     
-    $.framework('Foundation');
-    $.framework('Cocoa');
-
-    var pool = $.NSAutoreleasePool('alloc')('init');
     var windowList = $.CFBridgingRelease(
       $.CGWindowListCopyWindowInfo(
         $.kCGWindowListOptionOnScreenOnly, $.kCGNullWindowID
@@ -21,7 +33,7 @@ var methods = {
     var error = $.alloc($.NSError).ref();
     var jsonData = $.NSJSONSerialization(
       "dataWithJSONObject", windowList,
-      "options", $.NSJSONWritingPrettyPrinted,
+      "options", 0,
       "error", error);
     
     var jsonString = $.NSString("alloc")("initWithData", jsonData, "encoding", $.NSUTF8StringEncoding);
@@ -31,21 +43,17 @@ var methods = {
       return x["kCGWindowName"] == "Menubar"; // || x["kCGWindowName"] == "Backstop Menubar";
     });
     
-    console.log("There are " + displays.length + " displays");
-    console.log("There are " + visibleMenubars.length + " menus");
+    //console.log("There are " + displays.length + " displays");
+    //console.log("There are " + visibleMenubars.length + " menus");
     result = (visibleMenubars.length < displays.length);
     
-    pool('drain');
+    //    pool('drain');
 
     return result;
   },
 
   'win32': function() {
-    var winctl = require('winctl');
-    console.log("windows check");
-    
     var fullscreenWindow = winctl.GetFullscreenWindow();
-    console.log("fullscreen window " + fullscreenWindow);
     
     // we think we're in fullscreen mode if we have a fullscreen
     // window handle and the HWND id is > 0
@@ -59,15 +67,14 @@ var methods = {
 };
 
 
+var method = methods[platform];
+
 var inFullscreen = function(displays) {
   var result = false;
-  var p = process.platform;
 
-  console.log("inFullscreen");
-  
-  if ( methods[p] ) {
+  if ( method ) {
     try {
-      result = methods[p](displays);
+      result = method(displays);
     }
     catch(e) {
       console.log(e);
