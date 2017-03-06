@@ -24,7 +24,7 @@ a system that allows you to build desktop applications that run on
 There's about half a dozen screensavers right now, with more on the
 way. Here's the Flying Emoji screensaver:
 
-![flying emoji](//github.com/muffinista/before-dawn/raw/master/assets/emoji-on-monitor-opt.gif "Flying Emoji!")
+![flying emoji](https://github.com/muffinista/before-dawn/raw/master/assets/emoji-on-monitor-opt.gif "Flying Emoji!")
 
 You can get a quick preview of the other screensavers via this
 [preview page](http://muffinista.github.io/before-dawn-screensavers/).
