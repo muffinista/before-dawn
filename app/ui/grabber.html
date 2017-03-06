@@ -62,7 +62,6 @@
        }
 
        screen_opts.video.mandatory.chromeMediaSourceId = screen_id;
-
        
        navigator.webkitGetUserMedia(screen_opts, function(s) {
          video = findOrCreate('video', opts.id);
