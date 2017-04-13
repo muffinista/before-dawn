@@ -10,7 +10,7 @@
   },
   "devDependencies": {
     "electron-builder": "5.12.1",
-    "electron-prebuilt": "1.4.13"
+    "electron-prebuilt": "1.6.12"
   },
   "build": {
     "appId": "Before Dawn",

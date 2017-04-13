@@ -7,7 +7,7 @@ var _, $, pool, winctl;
 
 if ( platform === "darwin" ) {
   _ = require('lodash');
-  $ = require('NodObjC');
+  $ = require('nodobjc');
 
   $.framework('Foundation');
   $.framework('Cocoa');
