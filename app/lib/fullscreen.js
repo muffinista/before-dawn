@@ -6,6 +6,7 @@ var platform = process.platform;
 var _, $, pool, winctl;
 
 if ( platform === "darwin" ) {
+
   _ = require('lodash');
   $ = require('nodobjc');
 

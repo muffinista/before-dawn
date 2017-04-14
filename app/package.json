@@ -12,7 +12,7 @@
   ],
   "scripts": {
     "start": "electron main.js",
-    "rebuild": "./node_modules/.bin/electron-rebuild -f -w nodobjc,node-system-idle-time",
+    "rebuild": "./node_modules/.bin/electron-rebuild -w nodobjc,node-system-idle-time,ref,ffi",
     "test": "electron-mocha tests/"
   },
   "repository": {
@@ -43,9 +43,14 @@
     "tether": "^1.4.0",
     "yauzl": "^2.7.0"
   },
+  "#depnotes": [
+    "nodobjc is optional because it won't compile on windows, but is needed on OSX.",
+    "however, ref is a dependency of nodobjc that won't be rebuilt by electron-rebuild",
+    "unless specified as a dep so that's why it is in the rebuild command."
+  ],
   "optionalDependencies": {
-    "winctl": "muffinista/winctl",
-    "NodObjC": "^2.1.0"
+    "nodobjc": "^2.1.0",
+    "winctl": "muffinista/winctl"
   },
   "devDependencies": {
     "babel-core": "^6.14.0",
