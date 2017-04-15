@@ -9,22 +9,23 @@
     "dist": "build --x64"
   },
   "devDependencies": {
-    "electron-builder": "5.12.1",
-    "electron-prebuilt": "1.6.12"
+    "electron-builder": "16.8.3",
+    "electron": "1.6.2"
   },
   "build": {
     "appId": "Before Dawn",
-    "app-category-type": "public.app-category.entertainment",
+    "mac": {
+      "category": "public.app-category.entertainment"
+    },
     "nsis": {
       "installerIcon": "build/icon.ico",
-      "verbosity": 1,
-      "perMachine": "false"
+      "perMachine": false
     },
     "win": {
       "target": "nsis",
-      "iconUrl": "https://raw.githubusercontent.com/muffinista/before-dawn/master/assets/icon.ico"
+      "icon": "build/icon.ico"
     },
-    "asar": "false",
+    "asar": false,
     "dmg": {
       "contents": [
         {
@@ -41,11 +42,8 @@
       ]
     },
     "linux": {
-      "arch": 64,
       "target": "deb",
-      "title": "Before Dawn",
-      "executable": "before-dawn",
-      "comment": "Before Dawn",
+      "executableName": "before-dawn",
       "maintainer": "Colin Mitchell <colin@muffinlabs.com>"
     }
   }

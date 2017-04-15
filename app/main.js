@@ -217,7 +217,7 @@ var runScreenSaverOnDisplay = function(saver, s) {
     // Emitted when the window is closed.
     w.on('closed', function() {
       w.isClosed = true;
-      console.log("window closed!");
+      console.log("window closed!", w);
 
       if ( ! screenSaverIsRunning() ) {
         console.log("all windows closed, reset");
