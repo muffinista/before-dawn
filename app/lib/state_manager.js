@@ -11,37 +11,37 @@ const STATES = {
   STATE_PAUSED: Symbol('paused') // screensaver is paused
 };
 
-const idler = require('node-system-idle-time');
+const idleEvents = require('./idle-events');
 
 var currentState = STATES.STATE_NONE;
-var lastIdle = 0;
 
 var _idleTime;
 var _blankTime;
-var _wakeupTime;
 var _onIdleTime;
 var _onBlankTime;
-var _timer;
+
 
 /**
  * setup timing/callbacks
  */
 var setup = function(opts) {
-  if ( opts.idleTime ) {
+  idleEvents.reset();
+
+  if ( opts.idleTime && opts.onIdleTime ) {
     _idleTime = opts.idleTime;
-  }
-  if ( opts.onIdleTime ) {
     _onIdleTime = opts.onIdleTime;
+
+    idleEvents.set(_idleTime, _onIdleTime);
   }
 
-  if ( opts.blankTime ) {
+  if ( opts.blankTime && opts.onBlankTime ) {
     _blankTime = opts.blankTime;
-  }
-  if ( opts.onBlankTime ) {
     _onBlankTime = opts.onBlankTime;
+
+    idleEvents.set(_blankTime, _onBlankTime);
   }
 
-  _wakeupTime = 5000;
+  idleEvents.onReset(reset);
 
   if ( opts.state ) {
     switchState(opts.state);
@@ -59,14 +59,6 @@ var reset = function() {
   switchState(STATES.STATE_IDLE, true);
 };
 
-/**
- * set a timer to reset in the future
- */
-var resetAt = function(t) {
-  console.log("run reset in " + t);
-  clearTimer();
-  _timer = setTimeout(reset, t);
-};
 
 /**
  * pause the state machine
@@ -107,15 +99,13 @@ var onBlankTime = function(f) {
  * force == true, call onEnterState
  */
 var switchState = function(s, force) {
-  var idle = idler.getIdleTime();
-
   // we run onEnterState if the state has changed or if we need to
   // force a reload. we also run it if the new state is idle, this
   // should help with some weird issues where timers aren't being
   // reset properly
   var callEnterState = ( currentState !== s || s === STATES.STATE_IDLE || force === true);
 
-  console.log("switchState " + String(currentState) + " -> " + String(s) + " IDLE: " + idle + " callEnterState: " + callEnterState);  
+  console.log("switchState " + String(currentState) + " -> " + String(s) + " callEnterState: " + callEnterState);  
 
   currentState = s;
   
@@ -126,32 +116,18 @@ var switchState = function(s, force) {
 
 
 /**
- * clear any currently running timer
- */
-var clearTimer = function() {
-  console.log("clearTimer");
-  if ( typeof(_timer) !== "undefined" ) {
-    _timer = clearTimeout(_timer);
-  }
-};
-
-/**
  * enter a new state. set any timers/etc needed
  */
 var onEnterState = function(s) {
   console.log("onEnterState: " + String(s));
-  clearTimer();
 
   switch (s) {
     case STATES.STATE_IDLE:
-      setCheckScreensaverTimer();
       break;
     case STATES.STATE_RUNNING:
-      setBlankTimer();
       onIdleTime();
       break;
     case STATES.STATE_BLANKED:
-      setWakeupTimer();
       onBlankTime();
       break;
     case STATES.STATE_PAUSED:
@@ -160,80 +136,6 @@ var onEnterState = function(s) {
   };
 };
 
-
-/** 
- * set a timer to call checkIdle in time to possibly activate
- * the screensaver
- */
-var setCheckScreensaverTimer = function() {
-  var idle = idler.getIdleTime();
-  var timeLeft = _idleTime - idle;
- 
-  if ( timeLeft <= 0 ) {
-    console.log("setCheckScreensaverTimer: no time, run checkIdle");
-    checkIdle();
-  }
-  else {
-    console.log("setCheckScreensaverTimer: set sleep timer for " + timeLeft);
-    _timer = setTimeout(checkIdle, timeLeft);
-  }
-};
-
-/**
- * set a timer to check if we should blank the screen
- */
-var setBlankTimer = function() {
-  console.log("setBlankTimer");
-  if ( _blankTime > 0 ) {
-    _timer = setTimeout(checkBlank, _blankTime);
-  }
-  else {
-    console.log("no blank time set");
-  }
-};
-
-/**
- * set a timer that we'll use to determine if we should reset to idle
- */
-var setWakeupTimer = function() {
-  var idle = idler.getIdleTime();
-  lastIdle = idle;
-  
-  _timer = setTimeout(checkForWakeup, _wakeupTime);
-};
-
-
-/**
- * main idle time check. once our idle time gets high enough, we
- * activate the screensaver
- */
-var checkIdle = function() {
-  var idle;
-  
-  // don't bother checking if we're not in an idle/blank/running state
-  // or if we're not supposed to be running
-  if ( currentState == STATES.STATE_PAUSED || _idleTime <= 0 ) {
-    console.log("paused or no idle time, no screensaver!");
-    return;
-  }
-  idle = idler.getIdleTime();
-
-  // are we past our idle time?
-  if ( currentState === STATES.STATE_IDLE ) {
-    console.log("checkIdle: should we run screensaver");
-    if ( idle > _idleTime ) {
-      console.log("yes!");
-      switchState(STATES.STATE_RUNNING);
-    }
-    else {
-      console.log("no!");
-      setCheckScreensaverTimer();
-    }
-  }
-  else {
-    console.log("state is " + String(currentState) + ", exit without doing anything");
-  }
-};
 
 /**
  * check to see if we should switch from running -> blanked
@@ -245,21 +147,6 @@ var checkBlank = function() {
   }
 };
 
-/**
- * check to see if idle time has gone down since we blanked the screen
- */
-var checkForWakeup = function() {
-  var idle = idler.getIdleTime();
-  console.log("checkForWakeup " + String(currentState) + " " + idle + " " + lastIdle);
-  if ( idle < lastIdle ) {
-    console.log("Woke up, reset!");
-    reset();
-  }
-  else {
-    setWakeupTimer();
-  }
-};
-
 var getCurrentState = function() {
   return currentState;
 };
@@ -268,7 +155,6 @@ var getCurrentState = function() {
 exports.states = STATES;
 exports.setup = setup;
 exports.reset = reset;
-exports.resetAt = resetAt;
 exports.pause = pause;
 exports.run = run;
 exports.currentState = getCurrentState;

@@ -21,6 +21,7 @@ const Menu = electron.Menu;
 const Tray = electron.Tray;
 const {ipcMain} = require('electron');
 
+const _ = require('lodash');
 const fs = require('fs');
 const path = require('path');
 const parseArgs = require('minimist');
@@ -216,9 +217,24 @@ var runScreenSaverOnDisplay = function(saver, s) {
     
     // Emitted when the window is closed.
     w.on('closed', function() {
-      w.isClosed = true;
-      console.log("window closed!", w);
+      //console.log("window closed!", w);
+      // 100% close/kill this window
+      if ( typeof(w) !== 'undefined' ) {
+        w.destroy();
+      }
 
+      saverWindows = _.filter(saverWindows, function(w) {
+        return ( typeof(w) !== 'undefined' && ! w.isDestroyed() );
+      });
+      
+      /* var index = saverWindows.indexOf(w);
+         if ( index > -1 ) {
+         console.log("toss the window " + index);
+         saverWindows.splice(index, -1);
+         console.log("*****", saverWindows);
+         } */
+      
+      
       if ( ! screenSaverIsRunning() ) {
         console.log("all windows closed, reset");
         stateManager.reset();
@@ -321,6 +337,7 @@ var runScreenSaver = function() {
  * check if the screensaver is still running
  */
 var screenSaverIsRunning = function() {
+  console.log("window check: " + saverWindows.length);
   return ( saverWindows.length > 0 );
 }
 
@@ -351,13 +368,14 @@ var stopScreenSaver = function(fromBlank) {
     screen.doLockScreen();
   }
 
-  for ( var s in saverWindows ) {
-    saverWindows[s].destroy();
+  var tmp = _.filter(saverWindows, function(w) {
+    return ( typeof(w) !== 'undefined' && ! w.isDestroyed() );
+  });
+
+  for ( var s in tmp ) {
+    tmp[s].destroy();
   }
 };
-
-
-
 
 
 /**
@@ -441,10 +459,6 @@ var runScreenSaverIfNotFullscreen = function() {
     //console.log("I don't think we're in fullscreen mode");
     runScreenSaver();
   }
-  else {
-    //console.log("Seems like we might be in fullscreen mode");
-    stateManager.resetAt(savers.getDelay() * 60000);
-  }
 };
 
 /**
@@ -453,16 +467,20 @@ var runScreenSaverIfNotFullscreen = function() {
  */
 var runScreenSaverIfPowered = function() {
   console.log("runScreenSaverIfPowered");
+
+  if ( screenSaverIsRunning() ) {
+    console.log("looks like we're already running");
+    return;
+  }
+  
   // check if we are on battery, and if we should be running in that case
   if ( global.savers.getDisableOnBattery() ) {
     power.charging().then((is_powered) => {
-      if ( is_powered ) {
+      if ( is_powered ) {       
         runScreenSaverIfNotFullscreen();
       }
       else {
         console.log("I would run, but we're on battery :(");
-        // check state again in a little while
-        stateManager.resetAt(savers.getDelay() * 60000);
       }
     });
   }
