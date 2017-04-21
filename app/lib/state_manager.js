@@ -11,7 +11,8 @@ const STATES = {
   STATE_PAUSED: Symbol('paused') // screensaver is paused
 };
 
-const idleEvents = require('./idle-events');
+const idler = require('node-system-idle-time');
+const IDLE_CHECK_RATE = 25;
 
 var currentState = STATES.STATE_NONE;
 
@@ -21,33 +22,25 @@ var _onIdleTime;
 var _onBlankTime;
 
 var _onReset;
-
+var lastTime = -1;
 
 /**
  * setup timing/callbacks
  */
 var setup = function(opts) {
-  idleEvents.reset();
-
   if ( opts.idleTime && opts.onIdleTime ) {
     _idleTime = opts.idleTime;
     _onIdleTime = opts.onIdleTime;
-
-    idleEvents.set(_idleTime, _onIdleTime);
   }
 
   if ( opts.blankTime && opts.onBlankTime ) {
     _blankTime = opts.blankTime;
     _onBlankTime = opts.onBlankTime;
-
-    idleEvents.set(_blankTime, _onBlankTime);
   }
 
   if ( opts.onReset ) {
     _onReset = opts.onReset;
   }
-
-  idleEvents.onReset(reset);
 
   if ( opts.state ) {
     switchState(opts.state);
@@ -55,14 +48,15 @@ var setup = function(opts) {
   else {
     switchState(STATES.STATE_IDLE);
   }
+
 };
+
 
 /**
  * reset to idle and clear any timers
  */
 var reset = function() {
-  //console.log("RESET");
-  switchState(STATES.STATE_IDLE, true);
+  switchState(STATES.STATE_IDLE);
 };
 
 
@@ -116,8 +110,6 @@ var switchState = function(s, force) {
   // reset properly
   var callEnterState = ( currentState !== s || s === STATES.STATE_IDLE || force === true);
 
-  //console.log("switchState " + String(currentState) + " -> " + String(s) + " callEnterState: " + callEnterState);  
-
   currentState = s;
   
   if ( callEnterState ) {
@@ -162,6 +154,50 @@ var checkBlank = function() {
 var getCurrentState = function() {
   return currentState;
 };
+
+var getNextTime = function(i) {
+  if ( currentState === STATES.STATE_RUNNING ) {
+    return _blankTime;
+  }
+  return _idleTime;
+};
+
+var tick = function() {
+  var i, nextTime, hadActivity, nextState;
+
+  if ( currentState !== STATES.STATE_NONE && currentState !== STATES.STATE_PAUSED ) {
+    i = idler.getIdleTime();
+    nextTime = getNextTime(i);
+
+    hadActivity = (i < lastTime);
+
+    //console.log("TICK", i, hadActivity, nextTime);
+  
+    if ( hadActivity && currentState !== STATES.STATE_IDLE && typeof(_onReset) !== "undefined" ) {
+      reset();
+    }
+    else if ( i >= nextTime ) {
+      if ( currentState === STATES.STATE_IDLE) {
+        nextState = STATES.STATE_RUNNING;
+      }
+      else {
+        nextState = STATES.STATE_BLANKED;
+      }
+      //console.log("SWITCH STATE!");
+      switchState(nextState);
+    }
+    
+    lastTime = i;
+  }
+
+  scheduleTick();
+};
+
+var scheduleTick = function() {
+  setTimeout(tick, IDLE_CHECK_RATE);
+};
+
+scheduleTick();
 
 
 exports.states = STATES;

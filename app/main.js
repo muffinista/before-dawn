@@ -226,15 +226,7 @@ var runScreenSaverOnDisplay = function(saver, s) {
       saverWindows = _.filter(saverWindows, function(w) {
         return ( typeof(w) !== 'undefined' && ! w.isDestroyed() );
       });
-      
-      /* var index = saverWindows.indexOf(w);
-         if ( index > -1 ) {
-         console.log("toss the window " + index);
-         saverWindows.splice(index, -1);
-         console.log("*****", saverWindows);
-         } */
-      
-      
+
       if ( ! screenSaverIsRunning() ) {
         console.log("all windows closed, reset");
         stateManager.reset();
@@ -256,9 +248,9 @@ var runScreenSaverOnDisplay = function(saver, s) {
     // inject our custom JS and CSS into the screensaver window
     w.webContents.on('did-finish-load', function() {
       w.webContents.insertCSS(globalCSSCode);      
-      w.webContents.executeJavaScript(globalJSCode, false, function(result) {
-        //console.log("Global JS executed", result);
-      });
+      //w.webContents.executeJavaScript(globalJSCode, false, function(result) {
+      //console.log("Global JS executed", result);
+      //      });
     });
 
     // reload the screengrabber window to keep it from churning
@@ -340,13 +332,22 @@ var screenSaverIsRunning = function() {
   return ( saverWindows.length > 0 );
 };
 
+
+var activeWindowHandle = function(w) {
+  return (typeof(w) !== 'undefined' && ! w.isDestroyed());
+};
+
 var closeRunningScreensavers = function() {
-  var tmp = _.filter(saverWindows, function(w) {
-    return ( typeof(w) !== 'undefined' && ! w.isDestroyed() );
+  _.forEach(saverWindows, function(w) {
+    if ( activeWindowHandle(w) ) {
+      w.close();
+      setTimeout(function() {
+        if ( activeWindowHandle(w) ) {
+          w.destroy();
+        }
+      }, 2500);
+    }    
   });
-  for ( var s in tmp ) {
-    tmp[s].destroy();
-  }
 };
 
 /**
@@ -581,7 +582,9 @@ if ( typeof(app.dock) !== "undefined" ) {
 trayMenu = Menu.buildFromTemplate([
   {
     label: 'Run Now',
-    click: function() { setStateToRunning(); }
+    click: function() {
+      setTimeout(setStateToRunning, 50);
+    }
   },
   {
     label: 'Disable',
