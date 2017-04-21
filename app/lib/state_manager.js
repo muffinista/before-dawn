@@ -20,6 +20,8 @@ var _blankTime;
 var _onIdleTime;
 var _onBlankTime;
 
+var _onReset;
+
 
 /**
  * setup timing/callbacks
@@ -41,6 +43,10 @@ var setup = function(opts) {
     idleEvents.set(_blankTime, _onBlankTime);
   }
 
+  if ( opts.onReset ) {
+    _onReset = opts.onReset;
+  }
+
   idleEvents.onReset(reset);
 
   if ( opts.state ) {
@@ -55,7 +61,7 @@ var setup = function(opts) {
  * reset to idle and clear any timers
  */
 var reset = function() {
-  console.log("RESET");
+  //console.log("RESET");
   switchState(STATES.STATE_IDLE, true);
 };
 
@@ -93,6 +99,11 @@ var onBlankTime = function(f) {
   }
 };
 
+var onReset = function(f) {
+  if ( typeof(_onReset) !== "undefined" ) {
+    _onReset();
+  } 
+};
 
 /**
  * switch to a new state. if we're not already in that state, or if
@@ -105,7 +116,7 @@ var switchState = function(s, force) {
   // reset properly
   var callEnterState = ( currentState !== s || s === STATES.STATE_IDLE || force === true);
 
-  console.log("switchState " + String(currentState) + " -> " + String(s) + " callEnterState: " + callEnterState);  
+  //console.log("switchState " + String(currentState) + " -> " + String(s) + " callEnterState: " + callEnterState);  
 
   currentState = s;
   
@@ -119,10 +130,11 @@ var switchState = function(s, force) {
  * enter a new state. set any timers/etc needed
  */
 var onEnterState = function(s) {
-  console.log("onEnterState: " + String(s));
+  //console.log("onEnterState: " + String(s));
 
   switch (s) {
     case STATES.STATE_IDLE:
+      onReset();
       break;
     case STATES.STATE_RUNNING:
       onIdleTime();

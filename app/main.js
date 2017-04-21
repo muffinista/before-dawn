@@ -257,7 +257,7 @@ var runScreenSaverOnDisplay = function(saver, s) {
     w.webContents.on('did-finish-load', function() {
       w.webContents.insertCSS(globalCSSCode);      
       w.webContents.executeJavaScript(globalJSCode, false, function(result) {
-        console.log("Global JS executed", result);
+        //console.log("Global JS executed", result);
       });
     });
 
@@ -337,9 +337,17 @@ var runScreenSaver = function() {
  * check if the screensaver is still running
  */
 var screenSaverIsRunning = function() {
-  console.log("window check: " + saverWindows.length);
   return ( saverWindows.length > 0 );
-}
+};
+
+var closeRunningScreensavers = function() {
+  var tmp = _.filter(saverWindows, function(w) {
+    return ( typeof(w) !== 'undefined' && ! w.isDestroyed() );
+  });
+  for ( var s in tmp ) {
+    tmp[s].destroy();
+  }
+};
 
 /**
  * should we lock the user's screen when returning from running the saver?
@@ -359,7 +367,6 @@ var stopScreenSaver = function(fromBlank) {
   }
 
   if ( fromBlank !== true ) {
-    console.log("fromBlank", fromBlank);
     stateManager.reset();
   }
   
@@ -368,13 +375,7 @@ var stopScreenSaver = function(fromBlank) {
     screen.doLockScreen();
   }
 
-  var tmp = _.filter(saverWindows, function(w) {
-    return ( typeof(w) !== 'undefined' && ! w.isDestroyed() );
-  });
-
-  for ( var s in tmp ) {
-    tmp[s].destroy();
-  }
+  closeRunningScreensavers();
 };
 
 
@@ -453,8 +454,6 @@ var inFullscreen = require('./lib/fullscreen.js').inFullscreen;
  * run the screensaver, but only if there isn't an app in fullscreen mode right now
  */
 var runScreenSaverIfNotFullscreen = function() {
-  console.log("runScreenSaverIfNotFullscreen");
-
   if ( ! inFullscreen() ) {
     //console.log("I don't think we're in fullscreen mode");
     runScreenSaver();
@@ -508,7 +507,8 @@ var updateStateManager = function() {
     idleTime: savers.getDelay() * 60000,
     blankTime: savers.getSleep() * 60000,
     onIdleTime: runScreenSaverIfPowered,
-    onBlankTime: blankScreenIfNeeded
+    onBlankTime: blankScreenIfNeeded,
+    onReset: _.throttle(closeRunningScreensavers, 5000)
   });
 };
 

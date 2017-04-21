@@ -1,5 +1,5 @@
 'use strict';
-
+const _ = require('lodash');
 const idler = require('node-system-idle-time');
 var lastIdle = idler.getIdleTime();
 var rate = 25;
@@ -7,7 +7,6 @@ var _onReset;
 
 var times = {};
 var lastTime = -1;
-var lastCall = -1;
 var _timings = [];
 
 
@@ -15,7 +14,6 @@ var _timings = [];
 var reset = function() {
   times = {};
   lastTime = -1;
-  lastCall = -1;
   _timings = [];
 };
 
@@ -40,20 +38,12 @@ var tick = function() {
     return e >= lastTime;
   });
 
-  if ( i < lastTime && lastCall > 0 ) {
-    console.log("IDLE RESET");
-    lastCall = -1;
-    if ( typeof(_onReset) !== "undefined" ) {
-      _onReset();
-    }
+  if ( i < lastTime && typeof(_onReset) !== "undefined" ) {
+    _onReset();
   }
-  else {
-    //console.log("nextTime: " + nextTime);
-    if ( i >= nextTime ) {
-      lastCall = nextTime;
-      console.log("BING: " + i + " - " + nextTime);
-      times[nextTime]();
-    }
+  else if ( i >= nextTime ) {
+    //console.log("BING: " + i + " - " + nextTime);
+    times[nextTime]();
   }
 
   lastTime = i;
