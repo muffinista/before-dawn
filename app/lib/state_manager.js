@@ -155,23 +155,29 @@ var getCurrentState = function() {
   return currentState;
 };
 
-var getNextTime = function(i) {
+/**
+ * based on our current state, figure out the timestamp
+ * that we will enter the next state
+ */
+var getNextTime = function() {
   if ( currentState === STATES.STATE_RUNNING ) {
     return _blankTime;
   }
   return _idleTime;
 };
 
+/**
+ * check idle time and determine if we should switch states
+ */
 var tick = function() {
   var i, nextTime, hadActivity, nextState;
 
   if ( currentState !== STATES.STATE_NONE && currentState !== STATES.STATE_PAUSED ) {
     i = idler.getIdleTime();
-    nextTime = getNextTime(i);
+    nextTime = getNextTime();
 
     hadActivity = (i < lastTime);
 
-    //console.log("TICK", i, hadActivity, nextTime);
   
     if ( hadActivity && currentState !== STATES.STATE_IDLE && typeof(_onReset) !== "undefined" ) {
       reset();
@@ -183,7 +189,6 @@ var tick = function() {
       else {
         nextState = STATES.STATE_BLANKED;
       }
-      //console.log("SWITCH STATE!");
       switchState(nextState);
     }
     
