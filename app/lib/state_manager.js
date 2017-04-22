@@ -79,7 +79,7 @@ var run = function() {
  */
 var onIdleTime = function(f) {
   if ( typeof(_onIdleTime) !== "undefined" ) {
-    console.log("call idle callback");
+    console.log("onIdleTime: " + String(currentState));
     _onIdleTime();
   }
 };
@@ -110,6 +110,8 @@ var switchState = function(s, force) {
   // reset properly
   var callEnterState = ( currentState !== s || s === STATES.STATE_IDLE || force === true);
 
+  console.log("switchState from " + String(currentState) + " to " + String(s) + " " + callEnterState);
+  
   currentState = s;
   
   if ( callEnterState ) {
@@ -170,7 +172,7 @@ var getNextTime = function() {
  * check idle time and determine if we should switch states
  */
 var tick = function() {
-  var i, nextTime, hadActivity, nextState;
+  var i, nextTime, hadActivity;
 
   if ( currentState !== STATES.STATE_NONE && currentState !== STATES.STATE_PAUSED ) {
     i = idler.getIdleTime();
@@ -184,12 +186,11 @@ var tick = function() {
     }
     else if ( i >= nextTime ) {
       if ( currentState === STATES.STATE_IDLE) {
-        nextState = STATES.STATE_RUNNING;
+        switchState(STATES.STATE_RUNNING);
       }
-      else {
-        nextState = STATES.STATE_BLANKED;
+      else if ( currentState === STATES.STATE_RUNNING) {
+        switchState(STATES.STATE_BLANKED);
       }
-      switchState(nextState);
     }
     
     lastTime = i;

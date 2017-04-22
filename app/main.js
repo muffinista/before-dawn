@@ -219,9 +219,9 @@ var runScreenSaverOnDisplay = function(saver, s) {
     w.on('closed', function() {
       //console.log("window closed!", w);
       // 100% close/kill this window
-      if ( typeof(w) !== 'undefined' ) {
-        w.destroy();
-      }
+      //if ( typeof(w) !== 'undefined' ) {
+      //w.destroy();
+      //}
 
       saverWindows = _.filter(saverWindows, function(w) {
         return ( typeof(w) !== 'undefined' && ! w.isDestroyed() );
@@ -242,8 +242,8 @@ var runScreenSaverOnDisplay = function(saver, s) {
     
     // windows is having some issues with putting the window behind existing
     // stuff -- @see https://github.com/atom/electron/issues/2867
-    w.minimize();
-    w.focus();
+    //w.minimize();
+    //w.focus();
     
     // inject our custom JS and CSS into the screensaver window
     w.webContents.on('did-finish-load', function() {
@@ -494,13 +494,17 @@ var runScreenSaverIfPowered = function() {
  * reset state machine
  */
 var blankScreenIfNeeded = function() {
+  console.log("blankScreenIfNeeded");
   if ( screenSaverIsRunning() ) {
+    console.log("running, close windows");
     stopScreenSaver(true);
     screen.doSleep();
   }
-  else {
-    stateManager.reset();
-  }
+  /* else {
+     console.log("not running, reset");
+     stateManager.reset();
+     }  */
+  console.log("done");
 }
 
 var updateStateManager = function() {
@@ -509,7 +513,7 @@ var updateStateManager = function() {
     blankTime: savers.getSleep() * 60000,
     onIdleTime: runScreenSaverIfPowered,
     onBlankTime: blankScreenIfNeeded,
-    onReset: _.throttle(closeRunningScreensavers, 5000)
+    onReset: closeRunningScreensavers
   });
 };
 
@@ -635,6 +639,15 @@ trayMenu = Menu.buildFromTemplate([
 // seems like we need to catch this event to keep OSX from exiting app after screensaver runs?
 app.on('window-all-closed', function() {
   console.log("window-all-closed");
+});
+app.on('before-quit', function() {
+  console.log("before-quit");
+});
+app.on('will-quit', function() {
+  console.log("will-quit");
+});
+app.on('quit', function() {
+  console.log("quit");
 });
 
 // This method will be called when Electron has finished
