@@ -1,7 +1,8 @@
 'use strict'
 
 var React = require('react');
-var SliderWithValue = require('./slider-with-value');
+
+import SliderWithValue from './slider-with-value';
 
 module.exports = React.createClass({
   values: {},

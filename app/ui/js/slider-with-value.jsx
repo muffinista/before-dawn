@@ -1,11 +1,16 @@
 'use strict'
+import React from 'react';
 
-var React = require('react');
+export default class SliderWithValue extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { value: this.props.value };
+    this.onSliderChange = this.onSliderChange.bind(this);
+  }
 
-module.exports = React.createClass({
-  onSliderChange: function(evt) {
+  onSliderChange(evt) {
     var val = evt.target.value;
-    this.value = val;
+    //this.value = val;
     this.setState({
       name: this.name,
       value: val
@@ -15,11 +20,12 @@ module.exports = React.createClass({
       name: this.props.name,
       value: val
     });
-  },
-  render: function() {
+  }
+
+  render() {
     return <input type="range" defaultValue={this.props.value}
                   min={this.props.min} max={this.props.max}
                   onChange={this.onSliderChange}
                   className="slider slider-square-inverted" />
   }
-});
+}

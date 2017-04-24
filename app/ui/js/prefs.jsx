@@ -5,7 +5,6 @@ var path = require('path');
 
 var _ = require('lodash');
 
-var SliderWithValue = require('./slider-with-value');
 var OptionsForm = require('./options-form');
 
 import Preview from './preview';
