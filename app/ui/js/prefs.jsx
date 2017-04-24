@@ -8,9 +8,9 @@ var _ = require('lodash');
 var SliderWithValue = require('./slider-with-value');
 var OptionsForm = require('./options-form');
 
-var Preview = require('./preview');
-var SaverList = require('./saver-list');
+import Preview from './preview';
 
+var SaverList = require('./saver-list');
 
 const shell = window.require('electron').shell;
 const {BrowserWindow} = window.require('electron').remote;
@@ -84,8 +84,15 @@ const {BrowserWindow} = window.require('electron').remote;
 
 
   document.querySelector("[name=localSource]").value = savers.getLocalSource();
-  document.querySelector("select[name='delay'] option[value='" + savers.getDelay() + "']").setAttribute("selected", "selected");
-  document.querySelector("select[name='sleep'] option[value='" + savers.getSleep() + "']").setAttribute("selected", "selected");
+  el = document.querySelector("select[name='delay'] option[value='" + savers.getDelay() + "']");
+  if ( el !== null ) {
+    el.setAttribute("selected", "selected");
+  }
+
+  el = document.querySelector("select[name='sleep'] option[value='" + savers.getSleep() + "']");
+  if ( el !== null ) {
+    el.setAttribute("selected", "selected");
+  }
   
   if ( savers.getLock() === true ) {
     document.querySelector("input[name=lock_screen][type=checkbox]").setAttribute("checked", "checked");
@@ -117,6 +124,7 @@ const {BrowserWindow} = window.require('electron').remote;
 
   var loadPreview = function(s) {
     url_opts = getPreviewUrlOpts();
+
     ReactDOM.render(
       <Preview saver={s} url_opts={url_opts} saver_opts={saverOpts} />,
       document.getElementById('preview')
