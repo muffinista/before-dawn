@@ -9,8 +9,7 @@ var SliderWithValue = require('./slider-with-value');
 var OptionsForm = require('./options-form');
 
 import Preview from './preview';
-
-var SaverList = require('./saver-list');
+import SaverList from './saver-list';
 
 const shell = window.require('electron').shell;
 const {BrowserWindow} = window.require('electron').remote;

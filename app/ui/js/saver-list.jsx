@@ -1,21 +1,26 @@
 'use strict';
-var React = require('react');
+import React from 'react';
 
-module.exports = React.createClass({
-  getInitialState: function() {
-    return {
+export default class SaverList extends React.Component {
+  constructor(props) {
+    super(props);
+    self = this;
+    this.state = {
       value: this.props.current
     };
-  },
-  onChanged: function (e) {
-    this.setState({
+  }
+
+  onChanged(e) {
+    self.setState({
       key: e.currentTarget.value
     });
-  },
-  handleChange: function(event) {
+  }
+
+  handleChange(event) {
     this.setState({value: event.target.value});
-  },
-  render: function() {
+  }
+
+  render() {
     var self = this;
     var nodes = this.props.data.map(function(s, i) {
       var is_checked = (s.key === self.state.value);
@@ -59,5 +64,5 @@ module.exports = React.createClass({
 
     return(<ul className={"list-group"}>{nodes}</ul>);
   }
-});
+}
 
