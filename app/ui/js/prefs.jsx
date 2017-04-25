@@ -5,8 +5,7 @@ var path = require('path');
 
 var _ = require('lodash');
 
-var OptionsForm = require('./options-form');
-
+import OptionsForm from './options-form';
 import Preview from './preview';
 import SaverList from './saver-list';
 

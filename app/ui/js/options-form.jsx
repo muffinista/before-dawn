@@ -1,15 +1,20 @@
 'use strict'
-
-var React = require('react');
+import React from 'react';
 
 import SliderWithValue from './slider-with-value';
 
-module.exports = React.createClass({
-  values: {},
-  onChanged: function(e) {
+export default class OptionsForm extends React.Component {
+  constructor(props) {
+    super(props);
+//    this.state = { value: this.props.value };
+    this.onChanged = this.onChanged.bind(this);
+  }
+
+  onChanged(e) {
     this.props.onChange(this.getValues());
-  },
-  renderOption: function(o, index, val) {
+  }
+
+  renderOption(o, index, val) {
     var guts;
     var self = this;
     var ref = "option" + index;
@@ -36,8 +41,9 @@ module.exports = React.createClass({
         {guts}
       </fieldset>
     );
-  },
-  getValues: function() {
+  }
+
+  getValues() {
     var self = this;
     var data = {};
     _.each(this.props.saver.options, function(o, i) {
@@ -46,8 +52,9 @@ module.exports = React.createClass({
     });
     
     return data;
-  },
-  render: function() {
+  }
+
+  render() {
     var self = this;
     var s = this.props.saver;
     var onChange = this.props.onChange;
@@ -77,4 +84,4 @@ module.exports = React.createClass({
     
     return(<div><h1>{head}</h1>{nodes}</div>);
   }
-});
+}
