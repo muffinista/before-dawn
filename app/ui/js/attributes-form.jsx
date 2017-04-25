@@ -2,7 +2,8 @@
 
 import React from 'react';
 var ReactDOM = require('react-dom');
-var SliderWithValue = require('./slider-with-value');
+
+import SliderWithValue from './slider-with-value';
 import SaverOptionInput from './saver-option-input';
 
 

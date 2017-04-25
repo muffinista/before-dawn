@@ -1,5 +1,8 @@
 import React from 'react';
+import ReactDOM from 'react-dom'
+
 import AttributesForm from './attributes-form';
+import OptionsForm from './options-form';
 
 (function() {
   const remote = window.require('electron').remote;
@@ -11,11 +14,7 @@ import AttributesForm from './attributes-form';
   const url = require('url');
   const exec = require('child_process').exec;
   var savers = remote.getGlobal('savers');
-
-  var ReactDOM = require('react-dom');
   
-  var OptionsForm = require('./options-form');
-
   // parse incoming URL params -- we'll get a link to the current screen images for previews here
   var tmpParams = new URLSearchParams(document.location.search);
   window.urlParams = {};
