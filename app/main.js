@@ -343,12 +343,19 @@ var activeWindowHandle = function(w) {
   return (typeof(w) !== 'undefined' && ! w.isDestroyed());
 };
 
+/**
+ * close any running screensavers
+ */
 var closeRunningScreensavers = function() {
   console.log("closeRunningScreensavers");
   attemptToStopScreensavers();
   setTimeout(forcefullyCloseScreensavers, 2500);  
 };
 
+/**
+ * iterate through our list of running screensaver windows and attempt
+ * to close them nicely
+ */
 var attemptToStopScreensavers = function() {
   _.forEach(saverWindows, function(w) {
     if ( activeWindowHandle(w) ) {
@@ -357,6 +364,10 @@ var attemptToStopScreensavers = function() {
   });
 };
 
+/**
+ * iterate through our list of running screensaver windows and close
+ * them forcefully if needed
+ */
 var forcefullyCloseScreensavers = function() {
   _.forEach(saverWindows, function(w) {
     if ( activeWindowHandle(w) ) {
