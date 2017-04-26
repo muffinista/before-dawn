@@ -192,74 +192,80 @@ var runScreenSaverOnDisplay = function(saver, s) {
   };
   
   var windowOpts = {
-    fullscreen: ( debugMode !== true ),
+    //fullscreen: ( debugMode !== true ),
     autoHideMenuBar: true,
     alwaysOnTop: true,
     x: s.bounds.x,
-    y: s.bounds.y
+    y: s.bounds.y,
+    show: false
   };
 
   // don't do anything if we don't actually have a screensaver
   if ( typeof(saver) === "undefined" || saver === null ) {
     return;
   }
+
+  var w = new BrowserWindow(windowOpts);       
+  saverWindows.push(w);
   
   // listen for an event that we have an image of the display we will run on before completing setup
   ipcMain.once("screenshot-" + s.id, function(e, message) {
     var url;
-    var w = new BrowserWindow(windowOpts);       
 
-    saverWindows.push(w);
-
-    if ( debugMode === true ) {
-      w.webContents.openDevTools();
-    }
+    try {
+      if ( debugMode === true ) {
+        w.webContents.openDevTools();
+      }
     
-    // Emitted when the window is closed.
-    w.on('closed', function() {
-      //console.log("window closed!", w);
-      // 100% close/kill this window
-      //if ( typeof(w) !== 'undefined' ) {
-      //w.destroy();
-      //}
+      // Emitted when the window is closed.
+      w.on('closed', function() {
+        //console.log("close window!");
 
-      saverWindows = _.filter(saverWindows, function(w) {
-        return ( typeof(w) !== 'undefined' && ! w.isDestroyed() );
+        saverWindows = _.filter(saverWindows, function(w2) {
+          return (w2 !== w);
+        });
+        console.log("running windows: " + saverWindows.length);
+
+        // 100% close/kill this window
+        if ( typeof(w) !== 'undefined' ) {
+          try {
+            w.destroy();
+          }
+          catch (e) {
+            console.log(e);
+          }
+        }
+
+        if ( ! screenSaverIsRunning() ) {
+          console.log("all windows closed, reset");
+          stateManager.reset();
+        }
+      });
+    
+      url_opts.screenshot = encodeURIComponent("file://" + message.url);
+      url = saver.getUrl(url_opts);
+    
+      // and load the index.html of the app.
+      w.loadURL(url);
+
+      // inject our custom JS and CSS into the screensaver window
+      w.webContents.on('did-finish-load', function() {
+        w.webContents.insertCSS(globalCSSCode);      
+        w.webContents.executeJavaScript(globalJSCode, false, function(result) { });
       });
 
-      if ( ! screenSaverIsRunning() ) {
-        console.log("all windows closed, reset");
-        stateManager.reset();
-      }
-    });
+      w.once('ready-to-show', () => {
+        w.setFullScreen(true);
+      })
     
-    url_opts.screenshot = encodeURIComponent("file://" + message.url);
-
-    url = saver.getUrl(url_opts);
-    
-    // and load the index.html of the app.
-    w.loadURL(url);
-    
-    // windows is having some issues with putting the window behind existing
-    // stuff -- @see https://github.com/atom/electron/issues/2867
-    //w.minimize();
-    //w.focus();
-    
-    // inject our custom JS and CSS into the screensaver window
-    w.webContents.on('did-finish-load', function() {
-      w.webContents.insertCSS(globalCSSCode);      
-      //w.webContents.executeJavaScript(globalJSCode, false, function(result) {
-      //console.log("Global JS executed", result);
-      //      });
-    });
-
-    // reload the screengrabber window to keep it from churning
-    // CPU, until I can figure out why that is even happening
-    if ( saverWindows.length >= totalDisplays ) {
-      //console.log("Reloading screengrabber");
-      grabber.reload();
+      // windows is having some issues with putting the window behind existing
+      // stuff -- @see https://github.com/atom/electron/issues/2867
+      //w.minimize();
+      //w.focus();
     }
-
+    catch (e) {
+      console.log(e);
+    }
   });
 };
 
@@ -338,17 +344,29 @@ var activeWindowHandle = function(w) {
 };
 
 var closeRunningScreensavers = function() {
+  console.log("closeRunningScreensavers");
+  attemptToStopScreensavers();
+  setTimeout(forcefullyCloseScreensavers, 2500);  
+};
+
+var attemptToStopScreensavers = function() {
   _.forEach(saverWindows, function(w) {
     if ( activeWindowHandle(w) ) {
       w.close();
-      setTimeout(function() {
-        if ( activeWindowHandle(w) ) {
-          w.destroy();
-        }
-      }, 2500);
     }    
   });
 };
+
+var forcefullyCloseScreensavers = function() {
+  _.forEach(saverWindows, function(w) {
+    if ( activeWindowHandle(w) ) {
+      w.destroy();
+    }
+  });
+
+  saverWindows = [];
+};
+
 
 /**
  * should we lock the user's screen when returning from running the saver?
@@ -363,16 +381,16 @@ var shouldLockScreen = function() {
 var stopScreenSaver = function(fromBlank) {
   console.log("received stopScreenSaver call");
 
-  if ( ! screenSaverIsRunning() || debugMode === true ) {
-    return;
-  }
+  //if ( ! screenSaverIsRunning() || debugMode === true ) {
+  //    return;
+  //}
 
   if ( fromBlank !== true ) {
     stateManager.reset();
   }
   
   // trigger lock screen before actually closing anything
-  if ( shouldLockScreen() ) {
+  else if ( shouldLockScreen() ) {
     screen.doLockScreen();
   }
 
@@ -500,11 +518,6 @@ var blankScreenIfNeeded = function() {
     stopScreenSaver(true);
     screen.doSleep();
   }
-  /* else {
-     console.log("not running, reset");
-     stateManager.reset();
-     }  */
-  console.log("done");
 }
 
 var updateStateManager = function() {
