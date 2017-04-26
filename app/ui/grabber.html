@@ -9,8 +9,9 @@
   
   <script>
    const ipcRenderer = require('electron').ipcRenderer;
+   const desktopCapturer = require('electron').desktopCapturer;
    const temp = require("temp");
-
+   
    var findOrCreate = function(type, screen_id) {
      var el, id;
      id = type + screen_id;
@@ -47,7 +48,6 @@
 
      console.log(screen_opts);
 
-     var desktopCapturer = require('electron').desktopCapturer;
      desktopCapturer.getSources({types: ['screen']}, function(error, sources) {     
        if ( sources.length > 1 ) {
          screen_id = opts.id;
@@ -74,7 +74,7 @@
          video.addEventListener('canplay', function render(ev){
            video.removeEventListener("canplay", render, false); //remove listener, no longer needed
 
-           console.log("VIDEO", video);
+           //console.log("VIDEO", video);
            var width = video.videoWidth;
            var height = video.videoHeight;
 
@@ -97,15 +97,26 @@
            var buffer = new Buffer(data.split(",")[1], 'base64');
            fs.writeFileSync(tempName, buffer);
 
+           //
+           // stop video capture
+           // this seems to handle a problem where CPU load spikes
+           // after capture
+           //
+           s.getVideoTracks().forEach(function(track) {
+             track.stop();
+           });
+           
            // https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Using_HTML5_audio_and_video
            video.pause();
            video.src = "";
-
            photo.src = "";
-             
+           video.load();
+           
            video.remove();
            canvas.remove();
            photo.remove();
+
+
          
            console.log('screenshot-' + opts.id);
            ipcRenderer.send('screenshot-' + opts.id, {url:tempName});
@@ -117,17 +128,11 @@
 
    
    ipcRenderer.on('screengrab-request', function(event, displays) {
-     var desktopCapturer = require('electron').desktopCapturer;
      console.log("got screengrab request", event);
-
-     desktopCapturer.getSources({types: ['screen']}, function(error, sources) {
-       //console.log("SOURCES", sources);
-       for ( var i = 0; i < displays.length; i++ ) {
-         captureScreen(displays[i], displays.length > 1);
-       }
-     });
+     for ( var i = 0; i < displays.length; i++ ) {
+       captureScreen(displays[i], displays.length > 1);
+     }
    });
-  
    
    function getUserMediaError(e) {
      console.log('getUserMediaError');
