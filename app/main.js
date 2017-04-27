@@ -192,14 +192,17 @@ var runScreenSaverOnDisplay = function(saver, s) {
   };
   
   var windowOpts = {
-    //fullscreen: ( debugMode !== true ),
     autoHideMenuBar: true,
     alwaysOnTop: true,
     x: s.bounds.x,
     y: s.bounds.y,
+
+    // osx will display window immediately if fullscreen is true
+    fullscreen: (process.platform !== "darwin"),
     show: false
   };
 
+  console.log("runScreenSaverOnDisplay");
   // don't do anything if we don't actually have a screensaver
   if ( typeof(saver) === "undefined" || saver === null ) {
     return;
@@ -256,12 +259,17 @@ var runScreenSaverOnDisplay = function(saver, s) {
 
       w.once('ready-to-show', () => {
         w.setFullScreen(true);
+        if (process.platform !== "darwin") {
+          w.show();
+        }
       })
+
+      console.log("hello from", w);
     
       // windows is having some issues with putting the window behind existing
       // stuff -- @see https://github.com/atom/electron/issues/2867
       //w.minimize();
-      //w.focus();
+     // w.focus();
     }
     catch (e) {
       console.log(e);
@@ -484,9 +492,13 @@ var inFullscreen = require('./lib/fullscreen.js').inFullscreen;
  * run the screensaver, but only if there isn't an app in fullscreen mode right now
  */
 var runScreenSaverIfNotFullscreen = function() {
+  console.log("runScreenSaverIfNotFullscreen");
   if ( ! inFullscreen() ) {
-    //console.log("I don't think we're in fullscreen mode");
+    console.log("I don't think we're in fullscreen mode");
     runScreenSaver();
+  }
+  else {
+    console.log("looks like we are in fullscreen mode");
   }
 };
 
