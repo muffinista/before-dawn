@@ -33,6 +33,7 @@ var doLockScreen = function() {
  * put the display to sleep
  */
 var doSleep = function() {
+  const path = require('path');
   var exec = require('child_process').exec;
   var cmd;
 
