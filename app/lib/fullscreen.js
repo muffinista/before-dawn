@@ -59,12 +59,11 @@ var methods = {
     
     // we think we're in fullscreen mode if we have a fullscreen
     // window handle and the HWND id is > 0
-    result = (
+    return (
       typeof(fullscreenWindow) !== "undefined" &&
       fullscreenWindow !== null &&
       fullscreenWindow.getHwnd() > 0
     );
-    return result;
   }
 };
 
