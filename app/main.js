@@ -196,12 +196,14 @@ var runScreenSaverOnDisplay = function(saver, s) {
     alwaysOnTop: true,
     x: s.bounds.x,
     y: s.bounds.y,
-
-    // osx will display window immediately if fullscreen is true
-    fullscreen: (process.platform !== "darwin"),
     show: false
   };
 
+  // osx will display window immediately if fullscreen is true
+  if (process.platform !== "darwin") {
+    windowOpts.fullscreen = true;
+  }
+  
   console.log("runScreenSaverOnDisplay");
   // don't do anything if we don't actually have a screensaver
   if ( typeof(saver) === "undefined" || saver === null ) {
@@ -259,6 +261,8 @@ var runScreenSaverOnDisplay = function(saver, s) {
 
       w.once('ready-to-show', () => {
         w.setFullScreen(true);
+        //w.show();
+        w.webContents.openDevTools();
         if (process.platform !== "darwin") {
           w.show();
         }
@@ -356,8 +360,10 @@ var activeWindowHandle = function(w) {
  */
 var closeRunningScreensavers = function() {
   console.log("closeRunningScreensavers");
-  attemptToStopScreensavers();
-  setTimeout(forcefullyCloseScreensavers, 2500);  
+  if ( debugMode !== true ) {
+    attemptToStopScreensavers();
+    setTimeout(forcefullyCloseScreensavers, 2500);
+  }
 };
 
 /**

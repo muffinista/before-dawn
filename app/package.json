@@ -12,7 +12,7 @@
   ],
   "scripts": {
     "start": "electron main.js",
-    "rebuild": "./node_modules/.bin/electron-rebuild -w nodobjc,node-system-idle-time,ref,ffi",
+    "rebuild": "./node_modules/.bin/electron-rebuild -w nodobjc,node-system-idle-time,ref,ffi,winctl",
     "test": "electron-mocha tests/"
   },
   "repository": {
