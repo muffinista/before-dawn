@@ -249,7 +249,9 @@ var runScreenSaverOnDisplay = function(saver, s) {
     
       url_opts.screenshot = encodeURIComponent("file://" + message.url);
       url = saver.getUrl(url_opts);
-    
+
+      console.log("Loading " + url);
+
       // and load the index.html of the app.
       w.loadURL(url);
 
@@ -261,7 +263,6 @@ var runScreenSaverOnDisplay = function(saver, s) {
 
       w.once('ready-to-show', () => {
         w.setFullScreen(true);
-        //w.show();
         w.webContents.openDevTools();
         if (process.platform !== "darwin") {
           w.show();
@@ -273,7 +274,7 @@ var runScreenSaverOnDisplay = function(saver, s) {
       // windows is having some issues with putting the window behind existing
       // stuff -- @see https://github.com/atom/electron/issues/2867
       //w.minimize();
-     // w.focus();
+      // w.focus();
     }
     catch (e) {
       console.log(e);
