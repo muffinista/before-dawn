@@ -42,7 +42,6 @@ let debugMode = ( argv.debug === true );
 
 let saverWindows = [];
 
-var grabber;
 
 // track total displays so that when the screensaver is
 // running everywhere we can handle some background work
@@ -71,20 +70,47 @@ var icons = {
 
 
 /**
+ * open our screen grabber tool and issue a screengrab request
+ */
+var grabScreen = function(s, cb) {
+  var grabberUrl = 'file://' + __dirname + '/ui/grabber.html?id=' + s.id +
+                   "&width=" + s.bounds.width +
+                   "&height=" + s.bounds.height;
+
+  var grabber = new BrowserWindow({
+    show: debugMode === true,
+    width:200,
+    height:200
+  });
+
+  grabber.on('closed', function() {
+    grabber = null;
+  });
+  
+  var ipc_channel = "screenshot-" + s.id;
+  ipcMain.once("screenshot-" + s.id, function(e, message) {
+    log.info("got screenshot!", message);
+    cb(message);
+    grabber.close();
+  });
+  
+  grabber.loadURL(grabberUrl);
+  
+  if ( debugMode === true ) {
+    grabber.webContents.openDevTools();
+  }
+};
+
+
+/**
  * Open the preferences window
  */
 var openPrefsWindow = function() {
   var electronScreen = electron.screen;
   var primary = electronScreen.getPrimaryDisplay();
-  var displays = [
-    primary
-  ];
 
   // take a screenshot of the main screen for use in previews
-  log.info("register IPC handler for prefs page");
-  ipcMain.once("screenshot-" + primary.id, function(e, message) {
-    grabber.reload();
-
+  grabScreen(primary, function(message) {
     // call savers.reload to make sure our data is properly refreshed
     // and check for any system updates
     global.savers.reload(function() {
@@ -119,8 +145,6 @@ var openPrefsWindow = function() {
       });
     });
   });
-
-  grabber.webContents.send('screengrab-request', displays);
 };
 
 
@@ -161,29 +185,6 @@ var openHelpUrl = function() {
 
 
 /**
- * open our screen grabber tool. this should run in the background,
- * waiting to take screenshots when needed.
- */
-var openScreenGrabber = function() {
-  var grabberUrl = 'file://' + __dirname + '/ui/grabber.html';
-  grabber = new BrowserWindow({
-    show: debugMode === true,
-    width:800,
-    height:600
-  });
-
-  grabber.loadURL(grabberUrl);
-  
-  if ( debugMode === true ) {
-    grabber.webContents.openDevTools();
-  }
-  grabber.on('closed', function() {
-    grabber = null;
-  });
-};
-
-
-/**
  * run the specified screensaver on the specified screen
  */
 var runScreenSaverOnDisplay = function(saver, s) {
@@ -213,15 +214,11 @@ var runScreenSaverOnDisplay = function(saver, s) {
     return;
   }
 
-  var w = new BrowserWindow(windowOpts);       
-  saverWindows.push(w);
-
-  var ipc_channel = "screenshot-" + s.id;
-  
   // listen for an event that we have an image of the display we will run on before completing setup
-  log.info("register IPC handler");
-  ipcMain.once(ipc_channel, function(e, message) {
+  grabScreen(s, function(message) {
     var url;
+    var w = new BrowserWindow(windowOpts);       
+    saverWindows.push(w);
 
     log.info("got screenshot back, let's do this");
     
@@ -232,10 +229,6 @@ var runScreenSaverOnDisplay = function(saver, s) {
     
       // Emitted when the window is closed.
       w.on('closed', function() {
-        log.info("remove IPC listener");
-        ipcMain.removeAllListeners(ipc_channel);
-        //log.info("close window!");
-
         saverWindows = _.filter(saverWindows, function(w2) {
           return (w2 !== w);
         });
@@ -253,7 +246,7 @@ var runScreenSaverOnDisplay = function(saver, s) {
 
         if ( ! screenSaverIsRunning() ) {
           log.info("all windows closed, reset");
-          stateManager.reset();
+          //stateManager.reset();
         }
       });
     
@@ -272,6 +265,8 @@ var runScreenSaverOnDisplay = function(saver, s) {
       });
 
       w.once('ready-to-show', () => {
+        log.info('ready-to-show');
+
         w.setFullScreen(true);
         w.webContents.openDevTools();
         if (process.platform !== "darwin") {
@@ -279,8 +274,6 @@ var runScreenSaverOnDisplay = function(saver, s) {
         }
       })
 
-      log.info("hello from", w);
-    
       // windows is having some issues with putting the window behind existing
       // stuff -- @see https://github.com/atom/electron/issues/2867
       //w.minimize();
@@ -346,9 +339,6 @@ var runScreenSaver = function() {
     for ( var i in displays ) {
       runScreenSaverOnDisplay(saver, displays[i]);
     } // for
-
-    log.info("requesting screengrabs");
-    grabber.webContents.send('screengrab-request', displays);
   }
   catch (e) {
     log.info(e);
@@ -482,8 +472,6 @@ var bootApp = function(_basePath) {
       appIcon.popUpContextMenu();
     });
     
-    openScreenGrabber();
-
     if ( argv.screen === "prefs" ) {
       openPrefsWindow();
     }
