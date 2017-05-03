@@ -15,6 +15,8 @@
  */
 
 const electron = require('electron');
+const log = require('electron-log');
+
 const app = electron.app;  // Module to control application life.
 const BrowserWindow = electron.BrowserWindow;  // Module to create native browser window.
 const Menu = electron.Menu;
@@ -79,6 +81,7 @@ var openPrefsWindow = function() {
   ];
 
   // take a screenshot of the main screen for use in previews
+  log.info("register IPC handler for prefs page");
   ipcMain.once("screenshot-" + primary.id, function(e, message) {
     grabber.reload();
 
@@ -204,7 +207,7 @@ var runScreenSaverOnDisplay = function(saver, s) {
     windowOpts.fullscreen = true;
   }
   
-  console.log("runScreenSaverOnDisplay");
+  log.info("runScreenSaverOnDisplay");
   // don't do anything if we don't actually have a screensaver
   if ( typeof(saver) === "undefined" || saver === null ) {
     return;
@@ -212,11 +215,16 @@ var runScreenSaverOnDisplay = function(saver, s) {
 
   var w = new BrowserWindow(windowOpts);       
   saverWindows.push(w);
+
+  var ipc_channel = "screenshot-" + s.id;
   
   // listen for an event that we have an image of the display we will run on before completing setup
-  ipcMain.once("screenshot-" + s.id, function(e, message) {
+  log.info("register IPC handler");
+  ipcMain.once(ipc_channel, function(e, message) {
     var url;
 
+    log.info("got screenshot back, let's do this");
+    
     try {
       if ( debugMode === true ) {
         w.webContents.openDevTools();
@@ -224,12 +232,14 @@ var runScreenSaverOnDisplay = function(saver, s) {
     
       // Emitted when the window is closed.
       w.on('closed', function() {
-        //console.log("close window!");
+        log.info("remove IPC listener");
+        ipcMain.removeAllListeners(ipc_channel);
+        //log.info("close window!");
 
         saverWindows = _.filter(saverWindows, function(w2) {
           return (w2 !== w);
         });
-        console.log("running windows: " + saverWindows.length);
+        log.info("running windows: " + saverWindows.length);
 
         // 100% close/kill this window
         if ( typeof(w) !== 'undefined' ) {
@@ -237,12 +247,12 @@ var runScreenSaverOnDisplay = function(saver, s) {
             w.destroy();
           }
           catch (e) {
-            console.log(e);
+            log.info(e);
           }
         }
 
         if ( ! screenSaverIsRunning() ) {
-          console.log("all windows closed, reset");
+          log.info("all windows closed, reset");
           stateManager.reset();
         }
       });
@@ -250,7 +260,7 @@ var runScreenSaverOnDisplay = function(saver, s) {
       url_opts.screenshot = encodeURIComponent("file://" + message.url);
       url = saver.getUrl(url_opts);
 
-      console.log("Loading " + url);
+      log.info("Loading " + url);
 
       // and load the index.html of the app.
       w.loadURL(url);
@@ -269,7 +279,7 @@ var runScreenSaverOnDisplay = function(saver, s) {
         }
       })
 
-      console.log("hello from", w);
+      log.info("hello from", w);
     
       // windows is having some issues with putting the window behind existing
       // stuff -- @see https://github.com/atom/electron/issues/2867
@@ -277,7 +287,7 @@ var runScreenSaverOnDisplay = function(saver, s) {
       // w.focus();
     }
     catch (e) {
-      console.log(e);
+      log.info(e);
     }
   });
 };
@@ -337,10 +347,11 @@ var runScreenSaver = function() {
       runScreenSaverOnDisplay(saver, displays[i]);
     } // for
 
+    log.info("requesting screengrabs");
     grabber.webContents.send('screengrab-request', displays);
   }
   catch (e) {
-    console.log(e);
+    log.info(e);
   }
 };
 
@@ -360,7 +371,7 @@ var activeWindowHandle = function(w) {
  * close any running screensavers
  */
 var closeRunningScreensavers = function() {
-  console.log("closeRunningScreensavers");
+  log.info("closeRunningScreensavers");
   if ( debugMode !== true ) {
     attemptToStopScreensavers();
     setTimeout(forcefullyCloseScreensavers, 2500);
@@ -405,7 +416,7 @@ var shouldLockScreen = function() {
  * stop the running screensaver
  */
 var stopScreenSaver = function(fromBlank) {
-  console.log("received stopScreenSaver call");
+  log.info("received stopScreenSaver call");
 
   //if ( ! screenSaverIsRunning() || debugMode === true ) {
   //    return;
@@ -499,13 +510,13 @@ var inFullscreen = require('./lib/fullscreen.js').inFullscreen;
  * run the screensaver, but only if there isn't an app in fullscreen mode right now
  */
 var runScreenSaverIfNotFullscreen = function() {
-  console.log("runScreenSaverIfNotFullscreen");
+  log.info("runScreenSaverIfNotFullscreen");
   if ( ! inFullscreen() ) {
-    console.log("I don't think we're in fullscreen mode");
+    log.info("I don't think we're in fullscreen mode");
     runScreenSaver();
   }
   else {
-    console.log("looks like we are in fullscreen mode");
+    log.info("looks like we are in fullscreen mode");
   }
 };
 
@@ -514,10 +525,10 @@ var runScreenSaverIfNotFullscreen = function() {
  * is fine with running on battery
  */
 var runScreenSaverIfPowered = function() {
-  console.log("runScreenSaverIfPowered");
+  log.info("runScreenSaverIfPowered");
 
   if ( screenSaverIsRunning() ) {
-    console.log("looks like we're already running");
+    log.info("looks like we're already running");
     return;
   }
   
@@ -528,7 +539,7 @@ var runScreenSaverIfPowered = function() {
         runScreenSaverIfNotFullscreen();
       }
       else {
-        console.log("I would run, but we're on battery :(");
+        log.info("I would run, but we're on battery :(");
       }
     });
   }
@@ -542,9 +553,9 @@ var runScreenSaverIfPowered = function() {
  * reset state machine
  */
 var blankScreenIfNeeded = function() {
-  console.log("blankScreenIfNeeded");
+  log.info("blankScreenIfNeeded");
   if ( screenSaverIsRunning() ) {
-    console.log("running, close windows");
+    log.info("running, close windows");
     stopScreenSaver(true);
     screen.doSleep();
   }
@@ -562,7 +573,7 @@ var updateStateManager = function() {
 
 
 var checkForNewRelease = function() {
-  console.log("checkForNewRelease");
+  log.info("checkForNewRelease");
   releaseChecker.checkLatestRelease(
     global.APP_REPO, global.APP_VERSION, 
     function() {
@@ -681,16 +692,16 @@ trayMenu = Menu.buildFromTemplate([
 
 // seems like we need to catch this event to keep OSX from exiting app after screensaver runs?
 app.on('window-all-closed', function() {
-  console.log("window-all-closed");
+  log.info("window-all-closed");
 });
 app.on('before-quit', function() {
-  console.log("before-quit");
+  log.info("before-quit");
 });
 app.on('will-quit', function() {
-  console.log("will-quit");
+  log.info("will-quit");
 });
 app.on('quit', function() {
-  console.log("quit");
+  log.info("quit");
 });
 
 // This method will be called when Electron has finished
@@ -715,6 +726,7 @@ app.once('ready', function() {
 // listen for a message from global.js that we should stop running the screensaver
 //
 ipcMain.on("stopScreenSaver", (event, arg) => {
+  log.info("got IPC stopScreenSaver call");
   stopScreenSaver();
 });
 

@@ -8,6 +8,7 @@
   </body>
   
   <script>
+   const log = require('electron-log');
    const ipcRenderer = require('electron').ipcRenderer;
    const desktopCapturer = require('electron').desktopCapturer;
    const temp = require("temp");
@@ -46,7 +47,7 @@
        }
      };
 
-     console.log(screen_opts);
+     log.info(screen_opts);
 
      desktopCapturer.getSources({types: ['screen']}, function(error, sources) {     
        if ( sources.length > 1 ) {
@@ -74,7 +75,7 @@
          video.addEventListener('canplay', function render(ev){
            video.removeEventListener("canplay", render, false); //remove listener, no longer needed
 
-           //console.log("VIDEO", video);
+           //log.info("VIDEO", video);
            var width = video.videoWidth;
            var height = video.videoHeight;
 
@@ -118,7 +119,7 @@
 
 
          
-           console.log('screenshot-' + opts.id);
+           log.info('screenshot-' + opts.id);
            ipcRenderer.send('screenshot-' + opts.id, {url:tempName});
          });
 
@@ -128,15 +129,15 @@
 
    
    ipcRenderer.on('screengrab-request', function(event, displays) {
-     console.log("got screengrab request", event);
+     log.info("got screengrab request", event);
      for ( var i = 0; i < displays.length; i++ ) {
        captureScreen(displays[i], displays.length > 1);
      }
    });
    
    function getUserMediaError(e) {
-     console.log('getUserMediaError');
-     console.log(e);
+     log.info('getUserMediaError');
+     log.info(e);
    }
   </script>
 </html>
