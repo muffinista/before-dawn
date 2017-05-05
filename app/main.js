@@ -42,11 +42,6 @@ let debugMode = ( argv.debug === true );
 
 let saverWindows = [];
 
-
-// track total displays so that when the screensaver is
-// running everywhere we can handle some background work
-var totalDisplays = 0;
-
 var appReady = false;
 var configLoaded = false;
 
@@ -184,6 +179,18 @@ var openHelpUrl = function() {
 };
 
 
+var forceWindowClose = function(w) {
+  // 100% close/kill this window
+  if ( typeof(w) !== 'undefined' ) {
+    try {
+      w.destroy();
+    }
+    catch (e) {
+      log.info(e);
+    }
+  }
+};
+
 /**
  * run the specified screensaver on the specified screen
  */
@@ -204,6 +211,7 @@ var runScreenSaverOnDisplay = function(saver, s) {
   };
 
   // osx will display window immediately if fullscreen is true
+  // so we default it to false there
   if (process.platform !== "darwin") {
     windowOpts.fullscreen = true;
   }
@@ -222,11 +230,7 @@ var runScreenSaverOnDisplay = function(saver, s) {
 
     log.info("got screenshot back, let's do this");
     
-    try {
-      if ( debugMode === true ) {
-        w.webContents.openDevTools();
-      }
-    
+    try {   
       // Emitted when the window is closed.
       w.on('closed', function() {
         saverWindows = _.filter(saverWindows, function(w2) {
@@ -234,15 +238,7 @@ var runScreenSaverOnDisplay = function(saver, s) {
         });
         log.info("running windows: " + saverWindows.length);
 
-        // 100% close/kill this window
-        if ( typeof(w) !== 'undefined' ) {
-          try {
-            w.destroy();
-          }
-          catch (e) {
-            log.info(e);
-          }
-        }
+        forceWindowClose(w);
 
         if ( ! screenSaverIsRunning() ) {
           log.info("all windows closed, reset");
@@ -250,14 +246,6 @@ var runScreenSaverOnDisplay = function(saver, s) {
         }
       });
     
-      url_opts.screenshot = encodeURIComponent("file://" + message.url);
-      url = saver.getUrl(url_opts);
-
-      log.info("Loading " + url);
-
-      // and load the index.html of the app.
-      w.loadURL(url);
-
       // inject our custom JS and CSS into the screensaver window
       w.webContents.on('did-finish-load', function() {
         w.webContents.insertCSS(globalCSSCode);      
@@ -272,15 +260,28 @@ var runScreenSaverOnDisplay = function(saver, s) {
         if (process.platform !== "darwin") {
           w.show();
         }
-      })
-
+      });
+     
       // windows is having some issues with putting the window behind existing
       // stuff -- @see https://github.com/atom/electron/issues/2867
       //w.minimize();
       // w.focus();
+
+      url_opts.screenshot = encodeURIComponent("file://" + message.url);
+      url = saver.getUrl(url_opts);
+
+      log.info("Loading " + url);
+
+      if ( debugMode === true ) {
+        w.webContents.openDevTools();
+      }
+
+      // and load the index.html of the app.
+      w.loadURL(url);
     }
     catch (e) {
       log.info(e);
+      forceWindowClose(w);
     }
   });
 };
@@ -332,8 +333,6 @@ var runScreenSaver = function() {
       app.dock.show();
     }
   }
-
-  totalDisplays = displays.length;
 
   try {
     for ( var i in displays ) {
@@ -678,6 +677,17 @@ trayMenu = Menu.buildFromTemplate([
 
 
 
+//
+// if the user has updated one of their screensavers, we can let
+// the prefs window know that it needs to reload
+//
+ipcMain.on('savers-updated', (event, arg) => {
+  if ( prefsWindowHandle !== null ) {
+    prefsWindowHandle.send('savers-updated', arg);
+  }
+});
+
+
 // seems like we need to catch this event to keep OSX from exiting app after screensaver runs?
 app.on('window-all-closed', function() {
   log.info("window-all-closed");
@@ -708,25 +718,4 @@ app.once('ready', function() {
       bootApp();
     });
 });
-
-
-//
-// listen for a message from global.js that we should stop running the screensaver
-//
-ipcMain.on("stopScreenSaver", (event, arg) => {
-  log.info("got IPC stopScreenSaver call");
-  stopScreenSaver();
-});
-
-
-//
-// if the user has updated one of their screensavers, we can let
-// the prefs window know that it needs to reload
-//
-ipcMain.on('savers-updated', (event, arg) => {
-  if ( prefsWindowHandle !== null ) {
-    prefsWindowHandle.send('savers-updated', arg);
-  }
-});
-
 

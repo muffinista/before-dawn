@@ -1,6 +1,5 @@
 "use strict";
 
-
 module.exports.charging = function() {
   if ( process.platform === 'darwin') {
     var osxBattery = require('osx-battery');
@@ -48,5 +47,4 @@ module.exports.charging = function() {
     return p;    
 
   }
-
 };
