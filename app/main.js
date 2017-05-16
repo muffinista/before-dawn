@@ -256,7 +256,7 @@ var runScreenSaverOnDisplay = function(saver, s) {
         log.info('ready-to-show');
 
         w.setFullScreen(true);
-        w.webContents.openDevTools();
+        //w.webContents.openDevTools();
         if (process.platform !== "darwin") {
           w.show();
         }
