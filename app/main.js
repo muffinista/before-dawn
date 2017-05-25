@@ -259,6 +259,7 @@ var runScreenSaverOnDisplay = function(saver, s) {
         //w.webContents.openDevTools();
         if (process.platform !== "darwin") {
           w.show();
+          stateManager.ignoreReset = false;
         }
       });
      
@@ -333,14 +334,23 @@ var runScreenSaver = function() {
       app.dock.show();
     }
   }
-
+  
   try {
+    // turn off idle checks for a couple seconds while loading savers
+    stateManager.ignoreReset = true;
+
     for ( var i in displays ) {
       runScreenSaverOnDisplay(saver, displays[i]);
     } // for
   }
   catch (e) {
+    stateManager.ignoreReset = false;
     log.info(e);
+  }
+  finally {
+    setTimeout(function() {
+      stateManager.ignoreReset = false;      
+    }, 2500);
   }
 };
 
