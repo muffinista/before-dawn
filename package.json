@@ -10,7 +10,7 @@
   },
   "devDependencies": {
     "electron-builder": "16.8.3",
-    "electron": "1.7.1"
+    "electron": "1.6.8"
   },
   "build": {
     "appId": "Before Dawn",
@@ -25,7 +25,7 @@
       "target": "nsis",
       "icon": "build/icon.ico"
     },
-    "asar": false,
+    "asar": true,
     "dmg": {
       "contents": [
         {
