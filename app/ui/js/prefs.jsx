@@ -14,7 +14,9 @@ const {BrowserWindow} = window.require('electron').remote;
 
 (function() {
   var electron = window.require('electron');
-  const {ipcRenderer} = window.require('electron')
+  const {ipcRenderer} = window.require('electron');
+  const {crashReporter} = window.require('electron');
+
   var remote = window.require('electron').remote;
   var savers = remote.getGlobal('savers');
   var appName = remote.getGlobal('APP_NAME');
@@ -23,6 +25,7 @@ const {BrowserWindow} = window.require('electron').remote;
   var appRepo = remote.getGlobal('APP_REPO');
   var updateAvailable = remote.getGlobal('NEW_RELEASE_AVAILABLE');
 
+  crashReporter.start(remote.getGlobal('CRASH_REPORTER'));
 
   ipcRenderer.on('savers-updated', (event, arg) => {
     console.log("handle savers-updated event");

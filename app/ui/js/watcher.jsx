@@ -7,6 +7,9 @@ import OptionsForm from './options-form';
 (function() {
   const remote = window.require('electron').remote;
   const {ipcRenderer} = window.require('electron');
+  const {crashReporter} = require('electron');
+  crashReporter.start(remote.getGlobal('CRASH_REPORTER'));
+
   const _ = require('lodash');
 
   const fs = require('fs');

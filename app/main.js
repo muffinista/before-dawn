@@ -15,6 +15,7 @@
  */
 
 const electron = require('electron');
+const {crashReporter} = require('electron');
 const log = require('electron-log');
 
 const app = electron.app;  // Module to control application life.
@@ -138,6 +139,15 @@ var openPrefsWindow = function() {
           app.dock.hide();
         }
       });
+
+      // we could do something nice with either of these events
+      prefsWindowHandle.webContents.on('crashed', function (e) {
+        log.info(e);
+      });
+      prefsWindowHandle.webContents.on('unresponsive', function (e) {
+        log.info(e);
+      });
+
     });
   });
 };
@@ -252,6 +262,15 @@ var runScreenSaverOnDisplay = function(saver, s) {
         w.webContents.executeJavaScript(globalJSCode, false, function(result) { });
       });
 
+      // we could do something nice with either of these events
+      w.webContents.on('crashed', function (e) {
+        log.info(e);
+      });
+      w.webContents.on('unresponsive', function (e) {
+        log.info(e);
+      });
+
+      
       w.once('ready-to-show', () => {
         log.info('ready-to-show');
 
@@ -601,9 +620,10 @@ var updateTrayIcon = function() {
   }
 };
 
-
 // load a few global variables
 require('./bootstrap.js');
+
+crashReporter.start(global.CRASH_REPORTER);
 
 // store our root path as a global variable so we can access it from screens
 global.basePath = app.getPath('appData') + "/" + global.APP_DIR;
@@ -729,3 +749,6 @@ app.once('ready', function() {
     });
 });
 
+process.on('uncaughtException', function (ex) {
+  log.info(ex);
+});
