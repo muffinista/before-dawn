@@ -582,7 +582,7 @@ var blankScreenIfNeeded = function() {
 var updateStateManager = function() {
   stateManager.setup({
     idleTime: savers.getDelay() * 60000,
-    blankTime: savers.getSleep() * 60000,
+    blankTime: (savers.getDelay() + savers.getSleep()) * 60000,
     onIdleTime: runScreenSaverIfPowered,
     onBlankTime: blankScreenIfNeeded,
     onReset: closeRunningScreensavers
