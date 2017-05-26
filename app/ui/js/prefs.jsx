@@ -25,6 +25,13 @@ const {BrowserWindow} = window.require('electron').remote;
   var appRepo = remote.getGlobal('APP_REPO');
   var updateAvailable = remote.getGlobal('NEW_RELEASE_AVAILABLE');
 
+  
+  var ravenUrl = remote.getGlobal('RAVEN_URL');
+  if ( typeof(ravenUrl) !== "undefined" ) {
+    console.log("RAVEN!", ravenUrl);
+    Raven.config(ravenUrl).install();
+  }
+  
   crashReporter.start(remote.getGlobal('CRASH_REPORTER'));
 
   ipcRenderer.on('savers-updated', (event, arg) => {

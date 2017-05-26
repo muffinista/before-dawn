@@ -17,6 +17,12 @@ import OptionsForm from './options-form';
   const url = require('url');
   const exec = require('child_process').exec;
   var savers = remote.getGlobal('savers');
+
+  var ravenUrl = remote.getGlobal('RAVEN_URL');
+  if ( typeof(ravenUrl) !== "undefined" ) {
+    Raven.config(ravenUrl).install();
+  }
+
   
   // parse incoming URL params -- we'll get a link to the current screen images for previews here
   var tmpParams = new URLSearchParams(document.location.search);

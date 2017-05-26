@@ -36,6 +36,7 @@
     "node-system-idle-time": "muffinista/node-system-idle-time.git#master",
     "npm-platform-dependencies": "0.0.12",
     "osx-battery": "^4.0.0",
+    "raven": "^2.0.2",
     "react": "^15.5.4",
     "react-dom": "^15.5.4",
     "ref": "^1.3.4",

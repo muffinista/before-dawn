@@ -34,6 +34,8 @@ const releaseChecker = require('./lib/release_check.js');
 const power = require('./lib/power.js');
 let stateManager = require('./lib/state_manager.js');
 
+var Raven;
+
 // NOTE -- this needs to be global, otherwise the app icon gets
 // garbage collected and won't show up in the system tray
 let appIcon = null;
@@ -623,6 +625,12 @@ var updateTrayIcon = function() {
 // load a few global variables
 require('./bootstrap.js');
 
+if ( typeof(global.RAVEN_PRIVATE_URL) !== "undefined" ) {
+  Raven = require('raven');
+  log.info("Setup sentry logging with " + global.RAVEN_PRIVATE_URL);
+  Raven.config(global.RAVEN_PRIVATE_URL).install();
+}
+
 crashReporter.start(global.CRASH_REPORTER);
 
 // store our root path as a global variable so we can access it from screens
@@ -751,4 +759,10 @@ app.once('ready', function() {
 
 process.on('uncaughtException', function (ex) {
   log.info(ex);
+  if ( typeof(Raven) !== "undefined" ) {
+    Raven.captureException(ex);
+  }
 });
+
+log.transports.file.maxSize = 1 * 1024 * 1024;
+log.transports.file.file = __dirname + '/log.txt';
