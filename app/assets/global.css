@@ -1,4 +1,4 @@
 body {margin:0; padding:0; overflow: hidden}
-body, body:hover { cursor: url('data:image/gif;base64,R0lGODlhAQABAPAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=='), none !important; }
+*, *:hover { cursor: none !important; }
 canvas {display:block;}
 canvas:focus {outline:0;}
