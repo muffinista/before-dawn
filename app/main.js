@@ -222,6 +222,8 @@ var runScreenSaverOnDisplay = function(saver, s) {
     show: false
   };
 
+  var tickCount;
+  
   // osx will display window immediately if fullscreen is true
   // so we default it to false there
   if (process.platform !== "darwin") {
@@ -233,6 +235,8 @@ var runScreenSaverOnDisplay = function(saver, s) {
   if ( typeof(saver) === "undefined" || saver === null ) {
     return;
   }
+
+  tickCount = process.hrtime();
 
   // listen for an event that we have an image of the display we will run on before completing setup
   grabScreen(s, function(message) {
@@ -251,11 +255,6 @@ var runScreenSaverOnDisplay = function(saver, s) {
         log.info("running windows: " + saverWindows.length);
 
         forceWindowClose(w);
-
-        if ( ! screenSaverIsRunning() ) {
-          log.info("all windows closed, reset");
-          //stateManager.reset();
-        }
       });
     
       // inject our custom JS and CSS into the screensaver window
@@ -274,19 +273,22 @@ var runScreenSaverOnDisplay = function(saver, s) {
 
       
       w.once('ready-to-show', () => {
-        log.info('ready-to-show');
+        var diff;
 
+        log.info('ready-to-show');
         w.setFullScreen(true);
-        //w.webContents.openDevTools();
+
         if (process.platform !== "darwin") {
           w.show();
-          stateManager.ignoreReset = false;
         }
+
+        diff = process.hrtime(tickCount);
+        log.info(`rendered in ${diff[0] * 1e9 + diff[1]} nanoseconds`);
       });
-     
+      
       // windows is having some issues with putting the window behind existing
       // stuff -- @see https://github.com/atom/electron/issues/2867
-      //w.minimize();
+      // w.minimize();
       // w.focus();
 
       url_opts.screenshot = encodeURIComponent("file://" + message.url);
@@ -358,19 +360,19 @@ var runScreenSaver = function() {
   
   try {
     // turn off idle checks for a couple seconds while loading savers
-    stateManager.ignoreReset = true;
+    stateManager.ignoreReset(true);
 
     for ( var i in displays ) {
       runScreenSaverOnDisplay(saver, displays[i]);
     } // for
   }
   catch (e) {
-    stateManager.ignoreReset = false;
+    stateManager.ignoreReset(false);
     log.info(e);
   }
   finally {
     setTimeout(function() {
-      stateManager.ignoreReset = false;      
+      stateManager.ignoreReset(false);
     }, 2500);
   }
 };

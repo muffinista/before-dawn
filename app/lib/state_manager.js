@@ -168,7 +168,13 @@ var getNextTime = function() {
   return _idleTime;
 };
 
-var ignoreReset = false;
+var _ignoreReset = false;
+var ignoreReset = function(val) {
+  _ignoreReset = val;
+  if ( _ignoreReset === false ) {
+    lastTime = -1;
+  } 
+};
 
 /**
  * check idle time and determine if we should switch states
@@ -187,7 +193,7 @@ var tick = function() {
       // we won't actually reset the state while a screensaver is
       // loading, because sometimes we get zombie electron windows
       // when we do that
-      if ( ! ignoreReset ) {
+      if ( ! _ignoreReset ) {
         reset();
       }
     }
