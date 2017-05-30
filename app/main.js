@@ -416,6 +416,11 @@ var activeWindowHandle = function(w) {
 var closeRunningScreensavers = function() {
   log.info("closeRunningScreensavers");
   if ( debugMode !== true ) {
+    if ( oldMousePosition.x !== 0 && oldMousePosition.y !== 0 ) {
+      log.info("restore mouse to", oldMousePosition.x, oldMousePosition.y); 
+      robot.moveMouse(oldMousePosition.x, oldMousePosition.y);
+    }
+
     attemptToStopScreensavers();
     setTimeout(forcefullyCloseScreensavers, 2500);
   }
@@ -461,11 +466,6 @@ var shouldLockScreen = function() {
 var stopScreenSaver = function(fromBlank) {
   log.info("received stopScreenSaver call");
 
-  //if ( ! screenSaverIsRunning() || debugMode === true ) {
-  //    return;
-  //}
-
-  robot.moveMouse(oldMousePosition.x, oldMousePosition.y);
   
   if ( fromBlank !== true ) {
     stateManager.reset();
