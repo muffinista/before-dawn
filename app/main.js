@@ -34,6 +34,8 @@ const releaseChecker = require('./lib/release_check.js');
 const power = require('./lib/power.js');
 let stateManager = require('./lib/state_manager.js');
 
+const robot = require("robotjs");
+
 var Raven;
 
 // NOTE -- this needs to be global, otherwise the app icon gets
@@ -44,16 +46,19 @@ let argv = parseArgs(process.argv);
 let debugMode = ( argv.debug === true );
 
 let saverWindows = [];
+let oldMousePosition = {x:0, y:0};
 
 var appReady = false;
 var configLoaded = false;
 
 var shouldQuit = false;
 
-var globalJSCode, globalCSSCode;
+var globalCSSCode;
 
 var prefsWindowHandle = null;
 var trayMenu;
+
+
 
 var icons = {
   'win32' : {
@@ -215,11 +220,13 @@ var runScreenSaverOnDisplay = function(saver, s) {
   };
   
   var windowOpts = {
+    backgroundColor: '#000000',
     autoHideMenuBar: true,
     alwaysOnTop: true,
     x: s.bounds.x,
     y: s.bounds.y,
-    show: false
+    show: false,
+    frame: false
   };
 
   var tickCount;
@@ -259,8 +266,12 @@ var runScreenSaverOnDisplay = function(saver, s) {
     
       // inject our custom JS and CSS into the screensaver window
       w.webContents.on('did-finish-load', function() {
+        log.info('did-finish-load');
         w.webContents.insertCSS(globalCSSCode);      
-        w.webContents.executeJavaScript(globalJSCode, false, function(result) { });
+        //w.webContents.executeJavaScript(globalJSCode, false, function(result) { });
+        /* setTimeout(function() {
+           w.webContents.sendInputEvent({type:'mouseDown', x:300, y: 230, button:'left', clickCount: 1});
+           }, 2500); */
       });
 
       // we could do something nice with either of these events
@@ -276,11 +287,16 @@ var runScreenSaverOnDisplay = function(saver, s) {
         var diff;
 
         log.info('ready-to-show');
-        w.setFullScreen(true);
+        if ( debugMode !== true ) {
+          w.setFullScreen(true);
+        }
 
         if (process.platform !== "darwin") {
           w.show();
         }
+
+        //w.minimize();       
+        w.focus();
 
         diff = process.hrtime(tickCount);
         log.info(`rendered in ${diff[0] * 1e9 + diff[1]} nanoseconds`);
@@ -349,6 +365,11 @@ var runScreenSaver = function() {
     return;
   }
 
+  oldMousePosition = robot.getMousePos();
+
+  // move cursor so far off screen, it isn't even funny
+  robot.moveMouse(30000, 30000);
+  
   // @todo maybe add an option to only run on a single display?
   
   // limit to a single screen when debugging
@@ -444,6 +465,8 @@ var stopScreenSaver = function(fromBlank) {
   //    return;
   //}
 
+  robot.moveMouse(oldMousePosition.x, oldMousePosition.y);
+  
   if ( fromBlank !== true ) {
     stateManager.reset();
   }
@@ -640,7 +663,7 @@ global.basePath = app.getPath('appData') + "/" + global.APP_DIR;
 global.savers = require('./lib/savers.js');
 
 // some global JS/CSS we'll inject into running screensavers
-globalJSCode = fs.readFileSync( path.join(__dirname, 'assets', 'global-js-handlers.js'), 'ascii');
+//globalJSCode = fs.readFileSync( path.join(__dirname, 'assets', 'global-js-handlers.js'), 'ascii');
 globalCSSCode = fs.readFileSync( path.join(__dirname, 'assets', 'global.css'), 'ascii');  
 
 
