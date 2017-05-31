@@ -6,7 +6,8 @@
   "scripts": {
     "postinstall": "install-app-deps",
     "pack": "build --dir",
-    "dist": "build --x64"
+    "dist": "build --x64",
+    "cleanup": "npm prune && cd app/ && npm prune"
   },
   "devDependencies": {
     "electron-builder": "16.8.3",
