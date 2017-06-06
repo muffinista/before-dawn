@@ -170,8 +170,10 @@ const {BrowserWindow} = window.require('electron').remote;
       //console.log(current, s);
     }
 
-    loadPreview(s);
-    loadOptionsForm(s);
+    if ( typeof(s) !== "undefined" ) {
+      loadPreview(s);
+      loadOptionsForm(s);
+    }
   };
 
   var onResize = function() {
