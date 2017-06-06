@@ -11,6 +11,7 @@ global.APP_REPO = "muffinista/before-dawn";
 global.APP_VERSION = "v" + version;
 global.NEW_RELEASE_AVAILABLE = false;
 global.HELP_URL = "https://muffinista.github.io/before-dawn/";
+global.ISSUES_URL = "https://github.com/muffinista/before-dawn/issues";
 
 // this is a free sentry account and the URL will be in every copy of
 // the app that gets distrubuted, so i'm committing it to the repo for now

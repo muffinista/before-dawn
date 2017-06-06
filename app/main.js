@@ -166,8 +166,8 @@ var openPrefsWindow = function() {
 var openAboutWindow = function() {
   var prefsUrl = 'file://' + __dirname + '/ui/about.html';
   var w = new BrowserWindow({
-    width:450,
-    height:350,
+    width:500,
+    height:400,
     resizable:false,
     icon: path.join(__dirname, 'assets', 'icon.png')
   });
@@ -192,7 +192,20 @@ var openAboutWindow = function() {
  * open the help section in a browser
  */
 var openHelpUrl = function() {
-  require('electron').shell.openExternal(global.HELP_URL);
+  try {
+    require('electron').shell.openExternal(global.HELP_URL);
+  }
+  catch(e) {
+    log.info(e);
+  }
+};
+var openIssuesUrl = function() {
+  try {
+    require('electron').shell.openExternal(global.ISSUES_URL);
+  }
+  catch(e) {
+    log.info(e);
+  }
 };
 
 
@@ -731,6 +744,10 @@ trayMenu = Menu.buildFromTemplate([
   {
     label: 'Help',
     click: function() { openHelpUrl(); }
+  },
+  {
+    label: 'Report a Bug',
+    click: function() { openIssuesUrl(); }
   },
   {
     label: 'Quit',
