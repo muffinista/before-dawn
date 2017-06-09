@@ -512,6 +512,7 @@ var openPrefsOnFirstLoad = function() {
  */
 var bootApp = function(_basePath) {
   var icons = getIcons();
+  // @todo i think asar breaks this
   var menuTemplate = require("./ui/menu_template.js").buildMenuTemplate(app);
   var menu = Menu.buildFromTemplate(menuTemplate);
 
