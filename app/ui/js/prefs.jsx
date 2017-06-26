@@ -139,7 +139,12 @@ const {BrowserWindow} = window.require('electron').remote;
   };
 
   var getCurrentScreensaver = function() {
-    return document.querySelector("input[name=screensaver]:checked").value;
+    var el = document.querySelector("input[name=screensaver]:checked")
+    if ( el !== null ) {
+      return el.value;
+    }
+
+    return undefined;
   };
   
   var optionsUpdated = function(data) {
@@ -311,10 +316,11 @@ const {BrowserWindow} = window.require('electron').remote;
     
     var repo = document.querySelector("input[name=repo]").value;
     var localSource = document.querySelector("[name=localSource]").value;
-    
-    saverOpts = window.optionsFormRef.getValues();
-    
-    savers.setCurrent(val, saverOpts);
+
+    if ( val !== undefined ) {
+      saverOpts = window.optionsFormRef.getValues();
+      savers.setCurrent(val, saverOpts);
+    }
 
     delay = parseInt(delay, 10);   
     savers.setDelay(delay);

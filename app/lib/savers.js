@@ -328,6 +328,10 @@ var skipFolder = function(p) {
  *  @see http://stackoverflow.com/questions/2727167/getting-all-filenames-in-a-directory-with-node-js
  */
 var walk = function(currentDirPath, callback) {
+  if ( ! fs.existsSync(currentDirPath) ) {
+    return;
+  }
+  
   fs.readdirSync(currentDirPath).forEach(function(name) {
     var filePath = path.join(currentDirPath, name);
     try {
