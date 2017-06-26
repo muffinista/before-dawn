@@ -40,7 +40,11 @@ import OptionsForm from './options-form';
 
   // load screensaver object
   var s = savers.getByKey(src);
-  var saverAttrs = s.toHash();
+  var saverAttrs = {};
+
+  if ( s !== undefined ) {
+    saverAttrs = s.toHash();
+  }
     
   var reloadPreview = function(ev) {
     var iframe = document.querySelector("iframe");
