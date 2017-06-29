@@ -58,6 +58,8 @@ var globalCSSCode;
 var prefsWindowHandle = null;
 var trayMenu;
 
+var electronScreen;
+
 
 
 var icons = {
@@ -109,7 +111,6 @@ var grabScreen = function(s, cb) {
  * Open the preferences window
  */
 var openPrefsWindow = function() {
-  var electronScreen = electron.screen;
   var primary = electronScreen.getPrimaryDisplay();
 
   // take a screenshot of the main screen for use in previews
@@ -343,7 +344,6 @@ var runScreenSaverOnDisplay = function(saver, s) {
  * get a list of displays connected to the computer.
  */
 var getDisplays = function() {
-  var electronScreen = electron.screen;
   var displays = [];
   if ( debugMode === true ) {
     displays = [
@@ -422,6 +422,11 @@ var screenSaverIsRunning = function() {
 var activeWindowHandle = function(w) {
   return (typeof(w) !== 'undefined' && ! w.isDestroyed());
 };
+
+var handleDisplayChange = function() {
+  log.info("display change, let's close running screensavers");
+  closeRunningScreensavers();
+}
 
 /**
  * close any running screensavers
@@ -524,6 +529,11 @@ var bootApp = function(_basePath) {
 
   trayMenu.items[3].visible = global.NEW_RELEASE_AVAILABLE;
 
+  electronScreen = electron.screen;
+  electronScreen.on('display-added', handleDisplayChange);
+  electronScreen.on('display-removed', handleDisplayChange);
+  electronScreen.on('display-metrics-changed', handleDisplayChange);    
+  
   global.savers.init(global.basePath, function() {
     configLoaded = true;
     updateStateManager();
