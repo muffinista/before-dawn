@@ -1,5 +1,18 @@
 # Change Log
 
+## [v0.9.5](https://github.com/muffinista/before-dawn/tree/v0.9.5) (2017-06-27)
+- Fix some bugs that can occur when setting a custom screensaver
+  source directory that either doesn't exist or is empty.
+
+## [v0.9.4](https://github.com/muffinista/before-dawn/tree/v0.9.4) (2017-06-09)
+- Disable ASAR packages. I think there's a few things that are broken
+  when they are being used, and I want to have the whole app running
+  more smoothly before switching back to them.
+- Add link to issues URL so users can report bugs.
+- Fix bug where we tried to render preview when a screensaver hadn't
+  been selected yet.
+
+
 ## [v0.9.3](https://github.com/muffinista/before-dawn/tree/v0.9.3) (2017-06-01)
 - Tweak state machine to rely on idle time checks and not much else
 - Fix bug with (I think) newer versions of Electron where opening a
