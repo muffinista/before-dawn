@@ -38,6 +38,8 @@ import OptionsForm from './options-form';
   var screenshot = decodeURIComponent(urlParams.screenshot);
   var src = decodeURIComponent(urlParams.src);
 
+  console.log("SRC", src);
+  
   // load screensaver object
   var s = savers.getByKey(src);
   var saverAttrs = {};
@@ -45,7 +47,7 @@ import OptionsForm from './options-form';
   if ( s !== undefined ) {
     saverAttrs = s.toHash();
   }
-    
+
   var reloadPreview = function(ev) {
     var iframe = document.querySelector("iframe");
 
@@ -101,7 +103,9 @@ import OptionsForm from './options-form';
   reloadPreview();
   window.addEventListener('resize', reloadPreview, true);
 
-  var filePath = path.dirname(url.parse(src).path);
+  // figure out the path to the screensaver folder. use
+  // decodeURIComponent to convert %20 to spaces
+  var filePath = path.dirname(decodeURIComponent(url.parse(src).path));
   fs.watch(filePath, (eventType, filename) => {
     if (filename) {
       reloadPreview();
