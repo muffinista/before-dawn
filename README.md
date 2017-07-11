@@ -75,6 +75,9 @@ engage your screensaver. That's all there is to it!
 Steps for generating your own build Before Dawn are listed in
 [the wiki](https://github.com/muffinista/before-dawn/wiki/Building-Before-Dawn)
 
+@TODO - document a bit about windows -- pretty much just need to
+follow https://www.npmjs.com/package/windows-build-tools
+
 ## Hacking It
 
 If you would like to hack on Before Dawn, there's some instructions on
