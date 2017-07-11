@@ -533,6 +533,17 @@ var bootApp = function(_basePath) {
   electronScreen.on('display-added', handleDisplayChange);
   electronScreen.on('display-removed', handleDisplayChange);
   electronScreen.on('display-metrics-changed', handleDisplayChange);    
+
+  electron.powerMonitor.on('suspend', () => {
+    console.log('The system is going to sleep, stop screensavers');
+    closeRunningScreensavers();
+  });
+  electron.powerMonitor.on('resume', () => {
+    console.log('The system just woke up, stop screensavers');
+    closeRunningScreensavers();
+  });
+
+  
   
   global.savers.init(global.basePath, function() {
     configLoaded = true;
