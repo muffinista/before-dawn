@@ -198,6 +198,14 @@ const {BrowserWindow} = window.require('electron').remote;
         <SaverList current={current} data={entries} />,
         document.getElementById('savers')
       );
+
+      // scroll to the currently selected screensaver
+      var $target = $("input[name=screensaver]:checked");
+      if ( $target.length > 0 ) {
+        var $list = $("#savers");
+        $list.scrollTop($list.scrollTop() - $list.offset().top + $target.offset().top - 25);
+      }
+
       
       var s = savers.getByKey(current);
       redraw(s);
