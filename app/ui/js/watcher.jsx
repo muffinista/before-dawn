@@ -62,11 +62,13 @@ import OptionsForm from './options-form';
       screenshot: screenshot
     };
 
-    var mergedOpts = _.merge(url_opts, s.settings);
-    var previewUrl = s.getUrl(mergedOpts);
+    if ( s !== undefined ) {
+      var mergedOpts = _.merge(url_opts, s.settings);
+      var previewUrl = s.getUrl(mergedOpts);
 
-    console.log("LOAD URL", previewUrl);
-    iframe.src = previewUrl;
+      console.log("LOAD URL", previewUrl);
+      iframe.src = previewUrl;
+    }
 
     if ( typeof(ev) !== "undefined" ) {
       ev.preventDefault();
