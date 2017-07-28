@@ -1,5 +1,16 @@
 # Change Log
 
+## [v0.9.7](https://github.com/muffinista/before-dawn/tree/v0.9.7) (2017-07-28)
+- Scroll to the currently selected screensaver when rendering prefs
+  panel
+- Handle missing screensaver object in watcher window
+
+## [v0.9.6](https://github.com/muffinista/before-dawn/tree/v0.9.6) (2017-07-11)
+- Fix some issues with loading screensavers from folders with spaces in their name
+- Add some handlers for power on/off events
+- Close running screensavers when the display count changes (the user
+  has plugged/unplugged a monitor)
+
 ## [v0.9.5](https://github.com/muffinista/before-dawn/tree/v0.9.5) (2017-06-27)
 - Fix some bugs that can occur when setting a custom screensaver
   source directory that either doesn't exist or is empty.
