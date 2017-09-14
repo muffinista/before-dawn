@@ -329,31 +329,51 @@ var skipFolder = function(p) {
 };
 
 
-/**
- * recursively parse through a directory structure
- *  @see http://stackoverflow.com/questions/2727167/getting-all-filenames-in-a-directory-with-node-js
- */
-var walk = function(currentDirPath, callback) {
-  if ( ! fs.existsSync(currentDirPath) ) {
+var parseAndLoadSaver = function(opts) {
+
+  var f = opts.filepath;
+  var folder = path.dirname(f);
+
+  // make sure this is a saver.json file,
+  // not in a template directory
+  // and not in a folder we want to skip
+  var doSkip = ! f.match(/saver.json$/) ||
+               folder.split(path.sep).reverse()[0].match(/^__/) ||
+               skipFolder(folder);
+
+  if ( doSkip ) {
     return;
   }
   
-  fs.readdirSync(currentDirPath).forEach(function(name) {
-    var filePath = path.join(currentDirPath, name);
+  fs.readFile(opts.filepath, {encoding: 'utf8'}, function (err, content) {
     try {
-      var stat = fs.statSync(filePath);
-      if (stat.isFile()) {
-        callback(filePath, stat);
+      var contents = JSON.parse(content);           
+      var stub = path.dirname(f);
+      contents.path = stub;
+      contents.key = stub + "/" + contents.source;
+          
+      // allow for a specified URL -- this way you could create a screensaver
+      // that pointed to a remote URL
+      if ( typeof(contents.url) === "undefined" ) {
+        contents.url = 'file://' + contents.key;
       }
-      else if (stat.isDirectory() && ! skipFolder(filePath)) {
-        walk(filePath, callback);
+          
+      contents.settings = getOptions(contents.key);
+      contents.editable = (opts.root === getLocalSource());
+
+      var s = new Saver(contents);
+      if ( s.valid ) {
+        loadedScreensavers.push(s);
       }
     }
     catch(e) {
       console.log(e);
-    }
-
+      
+      console.log("file " + f);
+      console.log(content);
+    }          
   });
+  
 };
 
 /**
@@ -363,7 +383,8 @@ var walk = function(currentDirPath, callback) {
 var listAll = function(cb) {
   var root = path.join(baseDir, 'savers');
   var folders = [];
-
+  var walker = require('folder-walker');
+  
   var source = getSource();
   var local = getLocalSource();
   
@@ -375,62 +396,17 @@ var listAll = function(cb) {
     folders = folders.concat( local );
   }
 
-
   loadedScreensavers = [];
+  var stream = walker(folders);
 
-  folders.forEach( function ( src ) {
-    var editable = (src == local );
+  stream.on('data', parseAndLoadSaver);
+  stream.on('end', function() {
+    loadedScreensavers = _.sortBy(loadedScreensavers, function(s) { return s.name.toLowerCase(); });
     
-    walk(src, function(f, stat) {
-      // exclude matches from directories that start with __
-      if (
-        f.match(/saver.json$/) &&
-        ! path.dirname(f).split(path.sep).reverse()[0].match(/^__/)
-      ) {
-
-        var content;
-
-        try {
-          content = fs.readFileSync( f, "utf8" );
-          var contents = JSON.parse(content);
-          
-          var stub = path.dirname(f);
-          contents.path = stub;
-          contents.key = stub + "/" + contents.source;
-          
-          // allow for a specified URL -- this way you could create a screensaver
-          // that pointed to a remote URL
-          if ( typeof(contents.url) === "undefined" ) {
-            contents.url = 'file://' + contents.key;
-          }
-          
-          contents.settings = getOptions(contents.key);
-
-          contents.editable = editable;
-          
-          var s = new Saver(contents);
-          if ( s.valid ) {
-            loadedScreensavers.push(s);
-          }
-        }
-        catch(e) {
-          console.log(e);
-
-          console.log("file " + f);
-          console.log(content);
-        }
-      }
-    });
+    if ( typeof(cb) !== "undefined" ) {
+      cb(loadedScreensavers);
+    }
   });
-
-
-  loadedScreensavers = _.sortBy(loadedScreensavers, function(s) { return s.name.toLowerCase(); });
-  
-  if ( typeof(cb) !== "undefined" ) {
-    cb(loadedScreensavers);
-  }
-
-  return loadedScreensavers;
 };
 
 /**

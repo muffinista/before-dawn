@@ -25,6 +25,7 @@
     "bootstrap": "4.0.0-alpha.5",
     "electron-log": "^2.2.3",
     "ffi": "^2.2.0",
+    "folder-walker": "^3.1.0",
     "fs-extra": "^2.0.0",
     "github-releases": "^0.3.2",
     "jquery": "^3.1.1",
