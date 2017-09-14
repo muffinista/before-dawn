@@ -61,7 +61,6 @@ var trayMenu;
 var electronScreen;
 
 
-
 var icons = {
   'win32' : {
     active: __dirname + '/assets/icon.ico',
@@ -682,7 +681,7 @@ var updateTrayIcon = function() {
 require('./bootstrap.js');
 
 log.transports.file.maxSize = 1 * 1024 * 1024;
-log.transports.file.file = __dirname + '/log.txt';
+log.transports.file.file = path.join(__dirname, '/log.txt');
 
 if ( typeof(global.RAVEN_PRIVATE_URL) !== "undefined" ) {
   Raven = require('raven');
@@ -693,7 +692,7 @@ if ( typeof(global.RAVEN_PRIVATE_URL) !== "undefined" ) {
 crashReporter.start(global.CRASH_REPORTER);
 
 // store our root path as a global variable so we can access it from screens
-global.basePath = app.getPath('appData') + "/" + global.APP_DIR;
+global.basePath = path.join(app.getPath('appData'), global.APP_DIR);
 global.savers = require('./lib/savers.js');
 
 // some global CSS we'll inject into running screensavers
