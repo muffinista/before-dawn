@@ -1,16 +1,17 @@
 "use strict";
 
-var fs = require('fs-extra');
-var nconf = require('nconf');
-var path = require('path');
-var _ = require('lodash');
+const fs = require('fs-extra');
+const nconf = require('nconf');
+const path = require('path');
+const _ = require('lodash');
+const mkdirp = require('mkdirp');
 
-var Saver = require('./saver.js');
+const Saver = require('./saver.js');
 
 var config_file = "config.json";
 
 var baseDir;
-var loadedData = [];
+var loadedScreensavers = [];
 
 var _firstLoad = false;
 
@@ -19,48 +20,53 @@ var init = function(_path, cb) {
   reload(cb);
 };
 
+/**
+ * reload all our data/config/etc
+ */
 var reload = function(cb) {
-  var configPath = baseDir + "/" + config_file;
-
-  // create our main directory
-  if ( ! fs.existsSync(baseDir) ) {
-    console.log("creating " + baseDir);
-    fs.mkdirSync(baseDir);
-
-    _firstLoad = true;
-  }
-
-  // create a folder for the actual screensavers
-  // @todo multiple folder support?
+  var configPath = path.join(baseDir, config_file);
   let saversDir = defaultSaversDir();
-
-  if ( ! fs.existsSync(saversDir) ) {
-    console.log("create: " + saversDir);
-    fs.mkdirSync(saversDir);
-
-    _firstLoad = true;
-  }
-  else {
-    console.log(saversDir + " already exists");
-  }
-
-  // specify config path
-  console.log("load config from " + configPath);
-
-  if ( ! fs.existsSync(configPath) ) {
-    console.log("no config yet");
-    _firstLoad = true;
-  }
-
-  nconf.file({
-    file: configPath
-  });
-
-  ensureDefaults();
 
   if ( typeof(cb) === "undefined" ) {
     cb = console.log;
   }
+
+  // check for/create our main directory
+  mkdirp(baseDir, function(err, made) {
+    if ( made === true ) {
+      console.log("created " + baseDir);
+      _firstLoad = true;
+    }
+
+    // check for/create a folder for the actual screensavers
+    // @todo multiple folder support?
+    mkdirp(saversDir, function(err, made) {
+      if ( made === true ) {
+        console.log("created " + saversDir);
+        _firstLoad = true;
+      }
+
+      // specify config path
+      console.log("load config from " + configPath);      
+      if ( ! fs.existsSync(configPath) ) {
+        console.log("no config yet");
+        _firstLoad = true;
+      }
+
+      nconf.file({
+        file: configPath
+      });
+      setupPackages(cb);
+
+    }); 
+  });  
+};
+
+/**
+ * reload all our data/config/etc
+ */
+var setupPackages = function(cb) {
+  ensureDefaults();
 
   updatePackage(function(data) {
     if ( data.downloaded === true ) {
@@ -122,7 +128,7 @@ var deleteFolderRecursive = function(path) {
 };
 
 var defaultSaversDir = function() {
-  return baseDir + "/savers";
+  return path.join(baseDir, 'savers');
 };
 
 
@@ -174,7 +180,7 @@ var firstLoad = function() {
  * look up a screensaver by key, and return it
  */
 var getByKey = function(key) {
-  var result = _.find(loadedData, function(obj) {
+  var result = _.find(loadedScreensavers, function(obj) {
     return obj.key === key;
   });
   return result;
@@ -355,7 +361,7 @@ var walk = function(currentDirPath, callback) {
  * call it with data when done. if reload == true, don't use cached data.
  */
 var listAll = function(cb) {
-  var root = baseDir + '/savers/';
+  var root = path.join(baseDir, 'savers');
   var folders = [];
 
   var source = getSource();
@@ -370,7 +376,7 @@ var listAll = function(cb) {
   }
 
 
-  loadedData = [];
+  loadedScreensavers = [];
 
   folders.forEach( function ( src ) {
     var editable = (src == local );
@@ -404,7 +410,7 @@ var listAll = function(cb) {
           
           var s = new Saver(contents);
           if ( s.valid ) {
-            loadedData.push(s);
+            loadedScreensavers.push(s);
           }
         }
         catch(e) {
@@ -418,13 +424,13 @@ var listAll = function(cb) {
   });
 
 
-  loadedData = _.sortBy(loadedData, function(s) { return s.name.toLowerCase(); });
+  loadedScreensavers = _.sortBy(loadedScreensavers, function(s) { return s.name.toLowerCase(); });
   
   if ( typeof(cb) !== "undefined" ) {
-    cb(loadedData);
+    cb(loadedScreensavers);
   }
 
-  return loadedData;
+  return loadedScreensavers;
 };
 
 /**
@@ -537,7 +543,7 @@ exports.getOptions = getOptions;
 exports.listAll = listAll;
 exports.getCurrentUrl = getCurrentUrl;
 exports.getUrl = getUrl;
-exports.loadedData = loadedData;
+exports.loadedScreensavers = loadedScreensavers;
 exports.write = write;
 exports.firstLoad = firstLoad;
 exports.generateScreensaver = generateScreensaver;
