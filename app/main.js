@@ -282,10 +282,6 @@ var runScreenSaverOnDisplay = function(saver, s) {
       w.webContents.on('did-finish-load', function() {
         log.info('did-finish-load');
         w.webContents.insertCSS(globalCSSCode);      
-        //w.webContents.executeJavaScript(globalJSCode, false, function(result) { });
-        /* setTimeout(function() {
-           w.webContents.sendInputEvent({type:'mouseDown', x:300, y: 230, button:'left', clickCount: 1});
-           }, 2500); */
       });
 
       // we could do something nice with either of these events
@@ -685,6 +681,9 @@ var updateTrayIcon = function() {
 // load a few global variables
 require('./bootstrap.js');
 
+log.transports.file.maxSize = 1 * 1024 * 1024;
+log.transports.file.file = __dirname + '/log.txt';
+
 if ( typeof(global.RAVEN_PRIVATE_URL) !== "undefined" ) {
   Raven = require('raven');
   log.info("Setup sentry logging with " + global.RAVEN_PRIVATE_URL);
@@ -697,8 +696,7 @@ crashReporter.start(global.CRASH_REPORTER);
 global.basePath = app.getPath('appData') + "/" + global.APP_DIR;
 global.savers = require('./lib/savers.js');
 
-// some global JS/CSS we'll inject into running screensavers
-//globalJSCode = fs.readFileSync( path.join(__dirname, 'assets', 'global-js-handlers.js'), 'ascii');
+// some global CSS we'll inject into running screensavers
 globalCSSCode = fs.readFileSync( path.join(__dirname, 'assets', 'global.css'), 'ascii');  
 
 
@@ -828,5 +826,4 @@ process.on('uncaughtException', function (ex) {
   }
 });
 
-log.transports.file.maxSize = 1 * 1024 * 1024;
-log.transports.file.file = __dirname + '/log.txt';
+
