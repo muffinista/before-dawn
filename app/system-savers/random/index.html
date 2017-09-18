@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Random Screensaver</title>
+    <style>
+     body {
+       width: 100%;
+       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+     }
+    </style>
+    <script>
+     // load any incoming URL parameters. you could just use the
+     // URLSearchParams object directly to manage these variables, but
+     // having them in a hash is a little easier sometimes.
+     var tmpParams = new URLSearchParams(document.location.search);
+     window.urlParams = {};
+
+     for(let k of tmpParams.keys() ) {
+       window.urlParams[k] = tmpParams.get(k);
+     }
+    </script>
+  </head>
+  <body>
+    <h1>Hello!</h1>
+    <p>This screensaver will pick a random screensaver and run it for you. Enjoy!</p>   
+  </body>
+</html>

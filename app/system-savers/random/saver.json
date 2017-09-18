@@ -1,0 +1,7 @@
+{
+  "name": "Random",
+  "description": "Pick a random screensaver each time",
+  "author": "Colin Mitchell",
+  "preload": "random",
+  "source": "index.html"
+}
