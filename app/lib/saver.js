@@ -20,7 +20,6 @@ var serialize = function(obj) {
 module.exports = function Saver(_attrs) {
   this.UNWRITABLE_KEYS = ["key", "path", "url", "settings"];
 
-
   this.attrs = _attrs;
   this.path = _attrs.path;
   this.name = _attrs.name;
@@ -30,6 +29,7 @@ module.exports = function Saver(_attrs) {
   this.author = _attrs.author;
   this.license = _attrs.license;
   this.url = _attrs.url;
+  this.preload = _attrs.preload;
 
   
   this.published = _attrs.published;
@@ -74,43 +74,43 @@ module.exports = function Saver(_attrs) {
         else {
             this.previewUrl = this.path + "/" + this.attrs.previewUrl;
         }
+  } // if valid
+
+  /**
+   * generate a preview URL with our variables tacked on
+   */
+  this.getPreviewUrl = function(opts) {
+    return this.urlFor(this.previewUrl, opts);
+  };
+
+  /**
+   * generate a URL with our variables tacked on
+   */
+  this.getUrl = function(opts) {
+    return this.urlFor(this.url, opts);
+  };
+  
+  this.urlFor = function(url, opts) {
+    var joiner = "?";
+    if ( typeof(opts) === "undefined" ) {
+      opts = {};
+    }
+    
+    opts = _.merge({}, this.settings, opts);
+    
+    if ( url.lastIndexOf("?") !== -1 ) {
+      joiner ="&";
     }
 
-    /**
-     * generate a preview URL with our variables tacked on
-     */
-    this.getPreviewUrl = function(opts) {
-        return this.urlFor(this.previewUrl, opts);
-    };
-
-    /**
-     * generate a URL with our variables tacked on
-     */
-    this.getUrl = function(opts) {
-        return this.urlFor(this.url, opts);
-    };
-
-    this.urlFor = function(url, opts) {
-        var joiner = "?";
-        if ( typeof(opts) === "undefined" ) {
-            opts = {};
-        }
-
-        opts = _.merge({}, this.settings, opts);
-
-        if ( url.lastIndexOf("?") !== -1 ) {
-            joiner ="&";
-        }
-
-        opts = serialize(opts);
-        return url + joiner + opts;
-    };
-
+    opts = serialize(opts);
+    return url + joiner + opts;
+  };
+  
   this.toHash = function() {
     return this.attrs;   
   };
 
-  // write a new set of attributes for this saver to it's JSON file
+  // write a new set of attributes for this saver to its JSON file
   this.write = function(attrs) {
     var _path = require('path');
     var fs = require('fs');

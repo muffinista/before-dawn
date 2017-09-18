@@ -199,6 +199,11 @@ var openHelpUrl = function() {
     log.info(e);
   }
 };
+
+
+/**
+ * open the github issues url in a browser
+ */
 var openIssuesUrl = function() {
   try {
     require('electron').shell.openExternal(global.ISSUES_URL);
@@ -209,6 +214,9 @@ var openIssuesUrl = function() {
 };
 
 
+/**
+ * forcefully close a screensaver window
+ */
 var forceWindowClose = function(w) {
   // 100% close/kill this window
   if ( typeof(w) !== 'undefined' ) {
@@ -257,7 +265,7 @@ var runScreenSaverOnDisplay = function(saver, s) {
   }
 
   tickCount = process.hrtime();
-
+  
   // listen for an event that we have an image of the display we will run on before completing setup
   grabScreen(s, function(message) {
     var url;
@@ -366,6 +374,7 @@ var setStateToRunning = function() {
  */
 var runScreenSaver = function() {
   var displays = getDisplays();
+
   var saver = global.savers.getCurrentData();
 
   // make sure we have something to display
@@ -373,6 +382,8 @@ var runScreenSaver = function() {
     return;
   }
 
+  saver = global.savers.applyPreload(saver);
+  
   oldMousePosition = robot.getMousePos();
 
   // move cursor so far off screen, it isn't even funny
@@ -414,10 +425,16 @@ var screenSaverIsRunning = function() {
 };
 
 
+/**
+ * check if the specified window exists and isn't destroyed
+ */
 var activeWindowHandle = function(w) {
   return (typeof(w) !== 'undefined' && ! w.isDestroyed());
 };
 
+/**
+ * when the display count changes, close any running windows
+ */
 var handleDisplayChange = function() {
   log.info("display change, let's close running screensavers");
   closeRunningScreensavers();
@@ -537,13 +554,11 @@ var bootApp = function(_basePath) {
     console.log('The system just woke up, stop screensavers');
     closeRunningScreensavers();
   });
-
-  
   
   global.savers.init(global.basePath, function() {
     configLoaded = true;
     updateStateManager();
-
+    
     // check for a new release every 12 hours
     setInterval(checkForNewRelease, 1000 * 60 * 60 * 12);
 
@@ -634,6 +649,10 @@ var blankScreenIfNeeded = function() {
   }
 }
 
+/**
+ * update the state manager with our
+ * timeout values, etc
+ */
 var updateStateManager = function() {
   stateManager.setup({
     idleTime: savers.getDelay() * 60000,
@@ -645,6 +664,9 @@ var updateStateManager = function() {
 };
 
 
+/**
+ * check for a new release of the app
+ */
 var checkForNewRelease = function() {
   log.info("checkForNewRelease");
   releaseChecker.checkLatestRelease(
@@ -659,6 +681,9 @@ var checkForNewRelease = function() {
     });
 };
 
+/**
+ * get icons for the current platform
+ */
 var getIcons = function() {
   if ( icons[process.platform] ) {
     return icons[process.platform];
@@ -667,6 +692,9 @@ var getIcons = function() {
   return icons.default;
 };
 
+/**
+ * update tray icon to match our current state
+ */
 var updateTrayIcon = function() {
   var icons = getIcons();
   if ( stateManager.currentState() === stateManager.states.STATE_PAUSED ) {

@@ -201,6 +201,29 @@ var getCurrentData = function() {
   return getByKey(key);
 };
 
+/**
+ * pick a random screensaver
+ */
+var getRandomScreensaver = function() {
+  return _.sample(
+    _.reject(loadedScreensavers, function(s) {
+      return ( typeof(s.preload) !== 'undefined' );
+    })
+  );
+};
+
+/**
+ * run any defined preload scripts for the screensaver.
+ * for now, there's really just one and it's basically 
+ * hardcoded -- replace the given screensaver with a random one.
+ */
+var applyPreload = function(saver) {
+  if ( saver.preload && saver.preload === 'random' ) {
+    return getRandomScreensaver();
+  }
+
+  return saver;
+}
 
 /**
  * return the URL of a zip file that is the source we will check to update our screensavers
@@ -328,9 +351,45 @@ var skipFolder = function(p) {
   return fs.existsSync(path.join(p, ".before-dawn-skip"));
 };
 
+/**
+ * get a list of folders we should check for screensavers
+ */
+var sources = function() {
+  var source = getSource();
+  var local = getLocalSource();
+  var root = path.join(baseDir, 'savers');
+  var system = path.join(baseDir, 'system-savers');
+  var system2 = path.join(__dirname, '..', 'system-savers');  
 
+  
+  var folders = [];
+
+  // if we're pulling savers from a git repo, this is where
+  // they will be located
+  if ( typeof(source.repo) !== "undefined" && source.repo !== "" ) {
+    folders.push(root);
+  }
+
+  // if there's a local source, use that
+  if ( local !== "" && fs.existsSync(local)) {
+    folders = folders.concat( local );
+  }
+
+  // if there's a system source, use that
+  if ( fs.existsSync(system2) ) {
+    folders = folders.concat( system2 );
+  }
+  else if ( fs.existsSync(system) ) {
+    folders = folders.concat( system );
+  }
+  
+  return folders;
+};
+
+/**
+ * load screensaver data from filesystem
+ */
 var parseAndLoadSaver = function(opts) {
-
   var f = opts.filepath;
   var folder = path.dirname(f);
 
@@ -344,68 +403,76 @@ var parseAndLoadSaver = function(opts) {
   if ( doSkip ) {
     return;
   }
-  
-  fs.readFile(opts.filepath, {encoding: 'utf8'}, function (err, content) {
-    try {
-      var contents = JSON.parse(content);           
-      var stub = path.dirname(f);
-      contents.path = stub;
-      contents.key = stub + "/" + contents.source;
-          
-      // allow for a specified URL -- this way you could create a screensaver
-      // that pointed to a remote URL
-      if ( typeof(contents.url) === "undefined" ) {
-        contents.url = 'file://' + contents.key;
-      }
-          
-      contents.settings = getOptions(contents.key);
-      contents.editable = (opts.root === getLocalSource());
 
-      var s = new Saver(contents);
-      if ( s.valid ) {
-        loadedScreensavers.push(s);
+  return new Promise(function (resolve, reject) {
+    fs.readFile(opts.filepath, {encoding: 'utf8'}, function (err, content) {
+      if ( err ) {
+        reject(err);
       }
-    }
-    catch(e) {
-      console.log(e);
-      
-      console.log("file " + f);
-      console.log(content);
-    }          
+      else {
+        try {
+          var contents = JSON.parse(content);           
+          var stub = path.dirname(f);
+          contents.path = stub;
+          contents.key = stub + "/" + contents.source;
+        
+          // allow for a specified URL -- this way you could create a screensaver
+          // that pointed to a remote URL
+          if ( typeof(contents.url) === "undefined" ) {
+            contents.url = 'file://' + contents.key;
+          }
+          
+          contents.settings = getOptions(contents.key);
+          contents.editable = (opts.root === getLocalSource());
+          
+          var s = new Saver(contents);
+          if ( s.valid ) {
+            resolve(s);
+          }
+          else {
+            reject();
+          }
+        }
+        catch(e) {
+          console.log(e);
+          reject(e);
+        }
+      }
+    });
   });
-  
+
 };
+
+
 
 /**
  * search for all screensavers we can find on the filesystem. if cb is specified,
  * call it with data when done. if reload == true, don't use cached data.
  */
 var listAll = function(cb) {
-  var root = path.join(baseDir, 'savers');
-  var folders = [];
+  var folders = sources();
   var walker = require('folder-walker');
-  
-  var source = getSource();
-  var local = getLocalSource();
-  
-  if ( typeof(source.repo) !== "undefined" && source.repo !== "" ) {
-    folders.push(root);
-  }
-
-  if ( local !== "" ) {
-    folders = folders.concat( local );
-  }
-
-  loadedScreensavers = [];
   var stream = walker(folders);
 
-  stream.on('data', parseAndLoadSaver);
-  stream.on('end', function() {
-    loadedScreensavers = _.sortBy(loadedScreensavers, function(s) { return s.name.toLowerCase(); });
-    
-    if ( typeof(cb) !== "undefined" ) {
-      cb(loadedScreensavers);
+  var promises = [];
+  
+  stream.on('data', function(opts) {
+    var f = opts.filepath;
+    var folder = path.dirname(f);
+    var doLoad = f.match(/saver.json$/) &&
+                 ! folder.split(path.sep).reverse()[0].match(/^__/) &&
+                 ! skipFolder(folder);
+
+    if ( doLoad ) {
+      promises.push(parseAndLoadSaver(opts));
     }
+  });
+
+  stream.on('end', function() {
+    Promise.all(promises).then(function(data) {
+      loadedScreensavers = _.sortBy(data, function(s) { return s.name.toLowerCase(); });
+      cb(loadedScreensavers);
+    });
   });
 };
 
@@ -505,6 +572,7 @@ exports.setSource = setSource;
 exports.getLocalSource = getLocalSource;
 exports.setLocalSource = setLocalSource;
 exports.getCurrentData = getCurrentData;
+exports.applyPreload = applyPreload;
 exports.setCurrent = setCurrent;
 exports.setOptions = setOptions;
 exports.setDelay = setDelay;
@@ -519,7 +587,6 @@ exports.getOptions = getOptions;
 exports.listAll = listAll;
 exports.getCurrentUrl = getCurrentUrl;
 exports.getUrl = getUrl;
-exports.loadedScreensavers = loadedScreensavers;
 exports.write = write;
 exports.firstLoad = firstLoad;
 exports.generateScreensaver = generateScreensaver;

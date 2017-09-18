@@ -79,7 +79,7 @@ var run = function() {
  */
 var onIdleTime = function(f) {
   if ( typeof(_onIdleTime) !== "undefined" ) {
-    console.log("onIdleTime: " + String(currentState));
+    //console.log("onIdleTime: " + String(currentState));
     _onIdleTime();
   }
 };
@@ -110,7 +110,7 @@ var switchState = function(s, force) {
   // reset properly
   var callEnterState = ( currentState !== s || s === STATES.STATE_IDLE || force === true);
 
-  console.log("switchState from " + String(currentState) + " to " + String(s) + " " + callEnterState);
+  //console.log("switchState from " + String(currentState) + " to " + String(s) + " " + callEnterState);
   
   currentState = s;
   
@@ -147,7 +147,7 @@ var onEnterState = function(s) {
  * check to see if we should switch from running -> blanked
  */
 var checkBlank = function() {
-  console.log("checkBlank");
+  //console.log("checkBlank");
   if ( currentState === STATES.STATE_RUNNING ) {
     switchState(STATES.STATE_BLANKED);
   }
