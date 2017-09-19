@@ -205,11 +205,14 @@ var getCurrentData = function() {
  * pick a random screensaver
  */
 var getRandomScreensaver = function() {
-  return _.sample(
+  var s = _.sample(
     _.reject(loadedScreensavers, function(s) {
       return ( typeof(s.preload) !== 'undefined' );
     })
   );
+  console.log("RANDOM", s);
+
+  return s;
 };
 
 /**
