@@ -265,9 +265,8 @@ var runScreenSaverOnDisplay = function(saver, s) {
   }
 
   tickCount = process.hrtime();
-  
-  // listen for an event that we have an image of the display we will run on before completing setup
-  grabScreen(s, function(message) {
+
+  var runSaver = function(message) {
     var url;
     var w = new BrowserWindow(windowOpts);       
     saverWindows.push(w);
@@ -284,7 +283,7 @@ var runScreenSaverOnDisplay = function(saver, s) {
 
         forceWindowClose(w);
       });
-    
+      
       // inject our custom JS and CSS into the screensaver window
       w.webContents.on('did-finish-load', function() {
         log.info('did-finish-load');
@@ -324,7 +323,10 @@ var runScreenSaverOnDisplay = function(saver, s) {
       // w.minimize();
       // w.focus();
 
-      url_opts.screenshot = encodeURIComponent("file://" + message.url);
+      if ( typeof(message) !== 'undefined' ) {
+        url_opts.screenshot = encodeURIComponent("file://" + message.url);
+      }
+
       url = saver.getUrl(url_opts);
 
       log.info("Loading " + url);
@@ -340,7 +342,21 @@ var runScreenSaverOnDisplay = function(saver, s) {
       log.info(e);
       forceWindowClose(w);
     }
-  });
+  };
+
+  
+
+  //
+  // if this screensaver uses a screengrab, get it. 
+  // otherwise just boot it
+  //
+  if ( _.findIndex(saver.getRequirements(), 'screen') > -1 ) {
+    grabScreen(s, runSaver);
+  }
+  else {
+    runSaver();
+  }
+
 };
 
 /**

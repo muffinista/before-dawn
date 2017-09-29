@@ -4,6 +4,12 @@
 
 var _ = require('lodash');
 
+// we will generate a list of requirements that screensavers need
+// to work. for now, it's just a screengrab. to maintain
+// compatability, we'll generate a default list if one isn't
+// specified    
+const DEFAULT_REQUIREMENTS = ['screen'];
+
 /**
  * take a hash and turn it into a URL string
  * @see http://stackoverflow.com/questions/1714786/querystring-encoding-of-a-javascript-object
@@ -30,6 +36,7 @@ module.exports = function Saver(_attrs) {
   this.license = _attrs.license;
   this.url = _attrs.url;
   this.preload = _attrs.preload;
+  this.requirements = _attrs.requirements || DEFAULT_REQUIREMENTS;
 
   
   this.published = _attrs.published;
@@ -76,6 +83,10 @@ module.exports = function Saver(_attrs) {
         }
   } // if valid
 
+  this.getRequirements = function() {
+    return this.requirements;
+  };
+  
   /**
    * generate a preview URL with our variables tacked on
    */
