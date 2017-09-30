@@ -63,7 +63,7 @@
     "babel-preset-es2015": "^6.3.13",
     "babel-preset-react": "^6.3.13",
     "devtron": "^1.4.0",
-    "electron": "^1.8.0",
+    "electron": "^1.7.8",
     "electron-mocha": "^0.8.0",
     "electron-rebuild": "^1.5.7",
     "grunt": "^1.0.1",
