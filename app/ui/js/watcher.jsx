@@ -44,6 +44,8 @@ import OptionsForm from './options-form';
   var s = savers.getByKey(src);
   var saverAttrs = {};
 
+  console.log("SAVER", s);
+  
   if ( s !== undefined ) {
     saverAttrs = s.toHash();
   }

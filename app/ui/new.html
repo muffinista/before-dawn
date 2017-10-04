@@ -83,12 +83,13 @@
        author: author
      });
 
-
-     openSaverInWatcher(data.dest);
-
-     ipcRenderer.send('savers-updated', name);
-
-     closeWindow();
+     // call listAll to update our cache of screensavers
+     // before trying to render the edit form
+     savers.listAll(function() {
+       openSaverInWatcher(data.dest);
+       ipcRenderer.send('savers-updated', name);
+       closeWindow();
+     });
    };
 
    /**

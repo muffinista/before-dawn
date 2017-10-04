@@ -8,6 +8,9 @@ const _ = require('lodash');
 export default class SaverOptionInput extends React.Component {
   constructor(props) {
     super(props);
+    if ( typeof(props.options) === 'undefined' ) {
+      props.options = [];
+    }
 
     this.currentIndex = 0;
     this.state = { options: this.addIndexes(props.options, true) };
@@ -34,14 +37,19 @@ export default class SaverOptionInput extends React.Component {
   }
 
   onDelete(item) {
-    var newVals = item.state.value;
+    var newVals = item.state.option;
     var index = this.indexOfOption(newVals);
 
+    console.log("PRE", this.state.options);
     var foo = this.state.options;
     foo.splice(index, 1);
+    console.log("POST", foo);
     this.setState({
       options: foo
     });
+
+    var tmp = _.cloneDeep(this.state.options);
+    this.props.onChange(tmp);
   }
 
   onChanged(newVals) {
@@ -71,13 +79,17 @@ export default class SaverOptionInput extends React.Component {
       options: tmp
     });
 
+    console.log("addNew", tmp);
     this.props.onChange(tmp);
   }
 
   render() {
     var self = this;
-    var els = this.state.options.map(function(opt, i) {
-      return (<SaverOptionInputItem option={opt} onChange={self.onChanged} onDelete={self.onDelete} key={opt.index} />);
+    var els = this.state.options.map((opt, i) => {
+      return (<SaverOptionInputItem option={opt}
+                                    onChange={self.onChanged}
+                                    onDelete={(x) => self.onDelete(x)}
+                                    key={opt.index} />);
     });
 
     return(<div>

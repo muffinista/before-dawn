@@ -12,7 +12,7 @@ export default class AttributesForm extends React.Component {
     super(props);
     this.state = { saver: this.props.saver };
 
-    if ( this.state.saver.options === null ) {
+    if ( this.state.saver.options === null || typeof(this.state.saver.options) === 'undefined' ) {
       this.state.saver.options = [];
     }
     
@@ -103,6 +103,8 @@ export default class AttributesForm extends React.Component {
       </div>
     );
 
+    console.log("hey", this.state.saver);
+    console.log(this.state.saver.options);
     var opts = React.createElement(
       'div', null,
       <div className="container-fluid fieldset-padding">
