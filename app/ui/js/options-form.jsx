@@ -38,10 +38,12 @@ export default class OptionsForm extends React.Component {
     }
 
     return (
-      <fieldset>
+      <div className={"field"}>
         <legend>{o.name}</legend>
-        {guts}
-      </fieldset>
+        <div className={"input"}>
+          {guts}
+        </div>
+      </div>
     );
   }
 

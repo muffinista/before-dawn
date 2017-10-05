@@ -14,28 +14,29 @@
       <div class="navbar-header">
         <ul class="nav nav-tabs" role="tablist">
           <li role="presentation" class="nav-item">
-            <a data-toggle="tab" role="tab" class="nav-link active" href="#main">Screensavers</a>
+            <a data-toggle="tab" role="tab" class="nav-link active" id="home-tab" href="#main">Screensavers</a>
           </li>
           <li role="presentation" class="nav-item">
-            <a data-toggle="tab" role="tab" class="nav-link" href="#preferences">Preferences</a>
+            <a data-toggle="tab" role="tab" class="nav-link" id="prefs-tab"  href="#preferences">Preferences</a>
           </li>
         </ul>
       </div>
 
       <div class="row">
-        <div class="tab-content">
-          <div role="tabpanel" class="tab-pane active" id="main">
+        <div class="tab-content container-fluid">
+          <div role="tabpanel" class="tab-pane active" id="main"  aria-labelledby="home-tab">
             <div class="container-fluid">
               <div class="row no-padding">
                 <!-- left pane -->
-                <div class="col-sm-6 col-md-4">
+                <div class="col-sm-6 col-md-6">
                   <div class="scrollable" id="savers">
                   </div>
                 </div>
                 
                 <!-- right pane -->
-                <div class="col-sm-6 col-md-8">
+                <div class="col-sm-6 col-md-6">
                   <div class="wrapper" >
+                    <div id="details"></div>
                     <div id="preview">
                     </div>
                     <div id="options">
@@ -46,7 +47,7 @@
             </div>
           </div>
           
-          <div role="tabpanel" class="tab-pane" id="preferences">
+          <div role="tabpanel" class="tab-pane" id="preferences" aria-labelledby="prefs-tab">
             <div class="container-fluid">
 
               <h1>Options</h1>
@@ -137,7 +138,22 @@
                       We will download releases from this repository instead of the default repo if specified.
                     </small>
                   </div>
-                  
+
+                  <div class="form-group">
+                    <label for="localSource">Local Source:</label>
+                    <div class="input-group">
+                      <input type="text" name="localSource" class="form-control" />
+                      <span class="input-group-btn">
+                        <button class="btn btn-secondary pick">...</button>
+                      </span>
+                    </div>
+                    
+                    <small class="form-text text-muted">
+                      We will load screensavers from any directories listed here. Use this to add your own screensavers!
+                    </small>
+                  </div>
+
+                  <!-- 
                   <div class="form-group container-fluid">
                     <label for="localSource">Local Source:</label>
                     <div class="input-group row no-padding">
@@ -153,6 +169,7 @@
                       We will load screensavers from any directories listed here. Use this to add your own screensavers!
                     </small>
                   </div>
+                  -->
                 </fieldset>
               </form>
 
@@ -167,15 +184,13 @@
       </div>
     </div> <!-- window -->
 
-    <footer class="footer">
-      <div class="container-fluid">
-        <div class="float-xs-left">
-          <button class="btn btn-large btn-positive create">Create Screensaver</button>
-        </div>
-        <div class="float-xs-right">
-          <button class="btn btn-large btn-default cancel">Cancel</button>
-          <button class="btn btn-large btn-positive save">Save</button>
-        </div>
+    <footer class="footer d-flex justify-content-between">
+      <div>
+        <button class="btn btn-large btn-positive create">Create Screensaver</button>
+      </div>
+      <div>
+        <button class="btn btn-large btn-default cancel">Cancel</button>
+        <button class="btn btn-large btn-positive save">Save</button>
       </div>
     </footer>
     
@@ -185,8 +200,10 @@
      var $ = require('jquery');
      var jQuery = $;
      window.$ = $;
+     window.Popper = require('popper.js');
      require('bootstrap');
     </script>
+
     <script src="prefs.js"></script>
   </body>
 </html>

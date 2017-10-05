@@ -36,27 +36,23 @@ export default class SaverList extends React.Component {
       }
 
       if ( s.editable === true ) {
-        buttonWrapClass = "";
+        buttonWrapClass = "buttons";
       }
       
       return (
-        <li className={"list-group-item entry"} key={i}>
-          <div className={"media-body"}>
-            <label>
-              <div className={"body"}>
-                <input type="radio" name="screensaver" value={s.key} onChange={self.onChanged} defaultChecked={is_checked} />
-                <b>{s.name}</b>
-                <p className={"description"}>{s.description}</p>
-                <span className={authorClass}>
-                  {s.author} //
-                </span>
-                <a className={aboutUrlClass} href={s.aboutUrl}>learn more</a>
-                <div className={buttonWrapClass}>
-                  <a className={"watcher btn btn-secondary btn-sm"} href="#" role="button" data-key={s.key}>edit</a>
-                  <a className={"delete btn btn-secondary btn-sm"} href="#" role="button "data-key={s.key}>delete</a>
-                </div>
-              </div>
-            </label>
+        <li className={"list-group-item flex-column entry"} key={i}>
+          <div className={"d-flex w-100 justify-content-between"}>
+          <label>
+            <div className={"body"}>
+              <input type="radio" name="screensaver" value={s.key} onChange={self.onChanged} defaultChecked={is_checked} />
+              <b>{s.name}</b>
+            </div>
+          </label>
+          
+          <div className={buttonWrapClass}>
+            <a className={"watcher btn btn-outline-secondary btn-sm"} href="#" role="button" data-key={s.key}>edit</a>
+            <a className={"delete btn btn-outline-secondary btn-sm"} href="#" role="button "data-key={s.key}>delete</a>
+          </div>
           </div>
         </li>
       );

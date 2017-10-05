@@ -35,11 +35,14 @@ const {BrowserWindow} = window.require('electron').remote;
   crashReporter.start(remote.getGlobal('CRASH_REPORTER'));
 
   ipcRenderer.on('savers-updated', (event, arg) => {
-    console.log("handle savers-updated event");
-    renderList();
+    var val, s;
 
-    var val = getCurrentScreensaver();
-    var s = savers.getByKey(val);
+    console.log("handle savers-updated event");
+    val = getCurrentScreensaver();
+
+    renderList(false);
+
+    s = savers.getByKey(val);
     
     redraw(s);
 
@@ -180,6 +183,33 @@ const {BrowserWindow} = window.require('electron').remote;
     if ( typeof(s) !== "undefined" ) {
       loadPreview(s);
       loadOptionsForm(s);
+
+      var authorClass = "external author";
+      var aboutUrlClass = "external aboutUrl";
+      var buttonWrapClass = "hide";
+      
+      if ( typeof(s.author) === "undefined" || s.author === "" ) {
+        authorClass = authorClass + " hide";
+      }
+      if ( typeof(s.aboutUrl) === "undefined" || s.aboutUrl === "" ) {
+        aboutUrlClass = aboutUrlClass + " hide";
+      }
+
+      if ( s.editable === true ) {
+        buttonWrapClass = "buttons";
+      }
+      
+      ReactDOM.render(
+        <div>
+          <h1 className={"name"}>{s.name} <a className={aboutUrlClass} href={s.aboutUrl}>learn more</a></h1>
+          <p className={"description"}>{s.description}</p>
+          <span className={authorClass}>
+            {s.author}
+          </span>
+        </div>,
+        document.getElementById('details')
+      );
+
     }
   };
 
@@ -192,7 +222,11 @@ const {BrowserWindow} = window.require('electron').remote;
     shell.openExternal(this.href);
   };
   
-  var renderList = function() {
+  var renderList = function(doScroll) {
+    if ( typeof(doScroll) === 'undefined' ) {
+      doScroll = true;
+    }
+
     savers.listAll(function(entries) {
       var current = savers.getCurrent();
 
@@ -202,10 +236,12 @@ const {BrowserWindow} = window.require('electron').remote;
       );
 
       // scroll to the currently selected screensaver
-      var $target = $("input[name=screensaver]:checked");
-      if ( $target.length > 0 ) {
-        var $list = $("#savers");
-        $list.scrollTop($list.scrollTop() - $list.offset().top + $target.offset().top - 25);
+      if ( doScroll === true ) {
+        var $target = $("input[name=screensaver]:checked");
+        if ( $target.length > 0 ) {
+          var $list = $("#savers");
+          $list.scrollTop($list.scrollTop() - $list.offset().top + $target.offset().top - 25);
+        }
       }
       
       var s = savers.getByKey(current);
@@ -235,7 +271,7 @@ const {BrowserWindow} = window.require('electron').remote;
 
   var handlePathChoice = function(result) {
     var data;
-
+    console.log(result);
     if ( result === undefined ) {
       // this kind of stinks
       data = "";

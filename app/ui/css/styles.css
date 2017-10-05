@@ -68,19 +68,13 @@ input[type=range] {
   width: 100%;
 }
 
-input[type=radio], div.body > a, span.author, p.description {
+input[type=radio], div.body > a {
   margin: 4px;
 }
 
-p.description {
-  overflow: initial;
-  max-width: 370px;
-  text-overflow: initial;
-  white-space: initial;
-}
 .hint {
-    color: #888888;
-    font-size: 95%;
+  color: #888888;
+  font-size: 95%;
 }
 
 h1 .hint {
@@ -139,4 +133,40 @@ fieldset {
 
 .slider .only-for-slider {
   display: block;
+}
+
+
+#details {
+  min-height: 120px;
+}
+
+#details h1, #options h1 {
+  font-size: 125%;
+  margin-top: 5px;
+}
+p.description {
+  white-space: initial;
+  margin-bottom: 0px;
+}
+.buttons {
+
+}
+
+#options div.field {
+  display: flex;
+}
+#options div.input {
+  width: 75%;
+  align-self: center;
+  padding-right: 10px;
+}
+#options legend {
+  font-size: 95%;
+  width: 25%;
+  align-self: center;
+  margin: 0px;
+}
+
+.buttons > a {
+  margin: 2px;
 }
