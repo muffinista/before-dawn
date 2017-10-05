@@ -1,9 +1,9 @@
-var React = require('react');
-var ReactDOM = require('react-dom');
-var AutoLaunch = require('auto-launch');
-var path = require('path');
+const React = require('react');
+const ReactDOM = require('react-dom');
+const AutoLaunch = require('auto-launch');
+const path = require('path');
 
-var _ = require('lodash');
+const _ = require('lodash');
 
 import OptionsForm from './options-form';
 import Preview from './preview';
@@ -146,7 +146,11 @@ const {BrowserWindow} = window.require('electron').remote;
 
     return undefined;
   };
-  
+
+  /**
+   * the user has updated the settings for this screensaver,
+   * let's stash that data and redraw.
+   */
   var optionsUpdated = function(data) {
     saverOpts = data;
     var current = getCurrentScreensaver();
@@ -155,10 +159,8 @@ const {BrowserWindow} = window.require('electron').remote;
   };
   
   var loadOptionsForm = function(s) {
-    // hold a ref to the form so we can get values later
-    // @todo - i assume this is a hack that doesn't match with react very well
-    window.optionsFormRef = ReactDOM.render(
-      <OptionsForm saver={s} onChange={optionsUpdated} />,
+    ReactDOM.render(
+      <OptionsForm saver={s} onChange={(x) => optionsUpdated(x)} />,
       document.getElementById('options')
     );
   };
@@ -172,7 +174,7 @@ const {BrowserWindow} = window.require('electron').remote;
     if ( typeof(s) === "undefined" ) {
       var current = getCurrentScreensaver();
       s = savers.getByKey(current);
-      //console.log(current, s);
+      console.log(current, s);
     }
 
     if ( typeof(s) !== "undefined" ) {
@@ -205,7 +207,6 @@ const {BrowserWindow} = window.require('electron').remote;
         var $list = $("#savers");
         $list.scrollTop($list.scrollTop() - $list.offset().top + $target.offset().top - 25);
       }
-
       
       var s = savers.getByKey(current);
       redraw(s);
@@ -326,7 +327,6 @@ const {BrowserWindow} = window.require('electron').remote;
     var localSource = document.querySelector("[name=localSource]").value;
 
     if ( val !== undefined ) {
-      saverOpts = window.optionsFormRef.getValues();
       savers.setCurrent(val, saverOpts);
     }
 

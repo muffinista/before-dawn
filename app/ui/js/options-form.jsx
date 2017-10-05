@@ -48,9 +48,10 @@ export default class OptionsForm extends React.Component {
   getValues() {
     var self = this;
     var data = {};
+
     _.each(this.props.saver.options, function(o, i) {
       var ref = "option" + i;
-      data[o.name] = self.refs[ref].value;
+      data[o.name] = self.refs[ref].state.value;
     });
     
     return data;
