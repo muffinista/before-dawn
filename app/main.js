@@ -350,7 +350,7 @@ var runScreenSaverOnDisplay = function(saver, s) {
   // if this screensaver uses a screengrab, get it. 
   // otherwise just boot it
   //
-  if ( _.findIndex(saver.getRequirements(), 'screen') > -1 ) {
+  if ( _.findIndex(saver.getRequirements(), function(x) { return x === 'screen'; }) > -1 ) {
     grabScreen(s, runSaver);
   }
   else {
