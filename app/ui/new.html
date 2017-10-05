@@ -56,8 +56,6 @@
    const {ipcRenderer} = window.require('electron');
    const {BrowserWindow} = window.require('electron').remote;
 
-   console.log(document.location.search);
-   
    // parse incoming URL params -- we'll get a link to the current screen images for previews here
    var tmpParams = new URLSearchParams(document.location.search);
 
