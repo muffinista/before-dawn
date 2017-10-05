@@ -287,7 +287,9 @@ var runScreenSaverOnDisplay = function(saver, s) {
       // inject our custom JS and CSS into the screensaver window
       w.webContents.on('did-finish-load', function() {
         log.info('did-finish-load');
-        w.webContents.insertCSS(globalCSSCode);      
+        if (!w.isDestroyed()) {
+          w.webContents.insertCSS(globalCSSCode);
+        }
       });
 
       // we could do something nice with either of these events
