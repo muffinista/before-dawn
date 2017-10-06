@@ -42,7 +42,8 @@ var methods = {
     //console.log(jsonString);
     
     var visibleMenubars = _.filter(JSON.parse(jsonString), function(x) {
-      return x["kCGWindowName"] == "Menubar"; // || x["kCGWindowName"] == "Backstop Menubar";
+      //return x["kCGWindowName"] == "Menubar";
+      return x.kCGWindowName === "Menubar";      
     });
     
     //console.log("There are " + displays.length + " displays");

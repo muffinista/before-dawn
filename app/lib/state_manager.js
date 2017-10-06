@@ -139,7 +139,7 @@ var onEnterState = function(s) {
     case STATES.STATE_PAUSED:
 
       break;
-  };
+  }
 };
 
 

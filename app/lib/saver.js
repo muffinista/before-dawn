@@ -137,7 +137,6 @@ module.exports = function Saver(_attrs) {
     console.log("write to " + configDest);
     
     fs.writeFileSync(configDest, output);
-
-  }
+  };
 };
 

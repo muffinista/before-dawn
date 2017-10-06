@@ -226,7 +226,7 @@ var applyPreload = function(saver) {
   }
 
   return saver;
-}
+};
 
 /**
  * return the URL of a zip file that is the source we will check to update our screensavers
@@ -236,7 +236,8 @@ var getSource = function() {
 };
 
 var setSource = function(x) {
-  if ( x !== getSource()["repo"] ) {
+  var s = getSource();
+  if ( x !== s.repo ) {
     return nconf.set('source', {
       repo: x
     });
@@ -248,10 +249,10 @@ var setSource = function(x) {
 
 var setUpdateCheckTimestamp = function(x) {
   return nconf.set('sourceCheckTimestamp', x);
-}
+};
 var getUpdateCheckTimestamp = function(x) {
   return nconf.get('sourceCheckTimestamp') || 0;
-}
+};
 
 var getLocalSource = function() {
   return nconf.get('localSource') || "";
@@ -513,8 +514,7 @@ var writeSync = function() {
   var configPath = baseDir + "/" + config_file;
   console.log("sync write config to " + configPath);
   nconf.save();
-}
-
+};
 
 var getTemplatePath = function() {
   return path.join(defaultSaversDir(), "__template");
@@ -553,7 +553,7 @@ var generateScreensaver = function(opts) {
 
   var configDest = path.join(dest, "saver.json");
   var content = fs.readFileSync( configDest );
-  var contents = _.merge({}, JSON.parse(content), opts);
+  contents = _.merge({}, JSON.parse(content), opts);
 
   fs.writeFileSync(configDest, JSON.stringify(contents, null, 2));
 

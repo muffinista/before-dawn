@@ -69,7 +69,9 @@
     "electron-rebuild": "^1.6.0",
     "grunt": "^1.0.1",
     "grunt-babel": "^6.0.0",
+    "grunt-contrib-eslint": "0.0.5",
     "grunt-contrib-watch": "^1.0.0",
+    "grunt-eslint": "^20.1.0",
     "node-abi": "^2.1.1"
   }
 }

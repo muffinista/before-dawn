@@ -18,6 +18,19 @@ module.exports = function(grunt) {
         ]
       }
     },
+    jshint: {
+      all: ['Gruntfile.js', '*.js', 'lib/**/*.js'],
+      options: {
+        node: true,
+        esversion: 6
+      }
+    },
+    eslint: {
+      options: {
+        configFile: 'eslint.json'
+      },
+      target: ['Gruntfile.js', '*.js', 'lib/**/*.js']
+    },
     watch: {
       scripts: {
         files: ['**/*.jsx'],
@@ -25,12 +38,14 @@ module.exports = function(grunt) {
         options: {
           spawn: false,
         },
-      },
+      }
     }
   });
-  
+
   grunt.loadNpmTasks('grunt-babel');
   grunt.loadNpmTasks('load-grunt-tasks');
   grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks("grunt-eslint");
+//  grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.registerTask('default', ['babel']);
 };

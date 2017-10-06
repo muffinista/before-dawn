@@ -7,7 +7,7 @@ module.exports.charging = function() {
 	  return osxBattery().then(res => {
 		  return res.isCharging || res.fullyCharged;
 	  }).catch(err => {
-      console.log(err)
+      console.log(err);
       return true;
     });
    
@@ -18,7 +18,7 @@ module.exports.charging = function() {
 	  return linuxBattery().then(res => {
       return ( res.state !== "discharging" );
 	  }).catch(err => {
-      console.log(err)
+      console.log(err);
       return true;
     });    
   } 

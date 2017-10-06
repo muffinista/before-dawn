@@ -44,7 +44,7 @@ var doSleep = function() {
   else if ( process.platform === 'win32' ) {
     // this uses a 3rd party library -- nircmd -- to turn off the monitor
     // http://www.nirsoft.net/utils/nircmd.html
-    cmd = path.join(__dirname, 'bin', 'nircmd.exe') + " monitor off"
+    cmd = path.join(__dirname, 'bin', 'nircmd.exe') + " monitor off";
   }
   else {
     return;
@@ -57,7 +57,7 @@ var doSleep = function() {
       console.log('exec error: ' + error);
     }
   });
-}
+};
 
 exports.doLockScreen = doLockScreen;
 exports.doSleep = doSleep;

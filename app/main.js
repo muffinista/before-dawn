@@ -456,7 +456,7 @@ var activeWindowHandle = function(w) {
 var handleDisplayChange = function() {
   log.info("display change, let's close running screensavers");
   closeRunningScreensavers();
-}
+};
 
 /**
  * close any running screensavers
@@ -505,7 +505,7 @@ var forcefullyCloseScreensavers = function() {
  * should we lock the user's screen when returning from running the saver?
  */
 var shouldLockScreen = function() {
-  return ( savers.getLock() === true );
+  return ( global.savers.getLock() === true );
 };
 
 /**
@@ -536,7 +536,7 @@ var openPrefsOnFirstLoad = function() {
   if ( appReady === false || configLoaded === false ) {
     return;
   }
-  if ( savers.firstLoad() === true ) {
+  if ( global.savers.firstLoad() === true ) {
     setTimeout(openPrefsWindow, 1000);
   }
 };
@@ -665,7 +665,7 @@ var blankScreenIfNeeded = function() {
     stopScreenSaver(true);
     screen.doSleep();
   }
-}
+};
 
 /**
  * update the state manager with our
@@ -673,8 +673,8 @@ var blankScreenIfNeeded = function() {
  */
 var updateStateManager = function() {
   stateManager.setup({
-    idleTime: savers.getDelay() * 60000,
-    blankTime: (savers.getDelay() + savers.getSleep()) * 60000,
+    idleTime: global.savers.getDelay() * 60000,
+    blankTime: (global.savers.getDelay() + global.savers.getSleep()) * 60000,
     onIdleTime: runScreenSaverIfPowered,
     onBlankTime: blankScreenIfNeeded,
     onReset: closeRunningScreensavers
