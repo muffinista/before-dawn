@@ -1,30 +1,30 @@
-'use strict';
+"use strict";
 
-const electron = require('electron');
+const electron = require("electron");
 var platform = process.platform;
 
 var _, $, pool, winctl;
 
 if ( platform === "darwin" ) {
 
-  _ = require('lodash');
-  $ = require('nodobjc');
+  _ = require("lodash");
+  $ = require("nodobjc");
 
-  $.framework('Foundation');
-  $.framework('Cocoa');
+  $.framework("Foundation");
+  $.framework("Cocoa");
 
-  pool = $.NSAutoreleasePool('alloc')('init');
+  pool = $.NSAutoreleasePool("alloc")("init");
 
-  process.on('beforeExit', (code) => {
-    pool('drain');
+  process.on("beforeExit", (code) => {
+    pool("drain");
   });
 }
 else if ( platform === "win32" ) {
-  winctl = require('winctl');
+  winctl = require("winctl");
 }
 
 var methods = {
-  'darwin': function() {
+  "darwin": function() {
     var result;
     var displays = electron.screen.getAllDisplays();
     var windowList = $.CFBridgingRelease(
@@ -55,7 +55,7 @@ var methods = {
     return result;
   },
 
-  'win32': function() {
+  "win32": function() {
     var fullscreenWindow = winctl.GetFullscreenWindow();
     
     // we think we're in fullscreen mode if we have a fullscreen

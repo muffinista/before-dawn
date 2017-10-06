@@ -1,11 +1,11 @@
 "use strict";
 
-var fs = require('fs');
-var path = require('path');
-var request = require('request');
+var fs = require("fs");
+var path = require("path");
+var request = require("request");
 var yauzl = require("yauzl");
 var mkdirp = require("mkdirp");
-var remove = require('remove');
+var remove = require("remove");
 
 /**
  * need source repo url
@@ -39,7 +39,7 @@ module.exports = function Package(_attrs) {
             url: url,
             json: true,
             headers: {
-                'User-Agent': "Before Dawn"
+                "User-Agent": "Before Dawn"
             }
         }, function(error, response, body) {
             console.log( body.published_at + " --- " + self.updated_at );
@@ -60,7 +60,7 @@ module.exports = function Package(_attrs) {
 
     this.downloadFile = function(url, cb) {
         var temp = require("temp");
-        var tempName = temp.path({suffix: '.zip'});
+        var tempName = temp.path({suffix: ".zip"});
 
         console.log("download to " + tempName);
 
@@ -69,17 +69,17 @@ module.exports = function Package(_attrs) {
         request({
             url:url,
             headers: {
-                'User-Agent': "Before Dawn"
+                "User-Agent": "Before Dawn"
             }
         })
-            .on('error', function(err) {
+            .on("error", function(err) {
                 console.log(err);
                 cb(err);
             }).
-            on('response', function(r) {
+            on("response", function(r) {
                 _resp = r;
             }).
-            on('end', function() {
+            on("end", function() {
                 console.log("download over, let's trigger callback");
 
                 try {
@@ -90,7 +90,7 @@ module.exports = function Package(_attrs) {
                 }
 
                 yauzl.open(tempName, {lazyEntries: true}, function(err, zipfile) {
-                    if (err) throw err;
+                    if (err) {throw err;}
                     zipfile.readEntry();
                     zipfile.on("end", function() {
                         self.etag = _resp.headers.etag;
@@ -116,17 +116,17 @@ module.exports = function Package(_attrs) {
                         if (/\/$/.test(entry.fileName)) {
                             // directory file names end with '/' 
                             mkdirp(fullPath, function(err) {
-                                if (err) throw err;
+                                if (err) {throw err;}
                                 zipfile.readEntry();
                             });
                         }
                         else {
                             // file entry 
                             zipfile.openReadStream(entry, function(err, readStream) {
-                                if (err) throw err;
+                                if (err) {throw err;}
                                 // ensure parent directory exists 
                                 mkdirp(path.dirname(fullPath), function(err) {
-                                    if (err) throw err;
+                                    if (err) {throw err;}
                                     readStream.pipe(fs.createWriteStream(fullPath));
                                     readStream.on("end", function() {
                                         zipfile.readEntry();
@@ -143,12 +143,12 @@ module.exports = function Package(_attrs) {
     this.downloadIfStale = function(cb) {
         console.log("ETAG:" + self.etag);
         request({
-            method: 'HEAD',
+            method: "HEAD",
             uri: self.url,
             headers: {
-                'if-none-match': '"' + self.etag + '"'
+                "if-none-match": "\"" + self.etag + "\""
             }
-        }).on('response', function(response) {
+        }).on("response", function(response) {
             console.log(response.statusCode);
             if ( response.statusCode !== 304 ) {
                 console.log("too old, download again " + response.statusCode);

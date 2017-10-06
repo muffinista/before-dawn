@@ -1,5 +1,5 @@
-var fs = require('fs');
-var path = require('path');
+var fs = require("fs");
+var path = require("path");
 var filePath = path.join(__dirname, "package.json");
 var version = JSON.parse(fs.readFileSync( filePath )).version;
 
@@ -19,8 +19,8 @@ global.ISSUES_URL = "https://github.com/muffinista/before-dawn/issues";
 //global.RAVEN_URL = 'https://b86f7b0ac5604b55b4fd03adedc5d205@sentry.io/172824';
 
 global.CRASH_REPORTER = {
-  productName: 'Before Dawn',
-  companyName: 'Before Dawn',
-  submitURL: 'http://beforedawn.muffinlabs.com:1127/post',
+  productName: "Before Dawn",
+  companyName: "Before Dawn",
+  submitURL: "http://beforedawn.muffinlabs.com:1127/post",
   uploadToServer: true
 };

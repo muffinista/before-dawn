@@ -1,0 +1,12 @@
+{
+  "env": {
+    "browser": true,
+    "node": true,
+    "es6": true
+  },
+  "rules": {
+    "eqeqeq": "off",
+    "curly": "warn",
+    "quotes": ["warn", "double"]
+  }
+}

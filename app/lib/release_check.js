@@ -1,7 +1,7 @@
 "use strict";
 
-var request = require('request');
-var semver = require('semver');
+var request = require("request");
+var semver = require("semver");
 
 exports.checkLatestRelease = function(repo, version, yes_cb, no_cb) {
   var url = "https://api.github.com/repos/" + repo + "/releases/latest";
@@ -12,7 +12,7 @@ exports.checkLatestRelease = function(repo, version, yes_cb, no_cb) {
       json: true,
       timeout: 1000,
       headers: {
-        'User-Agent': "Before Dawn"
+        "User-Agent": "Before Dawn"
       }
     }, function(error, response, body) {
       var tag;

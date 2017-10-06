@@ -1,17 +1,17 @@
-'use strict';
+"use strict";
 
 /**
  * These are the possible states that the app can be in.
  */
 const STATES = {
-  STATE_NONE: Symbol('none'), // initial state
-  STATE_IDLE: Symbol('idle'), // not running, waiting
-  STATE_RUNNING: Symbol('running'), // running a screensaver
-  STATE_BLANKED: Symbol('blanked'), // long idle, screen is blanked
-  STATE_PAUSED: Symbol('paused') // screensaver is paused
+  STATE_NONE: Symbol("none"), // initial state
+  STATE_IDLE: Symbol("idle"), // not running, waiting
+  STATE_RUNNING: Symbol("running"), // running a screensaver
+  STATE_BLANKED: Symbol("blanked"), // long idle, screen is blanked
+  STATE_PAUSED: Symbol("paused") // screensaver is paused
 };
 
-const idler = require('node-system-idle-time');
+const idler = require("node-system-idle-time");
 const IDLE_CHECK_RATE = 25;
 
 var currentState = STATES.STATE_NONE;

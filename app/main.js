@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 /***
 
@@ -14,25 +14,25 @@
    
  */
 
-const electron = require('electron');
-const {crashReporter} = require('electron');
-const log = require('electron-log');
+const electron = require("electron");
+const {crashReporter} = require("electron");
+const log = require("electron-log");
 
 const app = electron.app;  // Module to control application life.
 const BrowserWindow = electron.BrowserWindow;  // Module to create native browser window.
 const Menu = electron.Menu;
 const Tray = electron.Tray;
-const {ipcMain} = require('electron');
+const {ipcMain} = require("electron");
 
-const _ = require('lodash');
-const fs = require('fs');
-const path = require('path');
-const parseArgs = require('minimist');
+const _ = require("lodash");
+const fs = require("fs");
+const path = require("path");
+const parseArgs = require("minimist");
 
-const screen = require('./lib/screen.js');
-const releaseChecker = require('./lib/release_check.js');
-const power = require('./lib/power.js');
-let stateManager = require('./lib/state_manager.js');
+const screen = require("./lib/screen.js");
+const releaseChecker = require("./lib/release_check.js");
+const power = require("./lib/power.js");
+let stateManager = require("./lib/state_manager.js");
 
 const robot = require("robotjs");
 
@@ -62,13 +62,13 @@ var electronScreen;
 
 
 var icons = {
-  'win32' : {
-    active: __dirname + '/assets/icon.ico',
-    paused: __dirname + '/assets/icon-paused.ico'
+  "win32" : {
+    active: __dirname + "/assets/icon.ico",
+    paused: __dirname + "/assets/icon-paused.ico"
   },
-  'default': {
-    active: __dirname + '/assets/icon.png',
-    paused: __dirname + '/assets/icon-paused.png'
+  "default": {
+    active: __dirname + "/assets/icon.png",
+    paused: __dirname + "/assets/icon-paused.png"
   }
 };
 
@@ -77,7 +77,7 @@ var icons = {
  * open our screen grabber tool and issue a screengrab request
  */
 var grabScreen = function(s, cb) {
-  var grabberUrl = 'file://' + __dirname + '/ui/grabber.html?id=' + s.id +
+  var grabberUrl = "file://" + __dirname + "/ui/grabber.html?id=" + s.id +
                    "&width=" + s.bounds.width +
                    "&height=" + s.bounds.height;
 
@@ -87,7 +87,7 @@ var grabScreen = function(s, cb) {
     height:200
   });
 
-  grabber.on('closed', function() {
+  grabber.on("closed", function() {
     grabber = null;
   });
   
@@ -117,12 +117,12 @@ var openPrefsWindow = function() {
     // call savers.reload to make sure our data is properly refreshed
     // and check for any system updates
     global.savers.reload(function() {
-      var prefsUrl = 'file://' + __dirname + '/ui/prefs.html';
+      var prefsUrl = "file://" + __dirname + "/ui/prefs.html";
       prefsWindowHandle = new BrowserWindow({
         width:800,
         height:675,
         resizable:true,
-        icon: path.join(__dirname, 'assets', 'icon.png')
+        icon: path.join(__dirname, "assets", "icon.png")
       });
 
       prefsUrl = prefsUrl + "?screenshot=" + encodeURIComponent("file://" + message.url);
@@ -137,7 +137,7 @@ var openPrefsWindow = function() {
         prefsWindowHandle.webContents.openDevTools();
       }
 
-      prefsWindowHandle.on('closed', function() {
+      prefsWindowHandle.on("closed", function() {
         prefsWindowHandle = null;
         global.savers.reload();
         updateStateManager();
@@ -148,10 +148,10 @@ var openPrefsWindow = function() {
       });
 
       // we could do something nice with either of these events
-      prefsWindowHandle.webContents.on('crashed', function (e) {
+      prefsWindowHandle.webContents.on("crashed", function (e) {
         log.info(e);
       });
-      prefsWindowHandle.webContents.on('unresponsive', function (e) {
+      prefsWindowHandle.webContents.on("unresponsive", function (e) {
         log.info(e);
       });
 
@@ -164,12 +164,12 @@ var openPrefsWindow = function() {
  * Open the About window for the app
  */
 var openAboutWindow = function() {
-  var prefsUrl = 'file://' + __dirname + '/ui/about.html';
+  var prefsUrl = "file://" + __dirname + "/ui/about.html";
   var w = new BrowserWindow({
     width:500,
     height:400,
     resizable:false,
-    icon: path.join(__dirname, 'assets', 'icon.png')
+    icon: path.join(__dirname, "assets", "icon.png")
   });
 
   w.loadURL(prefsUrl);
@@ -180,7 +180,7 @@ var openAboutWindow = function() {
   if ( debugMode === true ) {
     w.webContents.openDevTools();
   }
-  w.on('closed', function() {
+  w.on("closed", function() {
     w = null;
     if ( typeof(app.dock) !== "undefined" ) {
       app.dock.hide();
@@ -193,7 +193,7 @@ var openAboutWindow = function() {
  */
 var openHelpUrl = function() {
   try {
-    require('electron').shell.openExternal(global.HELP_URL);
+    require("electron").shell.openExternal(global.HELP_URL);
   }
   catch(e) {
     log.info(e);
@@ -206,7 +206,7 @@ var openHelpUrl = function() {
  */
 var openIssuesUrl = function() {
   try {
-    require('electron').shell.openExternal(global.ISSUES_URL);
+    require("electron").shell.openExternal(global.ISSUES_URL);
   }
   catch(e) {
     log.info(e);
@@ -219,7 +219,7 @@ var openIssuesUrl = function() {
  */
 var forceWindowClose = function(w) {
   // 100% close/kill this window
-  if ( typeof(w) !== 'undefined' ) {
+  if ( typeof(w) !== "undefined" ) {
     try {
       w.destroy();
     }
@@ -241,7 +241,7 @@ var runScreenSaverOnDisplay = function(saver, s) {
   };
   
   var windowOpts = {
-    backgroundColor: '#000000',
+    backgroundColor: "#000000",
     autoHideMenuBar: true,
     alwaysOnTop: true,
     x: s.bounds.x,
@@ -275,7 +275,7 @@ var runScreenSaverOnDisplay = function(saver, s) {
     
     try {   
       // Emitted when the window is closed.
-      w.on('closed', function() {
+      w.on("closed", function() {
         saverWindows = _.filter(saverWindows, function(w2) {
           return (w2 !== w);
         });
@@ -285,26 +285,26 @@ var runScreenSaverOnDisplay = function(saver, s) {
       });
       
       // inject our custom JS and CSS into the screensaver window
-      w.webContents.on('did-finish-load', function() {
-        log.info('did-finish-load');
+      w.webContents.on("did-finish-load", function() {
+        log.info("did-finish-load");
         if (!w.isDestroyed()) {
           w.webContents.insertCSS(globalCSSCode);
         }
       });
 
       // we could do something nice with either of these events
-      w.webContents.on('crashed', function (e) {
+      w.webContents.on("crashed", function (e) {
         log.info(e);
       });
-      w.webContents.on('unresponsive', function (e) {
+      w.webContents.on("unresponsive", function (e) {
         log.info(e);
       });
 
       
-      w.once('ready-to-show', () => {
+      w.once("ready-to-show", () => {
         var diff;
 
-        log.info('ready-to-show');
+        log.info("ready-to-show");
         if ( debugMode !== true ) {
           w.setFullScreen(true);
         }
@@ -325,7 +325,7 @@ var runScreenSaverOnDisplay = function(saver, s) {
       // w.minimize();
       // w.focus();
 
-      if ( typeof(message) !== 'undefined' ) {
+      if ( typeof(message) !== "undefined" ) {
         url_opts.screenshot = encodeURIComponent("file://" + message.url);
       }
 
@@ -352,7 +352,7 @@ var runScreenSaverOnDisplay = function(saver, s) {
   // if this screensaver uses a screengrab, get it. 
   // otherwise just boot it
   //
-  if ( _.findIndex(saver.getRequirements(), function(x) { return x === 'screen'; }) > -1 ) {
+  if ( _.findIndex(saver.getRequirements(), function(x) { return x === "screen"; }) > -1 ) {
     grabScreen(s, runSaver);
   }
   else {
@@ -447,7 +447,7 @@ var screenSaverIsRunning = function() {
  * check if the specified window exists and isn't destroyed
  */
 var activeWindowHandle = function(w) {
-  return (typeof(w) !== 'undefined' && ! w.isDestroyed());
+  return (typeof(w) !== "undefined" && ! w.isDestroyed());
 };
 
 /**
@@ -560,16 +560,16 @@ var bootApp = function(_basePath) {
   trayMenu.items[3].visible = global.NEW_RELEASE_AVAILABLE;
 
   electronScreen = electron.screen;
-  electronScreen.on('display-added', handleDisplayChange);
-  electronScreen.on('display-removed', handleDisplayChange);
-  electronScreen.on('display-metrics-changed', handleDisplayChange);    
+  electronScreen.on("display-added", handleDisplayChange);
+  electronScreen.on("display-removed", handleDisplayChange);
+  electronScreen.on("display-metrics-changed", handleDisplayChange);    
 
-  electron.powerMonitor.on('suspend', () => {
-    log.info('The system is going to sleep, stop screensavers');
+  electron.powerMonitor.on("suspend", () => {
+    log.info("The system is going to sleep, stop screensavers");
     closeRunningScreensavers();
   });
-  electron.powerMonitor.on('resume', () => {
-    log.info('The system just woke up, stop screensavers');
+  electron.powerMonitor.on("resume", () => {
+    log.info("The system just woke up, stop screensavers");
     closeRunningScreensavers();
   });
   
@@ -586,7 +586,7 @@ var bootApp = function(_basePath) {
 
     // show tray menu on right click
     // @todo should this be osx only?
-    appIcon.on('right-click', () => {
+    appIcon.on("right-click", () => {
       appIcon.popUpContextMenu();
     });
     
@@ -610,7 +610,7 @@ var bootApp = function(_basePath) {
 /**
  * try and guess if we are in fullscreen mode or not
  */
-var inFullscreen = require('./lib/fullscreen.js').inFullscreen;
+var inFullscreen = require("./lib/fullscreen.js").inFullscreen;
 
 /**
  * run the screensaver, but only if there isn't an app in fullscreen mode right now
@@ -724,13 +724,13 @@ var updateTrayIcon = function() {
 };
 
 // load a few global variables
-require('./bootstrap.js');
+require("./bootstrap.js");
 
 log.transports.file.maxSize = 1 * 1024 * 1024;
-log.transports.file.file = path.join(__dirname, '/log.txt');
+log.transports.file.file = path.join(__dirname, "/log.txt");
 
 if ( typeof(global.RAVEN_PRIVATE_URL) !== "undefined" ) {
-  Raven = require('raven');
+  Raven = require("raven");
   log.info("Setup sentry logging with " + global.RAVEN_PRIVATE_URL);
   Raven.config(global.RAVEN_PRIVATE_URL).install();
 }
@@ -738,11 +738,11 @@ if ( typeof(global.RAVEN_PRIVATE_URL) !== "undefined" ) {
 crashReporter.start(global.CRASH_REPORTER);
 
 // store our root path as a global variable so we can access it from screens
-global.basePath = path.join(app.getPath('appData'), global.APP_DIR);
-global.savers = require('./lib/savers.js');
+global.basePath = path.join(app.getPath("appData"), global.APP_DIR);
+global.savers = require("./lib/savers.js");
 
 // some global CSS we'll inject into running screensavers
-globalCSSCode = fs.readFileSync( path.join(__dirname, 'assets', 'global.css'), 'ascii');  
+globalCSSCode = fs.readFileSync( path.join(__dirname, "assets", "global.css"), "ascii");  
 
 
 /**
@@ -767,13 +767,13 @@ if ( typeof(app.dock) !== "undefined" ) {
 //
 trayMenu = Menu.buildFromTemplate([
   {
-    label: 'Run Now',
+    label: "Run Now",
     click: function() {
       setTimeout(setStateToRunning, 50);
     }
   },
   {
-    label: 'Disable',
+    label: "Disable",
     click: function() {
       stateManager.pause();
       updateTrayIcon();
@@ -782,7 +782,7 @@ trayMenu = Menu.buildFromTemplate([
     }
   },
   {
-    label: 'Enable',
+    label: "Enable",
     click: function() { 
       stateManager.reset();
       updateTrayIcon();
@@ -792,30 +792,30 @@ trayMenu = Menu.buildFromTemplate([
     visible: false
   },
   {
-    label: 'Update Available!',
+    label: "Update Available!",
     click: function() { 
-      require('electron').shell.openExternal('https://github.com/' + global.APP_REPO + '/releases/latest');
+      require("electron").shell.openExternal("https://github.com/" + global.APP_REPO + "/releases/latest");
     },
     visible: (global.NEW_RELEASE_AVAILABLE === true)
   },
   {
-    label: 'Preferences',
+    label: "Preferences",
     click: function() { openPrefsWindow(); }
   },
   {
-    label: 'About ' + global.APP_NAME,
+    label: "About " + global.APP_NAME,
     click: function() { openAboutWindow(); }
   },
   {
-    label: 'Help',
+    label: "Help",
     click: function() { openHelpUrl(); }
   },
   {
-    label: 'Report a Bug',
+    label: "Report a Bug",
     click: function() { openIssuesUrl(); }
   },
   {
-    label: 'Quit',
+    label: "Quit",
     click: function() { app.quit(); }
   }
 ]);
@@ -826,30 +826,30 @@ trayMenu = Menu.buildFromTemplate([
 // if the user has updated one of their screensavers, we can let
 // the prefs window know that it needs to reload
 //
-ipcMain.on('savers-updated', (event, arg) => {
+ipcMain.on("savers-updated", (event, arg) => {
   if ( prefsWindowHandle !== null ) {
-    prefsWindowHandle.send('savers-updated', arg);
+    prefsWindowHandle.send("savers-updated", arg);
   }
 });
 
 
 // seems like we need to catch this event to keep OSX from exiting app after screensaver runs?
-app.on('window-all-closed', function() {
+app.on("window-all-closed", function() {
   log.info("window-all-closed");
 });
-app.on('before-quit', function() {
+app.on("before-quit", function() {
   log.info("before-quit");
 });
-app.on('will-quit', function() {
+app.on("will-quit", function() {
   log.info("will-quit");
 });
-app.on('quit', function() {
+app.on("quit", function() {
   log.info("quit");
 });
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
-app.once('ready', function() {  
+app.once("ready", function() {  
   /**
    * check for a release and then boot!
    */
@@ -864,7 +864,7 @@ app.once('ready', function() {
     });
 });
 
-process.on('uncaughtException', function (ex) {
+process.on("uncaughtException", function (ex) {
   log.info(ex);
   if ( typeof(Raven) !== "undefined" ) {
     Raven.captureException(ex);

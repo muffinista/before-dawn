@@ -1,12 +1,12 @@
 "use strict";
 
-const fs = require('fs-extra');
-const nconf = require('nconf');
-const path = require('path');
-const _ = require('lodash');
-const mkdirp = require('mkdirp');
+const fs = require("fs-extra");
+const nconf = require("nconf");
+const path = require("path");
+const _ = require("lodash");
+const mkdirp = require("mkdirp");
 
-const Saver = require('./saver.js');
+const Saver = require("./saver.js");
 
 var config_file = "config.json";
 
@@ -70,17 +70,17 @@ var setupPackages = function(cb) {
 
   updatePackage(function(data) {
     if ( data.downloaded === true ) {
-      setConfig('source:updated_at', data.updated_at);
+      setConfig("source:updated_at", data.updated_at);
     }
 
     listAll(function(data) {
-      var current = nconf.get('saver');
+      var current = nconf.get("saver");
       if (
         ( current === undefined || getCurrentData() === undefined ) && 
         data.length > 0
       ) {
         console.log("setting default saver to first in list " + data[0].key);
-        setConfig('saver', data[0].key);
+        setConfig("saver", data[0].key);
       }
 
       writeSync();
@@ -128,7 +128,7 @@ var deleteFolderRecursive = function(path) {
 };
 
 var defaultSaversDir = function() {
-  return path.join(baseDir, 'savers');
+  return path.join(baseDir, "savers");
 };
 
 
@@ -161,13 +161,13 @@ var updatePackage = function(cb) {
  * setup some reasonable defaults
  */
 var ensureDefaults = function() {
-  var source = nconf.get('source');
+  var source = nconf.get("source");
   if ( source === undefined ) {
     _firstLoad = true;
     console.log("add default source");
-    setConfig('source',{
+    setConfig("source",{
       repo: global.SAVER_REPO,
-      hash: ''
+      hash: ""
     });
   }
 };
@@ -190,14 +190,14 @@ var getByKey = function(key) {
  * return the key of the current screensaver
  */
 var getCurrent = function() {
-  return nconf.get('saver');
+  return nconf.get("saver");
 };
 
 /**
  * return the object/data of the current screensaver
  */
 var getCurrentData = function() {
-  var key = nconf.get('saver');
+  var key = nconf.get("saver");
   return getByKey(key);
 };
 
@@ -207,7 +207,7 @@ var getCurrentData = function() {
 var getRandomScreensaver = function() {
   var s = _.sample(
     _.reject(loadedScreensavers, function(s) {
-      return ( typeof(s.preload) !== 'undefined' );
+      return ( typeof(s.preload) !== "undefined" );
     })
   );
   console.log("RANDOM", s);
@@ -221,7 +221,7 @@ var getRandomScreensaver = function() {
  * hardcoded -- replace the given screensaver with a random one.
  */
 var applyPreload = function(saver) {
-  if ( saver.preload && saver.preload === 'random' ) {
+  if ( saver.preload && saver.preload === "random" ) {
     return getRandomScreensaver();
   }
 
@@ -232,33 +232,33 @@ var applyPreload = function(saver) {
  * return the URL of a zip file that is the source we will check to update our screensavers
  */
 var getSource = function() {
-  return nconf.get('source');
+  return nconf.get("source");
 };
 
 var setSource = function(x) {
   var s = getSource();
   if ( x !== s.repo ) {
-    return nconf.set('source', {
+    return nconf.set("source", {
       repo: x
     });
   }
   else { 
-    return nconf.get('source');
+    return nconf.get("source");
   }
 };
 
 var setUpdateCheckTimestamp = function(x) {
-  return nconf.set('sourceCheckTimestamp', x);
+  return nconf.set("sourceCheckTimestamp", x);
 };
 var getUpdateCheckTimestamp = function(x) {
-  return nconf.get('sourceCheckTimestamp') || 0;
+  return nconf.get("sourceCheckTimestamp") || 0;
 };
 
 var getLocalSource = function() {
-  return nconf.get('localSource') || "";
+  return nconf.get("localSource") || "";
 };
 var setLocalSource = function(x) {
-  return nconf.set('localSource', x);
+  return nconf.set("localSource", x);
 };
 
 
@@ -274,7 +274,7 @@ var setConfig = function(k, v) {
  * set current screensaver key
  */
 var setCurrent = function(x, opts) {
-  setConfig('saver', x);
+  setConfig("saver", x);
 
   if ( typeof(opts) !== "undefined" ) {
     setOptions(opts, x);
@@ -282,11 +282,11 @@ var setCurrent = function(x, opts) {
 };
 
 var setDelay = function(x) {
-  setConfig('delay', x);
+  setConfig("delay", x);
 };
 
 var getDelay = function() {
-  var val = nconf.get('delay');
+  var val = nconf.get("delay");
   if ( typeof(val) === "undefined" ) {
     val = 15;
   }
@@ -295,11 +295,11 @@ var getDelay = function() {
 
 
 var setSleep = function(x) {
-  setConfig('sleep', x);
+  setConfig("sleep", x);
 };
 
 var getSleep = function() {
-  var val = nconf.get('sleep');
+  var val = nconf.get("sleep");
   if ( typeof(val) === "undefined" ) {
     val = 15;
   }
@@ -307,19 +307,19 @@ var getSleep = function() {
 };
 
 var setLock = function(x) {
-  setConfig('lock', x);
+  setConfig("lock", x);
 };
 
 var getLock = function() {
-  return nconf.get('lock') || false;
+  return nconf.get("lock") || false;
 };
 
 var setDisableOnBattery = function(x) {
-  setConfig('disable_on_battery', x);
+  setConfig("disable_on_battery", x);
 };
 
 var getDisableOnBattery = function() {
-  return nconf.get('disable_on_battery') || false;
+  return nconf.get("disable_on_battery") || false;
 };
 
 
@@ -361,9 +361,9 @@ var skipFolder = function(p) {
 var sources = function() {
   var source = getSource();
   var local = getLocalSource();
-  var root = path.join(baseDir, 'savers');
-  var system = path.join(baseDir, 'system-savers');
-  var system2 = path.join(__dirname, '..', 'system-savers');  
+  var root = path.join(baseDir, "savers");
+  var system = path.join(baseDir, "system-savers");
+  var system2 = path.join(__dirname, "..", "system-savers");  
 
   
   var folders = [];
@@ -409,7 +409,7 @@ var parseAndLoadSaver = function(opts) {
   }
 
   return new Promise(function (resolve, reject) {
-    fs.readFile(opts.filepath, {encoding: 'utf8'}, function (err, content) {
+    fs.readFile(opts.filepath, {encoding: "utf8"}, function (err, content) {
       if ( err ) {
         reject(err);
       }
@@ -423,7 +423,7 @@ var parseAndLoadSaver = function(opts) {
           // allow for a specified URL -- this way you could create a screensaver
           // that pointed to a remote URL
           if ( typeof(contents.url) === "undefined" ) {
-            contents.url = 'file://' + contents.key;
+            contents.url = "file://" + contents.key;
           }
           
           contents.settings = getOptions(contents.key);
@@ -455,12 +455,12 @@ var parseAndLoadSaver = function(opts) {
  */
 var listAll = function(cb) {
   var folders = sources();
-  var walker = require('folder-walker');
+  var walker = require("folder-walker");
   var stream = walker(folders);
 
   var promises = [];
   
-  stream.on('data', function(opts) {
+  stream.on("data", function(opts) {
     var f = opts.filepath;
     var folder = path.dirname(f);
     var doLoad = f.match(/saver.json$/) &&
@@ -472,7 +472,7 @@ var listAll = function(cb) {
     }
   });
 
-  stream.on('end', function() {
+  stream.on("end", function() {
     Promise.all(promises).then(function(data) {
       loadedScreensavers = _.sortBy(data, function(s) { return s.name.toLowerCase(); });
       cb(loadedScreensavers);
@@ -494,7 +494,7 @@ var getCurrentUrl = function(opts) {
  * return URL of the screensaver matching key
  */
 var getUrl = function(key) {   
-  var url = 'file://' + baseDir + '/savers/';
+  var url = "file://" + baseDir + "/savers/";
   if ( typeof(key) === "undefined" ) {
     key = getCurrent();
   }

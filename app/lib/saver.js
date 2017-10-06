@@ -2,13 +2,13 @@
  * simple class for a screen saver
  */
 
-var _ = require('lodash');
+var _ = require("lodash");
 
 // we will generate a list of requirements that screensavers need
 // to work. for now, it's just a screengrab. to maintain
 // compatability, we'll generate a default list if one isn't
 // specified    
-const DEFAULT_REQUIREMENTS = ['screen'];
+const DEFAULT_REQUIREMENTS = ["screen"];
 
 /**
  * take a hash and turn it into a URL string
@@ -17,9 +17,9 @@ const DEFAULT_REQUIREMENTS = ['screen'];
 var serialize = function(obj) {
   var str = [];
   for(var p in obj)
-    if (obj.hasOwnProperty(p)) {
+    {if (obj.hasOwnProperty(p)) {
       str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
-    }
+    }}
   return str.join("&");
 };
 
@@ -123,8 +123,8 @@ module.exports = function Saver(_attrs) {
 
   // write a new set of attributes for this saver to its JSON file
   this.write = function(attrs) {
-    var _path = require('path');
-    var fs = require('fs');
+    var _path = require("path");
+    var fs = require("fs");
 
     var configDest = _path.join(this.path, "saver.json");
 
