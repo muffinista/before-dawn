@@ -27,26 +27,6 @@ const {BrowserWindow} = window.require('electron').remote;
 
   
   var ravenUrl = remote.getGlobal('RAVEN_URL');
-  if ( typeof(ravenUrl) !== "undefined" ) {
-    console.log("RAVEN!", ravenUrl);
-    Raven.config(ravenUrl).install();
-  }
-  
-  crashReporter.start(remote.getGlobal('CRASH_REPORTER'));
-
-  ipcRenderer.on('savers-updated', (event, arg) => {
-    var val, s;
-
-    console.log("handle savers-updated event");
-    val = getCurrentScreensaver();
-
-    renderList(false);
-
-    s = savers.getByKey(val);
-    
-    redraw(s);
-
-  });
   
   const {dialog} = require('electron').remote;
 
@@ -62,7 +42,23 @@ const {BrowserWindow} = window.require('electron').remote;
 
   // the main app will pass us a screenshot URL, here it is
   var screenshot = decodeURIComponent(tmpParams.get("screenshot"));
+
+  if ( typeof(ravenUrl) !== "undefined" ) {
+    console.log("RAVEN!", ravenUrl);
+    Raven.config(ravenUrl).install();
+  }
   
+  crashReporter.start(remote.getGlobal('CRASH_REPORTER'));
+
+  ipcRenderer.on('savers-updated', (event, arg) => {
+    var val, s;
+
+    console.log("handle savers-updated event");
+    val = getCurrentScreensaver();
+
+    renderList(false);
+  });
+
   console.log("appLauncher " + appName);
   appLauncher.isEnabled().then(function(enabled){
     console.log("auto launch enabled?: " + enabled);
@@ -174,19 +170,27 @@ const {BrowserWindow} = window.require('electron').remote;
   };
 
   var redraw = function(s) {
+    var current_list_item = document.querySelector("#savers .list-group-item.active");
+    if ( current_list_item !== null ) {
+      current_list_item.classList.remove("active");
+    }
+    
     if ( typeof(s) === "undefined" ) {
       var current = getCurrentScreensaver();
       s = savers.getByKey(current);
-      console.log(current, s);
     }
 
     if ( typeof(s) !== "undefined" ) {
       loadPreview(s);
       loadOptionsForm(s);
 
+      var radio = document.querySelector("[name=screensaver]:checked");
+      var el = radio.closest("li");
       var authorClass = "external author";
       var aboutUrlClass = "external aboutUrl";
       var buttonWrapClass = "hide";
+
+      el.classList.add("active");
       
       if ( typeof(s.author) === "undefined" || s.author === "" ) {
         authorClass = authorClass + " hide";
@@ -270,17 +274,10 @@ const {BrowserWindow} = window.require('electron').remote;
 
 
   var handlePathChoice = function(result) {
-    var data;
-    console.log(result);
-    if ( result === undefined ) {
-      // this kind of stinks
-      data = "";
-    }
-    else {
+    if ( result !== undefined ) {
       data = result;
+      document.querySelector("[name=localSource]").value = data;
     }
-
-    document.querySelector("[name=localSource]").value = data;
   };
 
   var addNewSaver = function(e) {
@@ -340,7 +337,6 @@ const {BrowserWindow} = window.require('electron').remote;
         defaultId: 0
       },
       function(result) {
-        console.log(result);
         if ( result === 1 ) {
           savers.delete(key, function() {
             ipcRenderer.send('savers-updated', key);

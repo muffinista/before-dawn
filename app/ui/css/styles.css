@@ -18,6 +18,8 @@
 
   /* this should solve some input/footer overlap issues on prefs form */
   z-index: 1000;
+  padding-left: 5px;
+  padding-right: 5px;
 }
 
 .watcher .navbar-header {
@@ -169,4 +171,15 @@ p.description {
 
 .buttons > a {
   margin: 2px;
+}
+
+#savers li.list-group-item.active a.btn {
+  background: white;
+}
+
+.prefs-wrapper {
+  padding-left: 5px;
+}
+.prefs-wrapper .navbar-header.sticky-top {
+  background-color: white;
 }

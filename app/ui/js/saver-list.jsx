@@ -20,6 +20,19 @@ export default class SaverList extends React.Component {
     this.setState({value: event.target.value});
   }
 
+  // custom click handler so that when a user clicks anywhere in
+  // a list item, we treat it as the user selecting that screensaver.
+  handleClick(event) {
+    var buttons;
+    var radio;
+
+    buttons = event.target.closest(".buttons");
+    if ( buttons === null ) {
+      radio = event.target.closest(".entry").querySelector("input");
+      radio.click();
+    }
+  }
+
   render() {
     var self = this;
     var nodes = this.props.data.map(function(s, i) {
@@ -41,18 +54,18 @@ export default class SaverList extends React.Component {
       
       return (
         <li className={"list-group-item flex-column entry"} key={i}>
-          <div className={"d-flex w-100 justify-content-between"}>
-          <label>
-            <div className={"body"}>
-              <input type="radio" name="screensaver" value={s.key} onChange={self.onChanged} defaultChecked={is_checked} />
-              <b>{s.name}</b>
+          <div className={"d-flex w-100 justify-content-between"} onClick={self.handleClick}>
+            <label>
+              <div className={"body"}>
+                <input type="radio" name="screensaver" value={s.key} onChange={self.onChanged} defaultChecked={is_checked} />
+                <b>{s.name}</b>
+              </div>
+            </label>
+            
+            <div className={buttonWrapClass}>
+              <a className={"watcher btn btn-outline-secondary btn-sm"} href="#" role="button" data-key={s.key}>edit</a>
+              <a className={"delete btn btn-outline-secondary btn-sm"} href="#" role="button "data-key={s.key}>delete</a>
             </div>
-          </label>
-          
-          <div className={buttonWrapClass}>
-            <a className={"watcher btn btn-outline-secondary btn-sm"} href="#" role="button" data-key={s.key}>edit</a>
-            <a className={"delete btn btn-outline-secondary btn-sm"} href="#" role="button "data-key={s.key}>delete</a>
-          </div>
           </div>
         </li>
       );
