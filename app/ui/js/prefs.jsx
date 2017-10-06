@@ -397,6 +397,18 @@ const {BrowserWindow} = window.require('electron').remote;
 
   window.addEventListener('resize', onResize, true);
   
+
+  //
+  // i'm seeing a weird issue where both tabs can be marked as active,
+  // which ruins the output. this little snippet seems to handle that
+  // issue.
+  // @see https://github.com/twbs/bootstrap/issues/19374
+  $(document).ready(function() {
+    $(".nav-tabs .nav-item .nav-link:not(.nav-tabs .nav-item.dropdown .nav-link)")
+       .click(function() {
+        $(".dropdown-item.active").removeClass('active');
+      });
+  });
   
   var screensaverChanged = function() {
     var val = getCurrentScreensaver();
