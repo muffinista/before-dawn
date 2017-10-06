@@ -1,34 +1,34 @@
-const React = require('react');
-const ReactDOM = require('react-dom');
-const AutoLaunch = require('auto-launch');
-const path = require('path');
+const React = require("react");
+const ReactDOM = require("react-dom");
+const AutoLaunch = require("auto-launch");
+const path = require("path");
 
-const _ = require('lodash');
+const _ = require("lodash");
 
-import OptionsForm from './options-form';
-import Preview from './preview';
-import SaverList from './saver-list';
+import OptionsForm from "./options-form";
+import Preview from "./preview";
+import SaverList from "./saver-list";
 
-const shell = window.require('electron').shell;
-const {BrowserWindow} = window.require('electron').remote;
+const shell = window.require("electron").shell;
+const {BrowserWindow} = window.require("electron").remote;
 
 (function() {
-  var electron = window.require('electron');
-  const {ipcRenderer} = window.require('electron');
-  const {crashReporter} = window.require('electron');
+  var electron = window.require("electron");
+  const {ipcRenderer} = window.require("electron");
+  const {crashReporter} = window.require("electron");
 
-  var remote = window.require('electron').remote;
-  var savers = remote.getGlobal('savers');
-  var appName = remote.getGlobal('APP_NAME');
-  var appVersion = remote.getGlobal('APP_VERSION');
-  var defaultSaverRepo = remote.getGlobal('SAVER_REPO');
-  var appRepo = remote.getGlobal('APP_REPO');
-  var updateAvailable = remote.getGlobal('NEW_RELEASE_AVAILABLE');
+  var remote = window.require("electron").remote;
+  var savers = remote.getGlobal("savers");
+  var appName = remote.getGlobal("APP_NAME");
+  var appVersion = remote.getGlobal("APP_VERSION");
+  var defaultSaverRepo = remote.getGlobal("SAVER_REPO");
+  var appRepo = remote.getGlobal("APP_REPO");
+  var updateAvailable = remote.getGlobal("NEW_RELEASE_AVAILABLE");
 
   
-  var ravenUrl = remote.getGlobal('RAVEN_URL');
+  var ravenUrl = remote.getGlobal("RAVEN_URL");
   
-  const {dialog} = require('electron').remote;
+  const {dialog} = require("electron").remote;
 
   var appLauncher = new AutoLaunch({
 	  name: appName
@@ -48,9 +48,9 @@ const {BrowserWindow} = window.require('electron').remote;
     Raven.config(ravenUrl).install();
   }
   
-  crashReporter.start(remote.getGlobal('CRASH_REPORTER'));
+  crashReporter.start(remote.getGlobal("CRASH_REPORTER"));
 
-  ipcRenderer.on('savers-updated', (event, arg) => {
+  ipcRenderer.on("savers-updated", (event, arg) => {
     var val, s;
 
     console.log("handle savers-updated event");
@@ -133,7 +133,7 @@ const {BrowserWindow} = window.require('electron').remote;
 
     ReactDOM.render(
       <Preview saver={s} url_opts={url_opts} saver_opts={saverOpts} />,
-      document.getElementById('preview')
+      document.getElementById("preview")
     );
   };
 
@@ -160,7 +160,7 @@ const {BrowserWindow} = window.require('electron').remote;
   var loadOptionsForm = function(s) {
     ReactDOM.render(
       <OptionsForm saver={s} onChange={(x) => optionsUpdated(x)} />,
-      document.getElementById('options')
+      document.getElementById("options")
     );
   };
   
@@ -211,7 +211,7 @@ const {BrowserWindow} = window.require('electron').remote;
             {s.author}
           </span>
         </div>,
-        document.getElementById('details')
+        document.getElementById("details")
       );
 
     }
@@ -227,7 +227,7 @@ const {BrowserWindow} = window.require('electron').remote;
   };
   
   var renderList = function(doScroll) {
-    if ( typeof(doScroll) === 'undefined' ) {
+    if ( typeof(doScroll) === "undefined" ) {
       doScroll = true;
     }
 
@@ -236,7 +236,7 @@ const {BrowserWindow} = window.require('electron').remote;
 
       ReactDOM.render(
         <SaverList current={current} data={entries} />,
-        document.getElementById('savers')
+        document.getElementById("savers")
       );
 
       // scroll to the currently selected screensaver
@@ -251,23 +251,23 @@ const {BrowserWindow} = window.require('electron').remote;
       var s = savers.getByKey(current);
       redraw(s);
 
-      var radios = document.querySelectorAll('input[name=screensaver]');
+      var radios = document.querySelectorAll("input[name=screensaver]");
       for ( var i = 0; i < radios.length; i++ ) {
-        radios[i].addEventListener('click', screensaverChanged, false);
+        radios[i].addEventListener("click", screensaverChanged, false);
       }
 
-      var links = document.querySelectorAll('a.watcher');
+      var links = document.querySelectorAll("a.watcher");
       for ( var i = 0; i < links.length; i++ ) {
-        links[i].addEventListener('click', openSaverInWatcher, false);
+        links[i].addEventListener("click", openSaverInWatcher, false);
       }
-      links = document.querySelectorAll('a.delete');
+      links = document.querySelectorAll("a.delete");
       for ( var i = 0; i < links.length; i++ ) {
-        links[i].addEventListener('click', deleteSaver, false);
+        links[i].addEventListener("click", deleteSaver, false);
       }
 
-      links = document.querySelectorAll('a[href^="http"]');
+      links = document.querySelectorAll("a[href^=\"http\"]");
       for ( var i = 0; i < links.length; i++ ) {
-        links[i].addEventListener('click', handleLinkClick, false);
+        links[i].addEventListener("click", handleLinkClick, false);
       }
     });
   };
@@ -281,7 +281,7 @@ const {BrowserWindow} = window.require('electron').remote;
   };
 
   var addNewSaver = function(e) {
-    var prefsUrl = 'file://' + __dirname + '/new.html';
+    var prefsUrl = "file://" + __dirname + "/new.html";
     prefsUrl = prefsUrl + "?screenshot=" + encodeURIComponent(screenshot);
 
     var w = new BrowserWindow({
@@ -299,7 +299,7 @@ const {BrowserWindow} = window.require('electron').remote;
     e.preventDefault();
     dialog.showOpenDialog(
       {
-        properties: [ 'openDirectory', 'createDirectory' ]
+        properties: [ "openDirectory", "createDirectory" ]
       },
       handlePathChoice );
 
@@ -316,7 +316,7 @@ const {BrowserWindow} = window.require('electron').remote;
 
     // pass the key of the screensaver we want to load
     // as well as the URL to our screenshot image
-    var target = 'file://' + __dirname + "/watcher.html?" +
+    var target = "file://" + __dirname + "/watcher.html?" +
                  "src=" + encodeURIComponent(key) +
                  "&screenshot=" + encodeURIComponent(screenshot);
     w.loadURL(target);
@@ -339,7 +339,7 @@ const {BrowserWindow} = window.require('electron').remote;
       function(result) {
         if ( result === 1 ) {
           savers.delete(key, function() {
-            ipcRenderer.send('savers-updated', key);
+            ipcRenderer.send("savers-updated", key);
           });
         }
       }
@@ -390,12 +390,12 @@ const {BrowserWindow} = window.require('electron').remote;
   };
 
 
-  document.querySelector(".create").addEventListener('click', addNewSaver, false);
-  document.querySelector(".cancel").addEventListener('click', closeWindow, false);
-  document.querySelector(".pick").addEventListener('click', showPathChooser, false);
-  document.querySelector(".save").addEventListener('click', updatePrefs, false);
+  document.querySelector(".create").addEventListener("click", addNewSaver, false);
+  document.querySelector(".cancel").addEventListener("click", closeWindow, false);
+  document.querySelector(".pick").addEventListener("click", showPathChooser, false);
+  document.querySelector(".save").addEventListener("click", updatePrefs, false);
 
-  window.addEventListener('resize', onResize, true);
+  window.addEventListener("resize", onResize, true);
   
 
   //
@@ -406,7 +406,7 @@ const {BrowserWindow} = window.require('electron').remote;
   $(document).ready(function() {
     $(".nav-tabs .nav-item .nav-link:not(.nav-tabs .nav-item.dropdown .nav-link)")
        .click(function() {
-        $(".dropdown-item.active").removeClass('active');
+        $(".dropdown-item.active").removeClass("active");
       });
   });
   
@@ -432,7 +432,7 @@ const {BrowserWindow} = window.require('electron').remote;
       function(result) {
         console.log(result);
         if ( result === 1 ) {
-          shell.openExternal('https://github.com/' + appRepo + '/releases/latest');
+          shell.openExternal("https://github.com/" + appRepo + "/releases/latest");
         }
       }
     );

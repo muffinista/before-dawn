@@ -22,11 +22,11 @@ module.exports = function(grunt) {
       options: {
         configFile: "eslint.json"
       },
-      target: ["Gruntfile.js", "*.js", "lib/**/*.js"]
+      target: ["Gruntfile.js", "*.js", "lib/**/*.js", "ui/**/*.jsx"]
     },
     watch: {
       lint: {
-        files: ["Gruntfile.js", "*.js", "lib/**/*.js"],
+        files: ["Gruntfile.js", "*.js", "lib/**/*.js", "ui/**/*.jsx"],
         tasks: ["eslint"]
       },
       scripts: {

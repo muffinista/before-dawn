@@ -1,9 +1,9 @@
-'use strict'
-import React from 'react';
+"use strict"
+import React from "react";
 
-import SliderWithValue from './slider-with-value';
+import SliderWithValue from "./slider-with-value";
 
-const _ = require('lodash');
+const _ = require("lodash");
 
 export default class OptionsForm extends React.Component {
   constructor(props) {

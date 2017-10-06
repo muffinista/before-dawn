@@ -67,6 +67,7 @@
     "electron": "^1.8.0",
     "electron-mocha": "^0.8.0",
     "electron-rebuild": "^1.6.0",
+    "eslint-plugin-react": "^7.4.0",
     "grunt": "^1.0.1",
     "grunt-babel": "^6.0.0",
     "grunt-contrib-eslint": "0.0.5",

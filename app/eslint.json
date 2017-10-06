@@ -4,6 +4,16 @@
     "node": true,
     "es6": true
   },
+  "extends": ["plugin:react/recommended"],
+  "parserOptions": {
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true
+    }
+  },
+  "plugins": [
+    "react"
+  ],
   "rules": {
     "eqeqeq": "off",
     "curly": "warn",

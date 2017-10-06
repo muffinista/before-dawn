@@ -1,5 +1,5 @@
-'use strict'
-import React from 'react';
+"use strict"
+import React from "react";
 
 export default class SliderWithValue extends React.Component {
   constructor(props) {

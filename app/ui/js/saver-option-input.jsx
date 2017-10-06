@@ -1,14 +1,14 @@
-'use strict';
+"use strict";
 
-import React from 'react';
-import SaverOptionInputItem from './saver-option-input-item';
+import React from "react";
+import SaverOptionInputItem from "./saver-option-input-item";
 
-const _ = require('lodash');
+const _ = require("lodash");
 
 export default class SaverOptionInput extends React.Component {
   constructor(props) {
     super(props);
-    if ( typeof(props.options) === 'undefined' ) {
+    if ( typeof(props.options) === "undefined" ) {
       props.options = [];
     }
 
@@ -40,10 +40,9 @@ export default class SaverOptionInput extends React.Component {
     var newVals = item.state.option;
     var index = this.indexOfOption(newVals);
 
-    console.log("PRE", this.state.options);
     var foo = this.state.options;
     foo.splice(index, 1);
-    console.log("POST", foo);
+
     this.setState({
       options: foo
     });
@@ -54,8 +53,11 @@ export default class SaverOptionInput extends React.Component {
 
   onChanged(newVals) {
     var index = this.indexOfOption(newVals);
+    var pre = this.state.options;
+    pre[index] = newVals;
 
-    this.state.options[index] = newVals;
+    this.setState({options: pre});
+    //this.state.options[index] = newVals;
     this.props.onChange(this.state.options);
   }
 

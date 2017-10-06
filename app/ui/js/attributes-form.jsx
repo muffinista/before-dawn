@@ -1,10 +1,10 @@
-'use strict'
+"use strict"
 
-import React from 'react';
-var ReactDOM = require('react-dom');
+import React from "react";
+var ReactDOM = require("react-dom");
 
-import SliderWithValue from './slider-with-value';
-import SaverOptionInput from './saver-option-input';
+import SliderWithValue from "./slider-with-value";
+import SaverOptionInput from "./saver-option-input";
 
 
 export default class AttributesForm extends React.Component {
@@ -12,7 +12,7 @@ export default class AttributesForm extends React.Component {
     super(props);
     this.state = { saver: this.props.saver };
 
-    if ( this.state.saver.options === null || typeof(this.state.saver.options) === 'undefined' ) {
+    if ( this.state.saver.options === null || typeof(this.state.saver.options) === "undefined" ) {
       this.state.saver.options = [];
     }
     
@@ -52,7 +52,7 @@ export default class AttributesForm extends React.Component {
     var self = this;
 
     var guts = React.createElement(
-      'div', null, 
+      "div", null, 
       <div className="container-fluid">
         <h4>Basic Information</h4>
         <small>You can enter the basics about this screensaver here.</small>
@@ -106,7 +106,7 @@ export default class AttributesForm extends React.Component {
     console.log("hey", this.state.saver);
     console.log(this.state.saver.options);
     var opts = React.createElement(
-      'div', null,
+      "div", null,
       <div className="container-fluid fieldset-padding">
         <h4>Configurable Options</h4>
         <small>You can offer users configurable options to control your screensaver. Manage those here.</small>
@@ -114,6 +114,6 @@ export default class AttributesForm extends React.Component {
       </div>
     );
     
-    return React.createElement('div', null, guts, opts);   
+    return React.createElement("div", null, guts, opts);   
   }
 }

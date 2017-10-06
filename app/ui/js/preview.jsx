@@ -1,7 +1,7 @@
-'use strict'
+"use strict"
 
-import React from 'react';
-const _ = require('lodash');
+import React from "react";
+const _ = require("lodash");
 
 export default class Preview extends React.Component {
   render() {

@@ -1,24 +1,24 @@
-import React from 'react';
-import ReactDOM from 'react-dom'
+import React from "react";
+import ReactDOM from "react-dom"
 
-import AttributesForm from './attributes-form';
-import OptionsForm from './options-form';
+import AttributesForm from "./attributes-form";
+import OptionsForm from "./options-form";
 
 (function() {
-  const remote = window.require('electron').remote;
-  const {ipcRenderer} = window.require('electron');
-  const {crashReporter} = require('electron');
-  crashReporter.start(remote.getGlobal('CRASH_REPORTER'));
+  const remote = window.require("electron").remote;
+  const {ipcRenderer} = window.require("electron");
+  const {crashReporter} = require("electron");
+  crashReporter.start(remote.getGlobal("CRASH_REPORTER"));
 
-  const _ = require('lodash');
+  const _ = require("lodash");
 
-  const fs = require('fs');
-  const path = require('path');
-  const url = require('url');
-  const exec = require('child_process').exec;
-  var savers = remote.getGlobal('savers');
+  const fs = require("fs");
+  const path = require("path");
+  const url = require("url");
+  const exec = require("child_process").exec;
+  var savers = remote.getGlobal("savers");
 
-  var ravenUrl = remote.getGlobal('RAVEN_URL');
+  var ravenUrl = remote.getGlobal("RAVEN_URL");
   if ( typeof(ravenUrl) !== "undefined" ) {
     Raven.config(ravenUrl).install();
   }
@@ -78,7 +78,7 @@ import OptionsForm from './options-form';
   };
 
   var holder = document.getElementById("wrapper");
-  var iframe = document.createElement('iframe');
+  var iframe = document.createElement("iframe");
   var saverOpts;
 
   var optionsUpdated = function(data) {
@@ -91,21 +91,20 @@ import OptionsForm from './options-form';
     saverAttrs = data;
   };
 
-  // do we need this?
-  var optionsFormRef = ReactDOM.render(
+  ReactDOM.render(
     <OptionsForm saver={s} onChange={optionsUpdated} />,
-    document.getElementById('options')
+    document.getElementById("options")
   );
 
-  var attrFormRef = ReactDOM.render(
+  ReactDOM.render(
     <AttributesForm saver={saverAttrs} onChanged={attrsUpdated} />,
-    document.getElementById('attributes')
+    document.getElementById("attributes")
   );
   
   holder.appendChild(iframe);
 
   reloadPreview();
-  window.addEventListener('resize', reloadPreview, true);
+  window.addEventListener("resize", reloadPreview, true);
 
   // figure out the path to the screensaver folder. use
   // decodeURIComponent to convert %20 to spaces
@@ -120,15 +119,15 @@ import OptionsForm from './options-form';
   var openFolderInOS = function(f) {
     var cmd;
     switch(process.platform) {
-      case 'darwin':
+      case "darwin":
         cmd = `open ${f}`;
         break;
-      case 'win32':
+      case "win32":
         if (process.env.SystemRoot) {
-          cmd = path.join(process.env.SystemRoot, 'explorer.exe');
+          cmd = path.join(process.env.SystemRoot, "explorer.exe");
         }
         else {
-          cmd = 'explorer.exe';
+          cmd = "explorer.exe";
         }
 
         cmd = cmd + ` /select,${f}`;
@@ -141,10 +140,10 @@ import OptionsForm from './options-form';
     };
 
     exec(cmd, function(error, stdout, stderr) {
-      console.log('stdout: ' + stdout);
-      console.log('stderr: ' + stderr);
+      console.log("stdout: " + stdout);
+      console.log("stderr: " + stderr);
       if (error !== null) {
-        console.log('exec error: ' + error);
+        console.log("exec error: " + error);
       }
     });
   };
@@ -167,7 +166,7 @@ import OptionsForm from './options-form';
 
     console.log("SAVE", saverAttrs);
     s.write(saverAttrs);
-    ipcRenderer.send('savers-updated', s.key);
+    ipcRenderer.send("savers-updated", s.key);
 
     if ( this.classList.contains("and-close") ) {
       closeWindow(ev);
@@ -182,25 +181,25 @@ import OptionsForm from './options-form';
   $(function () {
     // we need to make sure the preview iframe is the right size
     // when we open that tab. this bit of jQuery handles that
-    $('a[href="#main"]').on('shown.bs.tab', function (e) {
+    $("a[href=\"#main\"]").on("shown.bs.tab", function (e) {
       reloadPreview();
     })
 
     // activate tooltips
-    $('[data-toggle="tooltip"]').tooltip();
+    $("[data-toggle=\"tooltip\"]").tooltip();
   })
 
   
   
-  document.querySelector(".open").addEventListener('click', openFolder, false);
-  document.querySelector(".cancel").addEventListener('click', closeWindow, false);
-  document.querySelector(".reload").addEventListener('click', reloadPreview, false);
-  document.querySelector(".console").addEventListener('click', openConsole, false);
+  document.querySelector(".open").addEventListener("click", openFolder, false);
+  document.querySelector(".cancel").addEventListener("click", closeWindow, false);
+  document.querySelector(".reload").addEventListener("click", reloadPreview, false);
+  document.querySelector(".console").addEventListener("click", openConsole, false);
   
   var saveButtons = document.querySelectorAll(".save");
 
   for ( var i = 0; i < saveButtons.length; i++ ) {
-    saveButtons[i].addEventListener('click', saveSettings, false);
+    saveButtons[i].addEventListener("click", saveSettings, false);
   }
 
   
