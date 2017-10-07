@@ -8,14 +8,13 @@
 
   <body class="watcher">
     <div class="container-fluid">
-      <div class="row">
-        <nav class="navbar-header bg-faded">
+        <nav class="navbar-header bg-faded sticky-top">
           <ul class="nav nav-pills" role="tablist">
             <li role="presentation" class="nav-item">
-              <a data-toggle="tab" role="tab" class="nav-link" href="#main">Preview</a>
+              <a data-toggle="tab" role="tab" class="nav-link active" href="#settings">Settings</a>
             </li>
             <li role="presentation" class="nav-item">
-              <a data-toggle="tab" role="tab" class="nav-link active" href="#settings">Settings</a>
+              <a data-toggle="tab" role="tab" class="nav-link" href="#main">Preview</a>
             </li>
             <li>
               <form class="form-inline">
@@ -37,24 +36,26 @@
             </li>
           </ul>
         </nav>
-      </div>
       
       <div class="row">
         <div class="tab-content">
-          <div role="tabpanel" class="tab-pane" id="main">
-            <div id="wrapper"></div>
-          </div>
           <div role="tabpanel" class="tab-pane active" id="settings">
             <div id="attributes"></div>
             <div id="options"></div>
+
+            <!-- hack some padding into the bottom -->
+            <br /><br /><br />
+          </div>
+          <div role="tabpanel" class="tab-pane" id="main">
+            <div id="wrapper"></div>
           </div>
         </div>
       </div>
     </div> <!-- container -->
 
-    <footer class="footer">
+    <footer class="footer d-flex justify-content-between">
       <div class="container-fluid">
-        <div class="row pull-xs-right">
+        <div class="row float-right spaced-buttons">
           <button class="btn btn-large btn-default cancel">Cancel</button>
           <button class="btn btn-large btn-positive save">Save</button>
           <button class="btn btn-large btn-positive save and-close">Save and Close</button>          
@@ -68,6 +69,7 @@
      var $ = require('jquery');
      var jQuery = $;
      window.$ = $;
+     window.Popper = require('popper.js');
      require('bootstrap');
     </script>
     <script src="watcher.js"></script>

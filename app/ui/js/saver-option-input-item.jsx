@@ -65,8 +65,8 @@ export default class SaverOptionInputItem extends React.Component {
     return (
       <fieldset className={className} key={this.state.option.index}>
         <div className="form-group row">
-          <label className="col-xs-2 col-form-label">Name</label>
-          <div className="col-xs-10" >
+          <label className="col-sm-2 col-form-label">Name</label>
+          <div className="col-sm-10" >
             <input
                 type="text"
                 ref="name" name="name" className="form-control"
@@ -77,8 +77,8 @@ export default class SaverOptionInputItem extends React.Component {
         </div>
 
         <div className="form-group row">
-          <label className="col-xs-2 col-form-label">Description</label>
-          <div className="col-xs-10" >
+          <label className="col-sm-2 col-form-label">Description</label>
+          <div className="col-sm-10" >
             <input type="text"
                    ref="description"
                    name="description"
@@ -90,8 +90,8 @@ export default class SaverOptionInputItem extends React.Component {
         </div>
 
         <div className="form-group row">
-          <label className="col-xs-2 col-form-label">Type</label>
-          <div className="col-xs-10" >
+          <label className="col-sm-2 col-form-label">Type</label>
+          <div className="col-sm-10" >
             <select
                 ref="type" name="type" className="form-control"
                 value={this.state.option.type} onChange={this.onTypeChange}>
@@ -102,29 +102,27 @@ export default class SaverOptionInputItem extends React.Component {
         </div>
 
         <div className="form-group row">
-          <span className="only-for-slider">
-            <label className="col-xs-2 col-form-label">Min</label>
-            <div className="col-sm-2">
-              <input ref="min"
-                     type="number"
-                     name="min"
-                     className="form-control"
-                     value={this.state.option.min}
-                     onChange={this.handleChange} />
-            </div>
+          <label className="col-sm-2 col-form-label only-for-slider">Min</label>
+          <div className="col-sm-2 only-for-slider">
+            <input ref="min"
+                   type="number"
+                   name="min"
+                   className="form-control"
+                   value={this.state.option.min}
+                   onChange={this.handleChange} />
+          </div>
 
-            <label className="col-xs-2 col-form-label">Max</label>
-            <div className="col-sm-2">
-              <input ref="max"
-                     type="number"
-                     name="max"
-                     className="form-control"
-                     value={this.state.option.max}
-                     onChange={this.handleChange} />
-            </div>
-          </span>
+          <label className="col-sm-2 col-form-label only-for-slider">Max</label>
+          <div className="col-sm-2 only-for-slider">
+            <input ref="max"
+                   type="number"
+                   name="max"
+                   className="form-control"
+                   value={this.state.option.max}
+                   onChange={this.handleChange} />
+          </div>
 
-          <label className="col-xs-2 col-form-label">Default</label>
+          <label className="col-sm-2 col-form-label">Default</label>
           <div className={defaultClassName}>
             <input ref="default"
                    type="text"
@@ -137,7 +135,7 @@ export default class SaverOptionInputItem extends React.Component {
         </div>
 
         <div className="form-actions">
-          <button className={"btn btn-danger remove-option"} onClick={() => this.props.onDelete(this)}>Remove this Option</button>
+          <button type="button" className={"btn btn-danger remove-option"} onClick={() => this.props.onDelete(this)}>Remove this Option</button>
         </div>
       </fieldset>
     );

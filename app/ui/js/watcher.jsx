@@ -52,10 +52,10 @@ import OptionsForm from "./options-form";
 
   var reloadPreview = function(ev) {
     var iframe = document.querySelector("iframe");
+    var holder = document.querySelector("#main").closest(".row");
 
-    var main = document.querySelector("#main");
-    iframe.width = main.offsetWidth - 3;
-    iframe.height = main.offsetHeight - 3;
+    iframe.width = holder.offsetWidth - 3;
+    iframe.height = holder.offsetHeight - 3;
 
     var url_opts = {
       width: iframe.width,
@@ -77,7 +77,7 @@ import OptionsForm from "./options-form";
     }
   };
 
-  var holder = document.getElementById("wrapper");
+  var wrapper = document.getElementById("wrapper");
   var iframe = document.createElement("iframe");
   var saverOpts;
 
@@ -100,8 +100,9 @@ import OptionsForm from "./options-form";
     <AttributesForm saver={saverAttrs} onChanged={attrsUpdated} />,
     document.getElementById("attributes")
   );
-  
-  holder.appendChild(iframe);
+
+  // add the iframe to the output
+  wrapper.appendChild(iframe);
 
   reloadPreview();
   window.addEventListener("resize", reloadPreview, true);
@@ -189,8 +190,7 @@ import OptionsForm from "./options-form";
     $("[data-toggle=\"tooltip\"]").tooltip();
   })
 
-  
-  
+   
   document.querySelector(".open").addEventListener("click", openFolder, false);
   document.querySelector(".cancel").addEventListener("click", closeWindow, false);
   document.querySelector(".reload").addEventListener("click", reloadPreview, false);

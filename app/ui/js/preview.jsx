@@ -1,6 +1,7 @@
 "use strict"
 
 import React from "react";
+import PropTypes from "prop-types";
 const _ = require("lodash");
 
 export default class Preview extends React.Component {
@@ -18,4 +19,10 @@ export default class Preview extends React.Component {
 
     return (<div><iframe scrolling='no' className='mini' src={previewUrl} /></div>);
   }
+};
+
+Preview.propTypes = {
+  saver: PropTypes.object.isRequired,
+  url_opts: PropTypes.object,
+  saver_opts: PropTypes.object  
 };

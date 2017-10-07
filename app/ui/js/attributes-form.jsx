@@ -1,6 +1,8 @@
 "use strict"
 
 import React from "react";
+import PropTypes from "prop-types";
+
 var ReactDOM = require("react-dom");
 
 import SliderWithValue from "./slider-with-value";
@@ -24,96 +26,126 @@ export default class AttributesForm extends React.Component {
   }
 
   handleNameChange(event) {
-    this.state.saver.name = event.target.value;
+    this.setState({
+      saver: {
+        ...this.state.saver,
+        name: event.target.value
+      },
+    });
+
+    //this.state.saver.name = event.target.value;
     this.props.onChanged(this.state.saver);
   }
 
   handleDescriptionChange(event) {
-    this.state.saver.description = event.target.value;
+    this.setState({
+      saver: {
+        ...this.state.saver,
+        description: event.target.value
+      },
+    });
+
+    //this.state.saver.description = event.target.value;
     this.props.onChanged(this.state.saver);
   }
 
   handleAboutUrlChange(event) {
-    this.state.saver.aboutUrl = event.target.value;
+    this.setState({
+      saver: {
+        ...this.state.saver,
+        aboutUrl: event.target.value
+      },
+    });
+
+    //this.state.saver.aboutUrl = event.target.value;
     this.props.onChanged(this.state.saver);
   }
 
   handleAuthorChange(event) {
-    this.state.saver.author = event.target.value;
+    this.setState({
+      saver: {
+        ...this.state.saver,
+        author: event.target.value
+      },
+    });
+
+    //this.state.saver.author = event.target.value;
     this.props.onChanged(this.state.saver);
   }
 
   handleOptionChange(vals) {
-    this.state.saver.options = vals;
+    this.setState({
+      saver: {
+        ...this.state.saver,
+        options: event.target.vals
+      },
+    });
+
+    //this.state.saver.options = vals;
     this.props.onChanged(this.state.saver);
   }
 
   render() {
     var self = this;
 
-    var guts = React.createElement(
-      "div", null, 
+    return (
       <div className="container-fluid">
         <h4>Basic Information</h4>
         <small>You can enter the basics about this screensaver here.</small>
-
-        <div className="form-group row">
-          <label htmlFor="name" className="col-xs-2 col-form-label">Name:</label>
-          <div className="col-xs-10">
+        <form>
+          <div className="form-group">
+            <label htmlFor="name">Name:</label>
             <input
-                type="text" name="name" ref="name"
+                type="text" name="name"
                 className="form-control"
                 defaultValue={this.props.saver.name} onChange={this.handleNameChange} />
             <div className="hint">The name of your screensaver.</div>
-          </div>
         </div>
 
-        <div className="form-group row">
-          <label htmlFor="name" className="col-xs-2 col-form-label">Description:</label>
-          <div className="col-xs-10">
+        <div className="form-group">
+          <label htmlFor="name">Description:</label>
             <input
-                type="text" name="description" ref="description"
+                type="text" name="description"
                 className="form-control"
                 defaultValue={this.state.saver.description} onChange={this.handleDescriptionChange} />
             <div className="hint">A brief description of your screensaver.</div>
-          </div>
         </div>
-        <div className="form-group row">
-          <label htmlFor="aboutUrl" className="col-xs-2 col-form-label">About URL:</label>
-          <div className="col-xs-10">
+        <div className="form-group">
+          <label htmlFor="aboutUrl">About URL:</label>
             <input
                 type="text"
-                name="aboutUrl" ref="aboutUrl"
+                name="aboutUrl"
                 className="form-control" defaultValue={this.state.saver.aboutUrl} onChange={this.handleAboutUrlChange} />
             <div className="hint">If you have a URL with more details about your work, put it here!</div>
-          </div>
         </div>
-        <div className="form-group row">
-          <label htmlFor="author" className="col-xs-2 col-form-label">Author:</label>
-          <div className="col-xs-10">
+        <div className="form-group">
+          <label htmlFor="author">Author:</label>
             <input
                 type="text"
-                name="author" ref="author"
+                name="author"
                 className="form-control"
                 defaultValue={this.state.saver.author} onChange={this.handleAuthorChange} />
             <div className="hint">The author of this screensaver.</div>
-          </div>
         </div>
+        </form>
 
-      </div>
-    );
-
-    console.log("hey", this.state.saver);
-    console.log(this.state.saver.options);
-    var opts = React.createElement(
-      "div", null,
-      <div className="container-fluid fieldset-padding">
         <h4>Configurable Options</h4>
         <small>You can offer users configurable options to control your screensaver. Manage those here.</small>
         <SaverOptionInput options={this.state.saver.options} onChange={this.handleOptionChange}/>
+
       </div>
     );
-    
-    return React.createElement("div", null, guts, opts);   
+
+    /* <div className="container-fluid fieldset-padding">
+       <h4>Configurable Options</h4>
+       <small>You can offer users configurable options to control your screensaver. Manage those here.</small>
+       <SaverOptionInput options={this.state.saver.options} onChange={this.handleOptionChange}/>
+        </div>
+      */
   }
 }
+
+AttributesForm.propTypes = {
+  saver: PropTypes.object.isRequired,
+  onChanged: PropTypes.func
+};

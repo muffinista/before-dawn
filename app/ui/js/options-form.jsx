@@ -1,5 +1,6 @@
 "use strict"
 import React from "react";
+import PropTypes from "prop-types";
 
 import SliderWithValue from "./slider-with-value";
 
@@ -87,6 +88,11 @@ export default class OptionsForm extends React.Component {
       head = "";
     }
     
-    return(<div><h1>{head}</h1>{nodes}</div>);
+    return(<div className="container-fluid"><h1>{head}</h1>{nodes}</div>);
   }
 }
+
+OptionsForm.propTypes = {
+  saver: PropTypes.object.isRequired,
+  onChange: PropTypes.func
+};

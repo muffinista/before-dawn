@@ -1,5 +1,6 @@
 "use strict";
 import React from "react";
+import PropTypes from "prop-types";
 
 export default class SaverList extends React.Component {
   constructor(props) {
@@ -75,3 +76,8 @@ export default class SaverList extends React.Component {
   }
 }
 
+
+SaverList.propTypes = {
+  current: PropTypes.string.isRequired,
+  data: PropTypes.array
+};

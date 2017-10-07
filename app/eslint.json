@@ -5,10 +5,15 @@
     "es6": true
   },
   "extends": ["plugin:react/recommended"],
+  "parser": "babel-eslint",
+  "rules": {
+    "strict": 0
+  },
   "parserOptions": {
     "sourceType": "module",
     "ecmaFeatures": {
-      "jsx": true
+      "jsx": true,
+      "spread": true
     }
   },
   "plugins": [
