@@ -1,5 +1,6 @@
 "use strict"
 import React from "react";
+import PropTypes from "prop-types";
 
 export default class SliderWithValue extends React.Component {
   constructor(props) {
@@ -29,3 +30,12 @@ export default class SliderWithValue extends React.Component {
                   className="slider slider-square-inverted" />
   }
 }
+
+
+SliderWithValue.propTypes = {
+  name: PropTypes.string.isRequired,
+  value: PropTypes.number,
+  min: PropTypes.number.isRequired,
+  max: PropTypes.number.isRequired,  
+  onChange: PropTypes.func
+};

@@ -1,6 +1,7 @@
 "use strict";
 
 import React from "react";
+import PropTypes from "prop-types";
 import SaverOptionInputItem from "./saver-option-input-item";
 
 const _ = require("lodash");
@@ -14,8 +15,7 @@ export default class SaverOptionInput extends React.Component {
 
     this.currentIndex = 0;
     this.state = { options: this.addIndexes(props.options, true) };
-
-    
+   
     this.onChanged = this.onChanged.bind(this);
   }
 
@@ -105,3 +105,8 @@ export default class SaverOptionInput extends React.Component {
       </form>);
   }
 }
+
+SaverOptionInput.propTypes = {
+  options: PropTypes.object.isRequired,
+  onChange: PropTypes.func
+};
