@@ -453,12 +453,18 @@ var parseAndLoadSaver = function(opts) {
  * search for all screensavers we can find on the filesystem. if cb is specified,
  * call it with data when done. if reload == true, don't use cached data.
  */
-var listAll = function(cb) {
+var listAll = function(cb, force) {
   var folders = sources();
   var walker = require("folder-walker");
   var stream = walker(folders);
 
   var promises = [];
+
+  // use cached data if available
+  if ( loadedScreensavers.length > 0 && ( typeof(force) === "undefined" || force === false ) ) {
+    cb(loadedScreensavers);
+    return;
+  }
   
   stream.on("data", function(opts) {
     var f = opts.filepath;
