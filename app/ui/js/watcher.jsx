@@ -52,10 +52,11 @@ import OptionsForm from "./options-form";
 
   var reloadPreview = function(ev) {
     var iframe = document.querySelector("iframe");
-    var holder = document.querySelector("#main").closest(".row");
+    var holder = document.querySelector(".guts-wrapper");
 
-    iframe.width = holder.offsetWidth - 3;
-    iframe.height = holder.offsetHeight - 3;
+//    console.log(holder, holder.offsetWidth);
+//    iframe.width = holder.offsetWidth - 10;
+//    iframe.height = holder.offsetHeight - 10;
 
     var url_opts = {
       width: iframe.width,
@@ -77,7 +78,7 @@ import OptionsForm from "./options-form";
     }
   };
 
-  var wrapper = document.getElementById("wrapper");
+  var wrapper = document.getElementById("main");
   var iframe = document.createElement("iframe");
   var saverOpts;
 

@@ -7,47 +7,46 @@
   </head>
 
   <body class="watcher">
-    <div class="container-fluid">
-        <nav class="navbar-header bg-faded sticky-top">
-          <ul class="nav nav-pills" role="tablist">
-            <li role="presentation" class="nav-item">
-              <a data-toggle="tab" role="tab" class="nav-link active" href="#settings">Settings</a>
-            </li>
-            <li role="presentation" class="nav-item">
-              <a data-toggle="tab" role="tab" class="nav-link" href="#main">Preview</a>
-            </li>
-            <li>
-              <form class="form-inline">
-                <div class="btn-group">
-                  <button class="btn btn-default open" data-toggle="tooltip" data-placement="bottom" title="Open screensaver folder">
-                    <span class="icon"><img src="img/folder.svg" width="14" height="14" /></span>
-                  </button>
-                  <button class="btn btn-default save" data-toggle="tooltip" data-placement="bottom" title="Save changes">
-                    <span class="icon"><img src="img/save.svg" width="14" height="14" /></span>
-                  </button>
-                  <button class="btn btn-default reload" data-toggle="tooltip" data-placement="bottom" title="Reload preview">
-                    <span class="icon"><img src="img/cycle.svg" width="14" height="14" /></span>
-                  </button>
-                  <button class="btn btn-default console" data-toggle="tooltip" data-placement="bottom" title="View Developer Console">
-                    <span class="icon"><img src="img/bug.svg" width="14" height="14" /></span>
-                  </button>
-                </div>
-              </form>
-            </li>
-          </ul>
-        </nav>
-      
+    <nav class="navbar-header bg-faded sticky-top">
+      <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="nav-item">
+          <a data-toggle="tab" role="tab" class="nav-link active" href="#main">Preview</a>
+        </li>
+        <li role="presentation" class="nav-item">
+          <a data-toggle="tab" role="tab" class="nav-link" href="#settings">Settings</a>
+        </li>
+        <li>
+          <form class="form-inline">
+            <div class="btn-group">
+              <button class="btn btn-default open" data-toggle="tooltip" data-placement="bottom" title="Open screensaver folder">
+                <span class="icon"><img src="img/folder.svg" width="14" height="14" /></span>
+              </button>
+              <button class="btn btn-default save" data-toggle="tooltip" data-placement="bottom" title="Save changes">
+                <span class="icon"><img src="img/save.svg" width="14" height="14" /></span>
+              </button>
+              <button class="btn btn-default reload" data-toggle="tooltip" data-placement="bottom" title="Reload preview">
+                <span class="icon"><img src="img/cycle.svg" width="14" height="14" /></span>
+              </button>
+              <button class="btn btn-default console" data-toggle="tooltip" data-placement="bottom" title="View Developer Console">
+                <span class="icon"><img src="img/bug.svg" width="14" height="14" /></span>
+              </button>
+            </div>
+          </form>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="container-fluid guts-wrapper">
       <div class="row">
         <div class="tab-content">
-          <div role="tabpanel" class="tab-pane active" id="settings">
+          <div role="tabpanel" class="tab-pane active" id="main">
+          </div>
+          <div role="tabpanel" class="tab-pane" id="settings">
             <div id="attributes"></div>
             <div id="options"></div>
 
             <!-- hack some padding into the bottom -->
             <br /><br /><br />
-          </div>
-          <div role="tabpanel" class="tab-pane" id="main">
-            <div id="wrapper"></div>
           </div>
         </div>
       </div>

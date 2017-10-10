@@ -9,19 +9,19 @@
     <link href="css/styles.css" rel="stylesheet" type="text/css" />
   </head>
 
-  <body>
-    <div class="container-fluid prefs-wrapper">
-      <div class="navbar-header sticky-top">
-        <ul class="nav nav-tabs" role="tablist">
-          <li role="presentation" class="nav-item">
-            <a data-toggle="tab" role="tab" class="nav-link active" id="home-tab" href="#main">Screensavers</a>
-          </li>
-          <li role="presentation" class="nav-item">
-            <a data-toggle="tab" role="tab" class="nav-link" id="prefs-tab"  href="#preferences">Preferences</a>
-          </li>
-        </ul>
-      </div>
+  <body class="prefs">
+    <div class="navbar-header sticky-top">
+      <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="nav-item">
+          <a data-toggle="tab" role="tab" class="nav-link active" id="home-tab" href="#main">Screensavers</a>
+        </li>
+        <li role="presentation" class="nav-item">
+          <a data-toggle="tab" role="tab" class="nav-link" id="prefs-tab"  href="#preferences">Preferences</a>
+        </li>
+      </ul>
+    </div>
 
+    <div class="container-fluid guts-wrapper">
       <div class="row">
         <div class="tab-content container-fluid">
           <div role="tabpanel" class="tab-pane active" id="main"  aria-labelledby="home-tab">
@@ -87,8 +87,6 @@
                     </small>
                   </div>
 
-
-                  
                   <div class="form-group">
                     <label for="lock_screen" class="form-check-label">
                       <input type="checkbox" name="lock_screen" id="lock_screen" class="form-check-input" value="1" />

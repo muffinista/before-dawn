@@ -1,16 +1,8 @@
-.no-padding > [class*="col-"] {
-  padding-left: 0 !important;
-  padding-right: 0 !important;
-}
-
-.scrollable {
-  height: 88vh;
-  overflow-y: scroll;
+.navbar-header {
+  height: 42px;
 }
 
 .footer {
-  position: fixed;
-  bottom: 0;
   width: 100%;
   /* Set the fixed height of the footer here */
   height: 40px;
@@ -22,30 +14,33 @@
   padding-right: 5px;
 }
 
-.watcher .navbar-header {
-  height: 42px;
+.guts-wrapper {
+  height: calc(100vh - 83px);
+  overflow-y: scroll;
 }
 
-#main, #settings {
-  height: calc(100vh - 82px);
+
+.watcher iframe {
+  width: calc(100vw - 15px);
+  height: calc(100vh - 90px);
+  margin-left: auto;
+  margin-right: auto;
 }
 
-//#settings {
-//  overflow-y: scroll;
-//}
+.scrollable {
+  height: 88vh;
+  overflow-y: scroll;
+}
 
-#wrapper {
-  height: inherit;
+.no-padding > [class*="col-"] {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
 }
 
 
 iframe {
   overflow: hidden;
   border: none;
-}
-
-#main iframe {
-  height: 100%;
 }
 
 .fieldset-padding fieldset {
@@ -103,11 +98,6 @@ fieldset {
 .window > footer {
   padding: 5px;
 }
-
-//form label {
-//  font-weight: bold;
-//}
-
 
 .about {
   margin-left: 5px;
@@ -189,9 +179,4 @@ p.description {
   margin-right: 2px;
 }
 
-.watcher .wrapper {
-  margin-left: auto;
-  margin-right: auto;
-  padding-bottom: 200px;
-}
 

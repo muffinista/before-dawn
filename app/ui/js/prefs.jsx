@@ -404,9 +404,9 @@ const {BrowserWindow} = window.require("electron").remote;
   // issue.
   // @see https://github.com/twbs/bootstrap/issues/19374
   $(document).ready(function() {
-    $(".nav-tabs .nav-item .nav-link:not(.nav-tabs .nav-item.dropdown .nav-link)")
+    $(".nav-tabs .nav-link")
        .click(function() {
-        $(".dropdown-item.active").removeClass("active");
+        $(".tab-pane.active,.nav-link.active").removeClass("active");
       });
   });
   
