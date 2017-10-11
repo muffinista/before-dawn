@@ -1,6 +1,7 @@
 "use strict";
 
 import React from "react";
+import PropTypes from "prop-types";
 
 export default class SaverOptionInputItem extends React.Component {
   constructor(props) {
@@ -31,21 +32,18 @@ export default class SaverOptionInputItem extends React.Component {
 
     this.handleChange(ev);
   }
-  handleChange() {
-    var newVals = {
-      "index": this.props.option.index,
-      "name": this.refs.name.value,
-      "type": this.refs.type.value,
-      "description": this.refs.description.value,
-      "min": this.refs.min.value,
-      "max": this.refs.max.value,
-      "default": this.refs.default.value
-    };
-    this.setState({
-      option: newVals
-    });
 
-    this.props.onChange(newVals);
+  handleChange(evt) {
+    var key = evt.target.name;
+    var val = evt.target.value;
+    var diff = this.state.option;
+    diff[key] = val;
+
+    this.setState({
+      option: diff
+    });
+    
+    this.props.onChange(diff);
   }
 
   render() {
@@ -69,7 +67,7 @@ export default class SaverOptionInputItem extends React.Component {
           <div className="col-sm-10" >
             <input
                 type="text"
-                ref="name" name="name" className="form-control"
+                name="name" className="form-control"
                 placeholder="Pick a name for this option"
                 value={this.state.option.name}
                 onChange={this.handleChange} />
@@ -80,7 +78,6 @@ export default class SaverOptionInputItem extends React.Component {
           <label className="col-sm-2 col-form-label">Description</label>
           <div className="col-sm-10" >
             <input type="text"
-                   ref="description"
                    name="description"
                    placeholder="Describe what this option does"
                    className="form-control"
@@ -93,7 +90,7 @@ export default class SaverOptionInputItem extends React.Component {
           <label className="col-sm-2 col-form-label">Type</label>
           <div className="col-sm-10" >
             <select
-                ref="type" name="type" className="form-control"
+                name="type" className="form-control"
                 value={this.state.option.type} onChange={this.onTypeChange}>
               <option value="slider">slider</option>
               <option value="text">text</option>
@@ -104,8 +101,7 @@ export default class SaverOptionInputItem extends React.Component {
         <div className="form-group row">
           <label className="col-sm-2 col-form-label only-for-slider">Min</label>
           <div className="col-sm-2 only-for-slider">
-            <input ref="min"
-                   type="number"
+            <input type="number"
                    name="min"
                    className="form-control"
                    value={this.state.option.min}
@@ -114,8 +110,7 @@ export default class SaverOptionInputItem extends React.Component {
 
           <label className="col-sm-2 col-form-label only-for-slider">Max</label>
           <div className="col-sm-2 only-for-slider">
-            <input ref="max"
-                   type="number"
+            <input type="number"
                    name="max"
                    className="form-control"
                    value={this.state.option.max}
@@ -124,8 +119,7 @@ export default class SaverOptionInputItem extends React.Component {
 
           <label className="col-sm-2 col-form-label">Default</label>
           <div className={defaultClassName}>
-            <input ref="default"
-                   type="text"
+            <input type="text"
                    name="default"
                    placeholder="Default value of this option"
                    className="form-control"
@@ -135,10 +129,17 @@ export default class SaverOptionInputItem extends React.Component {
         </div>
 
         <div className="form-actions">
-          <button type="button" className={"btn btn-danger remove-option"} onClick={() => this.props.onDelete(this)}>Remove this Option</button>
+          <button type="button"
+                  className={"btn btn-danger remove-option"}
+                  onClick={() => this.props.onDelete(this)}>Remove this Option</button>
         </div>
       </fieldset>
     );
   }
-
 }
+
+SaverOptionInputItem.propTypes = {
+  option: PropTypes.object,
+  onChange: PropTypes.func,
+  onDelete: PropTypes.func
+};

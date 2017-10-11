@@ -13,6 +13,7 @@ export default class SaverOptionInput extends React.Component {
       props.options = [];
     }
 
+    console.log("HELLO PROPS", props);
     this.currentIndex = 0;
     this.state = { options: this.addIndexes(props.options, true) };
    
@@ -48,7 +49,7 @@ export default class SaverOptionInput extends React.Component {
     });
 
     var tmp = _.cloneDeep(this.state.options);
-    this.props.onChange(tmp);
+    this.props.onDelete(index, tmp);
   }
 
   onChanged(newVals) {
@@ -57,6 +58,8 @@ export default class SaverOptionInput extends React.Component {
     pre[index] = newVals;
 
     this.setState({options: pre});
+
+    console.log("updated options", this.state.options);
     //this.state.options[index] = newVals;
     this.props.onChange(this.state.options);
   }
@@ -87,7 +90,9 @@ export default class SaverOptionInput extends React.Component {
 
   render() {
     var self = this;
+    console.log("RENDER INPUT", this.state.options);
     var els = this.state.options.map((opt, i) => {
+      console.log(opt, i);
       return (<SaverOptionInputItem option={opt}
                                     onChange={self.onChanged}
                                     onDelete={(x) => self.onDelete(x)}
@@ -107,6 +112,7 @@ export default class SaverOptionInput extends React.Component {
 }
 
 SaverOptionInput.propTypes = {
-  options: PropTypes.object.isRequired,
-  onChange: PropTypes.func
+  options: PropTypes.array,
+  onChange: PropTypes.func,
+  onDelete: PropTypes.func
 };

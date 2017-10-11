@@ -133,8 +133,8 @@ module.exports = function Saver(_attrs) {
     }
     
     var output = JSON.stringify(attrs, null, 2);
-    console.log(output);
-    console.log("write to " + configDest);
+    //console.log(output);
+    //console.log("write to " + configDest);
     
     fs.writeFileSync(configDest, output);
   };

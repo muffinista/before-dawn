@@ -22,7 +22,6 @@ import OptionsForm from "./options-form";
   if ( typeof(ravenUrl) !== "undefined" ) {
     Raven.config(ravenUrl).install();
   }
-
   
   // parse incoming URL params -- we'll get a link to the current screen images for previews here
   var tmpParams = new URLSearchParams(document.location.search);
@@ -54,10 +53,6 @@ import OptionsForm from "./options-form";
     var iframe = document.querySelector("iframe");
     var holder = document.querySelector(".guts-wrapper");
 
-//    console.log(holder, holder.offsetWidth);
-//    iframe.width = holder.offsetWidth - 10;
-//    iframe.height = holder.offsetHeight - 10;
-
     var url_opts = {
       width: iframe.width,
       height: iframe.height,
@@ -88,7 +83,7 @@ import OptionsForm from "./options-form";
   };
   
   var attrsUpdated = function(data) {
-    console.log("ATTRS UPDATED", data);
+    console.log("WATCHER UPDATED", data);
     saverAttrs = data;
   };
 

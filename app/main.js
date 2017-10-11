@@ -827,6 +827,7 @@ trayMenu = Menu.buildFromTemplate([
 // the prefs window know that it needs to reload
 //
 ipcMain.on("savers-updated", (event, arg) => {
+  global.savers.reset();  
   if ( prefsWindowHandle !== null ) {
     prefsWindowHandle.send("savers-updated", arg);
   }

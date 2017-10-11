@@ -62,6 +62,10 @@ var reload = function(cb) {
   });  
 };
 
+var reset = function() {
+  loadedScreensavers = [];
+};
+
 /**
  * reload all our data/config/etc
  */
@@ -572,6 +576,7 @@ var generateScreensaver = function(opts) {
 
 exports.init = init;
 exports.reload = reload;
+exports.reset = reset;
 exports.delete = deleteSaver;
 
 exports.getByKey = getByKey;
