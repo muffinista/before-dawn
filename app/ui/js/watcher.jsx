@@ -31,19 +31,19 @@ import OptionsForm from "./options-form";
     window.urlParams[k] = tmpParams.get(k);
   }
 
-  console.log("PARAMS", window.urlParams);
+  //console.log("PARAMS", window.urlParams);
   
   // the main app will pass us a screenshot URL, here it is
   var screenshot = decodeURIComponent(urlParams.screenshot);
   var src = decodeURIComponent(urlParams.src);
 
-  console.log("SRC", src);
+  //console.log("SRC", src);
   
   // load screensaver object
   var s = savers.getByKey(src);
   var saverAttrs = {};
 
-  console.log("SAVER", s);
+  //console.log("SAVER", s);
   
   if ( s !== undefined ) {
     saverAttrs = s.toHash();
@@ -64,7 +64,7 @@ import OptionsForm from "./options-form";
       var mergedOpts = _.merge(url_opts, s.settings);
       var previewUrl = s.getUrl(mergedOpts);
 
-      console.log("LOAD URL", previewUrl);
+      //console.log("LOAD URL", previewUrl);
       iframe.src = previewUrl;
     }
 
@@ -83,7 +83,6 @@ import OptionsForm from "./options-form";
   };
   
   var attrsUpdated = function(data) {
-    console.log("WATCHER UPDATED", data);
     saverAttrs = data;
   };
 

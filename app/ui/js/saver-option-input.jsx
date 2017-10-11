@@ -48,6 +48,8 @@ export default class SaverOptionInput extends React.Component {
       options: foo
     });
 
+    console.log("REMOVED", this.state.options);
+    
     var tmp = _.cloneDeep(this.state.options);
     this.props.onDelete(index, tmp);
   }

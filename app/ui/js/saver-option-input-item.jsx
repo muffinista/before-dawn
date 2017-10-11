@@ -10,7 +10,6 @@ export default class SaverOptionInputItem extends React.Component {
     this.handleChange = this.handleChange.bind(this);
     this.onTypeChange = this.onTypeChange.bind(this);    
 
-
     this.smallDefaultClass = "col-sm-2";
     this.largeDefaultClass = "col-sm-10";
   }
@@ -38,17 +37,11 @@ export default class SaverOptionInputItem extends React.Component {
     var val = evt.target.value;
     var diff = this.state.option;
     diff[key] = val;
-
-    this.setState({
-      option: diff
-    });
     
     this.props.onChange(diff);
   }
 
   render() {
-    var self = this;
-
     var className = "list-group-item entry";
     var defaultClassName = "";
     
@@ -61,16 +54,15 @@ export default class SaverOptionInputItem extends React.Component {
     }
     
     return (
-      <fieldset className={className} key={this.state.option.index}>
+      <fieldset className={className} key={this.props.option.index}>
         <div className="form-group row">
           <label className="col-sm-2 col-form-label">Name</label>
           <div className="col-sm-10" >
-            <input
-                type="text"
-                name="name" className="form-control"
-                placeholder="Pick a name for this option"
-                value={this.state.option.name}
-                onChange={this.handleChange} />
+            <input type="text"
+                   name="name" className="form-control"
+                   placeholder="Pick a name for this option"
+                   value={this.props.option.name}
+                   onChange={this.handleChange} />
           </div>
         </div>
 
@@ -81,7 +73,7 @@ export default class SaverOptionInputItem extends React.Component {
                    name="description"
                    placeholder="Describe what this option does"
                    className="form-control"
-                   value={this.state.option.description}
+                   value={this.props.option.description}
                    onChange={this.handleChange} />
           </div>
         </div>
@@ -91,7 +83,7 @@ export default class SaverOptionInputItem extends React.Component {
           <div className="col-sm-10" >
             <select
                 name="type" className="form-control"
-                value={this.state.option.type} onChange={this.onTypeChange}>
+                value={this.props.option.type} onChange={this.onTypeChange}>
               <option value="slider">slider</option>
               <option value="text">text</option>
             </select>
@@ -104,7 +96,7 @@ export default class SaverOptionInputItem extends React.Component {
             <input type="number"
                    name="min"
                    className="form-control"
-                   value={this.state.option.min}
+                   value={this.props.option.min}
                    onChange={this.handleChange} />
           </div>
 
@@ -113,7 +105,7 @@ export default class SaverOptionInputItem extends React.Component {
             <input type="number"
                    name="max"
                    className="form-control"
-                   value={this.state.option.max}
+                   value={this.props.option.max}
                    onChange={this.handleChange} />
           </div>
 
@@ -123,7 +115,7 @@ export default class SaverOptionInputItem extends React.Component {
                    name="default"
                    placeholder="Default value of this option"
                    className="form-control"
-                   value={this.state.option.default}
+                   value={this.props.option.default}
                    onChange={this.handleChange} />
           </div>
         </div>

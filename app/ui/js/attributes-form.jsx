@@ -76,16 +76,14 @@ export default class AttributesForm extends React.Component {
   }
 
   handleOptionChange(vals) {
-    console.log("HANDLE OPTION CHANGE", vals);
-    this.setState({
-      saver: {
-        ...this.state.saver,
-        options: vals
-      },
-    });
-    console.log("FORM POST CHANGE", this.state.saver.options);
+    var tmp = _.cloneDeep(this.state.saver);
+    tmp.options = vals;
 
-    this.props.onChanged(this.state.saver);
+    this.setState({
+      saver: tmp
+    });
+
+    this.props.onChanged(tmp);
   }
 
 
@@ -93,20 +91,14 @@ export default class AttributesForm extends React.Component {
     var foo = this.state.saver.options;
     foo.splice(index, 1);
 
-    // this is bad, but i'm having trouble finding
-    // another way to handle removed options. i think it's
-    // because of the nesting
-//    this.state.saver.options = foo;
-
     var tmp = _.cloneDeep(this.state.saver);
     tmp.options = foo;
 
-    console.log("TMP", tmp);
-    this.updateState({
+    this.setState({
       saver: tmp
     });
 
-    this.props.onChanged(this.state.saver);
+    this.props.onChanged(tmp);
   }
 
   render() {
