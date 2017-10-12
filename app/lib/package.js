@@ -42,19 +42,21 @@ module.exports = function Package(_attrs) {
                 "User-Agent": "Before Dawn"
             }
         }, function(error, response, body) {
-            console.log( body.published_at + " --- " + self.updated_at );
-            if ( body.published_at !== self.updated_at ) {
-                console.log("let's download!");
-                console.log(body.zipball_url);
-                self.downloadFile(body.zipball_url, function() {
-                    self.updated_at = body.published_at;
-                    cb(self.attrs());
-                });
-            }
-            else {
-                console.log("we're good!");
-                cb(self.attrs());
-            }
+          if ( error ) {
+            console.log("release check failed", error);
+          }
+          else if ( body.published_at !== self.updated_at ) {
+            console.log("let's download!");
+            console.log(body.zipball_url);
+            self.downloadFile(body.zipball_url, function() {
+              self.updated_at = body.published_at;
+              cb(self.attrs());
+            });
+          }
+          else {
+            console.log("we're good!");
+            cb(self.attrs());
+          }
         });
     };
 

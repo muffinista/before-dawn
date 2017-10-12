@@ -105,11 +105,15 @@ import OptionsForm from "./options-form";
   // figure out the path to the screensaver folder. use
   // decodeURIComponent to convert %20 to spaces
   var filePath = path.dirname(decodeURIComponent(url.parse(src).path));
-  fs.watch(filePath, (eventType, filename) => {
-    if (filename) {
-      reloadPreview();
-    }
-  });
+
+  // make sure folder actually exists
+  if ( fs.existsSync(filePath) ) {
+    fs.watch(filePath, (eventType, filename) => {
+      if (filename) {
+        reloadPreview();
+      }
+    });
+  }
 
   // this is duped from new.html -- are we keeping that?
   var openFolderInOS = function(f) {
@@ -143,7 +147,6 @@ import OptionsForm from "./options-form";
       }
     });
   };
-
   
   var openFolder = function(ev) {
     ev.preventDefault();

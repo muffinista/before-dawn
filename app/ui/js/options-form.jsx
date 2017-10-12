@@ -26,8 +26,8 @@ export default class OptionsForm extends React.Component {
       val = parseInt(val, 10);
       guts = <SliderWithValue name={o.name}
                               value={val}
-                              min={o.min}
-                              max={o.max}
+                              min={parseInt(o.min, 10)}
+                              max={parseInt(o.max, 10)}
                               ref={ref}
                               onChange={this.onChanged} />;             
     }
