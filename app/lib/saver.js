@@ -53,34 +53,34 @@ module.exports = function Saver(_attrs) {
                typeof(this.description) !== "undefined" &&
                this.published === true;
 
-  if ( this.valid === true ) {
-    if ( typeof(_attrs.options) === "undefined" ) {
-      _attrs.options = [];
-    }
-    this.options = _attrs.options;
+  if ( typeof(_attrs.options) === "undefined" ) {
+    _attrs.options = [];
+  }
+  this.options = _attrs.options;
 
+  if ( this.valid === true ) {
     // figure out the settings from any defaults for this screensaver,
     // and combine with incoming user-specified settings
     this.settings = _attrs.options.map(function(o, i) {
-            return [o.name, o.default];
-        }).reduce(function(o, v, i) {
-            o[v[0]] = v[1];
-            return o; 
-        }, {});
-        this.settings = _.merge({}, this.settings, _attrs.settings);
-
-        // allow for custom preview URL -- if not specified, just use the default
-        // if it is specified, do some checks to see if it's a full URL or a filename
-        // in which case we will turn it into a full path
-        if ( typeof(this.attrs.previewUrl) === "undefined" ) {
-            this.previewUrl = this.url;
-        }
-        else if ( this.attrs.previewUrl.match(/:\/\//) ) {
-            this.previewUrl = this.attrs.previewUrl;
-        }
-        else {
-            this.previewUrl = this.path + "/" + this.attrs.previewUrl;
-        }
+      return [o.name, o.default];
+    }).reduce(function(o, v, i) {
+      o[v[0]] = v[1];
+      return o; 
+    }, {});
+    this.settings = _.merge({}, this.settings, _attrs.settings);
+    
+    // allow for custom preview URL -- if not specified, just use the default
+    // if it is specified, do some checks to see if it's a full URL or a filename
+    // in which case we will turn it into a full path
+    if ( typeof(this.attrs.previewUrl) === "undefined" ) {
+      this.previewUrl = this.url;
+    }
+    else if ( this.attrs.previewUrl.match(/:\/\//) ) {
+      this.previewUrl = this.attrs.previewUrl;
+    }
+    else {
+      this.previewUrl = this.path + "/" + this.attrs.previewUrl;
+    }
   } // if valid
 
   this.getRequirements = function() {
@@ -133,9 +133,6 @@ module.exports = function Saver(_attrs) {
     }
     
     var output = JSON.stringify(attrs, null, 2);
-    //console.log(output);
-    //console.log("write to " + configDest);
-    
     fs.writeFileSync(configDest, output);
   };
 };

@@ -7,11 +7,20 @@
     "postinstall": "install-app-deps",
     "pack": "build --dir",
     "dist": "build --x64",
-    "cleanup": "npm prune && cd app/ && npm prune"
+    "cleanup": "npm prune && cd app/ && npm prune",
+    "test": "mocha test test/**"
   },
   "devDependencies": {
+    "chai": "^4.1.2",
+    "chai-as-promised": "^7.1.1",
+    "electron": "^1.7.8",
     "electron-builder": "16.8.3",
-    "electron": "^1.7.8"
+    "grunt": "^1.0.1",
+    "grunt-contrib-jshint": "^1.1.0",
+    "grunt-contrib-watch": "^1.0.0",
+    "grunt-simple-mocha": "^0.4.1",
+    "mocha": "^4.0.1",
+    "spectron": "^3.7.2"
   },
   "build": {
     "appId": "Before Dawn",
