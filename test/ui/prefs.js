@@ -33,7 +33,7 @@ describe('Prefs', function() {
     });
   });
 
-  it.only('lists screensavers', function(done) {
+  it('lists screensavers', function(done) {
     app.client.waitUntilWindowLoaded().
         getText('body').then(function (text) {
           assert(text.lastIndexOf('Holzer') !== -1)

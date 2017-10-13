@@ -93,6 +93,39 @@ describe('Savers', function() {
     });
   });
 
+  describe('getByKey', function() {
+    it("returns saver", function(done) {
+      savers.init(workingDir, function() {
+        savers.setLocalSource(saversDir);
+        savers.listAll(function(data) {
+          var key = data[2].key;
+          var s = savers.getByKey(key);
+          assert.equal("Screensaver One", s.name);
+          done();
+        });
+      });
+    });
+  });
+
+  describe('setCurrent', function() {
+    it("sets a key", function(done) {
+      savers.init(workingDir, function() {
+        savers.setLocalSource(saversDir);
+        savers.listAll(function(data) {
+          var key = data[2].key;
+          savers.setCurrent(key);
+          assert.equal(key, savers.getCurrent());
+          savers.write(function() {
+            savers.reload(function() {
+              assert.equal(key, savers.getCurrent());
+              done();
+            });
+          });
+        });
+      });
+    });
+  });
+
   // reset
   // load
   // default source
