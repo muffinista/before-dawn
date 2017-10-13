@@ -34,7 +34,7 @@ var reload = function(cb) {
   // check for/create our main directory
   mkdirp(baseDir, function(err, made) {
     if ( made === true ) {
-      console.log("created " + baseDir);
+      //console.log("created " + baseDir);
       _firstLoad = true;
     }
 
@@ -42,14 +42,14 @@ var reload = function(cb) {
     // @todo multiple folder support?
     mkdirp(saversDir, function(err, made) {
       if ( made === true ) {
-        console.log("created " + saversDir);
+        //console.log("created " + saversDir);
         _firstLoad = true;
       }
 
       // specify config path
-      console.log("load config from " + configPath);      
+      //console.log("load config from " + configPath);      
       if ( ! fs.existsSync(configPath) ) {
-        console.log("no config yet");
+        //console.log("no config yet");
         _firstLoad = true;
       }
 
@@ -83,7 +83,7 @@ var setupPackages = function(cb) {
         ( current === undefined || getCurrentData() === undefined ) && 
         data.length > 0
       ) {
-        console.log("setting default saver to first in list " + data[0].key);
+        //console.log("setting default saver to first in list " + data[0].key);
         setConfig("saver", data[0].key);
       }
 
@@ -99,7 +99,7 @@ var setupPackages = function(cb) {
  */
 var deleteSaver = function(k, cb) {
   var p = path.dirname(k);
-  console.log("DELETE " + p);
+  //console.log("DELETE " + p);
   var s = getByKey(k);
 
   // make sure we're deleting a screensaver that exists and is
@@ -140,7 +140,7 @@ var updatePackage = function(cb) {
   var Package = require("./package.js");
 
   var source = getSource();
-  console.log("source repo: " + source);
+  //console.log("source repo: " + source);
 
   var lastCheckAt = getUpdateCheckTimestamp();
   var now = new Date().getTime();
@@ -168,7 +168,7 @@ var ensureDefaults = function() {
   var source = nconf.get("source");
   if ( source === undefined ) {
     _firstLoad = true;
-    console.log("add default source");
+    //console.log("add default source");
     setConfig("source",{
       repo: global.SAVER_REPO,
       hash: ""
@@ -214,7 +214,7 @@ var getRandomScreensaver = function() {
       return ( typeof(s.preload) !== "undefined" );
     })
   );
-  console.log("RANDOM", s);
+  //console.log("RANDOM", s);
 
   return s;
 };
@@ -262,6 +262,7 @@ var getLocalSource = function() {
   return nconf.get("localSource") || "";
 };
 var setLocalSource = function(x) {
+  reset();
   return nconf.set("localSource", x);
 };
 
@@ -271,7 +272,7 @@ var setLocalSource = function(x) {
  */
 var setConfig = function(k, v) {
   nconf.set(k, v);
-  console.log("set "+ k + " to " + v);
+  //console.log("set "+ k + " to " + v);
 };
 
 /**
@@ -463,7 +464,7 @@ var listAll = function(cb, force) {
   var stream = walker(folders);
 
   var promises = [];
-
+  
   // use cached data if available
   if ( loadedScreensavers.length > 0 && ( typeof(force) === "undefined" || force === false ) ) {
     cb(loadedScreensavers);
@@ -516,18 +517,19 @@ var getUrl = function(key) {
 
 var write = function(cb) {
   var configPath = baseDir + "/" + config_file;
-  console.log("write config to " + configPath);
+  //console.log("write config to " + configPath);
   nconf.save(cb);
 };
 
 var writeSync = function() {
   var configPath = baseDir + "/" + config_file;
-  console.log("sync write config to " + configPath);
+  //console.log("sync write config to " + configPath);
   nconf.save();
 };
 
 var getTemplatePath = function() {
-  return path.join(defaultSaversDir(), "__template");
+  //  return path.join(defaultSaversDir(), "__template");
+  return path.join(__dirname, "..", "system-savers", "__template");
 };
 
 /**
@@ -548,14 +550,14 @@ var generateScreensaver = function(opts) {
   opts = _.merge({}, defaults, opts);
   opts.key = opts.name.toLowerCase().replace(/[^a-z0-9]+/gi, "-").replace(/-$/, "").replace(/^-/, "");
 
-  console.log(opts);
+  //  console.log(opts);
   
   var dest = path.join(destDir, opts.key);
   fs.mkdirpSync(dest);
-  console.log("copy from", getTemplatePath());
+  //  console.log("copy from", getTemplatePath());
 
   contents.forEach(function(content) {
-    console.log(path.join(src, content), path.join(dest, content));
+    //console.log(path.join(src, content), path.join(dest, content));
     fs.copySync(path.join(src, content), path.join(dest, content));
   });
 
