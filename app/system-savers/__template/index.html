@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>My Awesome Screensaver</title>
+    <style>
+     body {
+       width: 100%;
+     }
+    </style>
+    <script>
+     // load any incoming URL parameters. you could just use the
+     // URLSearchParams object directly to manage these variables, but
+     // having them in a hash is a little easier sometimes.
+     var tmpParams = new URLSearchParams(document.location.search);
+     window.urlParams = {};
+
+     for(let k of tmpParams.keys() ) {
+       window.urlParams[k] = tmpParams.get(k);
+     }
+    </script>
+  </head>
+  <body>
+    <h1>Hello! I am a screensaver template!</h1>
+    <p>I am located in <code><script>document.write(decodeURIComponent(document.location.pathname));</script></code>.</p>
+    <p>Put the content of your screensaver here!</p>
+    <h2>Incoming Values</h2>
+    <p>(These parameters will be sent to your screensaver when it loads)</p> 
+    <ul>
+      <script>
+       for(let k of Object.keys(window.urlParams) ) {
+         document.write("<li><code>window.urlParams[" + k + "]</code>: " + window.urlParams[k] + "</li>");
+       }
+      </script>
+    </ul>
+
+
+    <h2>Helpful Snippets</h2>
+    Here's some code to load the incoming screenshot, so you can apply effects/etc to it:
+    <pre><code>
+      &lt;body&gt;
+        &lt;img id="screen" /&gt;
+      &lt;/body&gt;
+      &lt;script&gt;
+       var img = document.getElementById("screen");
+       var url = unescape(decodeURIComponent(window.urlParams.screenshot));
+       img.src = url;
+     
+       if ( typeof(window.urlParams.width) !== "undefined" ) {
+         img.width = window.urlParams.width;
+         img.height = window.urlParams.height;
+       }
+      &lt;/script&gt;
+    </code></pre>
+
+    It might make sense to hide any margins on elements in your screensaver with some CSS like this:
+    <pre><code>
+      &lt;style&gt;
+        * {
+        padding: 0;
+        margin: 0;
+        }
+      &lt;/style&gt;
+
+    </code></pre>
+
+    
+  </body>
+</html>
