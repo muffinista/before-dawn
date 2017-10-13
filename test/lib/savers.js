@@ -5,7 +5,8 @@ const Saver = require('../../app/lib/savers.js');
 const _ = require('lodash');
 const tmp = require('tmp');
 const rimraf = require('rimraf');
-const fs = require('fs');
+const fs = require('fs-extra');
+const path = require('path');
 
 describe('Savers', function() {
   var savers = require('../../app/lib/savers.js');
@@ -18,10 +19,25 @@ describe('Savers', function() {
   };
 
   var workingDir;
-
+  var saversDir;
+  
   beforeEach(function() {
-    saverData = require('../fixtures/saver.json');
+    var testSaverDir;
+
     workingDir = getTempDir();
+    saversDir = getTempDir();
+
+    // make a subdir in the savers directory and drop screensaver
+    // config there
+    testSaverDir = path.join(saversDir, 'saver');
+    fs.mkdirSync(testSaverDir);
+    fs.copySync(path.join(__dirname, '../fixtures/saver.json'), path.join(testSaverDir, 'saver.json'));
+
+    testSaverDir = path.join(saversDir, 'saver2');
+    fs.mkdirSync(testSaverDir);
+    fs.copySync(path.join(__dirname, '../fixtures/saver2.json'), path.join(testSaverDir, 'saver.json'));
+
+    saverData = require('../fixtures/saver.json');
   });
 
   afterEach(function() {
@@ -34,21 +50,52 @@ describe('Savers', function() {
     it('sets firstLoad', function(done) {
       savers.init(workingDir, function() {
         assert(savers.firstLoad());
+        done();
       });
-
-      done();
     });
 
-    it('does not set firstLoad', function(done) {
+    /* it('does not set firstLoad', function(done) {
+       savers.init(workingDir, function() {
+       savers.init(workingDir, function() {
+       assert(!savers.firstLoad());
+       done();
+       });
+       });
+       });
+     */
+  });
+
+  describe('listAll', function() {
+    it('loads data', function(done) {
       savers.init(workingDir, function() {
-        savers.init(workingDir, function() {
-          assert(!savers.firstLoad());
+        savers.setLocalSource(saversDir);
+        savers.listAll(function(data) {
+          assert.equal(3, data.length);
+          done();
         });
       });
-
-      done();
     });
-
-    it('loads data');
   });
+
+  describe('generateScreensaver', function() {
+    it('works', function(done) {
+      savers.init(workingDir, function() {
+        savers.setLocalSource(saversDir);
+        savers.generateScreensaver({
+          name:"New Screensaver"
+        });
+
+        savers.listAll(function(data) {
+          assert.equal(4, data.length);
+          done();
+        });
+      });
+    });
+  });
+
+  // reset
+  // load
+  // default source
+  // sources
+  // write
 });

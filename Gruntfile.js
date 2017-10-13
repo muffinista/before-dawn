@@ -17,8 +17,9 @@ module.exports = function(grunt) {
       all: { src: ['test/**/*.js'] }
     },
     watch: {
+      options: { interval: 1000 },
       scripts: {
-        files: ['gruntfile.js', 'app/*.js', 'test/**/*.js'],
+        files: ['gruntfile.js', 'app/*.js', 'app/**/*.js', 'test/**/*.js'],
         tasks: ['default']
       }
     }
