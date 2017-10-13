@@ -44,6 +44,7 @@ let appIcon = null;
 
 let argv = parseArgs(process.argv);
 let debugMode = ( argv.debug === true );
+let testMode = ( argv['test-mode'] === 'true' );
 
 let saverWindows = [];
 let oldMousePosition = {x:0, y:0};
@@ -77,6 +78,18 @@ var icons = {
  * open our screen grabber tool and issue a screengrab request
  */
 var grabScreen = function(s, cb) {
+
+  // bypass screen capture in test mode
+  // this is a hack and if i can find a better
+  // way to do it (listening for the prefs window, etc),
+  // i'll do that instead
+  if ( testMode === true ) {
+    cb({
+      url: 'foo.png'
+    });
+    return;
+  }
+
   var grabberUrl = "file://" + __dirname + "/ui/grabber.html?id=" + s.id +
                    "&width=" + s.bounds.width +
                    "&height=" + s.bounds.height;
@@ -99,7 +112,7 @@ var grabScreen = function(s, cb) {
   });
   
   grabber.loadURL(grabberUrl);
-  
+
   if ( debugMode === true ) {
     grabber.webContents.openDevTools();
   }
@@ -602,7 +615,13 @@ var bootApp = function(_basePath) {
     
     appReady = true;
     
-    openPrefsOnFirstLoad();
+    if ( testMode === true ) {
+      openPrefsWindow();
+    }
+    else {
+      openPrefsOnFirstLoad();
+    }
+
   });
 };
 
@@ -820,8 +839,6 @@ trayMenu = Menu.buildFromTemplate([
   }
 ]);
 
-
-
 //
 // if the user has updated one of their screensavers, we can let
 // the prefs window know that it needs to reload
@@ -871,5 +888,4 @@ process.on("uncaughtException", function (ex) {
     Raven.captureException(ex);
   }
 });
-
 
