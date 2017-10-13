@@ -44,7 +44,7 @@ let appIcon = null;
 
 let argv = parseArgs(process.argv);
 let debugMode = ( argv.debug === true );
-let testMode = ( argv['test-mode'] === 'true' );
+let testMode = ( argv["test-mode"] === "true" );
 
 let saverWindows = [];
 let oldMousePosition = {x:0, y:0};
@@ -85,7 +85,7 @@ var grabScreen = function(s, cb) {
   // i'll do that instead
   if ( testMode === true ) {
     cb({
-      url: 'foo.png'
+      url: "foo.png"
     });
     return;
   }
