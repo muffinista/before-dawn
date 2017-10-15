@@ -133,7 +133,7 @@ var openPrefsWindow = function() {
       var prefsUrl = "file://" + __dirname + "/ui/prefs.html";
       prefsWindowHandle = new BrowserWindow({
         width:800,
-        height:675,
+        height:700,
         resizable:true,
         icon: path.join(__dirname, "assets", "icon.png")
       });
@@ -585,7 +585,8 @@ var bootApp = function(_basePath) {
     log.info("The system just woke up, stop screensavers");
     closeRunningScreensavers();
   });
-  
+
+  log.info("Load config from " + global.basePath);
   global.savers.init(global.basePath, function() {
     configLoaded = true;
     updateStateManager();
@@ -757,7 +758,12 @@ if ( typeof(global.RAVEN_PRIVATE_URL) !== "undefined" ) {
 crashReporter.start(global.CRASH_REPORTER);
 
 // store our root path as a global variable so we can access it from screens
-global.basePath = path.join(app.getPath("appData"), global.APP_DIR);
+if ( process.env.BEFORE_DAWN_DIR !== undefined ) {
+  global.basePath = process.env.BEFORE_DAWN_DIR;
+}
+else {
+  global.basePath = path.join(app.getPath("appData"), global.APP_DIR);
+}
 global.savers = require("./lib/savers.js");
 
 // some global CSS we'll inject into running screensavers

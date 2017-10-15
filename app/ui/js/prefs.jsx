@@ -17,15 +17,14 @@ const {BrowserWindow} = window.require("electron").remote;
   const {ipcRenderer} = window.require("electron");
   const {crashReporter} = window.require("electron");
 
+  var savers = require("../lib/savers");
   var remote = window.require("electron").remote;
-  var savers = remote.getGlobal("savers");
   var appName = remote.getGlobal("APP_NAME");
   var appVersion = remote.getGlobal("APP_VERSION");
   var defaultSaverRepo = remote.getGlobal("SAVER_REPO");
   var appRepo = remote.getGlobal("APP_REPO");
   var updateAvailable = remote.getGlobal("NEW_RELEASE_AVAILABLE");
 
-  
   var ravenUrl = remote.getGlobal("RAVEN_URL");
   
   const {dialog} = require("electron").remote;
@@ -44,7 +43,6 @@ const {BrowserWindow} = window.require("electron").remote;
   var screenshot = decodeURIComponent(tmpParams.get("screenshot"));
 
   if ( typeof(ravenUrl) !== "undefined" ) {
-    console.log("RAVEN!", ravenUrl);
     Raven.config(ravenUrl).install();
   }
   
@@ -83,32 +81,6 @@ const {BrowserWindow} = window.require("electron").remote;
   // the width and making it proprtional to the main screen. at the moment,
   // the div will never have a height at this point unless someone specifically
   // hacks the CSS to make it work differently
-
-  el = document.querySelector("[name=repo]");
-  el.value = savers.getSource().repo;
-  el.setAttribute("placeholder", defaultSaverRepo);
-
-
-  document.querySelector("[name=localSource]").value = savers.getLocalSource();
-  el = document.querySelector("select[name='delay'] option[value='" + savers.getDelay() + "']");
-  if ( el !== null ) {
-    el.setAttribute("selected", "selected");
-  }
-
-  el = document.querySelector("select[name='sleep'] option[value='" + savers.getSleep() + "']");
-  if ( el !== null ) {
-    el.setAttribute("selected", "selected");
-  }
-  
-  if ( savers.getLock() === true ) {
-    document.querySelector("input[name=lock_screen][type=checkbox]").setAttribute("checked", "checked");
-  }
-
-  if ( savers.getDisableOnBattery() === true ) {
-    document.querySelector("input[name=disable_on_battery]").setAttribute("checked", "checked");
-  }
-
-  
   var getPreviewUrlOpts = function() {
     var tmp = {
       width: document.querySelector("#preview").offsetWidth,
@@ -387,8 +359,15 @@ const {BrowserWindow} = window.require("electron").remote;
       }
       closeWindow();
     });
-  };
+  }; // updatePrefs
 
+  var screensaverChanged = function() {
+    var val = getCurrentScreensaver();
+    var s = savers.getByKey(val);
+    
+    saverOpts = {};
+    redraw(s);
+  };
 
   document.querySelector(".create").addEventListener("click", addNewSaver, false);
   document.querySelector(".cancel").addEventListener("click", closeWindow, false);
@@ -396,7 +375,6 @@ const {BrowserWindow} = window.require("electron").remote;
   document.querySelector(".save").addEventListener("click", updatePrefs, false);
 
   window.addEventListener("resize", onResize, true);
-  
 
   //
   // i'm seeing a weird issue where both tabs can be marked as active,
@@ -409,16 +387,35 @@ const {BrowserWindow} = window.require("electron").remote;
         $(".tab-pane.active,.nav-link.active").removeClass("active");
       });
   });
-  
-  var screensaverChanged = function() {
-    var val = getCurrentScreensaver();
-    var s = savers.getByKey(val);
-    
-    saverOpts = {};
-    redraw(s);
-  };
 
-  renderList();
+  
+  var basePath = window.require('electron').remote.getGlobal("basePath");
+  savers.init(basePath, function() {
+    el = document.querySelector("[name=repo]");
+    el.value = savers.getSource().repo;
+    el.setAttribute("placeholder", defaultSaverRepo);
+
+    document.querySelector("[name=localSource]").value = savers.getLocalSource();
+    el = document.querySelector("select[name='delay'] option[value='" + savers.getDelay() + "']");
+    if ( el !== null ) {
+      el.setAttribute("selected", "selected");
+    }
+
+    el = document.querySelector("select[name='sleep'] option[value='" + savers.getSleep() + "']");
+    if ( el !== null ) {
+      el.setAttribute("selected", "selected");
+    }
+    
+    if ( savers.getLock() === true ) {
+      document.querySelector("input[name=lock_screen][type=checkbox]").setAttribute("checked", "checked");
+    }
+
+    if ( savers.getDisableOnBattery() === true ) {
+      document.querySelector("input[name=disable_on_battery]").setAttribute("checked", "checked");
+    }
+    renderList();
+  });
+
   
   if ( updateAvailable === true ) {
     dialog.showMessageBox(

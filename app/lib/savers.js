@@ -375,7 +375,7 @@ var sources = function() {
 
   // if we're pulling savers from a git repo, this is where
   // they will be located
-  if ( typeof(source.repo) !== "undefined" && source.repo !== "" ) {
+  if ( source !== undefined && typeof(source.repo) !== "undefined" && source.repo !== "" ) {
     folders.push(root);
   }
 
@@ -391,7 +391,7 @@ var sources = function() {
   else if ( fs.existsSync(system) ) {
     folders = folders.concat( system );
   }
-  
+
   return folders;
 };
 
