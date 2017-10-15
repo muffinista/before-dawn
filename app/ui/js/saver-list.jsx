@@ -58,7 +58,11 @@ export default class SaverList extends React.Component {
           <div className={"d-flex w-100 justify-content-between"} onClick={self.handleClick}>
             <label>
               <div className={"body"}>
-                <input type="radio" name="screensaver" value={s.key} onChange={self.onChanged} defaultChecked={is_checked} />
+                <input type="radio"
+                       name="screensaver"
+                             value={s.key} data-name={s.name}
+                             onChange={self.onChanged}
+                             defaultChecked={is_checked} />
                 <b>{s.name}</b>
               </div>
             </label>
