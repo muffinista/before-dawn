@@ -3,14 +3,26 @@
 const assert = require('assert');
 const Application = require('spectron').Application;
 const fs = require('fs');
+const tmp = require('tmp');
 const appPath = __dirname + '/../../app/node_modules/electron/dist/Electron.app/Contents/MacOS/Electron';
+
+var getTempDir = function() {
+  var tmpObj = tmp.dirSync();
+  return tmpObj.name;
+};
+var workingDir = getTempDir();
+
+
 const app = new Application({
   path: appPath,
-  args: ['app/main.js', '--test-mode=true']
+  args: ['app/main.js', '--test-mode=true'],
+  env: {
+    BEFORE_DAWN_DIR: workingDir
+  }
 });
 
 describe('Prefs', function() {
-  this.timeout(60000);
+  this.timeout(6000);
   
 	beforeEach(() => {
 		return app.start();
@@ -34,13 +46,26 @@ describe('Prefs', function() {
   });
 
   it('lists screensavers', function(done) {
-    app.client.waitUntilWindowLoaded().
-        getText('body').then(function (text) {
-          assert(text.lastIndexOf('Holzer') !== -1)
-          done();
-        });
+    app.client.waitUntilTextExists('body', 'Holzer', 10000).getText('body').then((text) => {
+      assert(text.lastIndexOf('Holzer') !== -1);
+      done();
+    });
   });
 
+  it.only('allows picking a screensaver', function(done) {
+    app.client.waitUntilTextExists('body', 'Holzer', 10000)
+       .getAttribute("[type=radio]","data-name")
+       .then(console.log.bind(console))
+       .then(() => {
+         app.client.click("[type=radio][data-name='Cylon']").
+             getText('body').
+             then((text) => {
+               assert(text.lastIndexOf('lights on your screen') !== -1);
+               done();
+             });
+       });
+  });
+  
   
   /*it('lists screensaver', function(done) {
      app.browserWindow.capturePage().then(function(imageBuffer) {
