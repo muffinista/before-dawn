@@ -16,9 +16,10 @@ var saverJSON;
 
 const app = new Application({
   path: appPath,
-  args: ['app/main.js', '--test-mode=true'],
+  args: ['app/main.js'],
   env: {
-    BEFORE_DAWN_DIR: workingDir
+    BEFORE_DAWN_DIR: workingDir,
+    TEST_MODE: true
   }
 });
 

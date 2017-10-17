@@ -1,6 +1,8 @@
 'use strict';
 
 const assert = require('assert');
+var chai = require('chai')
+var chaiAsPromised = require('chai-as-promised')
 const Application = require('spectron').Application;
 const fs = require('fs');
 const path = require('path');
@@ -13,21 +15,27 @@ var getTempDir = function() {
 };
 var workingDir = getTempDir();
 
-
-const app = new Application({
-  path: appPath,
-  args: ['app/main.js', '--test-mode=true'],
-  env: {
-    BEFORE_DAWN_DIR: workingDir
-  }
-});
-
 var savedConfig = function() {
   var data = path.join(workingDir, "config.json");
   var json = fs.readFileSync(data);
 
   return JSON.parse(json);
-}
+};
+
+const app = new Application({
+  path: appPath,
+  args: ['app/main.js'],
+  env: {
+    BEFORE_DAWN_DIR: workingDir,
+    TEST_MODE: true
+  }
+});
+
+chai.should();
+chai.use(chaiAsPromised);
+
+chaiAsPromised.transferPromiseness = app.transferPromiseness;
+
 
 describe('Prefs', function() {
   this.timeout(6000);
@@ -66,20 +74,20 @@ describe('Prefs', function() {
   it('allows picking a screensaver', function(done) {
     app.client.waitUntilTextExists('body', 'Holzer', 10000)
        .getAttribute("[type=radio]","data-name")
-       //.then(console.log.bind(console))
        .then(() => {
          app.client.click("[type=radio][data-name='Cylon']").
              getText('body').
              then((text) => {
                assert(text.lastIndexOf('lights on your screen') !== -1);
-               done();
              });
        }).
         then(() => app.client.click("button.save")).
+        getWindowCount().should.eventually.equal(1).
         then(() => {
+          //console.log("hey!", savedConfig());
           assert(savedConfig().saver.lastIndexOf("/cylon/") !== -1);
-        }).
-        then(() => done());
+          done();
+        });
     
   });
   
@@ -88,6 +96,7 @@ describe('Prefs', function() {
         then(() => app.client.scroll("[name='localSource']")).
         then(() => app.client.setValue("[name='localSource']", '/tmp')).
         then(() => app.client.click("button.save")).
+        getWindowCount().should.eventually.equal(1).
         then(() => {
           assert.equal("/tmp", savedConfig().localSource);
         }).
