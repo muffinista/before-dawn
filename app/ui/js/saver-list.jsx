@@ -60,15 +60,15 @@ export default class SaverList extends React.Component {
               <div className={"body"}>
                 <input type="radio"
                        name="screensaver"
-                             value={s.key} data-name={s.name}
-                             onChange={self.onChanged}
-                             defaultChecked={is_checked} />
+                       value={s.key} data-name={s.name}
+                       onChange={self.onChanged}
+                       defaultChecked={is_checked} />
                 <b>{s.name}</b>
               </div>
             </label>
             
             <div className={buttonWrapClass}>
-              <a className={"watcher btn btn-outline-secondary btn-sm"} href="#" role="button" data-key={s.key}>edit</a>
+              <a className={"watcher btn btn-outline-secondary btn-sm"} href="#" role="button" data-key={s.key} data-src={s.src}>edit</a>
               <a className={"delete btn btn-outline-secondary btn-sm"} href="#" role="button "data-key={s.key}>delete</a>
             </div>
           </div>

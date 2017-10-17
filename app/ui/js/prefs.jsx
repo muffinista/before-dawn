@@ -281,7 +281,7 @@ const {BrowserWindow} = window.require("electron").remote;
    * open the screensaver in preview window
    */
   var openSaverInWatcher = function(e) {
-    var key = e.target.dataset.key;
+    var src = e.target.dataset.src;
     var w = new BrowserWindow();
 
     e.preventDefault();
@@ -289,7 +289,7 @@ const {BrowserWindow} = window.require("electron").remote;
     // pass the key of the screensaver we want to load
     // as well as the URL to our screenshot image
     var target = "file://" + __dirname + "/watcher.html?" +
-                 "src=" + encodeURIComponent(key) +
+                 "src=" + encodeURIComponent(src) +
                  "&screenshot=" + encodeURIComponent(screenshot);
     w.loadURL(target);
 
@@ -389,7 +389,7 @@ const {BrowserWindow} = window.require("electron").remote;
   });
 
   
-  var basePath = window.require('electron').remote.getGlobal("basePath");
+  var basePath = window.require("electron").remote.getGlobal("basePath");
   savers.init(basePath, function() {
     el = document.querySelector("[name=repo]");
     el.value = savers.getSource().repo;

@@ -108,7 +108,7 @@ export default class AttributesForm extends React.Component {
       <div className="container-fluid">
         <h4>Basic Information</h4>
         <small>You can enter the basics about this screensaver here.</small>
-        <form>
+        <form className="basic-attributes">
           <div className="form-group">
             <label htmlFor="name">Name:</label>
             <input
@@ -116,35 +116,35 @@ export default class AttributesForm extends React.Component {
                 className="form-control"
                 defaultValue={this.props.saver.name} onChange={this.handleNameChange} />
             <div className="hint">The name of your screensaver.</div>
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="name">Description:</label>
+          </div>
+          
+          <div className="form-group">
+            <label htmlFor="name">Description:</label>
             <input
                 type="text" name="description"
                 className="form-control"
                 defaultValue={this.state.saver.description} onChange={this.handleDescriptionChange} />
             <div className="hint">A brief description of your screensaver.</div>
-        </div>
-        <div className="form-group">
-          <label htmlFor="aboutUrl">About URL:</label>
+          </div>
+          <div className="form-group">
+            <label htmlFor="aboutUrl">About URL:</label>
             <input
                 type="text"
                 name="aboutUrl"
                 className="form-control" defaultValue={this.state.saver.aboutUrl} onChange={this.handleAboutUrlChange} />
             <div className="hint">If you have a URL with more details about your work, put it here!</div>
-        </div>
-        <div className="form-group">
-          <label htmlFor="author">Author:</label>
+          </div>
+          <div className="form-group">
+            <label htmlFor="author">Author:</label>
             <input
                 type="text"
                 name="author"
                 className="form-control"
                 defaultValue={this.state.saver.author} onChange={this.handleAuthorChange} />
             <div className="hint">The author of this screensaver.</div>
-        </div>
+          </div>
         </form>
-
+        
         <h4>Configurable Options</h4>
         <small>You can offer users configurable options to control your screensaver. Manage those here.</small>
         <SaverOptionInput

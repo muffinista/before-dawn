@@ -34,10 +34,23 @@ module.exports = function Saver(_attrs) {
   this.aboutUrl = _attrs.aboutUrl;
   this.author = _attrs.author;
   this.license = _attrs.license;
-  this.url = _attrs.url;
   this.preload = _attrs.preload;
   this.requirements = _attrs.requirements || DEFAULT_REQUIREMENTS;
 
+
+  // allow for a specified URL -- this way you could create a screensaver
+  // that pointed to a remote URL
+  this.url = _attrs.url;
+  if ( typeof(this.url) === "undefined" ) {
+    this.url = "file://" + this.key;
+  }
+
+  // keep track of our main saver.json file
+  this.src = _attrs.src;
+  if ( typeof(this.src) === "undefined" && typeof(this.key) !== "undefined" ) {
+    var p = require("path");
+    this.src = p.join(p.dirname(this.key), "saver.json");
+  }
   
   this.published = _attrs.published;
   if ( typeof(this.published) === "undefined" ) {
@@ -48,7 +61,7 @@ module.exports = function Saver(_attrs) {
   if ( typeof(this.editable) === "undefined" ) {
     this.editable = false;
   }
-  
+
   this.valid = typeof(this.name) !== "undefined" &&
                typeof(this.description) !== "undefined" &&
                this.published === true;
@@ -122,11 +135,13 @@ module.exports = function Saver(_attrs) {
   };
 
   // write a new set of attributes for this saver to its JSON file
-  this.write = function(attrs) {
+  this.write = function(attrs, configDest) {
     var _path = require("path");
     var fs = require("fs");
 
-    var configDest = _path.join(this.path, "saver.json");
+    if ( typeof(configDest) === "undefined" ) {
+      configDest = _path.join(this.path, "saver.json");
+    }
 
     for ( var i = 0 ; i < this.UNWRITABLE_KEYS.length; i++ ) {
       delete(attrs[this.UNWRITABLE_KEYS[i]]);

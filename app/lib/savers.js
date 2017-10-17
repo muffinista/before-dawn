@@ -180,6 +180,7 @@ var firstLoad = function() {
   return _firstLoad;
 };
 
+
 /**
  * look up a screensaver by key, and return it
  */
@@ -398,41 +399,28 @@ var sources = function() {
 /**
  * load screensaver data from filesystem
  */
-var parseAndLoadSaver = function(opts) {
-  var f = opts.filepath;
-  var folder = path.dirname(f);
-
-  // make sure this is a saver.json file,
-  // not in a template directory
-  // and not in a folder we want to skip
-  var doSkip = ! f.match(/saver.json$/) ||
-               folder.split(path.sep).reverse()[0].match(/^__/) ||
-               skipFolder(folder);
-
-  if ( doSkip ) {
-    return;
-  }
-
+var loadFromFile = function(src, editable, settings) {
   return new Promise(function (resolve, reject) {
-    fs.readFile(opts.filepath, {encoding: "utf8"}, function (err, content) {
+    fs.readFile(src, {encoding: "utf8"}, function (err, content) {
       if ( err ) {
         reject(err);
       }
       else {
         try {
           var contents = JSON.parse(content);           
-          var stub = path.dirname(f);
+          var stub = path.dirname(src);
           contents.path = stub;
           contents.key = stub + "/" + contents.source;
-        
-          // allow for a specified URL -- this way you could create a screensaver
-          // that pointed to a remote URL
-          if ( typeof(contents.url) === "undefined" ) {
-            contents.url = "file://" + contents.key;
+
+          if ( editable === undefined ) {
+            editable = false;
           }
-          
-          contents.settings = getOptions(contents.key);
-          contents.editable = (opts.root === getLocalSource());
+          if ( settings === undefined ) {
+            settings = getOptions(contents.key);
+          }
+
+          contents.editable = editable;
+          contents.settings = settings;
           
           var s = new Saver(contents);
           if ( s.valid ) {
@@ -449,10 +437,7 @@ var parseAndLoadSaver = function(opts) {
       }
     });
   });
-
 };
-
-
 
 /**
  * search for all screensavers we can find on the filesystem. if cb is specified,
@@ -478,8 +463,10 @@ var listAll = function(cb, force) {
                  ! folder.split(path.sep).reverse()[0].match(/^__/) &&
                  ! skipFolder(folder);
 
+   
     if ( doLoad ) {
-      promises.push(parseAndLoadSaver(opts));
+      var editable = (opts.root === getLocalSource());
+      promises.push(loadFromFile(f, editable));
     }
   });
 
@@ -581,6 +568,7 @@ exports.reload = reload;
 exports.reset = reset;
 exports.delete = deleteSaver;
 
+exports.loadFromFile = loadFromFile;
 exports.getByKey = getByKey;
 exports.getCurrent = getCurrent;
 exports.getSource = getSource;

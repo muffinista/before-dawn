@@ -16,8 +16,8 @@ import OptionsForm from "./options-form";
   const path = require("path");
   const url = require("url");
   const exec = require("child_process").exec;
-  var savers = remote.getGlobal("savers");
-
+  var savers = require("../lib/savers");
+  
   var ravenUrl = remote.getGlobal("RAVEN_URL");
   if ( typeof(ravenUrl) !== "undefined" ) {
     Raven.config(ravenUrl).install();
@@ -26,28 +26,19 @@ import OptionsForm from "./options-form";
   // parse incoming URL params -- we'll get a link to the current screen images for previews here
   var tmpParams = new URLSearchParams(document.location.search);
   window.urlParams = {};
+  //console.log("SEARCH: " + document.location.search);
 
   for(let k of tmpParams.keys() ) {
     window.urlParams[k] = tmpParams.get(k);
   }
 
-  //console.log("PARAMS", window.urlParams);
-  
   // the main app will pass us a screenshot URL, here it is
   var screenshot = decodeURIComponent(urlParams.screenshot);
   var src = decodeURIComponent(urlParams.src);
 
-  //console.log("SRC", src);
-  
-  // load screensaver object
-  var s = savers.getByKey(src);
+  var s;
   var saverAttrs = {};
 
-  //console.log("SAVER", s);
-  
-  if ( s !== undefined ) {
-    saverAttrs = s.toHash();
-  }
 
   var reloadPreview = function(ev) {
     var iframe = document.querySelector("iframe");
@@ -64,7 +55,6 @@ import OptionsForm from "./options-form";
       var mergedOpts = _.merge(url_opts, s.settings);
       var previewUrl = s.getUrl(mergedOpts);
 
-      //console.log("LOAD URL", previewUrl);
       iframe.src = previewUrl;
     }
 
@@ -86,25 +76,34 @@ import OptionsForm from "./options-form";
     saverAttrs = data;
   };
 
-  ReactDOM.render(
-    <OptionsForm saver={s} onChange={optionsUpdated} />,
-    document.getElementById("options")
-  );
-
-  ReactDOM.render(
-    <AttributesForm saver={saverAttrs} onChanged={attrsUpdated} />,
-    document.getElementById("attributes")
-  );
-
-  // add the iframe to the output
-  wrapper.appendChild(iframe);
-
-  reloadPreview();
-  window.addEventListener("resize", reloadPreview, true);
-
   // figure out the path to the screensaver folder. use
   // decodeURIComponent to convert %20 to spaces
   var filePath = path.dirname(decodeURIComponent(url.parse(src).path));
+
+  // load screensaver object
+  savers.loadFromFile(src).then((result) => {
+    s = result;
+    
+    if ( s !== undefined ) {
+      saverAttrs = s.toHash();
+    }
+
+    ReactDOM.render(
+      <OptionsForm saver={s} onChange={optionsUpdated} />,
+      document.getElementById("options")
+    );
+
+    ReactDOM.render(
+      <AttributesForm saver={saverAttrs} onChanged={attrsUpdated} />,
+      document.getElementById("attributes")
+    );
+
+    // add the iframe to the output
+    wrapper.appendChild(iframe);
+    reloadPreview();
+  });
+
+  window.addEventListener("resize", reloadPreview, true);
 
   // make sure folder actually exists
   if ( fs.existsSync(filePath) ) {
@@ -171,6 +170,7 @@ import OptionsForm from "./options-form";
       closeWindow(ev);
     }
   };
+
   var openConsole = function(ev) {
     ev.preventDefault();
     remote.getCurrentWindow().toggleDevTools();

@@ -85,7 +85,7 @@ var grabScreen = function(s, cb) {
   // i'll do that instead
   if ( testMode === true ) {
     cb({
-      url: "foo.png"
+      url: "file://" + __dirname + "/../test/fixtures/screenshot.png"
     });
     return;
   }
@@ -118,6 +118,14 @@ var grabScreen = function(s, cb) {
   }
 };
 
+var testWindow;
+var openTestShim = function() {
+  testWindow = new BrowserWindow({
+    width: 200,
+    height: 200
+  });
+  testWindow.loadURL("file://" + __dirname + "/ui/test-shim.html");
+};
 
 /**
  * Open the preferences window
@@ -617,7 +625,7 @@ var bootApp = function(_basePath) {
     appReady = true;
     
     if ( testMode === true ) {
-      openPrefsWindow();
+      openTestShim();
     }
     else {
       openPrefsOnFirstLoad();
@@ -857,6 +865,25 @@ ipcMain.on("savers-updated", (event, arg) => {
 });
 
 
+ipcMain.on("open-prefs", (event) => {
+  openPrefsWindow();
+});
+
+ipcMain.on("open-editor", (event, args) => {
+  var key = args.src;
+  var screenshot = args.screenshot;
+
+  var w = new BrowserWindow();
+
+  // pass the key of the screensaver we want to load
+  // as well as the URL to our screenshot image
+  var target = "file://" + __dirname + "/ui/watcher.html?" +
+               "src=" + encodeURIComponent(key) +
+               "&screenshot=" + encodeURIComponent(screenshot);
+  console.log(target);
+  w.loadURL(target);
+});
+
 // seems like we need to catch this event to keep OSX from exiting app after screensaver runs?
 app.on("window-all-closed", function() {
   log.info("window-all-closed");
@@ -874,6 +901,11 @@ app.on("quit", function() {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 app.once("ready", function() {  
+  if ( testMode === true ) {
+    bootApp();
+    return;
+  }
+
   /**
    * check for a release and then boot!
    */
