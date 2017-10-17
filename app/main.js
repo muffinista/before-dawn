@@ -44,7 +44,7 @@ let appIcon = null;
 
 let argv = parseArgs(process.argv);
 let debugMode = ( argv.debug === true );
-let testMode = ( argv["test-mode"] === "true" );
+let testMode = ( process.env.TEST_MODE !== undefined );
 
 let saverWindows = [];
 let oldMousePosition = {x:0, y:0};
