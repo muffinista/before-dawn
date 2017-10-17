@@ -4,6 +4,8 @@ import ReactDOM from "react-dom"
 import AttributesForm from "./attributes-form";
 import OptionsForm from "./options-form";
 
+const Noty = require('noty');
+
 (function() {
   const remote = window.require("electron").remote;
   const {ipcRenderer} = window.require("electron");
@@ -166,6 +168,16 @@ import OptionsForm from "./options-form";
     s.write(saverAttrs);
     ipcRenderer.send("savers-updated", s.key);
 
+    new Noty({
+      type: 'success',
+      layout: 'topRight',
+      timeout: 1000,
+      text: 'Changes saved!',
+      animation: {
+        open: null
+      }
+    }).show();      
+    
     if ( this.classList.contains("and-close") ) {
       closeWindow(ev);
     }

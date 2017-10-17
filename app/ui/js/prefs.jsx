@@ -4,6 +4,7 @@ const AutoLaunch = require("auto-launch");
 const path = require("path");
 
 const _ = require("lodash");
+const Noty = require('noty');
 
 import OptionsForm from "./options-form";
 import Preview from "./preview";
@@ -357,7 +358,18 @@ const {BrowserWindow} = window.require("electron").remote;
         console.log("set auto start == false");
 	      appLauncher.disable().then(function(x) { });
       }
-      closeWindow();
+
+      new Noty({
+        type: 'success',
+        layout: 'topRight',
+        timeout: 1000,
+        text: 'Changes saved!',
+        animation: {
+          open: null
+        }
+      }).show();      
+
+      //closeWindow();
     });
   }; // updatePrefs
 
