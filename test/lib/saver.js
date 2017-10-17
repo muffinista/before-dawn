@@ -3,6 +3,8 @@
 const assert = require('assert');
 const Saver = require('../../app/lib/saver.js');
 const _ = require('lodash');
+const tmp = require('tmp');
+const fs = require('fs');
 
 describe('Saver', function() {
   const testName = "Test Screensaver";
@@ -44,7 +46,7 @@ describe('Saver', function() {
     }
 
     var vals = _.merge({}, attrs, opts);
-    return  new Saver(vals);
+    return new Saver(vals);
   };
   
 	describe('initialization', function() {
@@ -114,7 +116,17 @@ describe('Saver', function() {
   });
   
   describe('write', function() {
-    it('should write some output');
+    it('should write some output', function() {
+      var dest = tmp.fileSync().name;
+      var s = loadSaver();
+      s.attrs.name = "New Name To Write";
+      
+      s.write(s.toHash(), dest);
+
+      var data = JSON.parse(fs.readFileSync(dest));
+      s = new Saver(data);
+      assert.equal("New Name To Write", s.name);
+    });
   });
 
   describe('published', function() {

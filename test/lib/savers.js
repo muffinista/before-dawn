@@ -20,6 +20,7 @@ describe('Savers', function() {
 
   var workingDir;
   var saversDir;
+  var saverJSONFile;
   
   beforeEach(function() {
     var testSaverDir;
@@ -31,7 +32,8 @@ describe('Savers', function() {
     // config there
     testSaverDir = path.join(saversDir, 'saver');
     fs.mkdirSync(testSaverDir);
-    fs.copySync(path.join(__dirname, '../fixtures/saver.json'), path.join(testSaverDir, 'saver.json'));
+    saverJSONFile = path.join(testSaverDir, 'saver.json');
+    fs.copySync(path.join(__dirname, '../fixtures/saver.json'), saverJSONFile);
 
     testSaverDir = path.join(saversDir, 'saver2');
     fs.mkdirSync(testSaverDir);
@@ -65,6 +67,30 @@ describe('Savers', function() {
      */
   });
 
+  describe('loadFromFile', function() {
+    it('loads data', function(done) {
+      savers.loadFromFile(saverJSONFile).then((s) => {
+        assert.equal("Screensaver One", s.name);
+        done();
+      });
+    });
+
+    it('sets editable', function(done) {
+      savers.loadFromFile(saverJSONFile, true).then((s) => {
+        assert(s.editable);
+        assert.equal(s.settings['New Option I Guess'], '75');
+        done();
+      });
+    });
+    
+    it('applies options', function(done) {
+      savers.loadFromFile(saverJSONFile, false, { 'New Option I Guess': '25' }).then((s) => {
+        assert.equal(s.settings['New Option I Guess'], '25');
+        done();
+      });
+    });
+  });
+  
   describe('listAll', function() {
     it('loads data', function(done) {
       savers.init(workingDir, function() {
