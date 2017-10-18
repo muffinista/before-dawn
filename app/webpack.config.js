@@ -1,8 +1,5 @@
 const path = require("path");
 const webpack = require("webpack");
-
-const port = process.env.PORT || "8080";
-
 const nodeExternals = require("webpack-node-externals");
 
 const externals = nodeExternals({
@@ -21,6 +18,8 @@ const config = {
     filename: "[name].js",
     path: path.resolve(__dirname, "dist")
   },
+  devtool: "source-map",
+  stats: "verbose",
   module: {
     rules: [
       {
@@ -39,28 +38,8 @@ const config = {
           { loader: "expose-loader", options: "$" }
         ]
       },
-      /*      {
-        test: /\.js$/,
-        loader: "babel-loader",
-        include: [
-          path.join(__dirname, "src"),
-          path.join(__dirname, "renderer.js")
-        ],
-        exclude: /node_modules/,
-        query: {
-          presets: ["es2015", "react", "react-hmre"]
-        }
-      },
-      {
-        test: /\.scss$/, loader: "style-loader!css-loader!sass-loader"
-      },
-      {
-        test: /\.json$/,
-        loader: "json-loader"
-      }*/
     ]
   },
-  stats: "verbose",
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
     new webpack.ProvidePlugin({
