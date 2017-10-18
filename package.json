@@ -5,8 +5,8 @@
   "author": "Colin Mitchell",
   "scripts": {
     "postinstall": "install-app-deps",
-    "pack": "build --dir",
-    "dist": "build --x64",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder--x64",
     "cleanup": "npm prune && cd app/ && npm prune",
     "test": "nyc mocha test test/**",
     "test-lib": "nyc --reporter=html mocha test test/lib/**"
@@ -14,8 +14,8 @@
   "devDependencies": {
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
-    "electron": "^1.7.8",
-    "electron-builder": "16.8.3",
+    "electron": "1.8.1",
+    "electron-builder": "19.37.2",
     "grunt": "^1.0.1",
     "grunt-contrib-jshint": "^1.1.0",
     "grunt-contrib-watch": "^1.0.0",
