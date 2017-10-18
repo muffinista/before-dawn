@@ -93,11 +93,23 @@ describe('Prefs', function() {
   
   it('allows setting path', function(done) {
     app.client.waitUntilWindowLoaded().click("#prefs-tab").
+        /* getWindowCount().
+           then((res) => {
+           console.log("COUNT", res);
+           }). */
         then(() => app.client.scroll("[name='localSource']")).
         then(() => app.client.setValue("[name='localSource']", '/tmp')).
         then(() => app.client.click("button.save")).
-        getWindowCount().should.eventually.equal(1).
+        /* getWindowCount().
+           then((res) => {
+           console.log("COUNT", res);
+           }). */
+        //getWindowCount().should.eventually.equal(1).
         then(() => {
+          app.client.getWindowCount().should.eventually.equal(1)
+        }).
+        then(() => {
+//          console.log("HI!");
           assert.equal("/tmp", savedConfig().localSource);
         }).
         then(() => done());

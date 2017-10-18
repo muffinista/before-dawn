@@ -16,10 +16,11 @@ const DEFAULT_REQUIREMENTS = ["screen"];
  */
 var serialize = function(obj) {
   var str = [];
-  for(var p in obj)
-    {if (obj.hasOwnProperty(p)) {
+  for(var p in obj) {
+    if (obj.hasOwnProperty(p)) {
       str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
-    }}
+    }
+  }
   return str.join("&");
 };
 
@@ -123,7 +124,7 @@ module.exports = function Saver(_attrs) {
     opts = _.merge({}, this.settings, opts);
     
     if ( url.lastIndexOf("?") !== -1 ) {
-      joiner ="&";
+      joiner = "&";
     }
 
     opts = serialize(opts);

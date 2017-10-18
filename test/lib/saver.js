@@ -4,6 +4,7 @@ const assert = require('assert');
 const Saver = require('../../app/lib/saver.js');
 const _ = require('lodash');
 const tmp = require('tmp');
+const path = require('path');
 const fs = require('fs');
 
 
@@ -80,14 +81,35 @@ describe('Saver', function() {
       assert.equal('50', s.settings['New Option I Guess']);      
     });
 
-    
     it('merges user settings', function() {
       var s = loadSaver({settings: []});
       assert.equal('75', s.settings['New Option']);
       assert.equal('50', s.settings['New Option I Guess']);      
     });
+
+    it('loads local previewUrl', function() {
+      var s = loadSaver({path: "path", previewUrl:"preview.html"});
+      assert.equal('path/preview.html', s.previewUrl);
+    });
   });
 
+  describe('getUrl', function() {
+    it('handles no opts', function() {
+      var s = loadSaver({url:'index.html'});
+      assert.equal('index.html?New%20Option%20I%20Guess=50&New%20Option=75', s.getUrl());
+    });
+
+    it('handles opts', function() {
+      var s = loadSaver({url:'index.html'});
+      assert.equal('index.html?New%20Option%20I%20Guess=50&New%20Option=75&foo=bar', s.getUrl({foo: 'bar'}));
+    });
+
+    it('handles urls with queries', function() {
+      var s = loadSaver({url:'index.html?baz=boo'});
+      assert.equal('index.html?baz=boo&New%20Option%20I%20Guess=50&New%20Option=75&foo=bar', s.getUrl({foo: 'bar'}));
+    });
+  });
+  
   describe('getRequirements', function() {
     it('defaults to empty', function() {
       var s = loadSaver();
@@ -98,10 +120,6 @@ describe('Saver', function() {
       var s = loadSaver({requirements:['stuff']});
       assert.deepEqual(['stuff'], s.getRequirements());
     });
-  });
-
-  describe('getUrl', function() {
-    it('returns a url');
   });
 
   describe('getPreviewUrl', function() {
@@ -124,6 +142,21 @@ describe('Saver', function() {
       
       s.write(s.toHash(), dest);
 
+      var data = JSON.parse(fs.readFileSync(dest));
+      s = new Saver(data);
+      assert.equal("New Name To Write", s.name);
+    });
+
+    it('should work without a dest', function() {
+      var p = tmp.dirSync().name;
+      var dest = path.join(p, "saver.json");
+
+      var s = loadSaver({path: p});
+      s.attrs.name = "New Name To Write";
+      
+      s.write(s.toHash());
+
+      
       var data = JSON.parse(fs.readFileSync(dest));
       s = new Saver(data);
       assert.equal("New Name To Write", s.name);
