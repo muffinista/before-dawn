@@ -864,7 +864,6 @@ ipcMain.on("savers-updated", (event, arg) => {
   }
 });
 
-
 ipcMain.on("open-prefs", (event) => {
   openPrefsWindow();
 });

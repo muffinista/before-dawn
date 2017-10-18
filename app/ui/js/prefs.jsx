@@ -286,17 +286,12 @@ const {BrowserWindow} = window.require("electron").remote;
    */
   var openSaverInWatcher = function(e) {
     var src = e.target.dataset.src;
-    var w = new BrowserWindow();
+    ipcRenderer.send("open-editor", {
+      src: src,
+      screenshot: screenshot
+    });
 
     e.preventDefault();
-
-    // pass the key of the screensaver we want to load
-    // as well as the URL to our screenshot image
-    var target = "file://" + __dirname + "/watcher.html?" +
-                 "src=" + encodeURIComponent(src) +
-                 "&screenshot=" + encodeURIComponent(screenshot);
-    w.loadURL(target);
-
   };
 
   var deleteSaver = function(e) {
