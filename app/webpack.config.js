@@ -19,7 +19,7 @@ const config = {
   externals: externals,
   output: {
     filename: '[name].js',
-    path: path.resolve(__dirname, 'bundle')
+    path: path.resolve(__dirname, 'dist')
   },
   module: {
     rules: [
@@ -38,7 +38,7 @@ const config = {
           { loader: 'expose-loader', options: 'jQuery' },
           { loader: 'expose-loader', options: '$' }
         ]
-      },     
+      },
       /*      {
         test: /\.js$/,
         loader: 'babel-loader',

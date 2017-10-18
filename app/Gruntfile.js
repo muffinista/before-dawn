@@ -1,3 +1,4 @@
+var webpackConfig = require('./webpack.config');
 module.exports = function(grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON("package.json"),
@@ -24,6 +25,24 @@ module.exports = function(grunt) {
       },
       target: ["Gruntfile.js", "*.js", "lib/**/*.js", "ui/**/*.jsx"]
     },
+    sass: {
+		  options: {
+			  sourceMap: true
+		  },
+		  dist: {
+			  files: {
+				  'dist/styles.css': 'css/styles.scss'
+			  }
+		  }
+	  },
+    webpack: {
+      options: {
+        stats: !process.env.NODE_ENV || process.env.NODE_ENV === 'development'
+      },
+      prod: webpackConfig,
+      //dev: Object.assign({ watch: true }, webpackConfig)
+      dev: webpackConfig
+    },
     watch: {
       lint: {
         files: ["Gruntfile.js", "*.js", "lib/**/*.js", "ui/**/*.jsx"],
@@ -39,8 +58,12 @@ module.exports = function(grunt) {
     }
   });
 
+
   grunt.loadNpmTasks("grunt-babel");
   grunt.loadNpmTasks("grunt-contrib-watch");
   grunt.loadNpmTasks("grunt-eslint");
-  grunt.registerTask("default", ["eslint", "babel"]);
+  grunt.loadNpmTasks("grunt-sass");  
+  grunt.loadNpmTasks('grunt-webpack');
+  
+  grunt.registerTask("default", ["eslint", "sass", "webpack"]);
 };
