@@ -12,17 +12,14 @@ const externals = nodeExternals({
 const config = {
   context: __dirname,
   entry: {
-//    'babel-polyfill',
     prefs: path.resolve(__dirname, 'ui', 'js', 'prefs.jsx'),
-//    `webpack-hot-middleware/client?path=http://localhost:${port}/__webpack_hmr`,
+    editor: path.resolve(__dirname, 'ui', 'js', 'watcher.jsx'),
   },
   target: 'electron-renderer',
   externals: externals,
   output: {
-    filename: 'prefs.bundle.js',
-    path: path.resolve(__dirname, 'bundle'),
-    publicPath: `http://localhost:${port}/bundle/`,
-    libraryTarget: 'commonjs2'
+    filename: '[name].js',
+    path: path.resolve(__dirname, 'bundle')
   },
   module: {
     rules: [
@@ -70,7 +67,7 @@ const config = {
       $: "jquery",
       jQuery: "jquery",
       "window.jQuery": "jquery",
-      Popper: ['popper.js', 'default'],
+      "Popper": ['popper.js', 'default'],
     })
   ]
 };

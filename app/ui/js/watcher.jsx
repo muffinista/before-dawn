@@ -1,8 +1,12 @@
+import "popper.js";
+import 'jquery';
+import 'bootstrap';
+
 import React from "react";
 import ReactDOM from "react-dom"
 
-import AttributesForm from "./attributes-form";
-import OptionsForm from "./options-form";
+import AttributesForm from "../components/attributes-form.jsx";
+import OptionsForm from "../components/options-form.jsx";
 
 const Noty = require('noty');
 
@@ -18,7 +22,7 @@ const Noty = require('noty');
   const path = require("path");
   const url = require("url");
   const exec = require("child_process").exec;
-  var savers = require("../lib/savers");
+  var savers = require("../../lib/savers.js");
   
   var ravenUrl = remote.getGlobal("RAVEN_URL");
   if ( typeof(ravenUrl) !== "undefined" ) {

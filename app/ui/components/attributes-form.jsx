@@ -3,8 +3,8 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-import SliderWithValue from "./slider-with-value";
-import SaverOptionInput from "./saver-option-input";
+import SliderWithValue from "./slider-with-value.jsx";
+import SaverOptionInput from "./saver-option-input.jsx";
 
 
 const ReactDOM = require("react-dom");

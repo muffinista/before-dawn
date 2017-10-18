@@ -2,7 +2,7 @@
 
 import React from "react";
 import PropTypes from "prop-types";
-import SaverOptionInputItem from "./saver-option-input-item";
+import SaverOptionInputItem from "./saver-option-input-item.jsx";
 
 const _ = require("lodash");
 
