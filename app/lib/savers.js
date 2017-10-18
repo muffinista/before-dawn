@@ -482,16 +482,16 @@ var listAll = function(cb, force) {
  * get a URL we can use to render current screensaver. if opts is passed in, use them
  * when generating URL. otherwise use our global URL options
  */
-var getCurrentUrl = function(opts) {
+/*var getCurrentUrl = function(opts) {
   var s = getCurrentData();
   return s.getUrl(opts);   
 };
-
+*/
 
 /**
  * return URL of the screensaver matching key
  */
-var getUrl = function(key) {   
+/*var getUrl = function(key) {   
   var url = "file://" + baseDir + "/savers/";
   if ( typeof(key) === "undefined" ) {
     key = getCurrent();
@@ -499,7 +499,7 @@ var getUrl = function(key) {
   url = url + key;
 
   return url;
-};
+};*/
 
 
 var write = function(cb) {
@@ -589,8 +589,8 @@ exports.setDisableOnBattery = setDisableOnBattery;
 exports.getDisableOnBattery = getDisableOnBattery;
 exports.getOptions = getOptions;
 exports.listAll = listAll;
-exports.getCurrentUrl = getCurrentUrl;
-exports.getUrl = getUrl;
+//exports.getCurrentUrl = getCurrentUrl;
+//exports.getUrl = getUrl;
 exports.write = write;
 exports.firstLoad = firstLoad;
 exports.generateScreensaver = generateScreensaver;

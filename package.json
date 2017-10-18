@@ -9,7 +9,7 @@
     "dist": "build --x64",
     "cleanup": "npm prune && cd app/ && npm prune",
     "test": "nyc mocha test test/**",
-    "test-lib": "nyc mocha test test/lib/**"
+    "test-lib": "nyc --reporter=html mocha test test/lib/**"
   },
   "devDependencies": {
     "chai": "^4.1.2",

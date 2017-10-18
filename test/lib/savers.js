@@ -89,6 +89,19 @@ describe('Savers', function() {
         done();
       });
     });
+
+    it('rejects bad json', function(done) {
+      var f = path.join(__dirname, '../fixtures/index.html');
+      savers.loadFromFile(f, false, { 'New Option I Guess': '25' }).
+             then(() => {
+               done(new Error('Expected method to reject.'));               
+             }).
+             catch((err) => {
+               assert(typeof(err) !== "undefined");
+               done();
+             }).
+             catch(done);
+    });
   });
   
   describe('listAll', function() {
@@ -103,6 +116,34 @@ describe('Savers', function() {
     });
   });
 
+  describe('applyPreload/getRandomScreensaver', function() {
+    it('works for random', function(done) {
+      savers.init(workingDir, function() {
+        savers.listAll(function(data) {
+          var s = {
+            preload:"random"
+          };
+          var s2 = savers.applyPreload(s);
+          assert.notDeepEqual(s, s2);
+          done();
+        });
+      });
+    });
+
+    it('works for non-random', function(done) {
+      savers.init(workingDir, function() {
+        savers.listAll(function(data) {
+          var s = {
+            name:"hello"
+          };
+          var s2 = savers.applyPreload(s);
+          assert.deepEqual(s, s2);
+          done();
+        });
+      });
+    });
+  });
+  
   describe('generateScreensaver', function() {
     it('works', function(done) {
       savers.init(workingDir, function() {
