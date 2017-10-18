@@ -359,17 +359,17 @@ const {BrowserWindow} = window.require("electron").remote;
 	      appLauncher.disable().then(function(x) { });
       }
 
-      new Noty({
-        type: 'success',
-        layout: 'topRight',
-        timeout: 1000,
-        text: 'Changes saved!',
-        animation: {
-          open: null
-        }
-      }).show();      
-
-      //closeWindow();
+      /* new Noty({
+         type: 'success',
+         layout: 'topRight',
+         timeout: 1000,
+         text: 'Changes saved!',
+         animation: {
+         open: null
+         }
+         }).show();      
+       */
+      closeWindow();
     });
   }; // updatePrefs
 
