@@ -6,6 +6,7 @@ const _ = require('lodash');
 const tmp = require('tmp');
 const fs = require('fs');
 
+
 describe('Saver', function() {
   const testName = "Test Screensaver";
   const testDescription = "It's a screensaver, but for testing";

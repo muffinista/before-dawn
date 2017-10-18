@@ -1,8 +1,8 @@
 'use strict';
 
 const assert = require('assert');
-var chai = require('chai')
-var chaiAsPromised = require('chai-as-promised')
+const chai = require('chai');
+const chaiAsPromised = require('chai-as-promised');
 const Application = require('spectron').Application;
 const fs = require('fs');
 const path = require('path');
@@ -44,7 +44,7 @@ describe('Prefs', function() {
 		return app.start().
                then(() => app.client.waitUntilWindowLoaded() ).
 			         then(() => app.electron.ipcRenderer.send('open-prefs')).
-			         then(() => app.client.windowByIndex(1))
+			         then(() => app.client.windowByIndex(1));
 	});
 
 	afterEach(() => {
@@ -57,7 +57,7 @@ describe('Prefs', function() {
     assert(app.browserWindow.isVisible());
   });
 
-  it('sets title', function() {
+  it('sets title', function(done) {
     app.client.waitUntilWindowLoaded().getTitle().then((res) => {
       assert.equal('Before Dawn -- screensaver fun', res);
       done();

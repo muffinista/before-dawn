@@ -8,7 +8,8 @@
     "pack": "build --dir",
     "dist": "build --x64",
     "cleanup": "npm prune && cd app/ && npm prune",
-    "test": "mocha test test/**"
+    "test": "nyc mocha test test/**",
+    "test-lib": "nyc mocha test test/lib/**"
   },
   "devDependencies": {
     "chai": "^4.1.2",
@@ -18,10 +19,12 @@
     "grunt": "^1.0.1",
     "grunt-contrib-jshint": "^1.1.0",
     "grunt-contrib-watch": "^1.0.0",
+    "grunt-mocha-test": "^0.13.3",
     "grunt-simple-mocha": "^0.4.1",
     "install": "^0.10.1",
     "mocha": "^4.0.1",
     "npm": "^5.4.2",
+    "nyc": "^11.2.1",
     "rimraf": "^2.6.2",
     "spectron": "^3.7.2"
   },

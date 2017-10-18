@@ -28,7 +28,7 @@ var savedConfig = function() {
   var json = fs.readFileSync(data);
 
   return JSON.parse(json);
-}
+};
 
 describe('Editor', function() {
   this.timeout(6000);
@@ -51,7 +51,7 @@ describe('Editor', function() {
                  screenshot: 'file://' + path.join(__dirname, '../fixtures/screenshot.png'),
                  src: saverJSON
                })).
-			         then(() => app.client.windowByIndex(1))
+			         then(() => app.client.windowByIndex(1));
 	});
 
 	afterEach(() => {
