@@ -91,4 +91,29 @@ describe('Editor', function() {
           done();
         });
   });
+
+  it('adds and removes options', function(done) {
+    app.client.waitUntilWindowLoaded().
+        then(() => app.client.click("a.settings")).
+        then(() => app.client.getText('body')).
+        then((text) => {
+          assert(text.lastIndexOf('You can enter the basics about this screensaver here') !== -1);
+        }).
+        then(() => app.client.getValue(".basic-attributes [name='name']")).
+        then((res) => {
+          assert.equal('Screensaver One', res);
+        }).
+        then(() => app.client.setValue(".basic-attributes [name='name']", 'A New Name!!!')).
+        then(() => app.client.setValue(".basic-attributes [name='description']", 'A Thing I Made?')).
+        then(() => app.client.click("button.save")).
+        then(() => {
+          var data = JSON.parse(fs.readFileSync(saverJSON));
+          assert.equal('A New Name!!!', data.name);
+        }).
+        then(() => {
+          done();
+        });
+  });
+
+  it('works with new screensaver');
 });

@@ -1,3 +1,6 @@
+import 'jquery';
+import 'bootstrap';
+
 const React = require("react");
 const ReactDOM = require("react-dom");
 const AutoLaunch = require("auto-launch");
@@ -6,9 +9,9 @@ const path = require("path");
 const _ = require("lodash");
 const Noty = require('noty');
 
-import OptionsForm from "./options-form";
-import Preview from "./preview";
-import SaverList from "./saver-list";
+import OptionsForm from "../components/options-form.jsx";
+import Preview from "../components/preview.jsx";
+import SaverList from "../components/saver-list.jsx";
 
 const shell = window.require("electron").shell;
 const {BrowserWindow} = window.require("electron").remote;
@@ -18,7 +21,7 @@ const {BrowserWindow} = window.require("electron").remote;
   const {ipcRenderer} = window.require("electron");
   const {crashReporter} = window.require("electron");
 
-  var savers = require("../lib/savers");
+  var savers = require("../../lib/savers.js");
   var remote = window.require("electron").remote;
   var appName = remote.getGlobal("APP_NAME");
   var appVersion = remote.getGlobal("APP_VERSION");

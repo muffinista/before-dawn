@@ -2,7 +2,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-import SliderWithValue from "./slider-with-value";
+import SliderWithValue from "./slider-with-value.jsx";
 
 const _ = require("lodash");
 
