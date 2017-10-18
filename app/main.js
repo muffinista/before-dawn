@@ -90,7 +90,7 @@ var grabScreen = function(s, cb) {
     return;
   }
 
-  var grabberUrl = "file://" + __dirname + "/grabber.html?id=" + s.id +
+  var grabberUrl = "file://" + __dirname + "/html/grabber.html?id=" + s.id +
                    "&width=" + s.bounds.width +
                    "&height=" + s.bounds.height;
 
@@ -124,7 +124,7 @@ var openTestShim = function() {
     width: 200,
     height: 200
   });
-  testWindow.loadURL("file://" + __dirname + "/test-shim.html");
+  testWindow.loadURL("file://" + __dirname + "/html/test-shim.html");
 };
 
 /**
@@ -138,7 +138,7 @@ var openPrefsWindow = function() {
     // call savers.reload to make sure our data is properly refreshed
     // and check for any system updates
     global.savers.reload(function() {
-      var prefsUrl = "file://" + __dirname + "/prefs.html";
+      var prefsUrl = "file://" + __dirname + "/html/prefs.html";
       prefsWindowHandle = new BrowserWindow({
         width:800,
         height:700,
@@ -185,7 +185,7 @@ var openPrefsWindow = function() {
  * Open the About window for the app
  */
 var openAboutWindow = function() {
-  var prefsUrl = "file://" + __dirname + "/about.html";
+  var prefsUrl = "file://" + __dirname + "/html/about.html";
   var w = new BrowserWindow({
     width:500,
     height:400,
@@ -569,7 +569,7 @@ var openPrefsOnFirstLoad = function() {
 var bootApp = function(_basePath) {
   var icons = getIcons();
   // @todo i think asar breaks this
-  var menuTemplate = require("./menu_template.js").buildMenuTemplate(app);
+  var menuTemplate = require("./js/menu_template.js").buildMenuTemplate(app);
   var menu = Menu.buildFromTemplate(menuTemplate);
 
   Menu.setApplicationMenu(menu);
@@ -876,7 +876,7 @@ ipcMain.on("open-editor", (event, args) => {
 
   // pass the key of the screensaver we want to load
   // as well as the URL to our screenshot image
-  var target = "file://" + __dirname + "/watcher.html?" +
+  var target = "file://" + __dirname + "/html/watcher.html?" +
                "src=" + encodeURIComponent(key) +
                "&screenshot=" + encodeURIComponent(screenshot);
   w.loadURL(target);

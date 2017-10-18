@@ -12,8 +12,8 @@ const externals = nodeExternals({
 const config = {
   context: __dirname,
   entry: {
-    prefs: path.resolve(__dirname, 'ui', 'js', 'prefs.jsx'),
-    editor: path.resolve(__dirname, 'ui', 'js', 'watcher.jsx'),
+    prefs: path.resolve(__dirname, 'js', 'prefs.jsx'),
+    editor: path.resolve(__dirname, 'js', 'watcher.jsx'),
   },
   target: 'electron-renderer',
   externals: externals,
