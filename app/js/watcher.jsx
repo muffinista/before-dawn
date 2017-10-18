@@ -1,6 +1,6 @@
 import "popper.js";
-import 'jquery';
-import 'bootstrap';
+import "jquery";
+import "bootstrap";
 
 import React from "react";
 import ReactDOM from "react-dom"
@@ -9,7 +9,7 @@ import ReactDOM from "react-dom"
 import AttributesForm from "./components/attributes-form.jsx";
 import OptionsForm from "./components/options-form.jsx";
 
-const Noty = require('noty');
+const Noty = require("noty");
 
 (function() {
   const remote = window.require("electron").remote;
@@ -174,10 +174,10 @@ const Noty = require('noty');
     ipcRenderer.send("savers-updated", s.key);
 
     new Noty({
-      type: 'success',
-      layout: 'topRight',
+      type: "success",
+      layout: "topRight",
       timeout: 1000,
-      text: 'Changes saved!',
+      text: "Changes saved!",
       animation: {
         open: null
       }

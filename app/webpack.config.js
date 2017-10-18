@@ -1,62 +1,62 @@
-const path = require('path');
-const webpack = require('webpack');
+const path = require("path");
+const webpack = require("webpack");
 
-const port = process.env.PORT || '8080';
+const port = process.env.PORT || "8080";
 
-const nodeExternals = require('webpack-node-externals');
+const nodeExternals = require("webpack-node-externals");
 
 const externals = nodeExternals({
-  whitelist:['jquery', 'bootstrap', 'popper.js']
+  whitelist:["jquery", "bootstrap", "popper.js"]
 });
 
 const config = {
   context: __dirname,
   entry: {
-    prefs: path.resolve(__dirname, 'js', 'prefs.jsx'),
-    editor: path.resolve(__dirname, 'js', 'watcher.jsx'),
+    prefs: path.resolve(__dirname, "js", "prefs.jsx"),
+    editor: path.resolve(__dirname, "js", "watcher.jsx"),
   },
-  target: 'electron-renderer',
+  target: "electron-renderer",
   externals: externals,
   output: {
-    filename: '[name].js',
-    path: path.resolve(__dirname, 'dist')
+    filename: "[name].js",
+    path: path.resolve(__dirname, "dist")
   },
   module: {
     rules: [
       {
         test: /\.jsx?$/,
         exclude: /node_modules/,
-        loader: 'babel-loader',
+        loader: "babel-loader",
         options: {
-          presets: ['env', 'es2015', 'react'],
-          plugins: [require('babel-plugin-transform-object-rest-spread')]
+          presets: ["env", "es2015", "react"],
+          plugins: [require("babel-plugin-transform-object-rest-spread")]
         }
       },
       {
-        test: require.resolve('jquery'),
+        test: require.resolve("jquery"),
         use: [
-          { loader: 'expose-loader', options: 'jQuery' },
-          { loader: 'expose-loader', options: '$' }
+          { loader: "expose-loader", options: "jQuery" },
+          { loader: "expose-loader", options: "$" }
         ]
       },
       /*      {
         test: /\.js$/,
-        loader: 'babel-loader',
+        loader: "babel-loader",
         include: [
-          path.join(__dirname, 'src'),
-          path.join(__dirname, 'renderer.js')
+          path.join(__dirname, "src"),
+          path.join(__dirname, "renderer.js")
         ],
         exclude: /node_modules/,
         query: {
-          presets: ['es2015', 'react', 'react-hmre']
+          presets: ["es2015", "react", "react-hmre"]
         }
       },
       {
-        test: /\.scss$/, loader: 'style-loader!css-loader!sass-loader'
+        test: /\.scss$/, loader: "style-loader!css-loader!sass-loader"
       },
       {
         test: /\.json$/,
-        loader: 'json-loader'
+        loader: "json-loader"
       }*/
     ]
   },
@@ -67,7 +67,7 @@ const config = {
       $: "jquery",
       jQuery: "jquery",
       "window.jQuery": "jquery",
-      "Popper": ['popper.js', 'default'],
+      "Popper": ["popper.js", "default"],
     })
   ]
 };

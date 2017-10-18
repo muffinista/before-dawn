@@ -1,5 +1,5 @@
-import 'jquery';
-import 'bootstrap';
+import "jquery";
+import "bootstrap";
 
 const React = require("react");
 const ReactDOM = require("react-dom");
@@ -7,7 +7,7 @@ const AutoLaunch = require("auto-launch");
 const path = require("path");
 
 const _ = require("lodash");
-const Noty = require('noty');
+const Noty = require("noty");
 
 import OptionsForm from "./components/options-form.jsx";
 import Preview from "./components/preview.jsx";
