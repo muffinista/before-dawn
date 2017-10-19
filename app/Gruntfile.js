@@ -48,9 +48,13 @@ module.exports = function(grunt) {
         files: ["Gruntfile.js", "*.js", "lib/**/*.js", "ui/**/*.jsx"],
         tasks: ["eslint"]
       },
+      sass: {
+        files: ["css/**/*"],
+        tasks: ["sass"]
+      },
       scripts: {
-        files: ["**/*.jsx"],
-        tasks: ["babel"],
+        files: ["**/*.js?"],
+        tasks: ["webpack"],
         options: {
           spawn: false,
         },
