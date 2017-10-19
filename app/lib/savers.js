@@ -9,7 +9,6 @@ const mkdirp = require("mkdirp");
 const Saver = require("./saver.js");
 
 var config_file = "config.json";
-
 var baseDir;
 var loadedScreensavers = [];
 
@@ -20,12 +19,25 @@ var init = function(_path, cb) {
   reload(cb);
 };
 
+var initFromList = function(_path, data) {
+  baseDir = path.resolve(_path);
+  loadedScreensavers = _.map(data, function(attrs) {
+    return new Saver(attrs);
+  });
+};
+
+var toList = function(cb) {
+  listAll(function(data) {
+    cb(_.map(data, function(s) { return s.toHash(); }));
+  });
+};
+
 /**
  * reload all our data/config/etc
  */
-var reload = function(cb) {
+var reload = function(cb, load_savers) {
   var configPath = path.join(baseDir, config_file);
-  let saversDir = defaultSaversDir();
+  var saversDir = defaultSaversDir();
 
   if ( typeof(cb) === "undefined" ) {
     cb = console.log;
@@ -39,7 +51,7 @@ var reload = function(cb) {
       _firstLoad = true;
     }
 
-    console.log("First Load? " + _firstLoad);
+    //console.log("First Load? " + _firstLoad);
     nconf.file({
       file: configPath
     });
@@ -53,7 +65,7 @@ var reload = function(cb) {
         _firstLoad = false;
       });
     }
-    else {
+    else if ( typeof(load_savers) === "undefined" || load_savers === true ) {
       setupPackages(cb);
     }
   });  
@@ -404,20 +416,8 @@ var loadFromFile = function(src, editable, settings) {
         try {
           var contents = JSON.parse(content);           
           var stub = path.dirname(src);
-          contents.path = stub;
-          contents.key = stub + "/" + contents.source;
+          var s = loadFromData(contents, stub, editable, settings);
 
-          if ( editable === undefined ) {
-            editable = false;
-          }
-          if ( settings === undefined ) {
-            settings = getOptions(contents.key);
-          }
-
-          contents.editable = editable;
-          contents.settings = settings;
-          
-          var s = new Saver(contents);
           if ( s.valid ) {
             resolve(s);
           }
@@ -432,6 +432,29 @@ var loadFromFile = function(src, editable, settings) {
       }
     });
   });
+};
+
+var loadFromData = function(contents, stub, editable, settings) {
+  if ( typeof(stub) !== "undefined" ) {
+    contents.path = stub;
+    contents.key = stub + "/" + contents.source;
+  }
+
+  if ( typeof(contents.editable) === "undefined" ) {
+    if ( editable === undefined ) {
+      editable = false;
+    }
+    contents.editable = editable;
+  }
+
+  if ( typeof(contents.settings) === "undefined" ) {
+    if ( settings === undefined ) {
+      settings = getOptions(contents.key);
+    }
+    contents.settings = settings;
+  }
+
+  return new Saver(contents);
 };
 
 /**
@@ -472,30 +495,6 @@ var listAll = function(cb, force) {
     });
   });
 };
-
-/**
- * get a URL we can use to render current screensaver. if opts is passed in, use them
- * when generating URL. otherwise use our global URL options
- */
-/*var getCurrentUrl = function(opts) {
-  var s = getCurrentData();
-  return s.getUrl(opts);   
-};
-*/
-
-/**
- * return URL of the screensaver matching key
- */
-/*var getUrl = function(key) {   
-  var url = "file://" + baseDir + "/savers/";
-  if ( typeof(key) === "undefined" ) {
-    key = getCurrent();
-  }
-  url = url + key;
-
-  return url;
-};*/
-
 
 var write = function(cb) {
   var configPath = baseDir + "/" + config_file;
@@ -559,6 +558,8 @@ var generateScreensaver = function(opts) {
 };
 
 exports.init = init;
+exports.initFromList = initFromList;
+exports.toList = toList;
 exports.reload = reload;
 exports.reset = reset;
 exports.delete = deleteSaver;
