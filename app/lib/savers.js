@@ -19,11 +19,13 @@ var init = function(_path, cb) {
   reload(cb);
 };
 
-var initFromList = function(_path, data) {
+var initFromList = function(_path, data, cb) {
   baseDir = path.resolve(_path);
   loadedScreensavers = _.map(data, function(attrs) {
     return new Saver(attrs);
   });
+
+  reload(cb, false);
 };
 
 var toList = function(cb) {
@@ -67,6 +69,9 @@ var reload = function(cb, load_savers) {
     }
     else if ( typeof(load_savers) === "undefined" || load_savers === true ) {
       setupPackages(cb);
+    }
+    else {
+      cb();
     }
   });  
 };

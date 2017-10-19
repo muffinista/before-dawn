@@ -27,17 +27,13 @@ module.exports = function(grunt) {
       dev: webpackConfig
     },
     watch: {
-      lint: {
-        files: ["Gruntfile.js", "*.js", "lib/**/*.js", "ui/**/*.jsx"],
-        tasks: ["eslint"]
-      },
       sass: {
         files: ["css/**/*"],
         tasks: ["sass"]
       },
       scripts: {
-        files: ["**/*.js?"],
-        tasks: ["webpack"],
+        files: ["*.js", "**/*.js?"],
+        tasks: ["eslint", "webpack"],
         options: {
           spawn: false,
         },

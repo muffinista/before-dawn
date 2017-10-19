@@ -127,6 +127,7 @@ var openTestShim = function() {
   testWindow.loadURL("file://" + __dirname + "/html/test-shim.html");
 };
 
+
 /**
  * Open the preferences window
  */
@@ -175,7 +176,6 @@ var openPrefsWindow = function() {
       prefsWindowHandle.webContents.on("unresponsive", function (e) {
         log.info(e);
       });
-
     });
   });
 };
@@ -881,6 +881,13 @@ ipcMain.on("open-editor", (event, args) => {
                "&screenshot=" + encodeURIComponent(screenshot);
   w.loadURL(target);
 });
+
+ipcMain.on("list-savers", (event) => {
+  global.savers.toList(function(data) {
+    event.sender.send("list-savers", data);
+  });
+});
+
 
 // seems like we need to catch this event to keep OSX from exiting app after screensaver runs?
 app.on("window-all-closed", function() {

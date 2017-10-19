@@ -399,31 +399,36 @@ const {BrowserWindow} = window.require("electron").remote;
   });
   
   var basePath = window.require("electron").remote.getGlobal("basePath");
-  savers.init(basePath, function() {
-    el = document.querySelector("[name=repo]");
-    el.value = savers.getSource().repo;
-    el.setAttribute("placeholder", defaultSaverRepo);
 
-    document.querySelector("[name=localSource]").value = savers.getLocalSource();
-    el = document.querySelector("select[name='delay'] option[value='" + savers.getDelay() + "']");
-    if ( el !== null ) {
-      el.setAttribute("selected", "selected");
-    }
+  ipcRenderer.on("list-savers", (event, data) => {
+    savers.initFromList(basePath, data, function() {
+      el = document.querySelector("[name=repo]");
+      el.value = savers.getSource().repo;
+      el.setAttribute("placeholder", defaultSaverRepo);
 
-    el = document.querySelector("select[name='sleep'] option[value='" + savers.getSleep() + "']");
-    if ( el !== null ) {
-      el.setAttribute("selected", "selected");
-    }
-    
-    if ( savers.getLock() === true ) {
-      document.querySelector("input[name=lock_screen][type=checkbox]").setAttribute("checked", "checked");
-    }
+      document.querySelector("[name=localSource]").value = savers.getLocalSource();
+      el = document.querySelector("select[name='delay'] option[value='" + savers.getDelay() + "']");
+      if ( el !== null ) {
+        el.setAttribute("selected", "selected");
+      }
 
-    if ( savers.getDisableOnBattery() === true ) {
-      document.querySelector("input[name=disable_on_battery]").setAttribute("checked", "checked");
-    }
-    renderList();
+      el = document.querySelector("select[name='sleep'] option[value='" + savers.getSleep() + "']");
+      if ( el !== null ) {
+        el.setAttribute("selected", "selected");
+      }
+      
+      if ( savers.getLock() === true ) {
+        document.querySelector("input[name=lock_screen][type=checkbox]").setAttribute("checked", "checked");
+      }
+
+      if ( savers.getDisableOnBattery() === true ) {
+        document.querySelector("input[name=disable_on_battery]").setAttribute("checked", "checked");
+      }
+      renderList();
+    });
   });
+  ipcRenderer.send("list-savers");
+ 
   
   if ( updateAvailable === true ) {
     dialog.showMessageBox(

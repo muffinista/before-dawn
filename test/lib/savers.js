@@ -203,12 +203,13 @@ describe('Savers', function() {
         saverData
       ];
 
-      savers.initFromList(workingDir, list);
-      savers.listAll(function(data) {
-        var s = data[0];
-        assert.equal("Screensaver One", s.name);
-        assert.equal(5, data.length);
-        done();
+      savers.initFromList(workingDir, list, function() {
+        savers.listAll(function(data) {
+          var s = data[0];
+          assert.equal("Screensaver One", s.name);
+          assert.equal(5, data.length);
+          done();
+        });
       });
     });
   });
@@ -224,11 +225,12 @@ describe('Savers', function() {
         saverData
       ];
 
-      savers.initFromList(workingDir, list);
-      savers.toList(function(output) {
-        assert.deepEqual(output, list);
-        assert.equal(6, output.length);
-        done();
+      savers.initFromList(workingDir, list, function() {
+        savers.toList(function(output) {
+          assert.deepEqual(output, list);
+          assert.equal(6, output.length);
+          done();
+        });
       });
     });
   });
