@@ -180,6 +180,19 @@ var openPrefsWindow = function() {
   });
 };
 
+var addNewSaver = function(screenshot) {
+  var newUrl = "file://" + __dirname + "/html/new.html" +
+               "?screenshot=" + encodeURIComponent(screenshot);
+
+  var w = new BrowserWindow({
+    width:450,
+    height:500,
+    resizable:true
+  });
+
+  w.loadURL(newUrl);
+};
+
 
 /**
  * Open the About window for the app
@@ -853,6 +866,7 @@ trayMenu = Menu.buildFromTemplate([
   }
 ]);
 
+
 //
 // if the user has updated one of their screensavers, we can let
 // the prefs window know that it needs to reload
@@ -866,6 +880,10 @@ ipcMain.on("savers-updated", (event, arg) => {
 
 ipcMain.on("open-prefs", (event) => {
   openPrefsWindow();
+});
+
+ipcMain.on("open-add-screensaver", (event, screenshot) => {
+  addNewSaver(screenshot);
 });
 
 ipcMain.on("open-editor", (event, args) => {

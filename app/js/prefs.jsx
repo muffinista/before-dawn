@@ -14,7 +14,6 @@ import Preview from "./components/preview.jsx";
 import SaverList from "./components/saver-list.jsx";
 
 const shell = window.require("electron").shell;
-const {BrowserWindow} = window.require("electron").remote;
 
 (function() {
   var electron = window.require("electron");
@@ -257,19 +256,11 @@ const {BrowserWindow} = window.require("electron").remote;
   };
 
   var addNewSaver = function(e) {
-    var prefsUrl = "file://" + __dirname + "/new.html";
-    prefsUrl = prefsUrl + "?screenshot=" + encodeURIComponent(screenshot);
-
-    var w = new BrowserWindow({
-      width:450,
-      height:500,
-      resizable:true
+    ipcRenderer.send("open-add-screensaver", {
+      screenshot: screenshot
     });
-
-    w.loadURL(prefsUrl);
     e.preventDefault();
   };
-
   
   var showPathChooser = function(e) {
     e.preventDefault();
@@ -278,7 +269,6 @@ const {BrowserWindow} = window.require("electron").remote;
         properties: [ "openDirectory", "createDirectory" ]
       },
       handlePathChoice );
-
   };
 
   /**
@@ -357,16 +347,6 @@ const {BrowserWindow} = window.require("electron").remote;
 	      appLauncher.disable().then(function(x) { });
       }
 
-      /* new Noty({
-         type: 'success',
-         layout: 'topRight',
-         timeout: 1000,
-         text: 'Changes saved!',
-         animation: {
-         open: null
-         }
-         }).show();      
-       */
       closeWindow();
     });
   }; // updatePrefs
@@ -429,7 +409,6 @@ const {BrowserWindow} = window.require("electron").remote;
   });
   ipcRenderer.send("list-savers");
  
-  
   if ( updateAvailable === true ) {
     dialog.showMessageBox(
       {
