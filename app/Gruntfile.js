@@ -2,23 +2,6 @@ var webpackConfig = require("./webpack.config");
 module.exports = function(grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON("package.json"),
-    babel: {
-      options: {
-        sourceMap: true,
-        presets: ["es2015", "react"]
-      },
-      dist: {
-        files: [
-          {
-            expand: true,
-            cwd: "ui/js",
-            src: ["*.js", "*.jsx"],
-            ext: ".js",
-            dest: "ui/"
-          }
-        ]
-      }
-    },
     eslint: {
       options: {
         configFile: "eslint.json"
@@ -62,8 +45,6 @@ module.exports = function(grunt) {
     }
   });
 
-
-  grunt.loadNpmTasks("grunt-babel");
   grunt.loadNpmTasks("grunt-contrib-watch");
   grunt.loadNpmTasks("grunt-eslint");
   grunt.loadNpmTasks("grunt-sass");  

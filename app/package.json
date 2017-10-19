@@ -62,7 +62,6 @@
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
-    "babel-eslint": "^8.0.1",
     "babel-loader": "^7.1.2",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-polyfill": "^6.26.0",
@@ -76,7 +75,6 @@
     "eslint-plugin-react": "^7.4.0",
     "expose-loader": "^0.7.3",
     "grunt": "^1.0.1",
-    "grunt-babel": "^6.0.0",
     "grunt-contrib-eslint": "0.0.5",
     "grunt-contrib-watch": "^1.0.0",
     "grunt-eslint": "^20.1.0",
