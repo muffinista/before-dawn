@@ -425,7 +425,6 @@ const {BrowserWindow} = window.require("electron").remote;
     }
     renderList();
   });
-
   
   if ( updateAvailable === true ) {
     dialog.showMessageBox(
