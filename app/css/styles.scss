@@ -6,6 +6,10 @@
   height: 42px;
 }
 
+button {
+  cursor: pointer;
+}
+
 .footer {
   width: 100%;
   /* Set the fixed height of the footer here */
@@ -16,6 +20,11 @@
   z-index: 1000;
   padding-left: 5px;
   padding-right: 5px;
+
+  button.btn-positive:hover {
+    background-color: green;
+    color: white;
+  }
 }
 
 .guts-wrapper {
