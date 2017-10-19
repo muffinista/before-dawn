@@ -32,33 +32,30 @@ var reload = function(cb) {
   }
 
   // check for/create our main directory
-  mkdirp(baseDir, function(err, made) {
-    if ( made === true ) {
-      //console.log("created " + baseDir);
+  // and our savers directory (which is a subdir
+  // of the main dir)
+  mkdirp(saversDir, function(err, made) {
+    if ( made === true || ! fs.existsSync(configPath) ) {
       _firstLoad = true;
     }
 
-    // check for/create a folder for the actual screensavers
-    // @todo multiple folder support?
-    mkdirp(saversDir, function(err, made) {
-      if ( made === true ) {
-        //console.log("created " + saversDir);
-        _firstLoad = true;
-      }
+    console.log("First Load? " + _firstLoad);
+    nconf.file({
+      file: configPath
+    });
 
-      // specify config path
-      //console.log("load config from " + configPath);      
-      if ( ! fs.existsSync(configPath) ) {
-        //console.log("no config yet");
-        _firstLoad = true;
-      }
+    ensureDefaults();
 
-      nconf.file({
-        file: configPath
+    if ( _firstLoad === true ) {
+      writeSync();
+      setupPackages(function() {
+        cb();
+        _firstLoad = false;
       });
+    }
+    else {
       setupPackages(cb);
-
-    }); 
+    }
   });  
 };
 
@@ -70,8 +67,6 @@ var reset = function() {
  * reload all our data/config/etc
  */
 var setupPackages = function(cb) {
-  ensureDefaults();
-
   updatePackage(function(data) {
     if ( data.downloaded === true ) {
       setConfig("source:updated_at", data.updated_at);
@@ -85,9 +80,9 @@ var setupPackages = function(cb) {
       ) {
         //console.log("setting default saver to first in list " + data[0].key);
         setConfig("saver", data[0].key);
+        writeSync();
       }
 
-      writeSync();
       cb();
     });
   });

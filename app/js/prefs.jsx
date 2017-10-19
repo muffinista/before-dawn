@@ -397,7 +397,6 @@ const {BrowserWindow} = window.require("electron").remote;
         $(".tab-pane.active,.nav-link.active").removeClass("active");
       });
   });
-
   
   var basePath = window.require("electron").remote.getGlobal("basePath");
   savers.init(basePath, function() {
