@@ -161,8 +161,6 @@ var openPrefsWindow = function() {
 
       prefsWindowHandle.on("closed", function() {
         prefsWindowHandle = null;
-        global.savers.reload();
-        updateStateManager();
 
         if ( typeof(app.dock) !== "undefined" ) {
           app.dock.hide();
@@ -713,6 +711,9 @@ var blankScreenIfNeeded = function() {
  * timeout values, etc
  */
 var updateStateManager = function() {
+  log.info("updateStateManager idleTime: " +
+           global.savers.getDelay());
+
   stateManager.setup({
     idleTime: global.savers.getDelay() * 60000,
     blankTime: (global.savers.getDelay() + global.savers.getSleep()) * 60000,
@@ -876,6 +877,16 @@ ipcMain.on("savers-updated", (event, arg) => {
   if ( prefsWindowHandle !== null ) {
     prefsWindowHandle.send("savers-updated", arg);
   }
+});
+
+//
+// user has updated their preferences, let's reload
+//
+ipcMain.on("prefs-updated", (event, arg) => {
+  log.info("prefs-updated");
+  global.savers.reload(function() {
+    updateStateManager();
+  });
 });
 
 ipcMain.on("open-prefs", (event) => {

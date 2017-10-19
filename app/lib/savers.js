@@ -57,8 +57,7 @@ var reload = function(cb, load_savers) {
       _firstLoad = true;
     }
 
-    //console.log("First Load? " + _firstLoad);
-    nconf.file({
+    nconf.remove('file').file({
       file: configPath
     });
 
@@ -303,6 +302,7 @@ var setCurrent = function(x, opts) {
 };
 
 var setDelay = function(x) {
+  //console.log("setDelay: " + x);
   setConfig("delay", x);
 };
 

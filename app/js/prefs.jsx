@@ -250,8 +250,7 @@ const shell = window.require("electron").shell;
 
   var handlePathChoice = function(result) {
     if ( result !== undefined ) {
-      data = result;
-      document.querySelector("[name=localSource]").value = data;
+      document.querySelector("[name=localSource]").value = result;
     }
   };
 
@@ -347,6 +346,7 @@ const shell = window.require("electron").shell;
 	      appLauncher.disable().then(function(x) { });
       }
 
+      ipcRenderer.send("prefs-updated");
       closeWindow();
     });
   }; // updatePrefs
