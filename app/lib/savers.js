@@ -8,6 +8,10 @@ const mkdirp = require("mkdirp");
 
 const Saver = require("./saver.js");
 
+// wait for awhile before checking for a new package
+const PACKAGE_WAIT_TIME = 60 * 60 * 1000;
+
+
 var config_file = "config.json";
 var baseDir;
 var loadedScreensavers = [];
@@ -147,7 +151,6 @@ var defaultSaversDir = function() {
   return path.join(baseDir, "savers");
 };
 
-
 var updatePackage = function(cb) {
   var Package = require("./package.js");
 
@@ -161,7 +164,7 @@ var updatePackage = function(cb) {
 
   // don't bother checking if there's no source repo specified,
   // or if we've pinged it in the last 15 minutes
-  if ( typeof(source.repo) == "undefined" || source.repo === "" || diff < 15 * 60 * 1000 ) {
+  if ( typeof(source.repo) === "undefined" || source.repo === "" || diff < PACKAGE_WAIT_TIME ) {
     cb({downloaded: false});
   }
   else {
