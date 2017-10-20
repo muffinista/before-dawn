@@ -52,11 +52,10 @@ const shell = window.require("electron").shell;
   crashReporter.start(remote.getGlobal("CRASH_REPORTER"));
 
   ipcRenderer.on("savers-updated", (event, arg) => {
-    var val, s;
+    var val;
 
-    console.log("handle savers-updated event");
+    //console.log("handle savers-updated event");
     val = getCurrentScreensaver();
-
     renderList(false);
   });
 
@@ -91,13 +90,14 @@ const shell = window.require("electron").shell;
       screenshot: screenshot,
       preview: 1
     };
+    var atomScreen = electron.screen;
+    var size = atomScreen.getPrimaryDisplay().bounds;
+
+    var ratio = size.height / size.width;
+    tmp.ratio = ratio;
 
     if ( tmp.height == 0 ) {
-      var atomScreen = electron.screen;
-      var size = atomScreen.getPrimaryDisplay().bounds;
-      var ratio = size.height / size.width;
       tmp.height = tmp.width * ratio;
-      //console.log("setting preview opts to", url_opts);
     }
 
     return tmp;
@@ -110,6 +110,11 @@ const shell = window.require("electron").shell;
       <Preview saver={s} url_opts={url_opts} saver_opts={saverOpts} />,
       document.getElementById("preview")
     );
+
+    // set the height of the preview iframe to maintain aspect ratio
+    var w = document.querySelector('#preview iframe').offsetWidth;
+    var h = w * url_opts.ratio;
+    document.querySelector('#preview iframe').style['height'] = h + "px";
   };
 
   var getCurrentScreensaver = function() {
@@ -158,7 +163,7 @@ const shell = window.require("electron").shell;
     if ( typeof(s) !== "undefined" ) {
       loadPreview(s);
       loadOptionsForm(s);
-
+      
       var radio = document.querySelector("[name=screensaver]:checked");
       var el = radio.closest("li");
       var authorClass = "external author";

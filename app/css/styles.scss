@@ -53,20 +53,13 @@ button {
   padding-right: 0 !important;
 }
 
-
 iframe {
   overflow: hidden;
   border: none;
 }
 
-.fieldset-padding fieldset {
-  margin-bottom: 5px;
-}
-
-iframe.mini {
-  display: block;
+iframe.preview {
   width: 100%;
-  min-height: 40vh;
 }
 
 .hide {
@@ -92,10 +85,6 @@ input[type=radio], div.body > a {
 
 h1 .hint {
   font-size: 60%;
-}
-.tab-item a {
-  color: black;
-  text-decoration: none;
 }
 
 fieldset {
