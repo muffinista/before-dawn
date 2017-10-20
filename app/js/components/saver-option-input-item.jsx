@@ -54,7 +54,7 @@ export default class SaverOptionInputItem extends React.Component {
     }
     
     return (
-      <fieldset className={className} key={this.props.option.index}>
+      <fieldset className={className} key={this.props.option.index} data-key={this.props.option.index}>
         <div className="form-group row">
           <label className="col-sm-2 col-form-label">Name</label>
           <div className="col-sm-10" >

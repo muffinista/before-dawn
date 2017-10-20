@@ -40,17 +40,18 @@ export default class SaverOptionInput extends React.Component {
   onDelete(item) {
     var newVals = item.state.option;
     var index = this.indexOfOption(newVals);
+    var tmp = _.cloneDeep(this.state.options);
 
-    var foo = this.state.options;
-    foo.splice(index, 1);
+    console.log("onDelete", item, index);
+    
+    tmp.splice(index, 1);
 
     this.setState({
-      options: foo
+      options: tmp
     });
 
-    //console.log("REMOVED", this.state.options);
+    console.log("REMOVED", tmp);
     
-    var tmp = _.cloneDeep(this.state.options);
     this.props.onDelete(index, tmp);
   }
 
@@ -106,7 +107,9 @@ export default class SaverOptionInput extends React.Component {
         <div>
           {els}
           <fieldset>
-            <button type="button" onClick={() => this.onAddNew()} className="btn btn-default">Add New Option</button>
+            <button type="button"
+                    onClick={() => this.onAddNew()}
+                    className="btn btn-default add-option">Add New Option</button>
           </fieldset>
         </div>
       </form>);

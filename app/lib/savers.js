@@ -560,7 +560,7 @@ var generateScreensaver = function(opts) {
 
   // add dest in case someone needs it
   // but don't persist that data because that would be icky
-  opts.dest = path.join(dest, "index.html");
+  opts.dest = path.join(dest, "saver.json");
   
   return opts;
 };
