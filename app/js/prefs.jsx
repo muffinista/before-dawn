@@ -112,9 +112,9 @@ const shell = window.require("electron").shell;
     );
 
     // set the height of the preview iframe to maintain aspect ratio
-    var w = document.querySelector('#preview iframe').offsetWidth;
+    var w = document.querySelector("#preview iframe").offsetWidth;
     var h = w * url_opts.ratio;
-    document.querySelector('#preview iframe').style['height'] = h + "px";
+    document.querySelector("#preview iframe").style["height"] = h + "px";
   };
 
   var getCurrentScreensaver = function() {

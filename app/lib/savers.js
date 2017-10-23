@@ -57,7 +57,7 @@ var reload = function(cb, load_savers) {
       _firstLoad = true;
     }
 
-    nconf.remove('file').file({
+    nconf.remove("file").file({
       file: configPath
     });
 
