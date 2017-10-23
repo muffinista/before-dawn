@@ -184,12 +184,11 @@ var addNewSaver = function(screenshot) {
 
   var w = new BrowserWindow({
     width:450,
-    height:550,
+    height:600,
     resizable:true
   });
 
   w.loadURL(newUrl);
-  w.webContents.openDevTools();
 };
 
 

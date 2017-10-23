@@ -6,44 +6,49 @@
     <link href="../dist/styles.css" rel="stylesheet" type="text/css" />
   </head>
 
-  <body>
-    <div class="container-fluid new">
-      <form>
-        <fieldset>
-          <div class="form-group">
-            <label for="name">Name:</label>
-            <input type="text" name="name" class="form-control" placeholder="" />
-            <div class="hint">The name of your screensaver.</div>
-          </div>
-          <div class="form-group">
-            <label for="name">Description:</label>
-            <input type="text" name="description" class="form-control" placeholder="" />
-            <div class="hint">A brief description of your screensaver.</div>
-          </div>
-          <div class="form-group">
-            <label for="aboutUrl">About URL:</label>
-            <input type="text" name="aboutUrl" class="form-control" placeholder="" />
-            <div class="hint">If you have a URL with more details about your work, put it here!</div>
-          </div>
-          <div class="form-group">
-            <label for="author">Author:</label>
-            <input type="text" name="author" class="form-control" placeholder="" />
-            <div class="hint">The author of this screensaver.</div>
-          </div>
-        </fieldset>
-      </form>
+  <body class="new">
+    <div class="guts-wrapper">
+      <div class="loader-wrapper hide-when-loaded">
+        <div class="loader">Loading...</div>
+      </div>
+      <div class="show-when-loaded container-fluid">
+        <p>Use this form to create a new screensaver. A template will be
+          added to the system that you can fill in with your code.</p>
+        <form>
+          <fieldset>
+            <div class="form-group">
+              <label for="name">Name:</label>
+              <input type="text" name="name" class="form-control" placeholder="" />
+              <div class="hint">The name of your screensaver.</div>
+            </div>
+            <div class="form-group">
+              <label for="name">Description:</label>
+              <input type="text" name="description" class="form-control" placeholder="" />
+              <div class="hint">A brief description of your screensaver.</div>
+            </div>
+            <div class="form-group">
+              <label for="aboutUrl">About URL:</label>
+              <input type="text" name="aboutUrl" class="form-control" placeholder="" />
+              <div class="hint">If you have a URL with more details about your work, put it here!</div>
+            </div>
+            <div class="form-group">
+              <label for="author">Author:</label>
+              <input type="text" name="author" class="form-control" placeholder="" />
+              <div class="hint">The author of this screensaver.</div>
+            </div>
+          </fieldset>
+        </form>
+      </div>
+      
+      <div class="container-fluid need-setup hide">
+        Hey, before you can create a new screensaver, you'll need to set a local directory in the preferences window!
+      </div>
     </div>
 
-    <div class="container-fluid need-setup hide">
-      Hey, before you can create a new screensaver, you'll need to set a local directory in the preferences window!
-    </div>
-    
-    <footer class="footer">
-      <div class="container-fluid">
-        <div class="row pull-xs-right">
-          <button class="btn btn-large btn-default cancel">Cancel</button>
-          <button class="btn btn-large btn-positive save">Save</button>
-        </div>
+    <footer class="footer d-flex show-when-loaded">
+      <div>
+        <button class="btn btn-large btn-default cancel">Cancel</button>
+        <button class="btn btn-large btn-positive save">Save</button>
       </div>
     </footer>
   </body>
@@ -83,13 +88,12 @@
        src: data.dest,
        screenshot: screenshot
      });
-
      closeWindow();
    };
 
    document.querySelector(".cancel").addEventListener('click', closeWindow, false);
-
    savers.init(basePath, function() {
+     document.querySelector("body").classList.add("loaded");
      if ( typeof(savers.getLocalSource()) === "undefined" || savers.getLocalSource() === "" ) {
        document.querySelector(".new").classList.add("hide");
        document.querySelector(".need-setup").classList.remove("hide");     

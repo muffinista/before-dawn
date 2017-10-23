@@ -1,11 +1,14 @@
 'use strict';
 
 const assert = require('assert');
+const chai = require('chai');
+const chaiAsPromised = require('chai-as-promised');
 const Application = require('spectron').Application;
 const fs = require('fs-extra');
 const path = require('path');
 const tmp = require('tmp');
 const appPath = __dirname + '/../../app/node_modules/electron/dist/Electron.app/Contents/MacOS/Electron';
+
 
 var getTempDir = function() {
   var tmpObj = tmp.dirSync();
@@ -43,6 +46,11 @@ const app = new Application({
     TEST_MODE: true
   }
 });
+
+chai.should();
+chai.use(chaiAsPromised);
+
+chaiAsPromised.transferPromiseness = app.transferPromiseness;
 
 describe('Add New', function() {
   this.timeout(60000);
@@ -99,19 +107,30 @@ describe('Add New', function() {
 	  });
 
     it('works', function(done) {
+      var src = path.join(saversDir, "a-new-name", "saver.json");
       app.client.waitUntilWindowLoaded().
+			    then(() => app.client.windowByIndex(1)).
+          waitUntil(() => {
+            return app.client.getText('body').then((res) => {
+              return res.indexOf('Use this form') !== -1
+            });
+          }).
           then(() => app.client.setValue("[name='name']", 'A New Name')).
           then(() => app.client.setValue("[name='description']", 'A Thing I Made?')).
           then(() => app.client.click(".save")).
+			    then(() => app.client.windowByIndex(1)).
+          getTitle().
+          then((res) => {
+            // wait for the editor to load
+            assert.equal('Before Dawn -- Editor!', res);
+          }).
           then(() => {
-            //            setTimeout(function() {
-            var src = path.join(saversDir, "a-new-name", "saver.json");
-            var contents = fs.readFileSync(src);
-            var data = JSON.parse(contents);
-            assert.equal('A New Name', data.name);
+            assert(fs.existsSync(src));
+          }).
+          then(() => {
             done();
-            //          }, 1000);
           });
+      
     });
   });
 });

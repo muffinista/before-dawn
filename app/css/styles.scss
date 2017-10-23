@@ -1,6 +1,39 @@
 @import "../node_modules/bootstrap/scss/bootstrap.scss";
 @import "../node_modules/noty/lib/noty.css";
+@import "loader";
 
+.hide {
+  display: none;
+}
+
+.loader-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 80vh;
+}
+
+body .show-when-loaded {
+  display: none !important;
+}
+body.loaded .hide-when-loaded {
+  display: none !important;
+}
+body.loaded .show-when-loaded {
+  display: initial;
+}
+
+body.loaded .show-when-loaded.container-fluid {
+  display: block !important;
+}
+body.loaded .show-when-loaded.d-flex {
+  display: flex !important;
+}
+
+div.with-margin > * {
+  margin-left: 15px;
+  margin-right: 15px;
+}
 .navbar-header {
   height: 42px;
 }
@@ -27,6 +60,16 @@ button {
   button.btn-default:hover {
     background-color: rgb(160, 160, 160);
     color: white;
+  }
+}
+
+.new {
+  .guts-wrapper {
+    height: calc(100vh - 40px);
+    overflow-y: scroll;
+  }
+  footer {
+    justify-content: flex-end;
   }
 }
 
@@ -60,10 +103,6 @@ iframe {
 
 iframe.preview {
   width: 100%;
-}
-
-.hide {
-  display: none;
 }
 
 .form-control[name=repo] {

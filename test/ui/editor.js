@@ -61,10 +61,11 @@ describe('Editor', function() {
 	});
 
   it('opens window', function() {
-    return app.client.waitUntilWindowLoaded().getTitle().
-        then((res) => {
-          assert.equal('Before Dawn -- Editor!', res);
-        });
+    return app.client.waitUntilWindowLoaded().
+               getTitle().
+               then((res) => {
+                 assert.equal('Before Dawn -- Editor!', res);
+               });
   });
   
   it('shows settings form', function(done) {
