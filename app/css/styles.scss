@@ -173,9 +173,13 @@ fieldset {
   min-height: 120px;
 }
 
-#details h1, #options h1 {
+#details h1, #options h1, #preview-wrapper h1 {
   font-size: 125%;
   margin-top: 5px;
+}
+
+#preview-wrapper h1 {
+  padding-left: 15px;
 }
 
 p.description {
