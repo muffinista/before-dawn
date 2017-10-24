@@ -31,13 +31,19 @@ module.exports = function(grunt) {
         tasks: ["sass"]
       },
       scripts: {
-        files: ["*.js", "**/*.js?"],
+        files: ["*.js", "**/*.js", "**/*.js?", "js/*.js?", "!dist/*.*"],
         tasks: ["eslint", "webpack"],
         options: {
-          spawn: false,
+          interval: 1000,
+          debounceDelay: 250,
+          //          spawn: false,
         },
       }
     }
+  });
+
+  grunt.event.on('watch', function(action, filepath, target) {
+    grunt.log.writeln(target + ': ' + filepath + ' has ' + action);
   });
 
   grunt.loadNpmTasks("grunt-contrib-watch");

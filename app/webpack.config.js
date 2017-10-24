@@ -11,6 +11,7 @@ const config = {
   entry: {
     prefs: path.resolve(__dirname, "js", "prefs.jsx"),
     editor: path.resolve(__dirname, "js", "watcher.jsx"),
+    new: path.resolve(__dirname, "js", "new.js"),    
   },
   target: "electron-renderer",
   externals: externals,
