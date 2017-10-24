@@ -5,7 +5,6 @@ import "bootstrap";
 import React from "react";
 import ReactDOM from "react-dom"
 
-
 import AttributesForm from "./components/attributes-form.jsx";
 import OptionsForm from "./components/options-form.jsx";
 
@@ -51,9 +50,11 @@ const Noty = require("noty");
     var iframe = document.querySelector("iframe");
     var holder = document.querySelector(".guts-wrapper");
 
+    //console.log("reloadPreview");
+    
     var url_opts = {
-      width: iframe.width,
-      height: iframe.height,
+      width: iframe.offsetWidth,
+      height: iframe.offsetHeight,
       preview: 1,
       screenshot: screenshot
     };
@@ -216,7 +217,5 @@ const Noty = require("noty");
   for ( var i = 0; i < saveButtons.length; i++ ) {
     saveButtons[i].addEventListener("click", saveSettings, false);
   }
-
-  
   
 })();
