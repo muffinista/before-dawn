@@ -62,7 +62,7 @@ export default class SaverOptionInputItem extends React.Component {
                    name="name" className="form-control"
                    placeholder="Pick a name for this option"
                    value={this.props.option.name}
-                   onChange={this.handleChange} />
+                   onChange={this.handleChange} required />
           </div>
         </div>
 
@@ -74,7 +74,7 @@ export default class SaverOptionInputItem extends React.Component {
                    placeholder="Describe what this option does"
                    className="form-control"
                    value={this.props.option.description}
-                   onChange={this.handleChange} />
+                   onChange={this.handleChange} required />
           </div>
         </div>
 
