@@ -168,24 +168,33 @@ const Noty = require("noty");
   };
 
   var saveSettings = function(ev) {
-    ev.preventDefault();
+    var invalidCount = document.querySelectorAll("input:invalid").length;
+    var form = document.querySelector("form.basic-attributes");
 
-    console.log("SAVE", saverAttrs);
+    ev.preventDefault();
+    form.classList.add("submit-attempt");
+
+    if (invalidCount > 0 ) {
+      return;
+    }
+
+    //console.log("SAVE", saverAttrs);
     s.write(saverAttrs);
     ipcRenderer.send("savers-updated", s.key);
-
-    new Noty({
-      type: "success",
-      layout: "topRight",
-      timeout: 1000,
-      text: "Changes saved!",
-      animation: {
-        open: null
-      }
-    }).show();      
     
     if ( this.classList.contains("and-close") ) {
       closeWindow(ev);
+    }
+    else {
+      new Noty({
+        type: "success",
+        layout: "topRight",
+        timeout: 1000,
+        text: "Changes saved!",
+        animation: {
+          open: null
+        }
+      }).show();      
     }
   };
 

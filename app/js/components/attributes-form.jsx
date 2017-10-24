@@ -114,7 +114,7 @@ export default class AttributesForm extends React.Component {
             <input
                 type="text" name="name"
                 className="form-control"
-                defaultValue={this.props.saver.name} onChange={this.handleNameChange} />
+                defaultValue={this.props.saver.name} onChange={this.handleNameChange} required />
             <div className="hint">The name of your screensaver.</div>
           </div>
           
@@ -123,7 +123,7 @@ export default class AttributesForm extends React.Component {
             <input
                 type="text" name="description"
                 className="form-control"
-                defaultValue={this.state.saver.description} onChange={this.handleDescriptionChange} />
+                defaultValue={this.state.saver.description} onChange={this.handleDescriptionChange} required  />
             <div className="hint">A brief description of your screensaver.</div>
           </div>
           <div className="form-group">
