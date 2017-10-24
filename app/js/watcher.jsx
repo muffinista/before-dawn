@@ -81,17 +81,28 @@ const Noty = require("noty");
     }
   };
 
-  var wrapper = document.getElementById("main");
+  var wrapper = document.getElementById("preview-wrapper");
   var iframe = document.createElement("iframe");
   var saverOpts;
 
+  var renderOptions = function() {
+    ReactDOM.render(
+      <OptionsForm saver={s} onChange={optionsUpdated} />,
+      document.getElementById("options")
+    );
+  };
+  
   var optionsUpdated = function(data) {
     saverOpts = data;
+    //console.log("optionsUpdated");
     reloadPreview();
   };
   
   var attrsUpdated = function(data) {
+    //console.log("attrsUpdated", data);
     saverAttrs = data;
+    s.options = data.options;
+    renderOptions();
   };
 
   // figure out the path to the screensaver folder. use
@@ -106,10 +117,7 @@ const Noty = require("noty");
       saverAttrs = s.toHash();
     }
 
-    ReactDOM.render(
-      <OptionsForm saver={s} onChange={optionsUpdated} />,
-      document.getElementById("options")
-    );
+    renderOptions();
 
     ReactDOM.render(
       <AttributesForm saver={saverAttrs} onChanged={attrsUpdated} />,

@@ -14,6 +14,7 @@ export default class OptionsForm extends React.Component {
   }
 
   onChanged(e) {
+    //console.log("OptionsForm onChanged");
     this.props.onChange(this.getValues());
   }
 
@@ -67,9 +68,10 @@ export default class OptionsForm extends React.Component {
     var values = s.settings;
     var head;
 
+    //console.log("RENDER!!!", this.props.saver);
     var nodes = this.props.saver.options.map(function(o, i) {
       var val = values[o.name];
-      //console.log(o, val);
+      //console.log("RENDER1", o, val);
       if ( typeof(val) === "undefined" ) {
         val = o.default;
       }
