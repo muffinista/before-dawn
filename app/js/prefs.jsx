@@ -290,6 +290,7 @@ const shell = window.require("electron").shell;
 
   var deleteSaver = function(e) {
     var key = e.target.dataset.key;
+    var holder = e.target.closest("li");
     var s = savers.getByKey(key);
     
     dialog.showMessageBox(
@@ -304,6 +305,7 @@ const shell = window.require("electron").shell;
       function(result) {
         if ( result === 1 ) {
           savers.delete(key, function() {
+            holder.remove();
             ipcRenderer.send("savers-updated", key);
           });
         }
