@@ -25,7 +25,7 @@ var serialize = function(obj) {
 };
 
 module.exports = function Saver(_attrs) {
-  this.UNWRITABLE_KEYS = ["key", "path", "url", "settings"];
+  this.UNWRITABLE_KEYS = ["key", "path", "url", "settings", "editable"];
 
   this.attrs = _attrs;
   this.path = _attrs.path;
@@ -58,6 +58,9 @@ module.exports = function Saver(_attrs) {
     this.published = true;
   }
 
+  // provide a default editable value (this will
+  // be set when loading to determine if the user
+  // can edit this screensaver or not)
   this.editable = _attrs.editable;
   if ( typeof(this.editable) === "undefined" ) {
     this.editable = false;

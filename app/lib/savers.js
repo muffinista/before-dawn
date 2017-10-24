@@ -414,7 +414,7 @@ var sources = function() {
 /**
  * load screensaver data from filesystem
  */
-var loadFromFile = function(src, editable, settings) {
+var loadFromFile = function(src, settings) {
   return new Promise(function (resolve, reject) {
     fs.readFile(src, {encoding: "utf8"}, function (err, content) {
       if ( err ) {
@@ -424,7 +424,7 @@ var loadFromFile = function(src, editable, settings) {
         try {
           var contents = JSON.parse(content);           
           var stub = path.dirname(src);
-          var s = loadFromData(contents, stub, editable, settings);
+          var s = loadFromData(contents, stub, settings);
 
           if ( s.valid ) {
             resolve(s);
@@ -442,17 +442,17 @@ var loadFromFile = function(src, editable, settings) {
   });
 };
 
-var loadFromData = function(contents, stub, editable, settings) {
+var loadFromData = function(contents, stub, settings) {
+  var src = getLocalSource();
+
   if ( typeof(stub) !== "undefined" ) {
     contents.path = stub;
     contents.key = stub + "/" + contents.source;
   }
 
-  if ( typeof(contents.editable) === "undefined" ) {
-    if ( editable === undefined ) {
-      editable = false;
-    }
-    contents.editable = editable;
+  contents.editable = false;
+  if ( typeof(src) !== "undefined" && src !== "" ) {
+    contents.editable = (contents.key.indexOf(src) === 0);
   }
 
   if ( typeof(contents.settings) === "undefined" ) {
@@ -491,8 +491,7 @@ var listAll = function(cb, force) {
 
    
     if ( doLoad ) {
-      var editable = (opts.root === getLocalSource());
-      promises.push(loadFromFile(f, editable));
+      promises.push(loadFromFile(f));
     }
   });
 
