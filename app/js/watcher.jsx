@@ -11,6 +11,7 @@ import OptionsForm from "./components/options-form.jsx";
 const Noty = require("noty");
 
 (function() {
+  var electron = window.require("electron");
   const remote = window.require("electron").remote;
   const {ipcRenderer} = window.require("electron");
   const {crashReporter} = require("electron");
@@ -49,9 +50,18 @@ const Noty = require("noty");
   var reloadPreview = function(ev) {
     var iframe = document.querySelector("iframe");
     var holder = document.querySelector(".guts-wrapper");
+    var atomScreen = electron.screen;
+    var size = atomScreen.getPrimaryDisplay().bounds;
+
+    var ratio = size.height / size.width;
 
     //console.log("reloadPreview");
-    
+
+    // set the height of the preview iframe to maintain aspect ratio
+    var w = iframe.offsetWidth;
+    var h = w * ratio;
+    iframe.style["height"] = h + "px";
+
     var url_opts = {
       width: iframe.offsetWidth,
       height: iframe.offsetHeight,
