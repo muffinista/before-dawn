@@ -540,24 +540,21 @@ var generateScreensaver = function(opts) {
     "options": []
   };
 
-  // throw error if no dest dir
+  // @todo throw error if no dest dir
 
   opts = _.merge({}, defaults, opts);
   opts.key = opts.name.toLowerCase().replace(/[^a-z0-9]+/gi, "-").replace(/-$/, "").replace(/^-/, "");
 
-  //  console.log(opts);
-  
   var dest = path.join(destDir, opts.key);
   fs.mkdirpSync(dest);
-  console.log("copy from", getTemplatePath());
 
   contents.forEach(function(content) {
-    //console.log(path.join(src, content), path.join(dest, content));
     fs.copySync(path.join(src, content), path.join(dest, content));
   });
 
+  //
   // generate JSON file
-
+  //
   var configDest = path.join(dest, "saver.json");
   var content = fs.readFileSync( configDest );
   contents = _.merge({}, JSON.parse(content), opts);

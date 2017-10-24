@@ -53,7 +53,7 @@ chai.use(chaiAsPromised);
 chaiAsPromised.transferPromiseness = app.transferPromiseness;
 
 describe('Add New', function() {
-  this.timeout(60000);
+  this.timeout(6000);
 
   describe('when not setup', function() {
 	  beforeEach(() => {
@@ -62,8 +62,9 @@ describe('Add New', function() {
                    removeLocalSource();
                  }).
                  then(() => app.client.waitUntilWindowLoaded() ).
-			           then(() => app.electron.ipcRenderer.send('open-add-screensaver',
-                                                          'file://' + path.join(__dirname, '../fixtures/screenshot.png'))
+			           then(() => app.electron.ipcRenderer.
+                                send('open-add-screensaver',
+                                     'file://' + path.join(__dirname, '../fixtures/screenshot.png'))
                  ).
 			           then(() => app.client.windowByIndex(1));
 	  });
@@ -86,16 +87,17 @@ describe('Add New', function() {
 
   describe('when setup', function() {
 	  beforeEach(() => {
-      var saversDir = getTempDir();
-      
 		  return app.start().
                  then(() => app.client.waitUntilWindowLoaded() ).
                  then(() => {
                    addLocalSource();
+                   // tell app to reload config
+                   app.electron.ipcRenderer.send("prefs-updated");
                  }).
 			           then(() => {
                    app.electron.ipcRenderer.
-                       send('open-add-screensaver', 'file://' + path.join(__dirname, '../fixtures/screenshot.png'));
+                       send('open-add-screensaver',
+                            'file://' + path.join(__dirname, '../fixtures/screenshot.png'));
                  }).
 			           then(() => app.client.windowByIndex(1));
 	  });
@@ -118,6 +120,20 @@ describe('Add New', function() {
           then(() => app.client.setValue("[name='name']", 'A New Name')).
           then(() => app.client.setValue("[name='description']", 'A Thing I Made?')).
           then(() => app.client.click(".save")).
+          /* then(() => {
+             app.client.getMainProcessLogs().then(function (logs) {
+             logs.forEach(function (log) {
+             console.log(log)
+             })
+             })
+             }).
+             then(() => {
+             app.client.getRenderProcessLogs().then(function (logs) {
+             logs.forEach(function (log) {
+             console.log(log.message)
+             })
+             })
+             }). */
 			    then(() => app.client.windowByIndex(1)).
           getTitle().
           then((res) => {
@@ -125,9 +141,11 @@ describe('Add New', function() {
             assert.equal('Before Dawn -- Editor!', res);
           }).
           then(() => {
+            //console.log(src, fs.existsSync(src));
             assert(fs.existsSync(src));
           }).
           then(() => {
+            //console.log("done!");
             done();
           });
       

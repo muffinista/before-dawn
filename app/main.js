@@ -179,8 +179,14 @@ var openPrefsWindow = function() {
 };
 
 var addNewSaver = function(screenshot) {
-  var newUrl = "file://" + __dirname + "/html/new.html" +
-               "?screenshot=" + encodeURIComponent(screenshot.screenshot);
+  var newUrl;
+
+  if ( screenshot.screenshot ) {
+    screenshot = screenshot.screenshot;
+  }
+
+  newUrl = "file://" + __dirname + "/html/new.html" +
+           "?screenshot=" + encodeURIComponent(screenshot);
 
   var w = new BrowserWindow({
     width:450,
@@ -189,6 +195,7 @@ var addNewSaver = function(screenshot) {
   });
 
   w.loadURL(newUrl);
+  //w.webContents.openDevTools();
 };
 
 /**
@@ -889,6 +896,7 @@ ipcMain.on("prefs-updated", (event, arg) => {
 });
 
 ipcMain.on("open-prefs", (event) => {
+  log.info("open-prefs");
   openPrefsWindow();
 });
 
@@ -918,6 +926,7 @@ ipcMain.on("list-savers", (event) => {
 
 ipcMain.on("get-settings", (event) => {
   global.savers.getConfig(function(data) {
+    console.log("get-settings: " + data.localSource);
     event.sender.send("get-settings", data);
   });
 });

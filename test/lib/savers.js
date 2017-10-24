@@ -74,17 +74,9 @@ describe('Savers', function() {
         done();
       });
     });
-
-    it('sets editable', function(done) {
-      savers.loadFromFile(saverJSONFile, true).then((s) => {
-        assert(s.editable);
-        assert.equal(s.settings['New Option I Guess'], '75');
-        done();
-      });
-    });
     
     it('applies options', function(done) {
-      savers.loadFromFile(saverJSONFile, false, { 'New Option I Guess': '25' }).then((s) => {
+      savers.loadFromFile(saverJSONFile, { 'New Option I Guess': '25' }).then((s) => {
         assert.equal(s.settings['New Option I Guess'], '25');
         done();
       });
