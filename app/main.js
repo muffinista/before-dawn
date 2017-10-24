@@ -180,17 +180,16 @@ var openPrefsWindow = function() {
 
 var addNewSaver = function(screenshot) {
   var newUrl = "file://" + __dirname + "/html/new.html" +
-               "?screenshot=" + encodeURIComponent(screenshot);
+               "?screenshot=" + encodeURIComponent(screenshot.screenshot);
 
   var w = new BrowserWindow({
     width:450,
-    height:600,
+    height:620,
     resizable:true
   });
 
   w.loadURL(newUrl);
 };
-
 
 /**
  * Open the About window for the app
@@ -915,6 +914,17 @@ ipcMain.on("list-savers", (event) => {
   global.savers.toList(function(data) {
     event.sender.send("list-savers", data);
   });
+});
+
+ipcMain.on("get-settings", (event) => {
+  global.savers.getConfig(function(data) {
+    event.sender.send("get-settings", data);
+  });
+});
+
+ipcMain.on("generate-screensaver", (event, args) => {
+  var data = global.savers.generateScreensaver(args);
+  event.sender.send("generate-screensaver", data);
 });
 
 

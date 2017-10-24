@@ -214,3 +214,10 @@ p.description {
   margin-left: 2px;
   margin-right: 2px;
 }
+
+
+form.submit-attempt {
+  input:invalid {
+    border: 2px dashed red;
+  }
+}

@@ -7,6 +7,7 @@
   </head>
 
   <body class="new">
+    <form>
     <div class="guts-wrapper">
       <div class="loader-wrapper hide-when-loaded">
         <div class="loader">Loading...</div>
@@ -14,17 +15,16 @@
       <div class="show-when-loaded container-fluid">
         <p>Use this form to create a new screensaver. A template will be
           added to the system that you can fill in with your code.</p>
-        <form>
           <fieldset>
             <div class="form-group">
               <label for="name">Name:</label>
-              <input type="text" name="name" class="form-control" placeholder="" />
-              <div class="hint">The name of your screensaver.</div>
+              <input type="text" name="name" class="form-control" placeholder="" required="">
+              <div class="hint">(required) The name of your screensaver.</div>
             </div>
             <div class="form-group">
               <label for="name">Description:</label>
-              <input type="text" name="description" class="form-control" placeholder="" />
-              <div class="hint">A brief description of your screensaver.</div>
+              <input type="text" name="description" class="form-control" placeholder="" required="">
+              <div class="hint">(required) A brief description of your screensaver.</div>
             </div>
             <div class="form-group">
               <label for="aboutUrl">About URL:</label>
@@ -37,7 +37,6 @@
               <div class="hint">The author of this screensaver.</div>
             </div>
           </fieldset>
-        </form>
       </div>
       
       <div class="container-fluid need-setup hide">
@@ -48,59 +47,12 @@
     <footer class="footer d-flex show-when-loaded">
       <div>
         <button class="btn btn-large btn-default cancel">Cancel</button>
-        <button class="btn btn-large btn-positive save">Save</button>
+        <button type="submit" class="btn btn-large btn-positive save">Save</button>
       </div>
     </footer>
+      </form>
   </body>
-  
-  <script>
-   var remote = window.require('electron').remote;
-   var savers = require("../lib/savers.js");
-   const {ipcRenderer} = window.require('electron');
 
-   var basePath = window.require("electron").remote.getGlobal("basePath");
- 
-   // parse incoming URL params -- we'll get a link to the current screen images for previews here
-   var tmpParams = new URLSearchParams(document.location.search);
-
-   // the main app will pass us a screenshot URL, here it is
-   var screenshot = decodeURIComponent(tmpParams.get("screenshot"));
-   
-   var closeWindow = function() {
-     var window = remote.getCurrentWindow();
-     window.close();
-   };
-
-   var handleSave = function() {   
-     var name = document.querySelector("[name=name]").value;
-     var description = document.querySelector("[name=description]").value;     
-     var aboutUrl = document.querySelector("[name=aboutUrl]").value;     
-     var author = document.querySelector("[name=author]").value;
-
-     var data = savers.generateScreensaver({
-       name: name,
-       description: description,
-       aboutUrl: aboutUrl,
-       author: author
-     });
-
-     ipcRenderer.send("open-editor", {
-       src: data.dest,
-       screenshot: screenshot
-     });
-     closeWindow();
-   };
-
-   document.querySelector(".cancel").addEventListener('click', closeWindow, false);
-   savers.init(basePath, function() {
-     document.querySelector("body").classList.add("loaded");
-     if ( typeof(savers.getLocalSource()) === "undefined" || savers.getLocalSource() === "" ) {
-       document.querySelector(".new").classList.add("hide");
-       document.querySelector(".need-setup").classList.remove("hide");     
-     }
-     else {
-       document.querySelector(".save").addEventListener('click', handleSave, false);
-     }
-   });  
-  </script>
+  <script src="https://cdn.ravenjs.com/3.15.0/raven.min.js"></script>    
+  <script src="../dist/new.js"></script> 
 </html>

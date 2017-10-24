@@ -76,7 +76,7 @@ var reload = function(cb, load_savers) {
     else {
       cb();
     }
-  });  
+  });
 };
 
 var reset = function() {
@@ -521,6 +521,13 @@ var getTemplatePath = function() {
   return path.join(__dirname, "..", "system-savers", "__template");
 };
 
+var getConfig = function(cb) {
+  var configPath = path.join(baseDir, config_file);
+  fs.readFile(configPath, function(err, data) {
+    cb(JSON.parse(data.toString()));
+  });
+}
+
 /**
  * generate a screensaver template
  */
@@ -543,7 +550,7 @@ var generateScreensaver = function(opts) {
   
   var dest = path.join(destDir, opts.key);
   fs.mkdirpSync(dest);
-  //  console.log("copy from", getTemplatePath());
+  console.log("copy from", getTemplatePath());
 
   contents.forEach(function(content) {
     //console.log(path.join(src, content), path.join(dest, content));
@@ -597,4 +604,5 @@ exports.listAll = listAll;
 //exports.getUrl = getUrl;
 exports.write = write;
 exports.firstLoad = firstLoad;
+exports.getConfig = getConfig;
 exports.generateScreensaver = generateScreensaver;
