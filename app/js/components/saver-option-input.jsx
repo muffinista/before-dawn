@@ -109,7 +109,7 @@ export default class SaverOptionInput extends React.Component {
           <fieldset>
             <button type="button"
                     onClick={() => this.onAddNew()}
-                    className="btn btn-default add-option">Add New Option</button>
+                    className="btn btn-positive add-option">Add New Option</button>
           </fieldset>
         </div>
       </form>);

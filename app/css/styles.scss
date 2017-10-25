@@ -40,6 +40,18 @@ body.loaded .show-when-loaded.d-flex {
 button {
   cursor: pointer;
 }
+button.btn-positive:hover {
+  background-color: green;
+  color: white;
+}
+button.btn-default:hover {
+  background-color: rgb(160, 160, 160);
+  color: white;
+}
+
+button.add-option {
+  margin-top: 12px;
+}
 
 .footer {
   width: 100%;
@@ -51,15 +63,6 @@ button {
   z-index: 1000;
   padding-left: 5px;
   padding-right: 5px;
-
-  button.btn-positive:hover {
-    background-color: green;
-    color: white;
-  }
-  button.btn-default:hover {
-    background-color: rgb(160, 160, 160);
-    color: white;
-  }
 }
 
 .new {
@@ -141,6 +144,9 @@ fieldset {
   padding: 5px;
 }
 
+body.about {
+  overflow-x: hidden;
+}
 .about {
   margin-left: 5px;
   text-align: center;
