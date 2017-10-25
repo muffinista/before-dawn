@@ -135,6 +135,20 @@ describe('Savers', function() {
       });
     });
   });
+
+  describe('getConfig', function() {
+    it('returns object', function(done) {
+      savers.init(workingDir, function() {
+        savers.setLocalSource(saversDir);
+        savers.write(function() {
+          savers.getConfig(function(data) {
+            assert.equal(saversDir, data.localSource);
+            done();
+          });
+        });
+      });
+    });
+  });
   
   describe('generateScreensaver', function() {
     it('works', function(done) {
@@ -149,6 +163,20 @@ describe('Savers', function() {
           done();
         });
       });
+    });
+
+    it('throws exception', function(done) {
+      savers.init(workingDir, function() {
+        assert.throws(
+          () => {
+            savers.generateScreensaver({
+              name:"New Screensaver"
+            })
+          },
+          Error);
+        done();
+      });
+
     });
   });
 
@@ -227,6 +255,137 @@ describe('Savers', function() {
     });
   });
 
+  describe('getSource/setSource', function() {
+    it("works", function(done) {
+      savers.init(workingDir, function() {
+        savers.setSource("foo");
+        assert.deepEqual({repo: "foo"}, savers.getSource());
+        done();
+      });
+    });
+  });
+  
+  describe('getCurrent/setCurrent', function() {
+    it("works", function(done) {
+      savers.init(workingDir, function() {
+        savers.setCurrent("foo");
+        assert.equal("foo", savers.getCurrent());
+        done();
+      });
+    });
+
+    it("also applies options", function(done) {
+      savers.init(workingDir, function() {
+        savers.setCurrent("foo", {bar: "baz"});
+        assert.equal("foo", savers.getCurrent());
+        assert.deepEqual({bar:"baz"}, savers.getOptions("foo"));
+        done();
+      });
+    });
+  });
+
+  describe('getOptions/setOptions', function() {
+    it("works", function(done) {
+      savers.init(workingDir, function() {
+        savers.setOptions({bar: "baz"}, "foo");
+        assert.deepEqual({bar:"baz"}, savers.getOptions("foo"));
+        done();
+      });
+    });
+
+    it("updates default", function(done) {
+      savers.init(workingDir, function() {
+        savers.setOptions({bar: "baz"});
+        assert.deepEqual({bar:"baz"}, savers.getOptions());
+        done();
+      });
+    });
+  });
+  
+  describe('getDelay/setDelay', function() {
+    it("works", function(done) {
+      savers.init(workingDir, function() {
+        savers.setDelay(420);
+        assert.equal(420, savers.getDelay());
+        done();
+      });
+    });
+
+    it("defaults", function(done) {
+      savers.init(workingDir, function() {
+        assert.equal(15, savers.getDelay());
+        done();
+      });
+    });
+  });
+  
+  describe('getSleep/setSleep', function() {
+    it("works", function(done) {
+      savers.init(workingDir, function() {
+        savers.setSleep(420);
+        assert.equal(420, savers.getSleep());
+        done();
+      });
+    });
+
+    it("defaults", function(done) {
+      savers.init(workingDir, function() {
+        assert.equal(15, savers.getSleep());
+        done();
+      });
+    });
+  });
+  
+  describe('getLock/setLock', function() {
+    it("works", function(done) {
+      savers.init(workingDir, function() {
+        savers.setLock(true);
+        assert.equal(true, savers.getLock());
+        done();
+      });
+    });
+
+    it("defaults", function(done) {
+      savers.init(workingDir, function() {
+        assert.equal(false, savers.getLock());
+        done();
+      });
+    });
+  });
+  
+  describe('getDisableOnBattery/setDisableOnBattery', function() {
+    it("works", function(done) {
+      savers.init(workingDir, function() {
+        savers.setDisableOnBattery(true);
+        assert.equal(true, savers.getDisableOnBattery());
+        done();
+      });
+    });
+
+    it("defaults", function(done) {
+      savers.init(workingDir, function() {
+        assert.equal(false, savers.getDisableOnBattery());
+        done();
+      });
+    });
+  });
+
+  describe('getCurrent/setCurrent', function() {
+    it("works", function(done) {
+      savers.init(workingDir, function() {
+        done();
+      });
+    });
+  });
+
+  describe('getCurrent/setCurrent', function() {
+    it("works", function(done) {
+      savers.init(workingDir, function() {
+        done();
+      });
+    });
+  });
+  
   // reset
   // load
   // default source

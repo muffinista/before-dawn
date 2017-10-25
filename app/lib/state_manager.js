@@ -48,7 +48,6 @@ var setup = function(opts) {
   else {
     switchState(STATES.STATE_IDLE);
   }
-
 };
 
 

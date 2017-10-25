@@ -434,7 +434,6 @@ var loadFromFile = function(src, settings) {
           }
         }
         catch(e) {
-          console.log(e);
           reject(e);
         }
       }
@@ -540,7 +539,9 @@ var generateScreensaver = function(opts) {
     "options": []
   };
 
-  // @todo throw error if no dest dir
+  if ( destDir === "" ) {
+    throw new Error("No local directory specified!");
+  }
 
   opts = _.merge({}, defaults, opts);
   opts.key = opts.name.toLowerCase().replace(/[^a-z0-9]+/gi, "-").replace(/-$/, "").replace(/^-/, "");
@@ -596,8 +597,6 @@ exports.setDisableOnBattery = setDisableOnBattery;
 exports.getDisableOnBattery = getDisableOnBattery;
 exports.getOptions = getOptions;
 exports.listAll = listAll;
-//exports.getCurrentUrl = getCurrentUrl;
-//exports.getUrl = getUrl;
 exports.write = write;
 exports.firstLoad = firstLoad;
 exports.getConfig = getConfig;

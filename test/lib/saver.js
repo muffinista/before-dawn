@@ -123,8 +123,18 @@ describe('Saver', function() {
   });
 
   describe('getPreviewUrl', function() {
-    it('returns a preview url');
-    it('uses custom url');    
+    it('returns a preview url', function() {
+      var s = loadSaver({url:'index.html'});
+      assert.equal('index.html?New%20Option%20I%20Guess=50&New%20Option=75', s.getPreviewUrl());
+    });
+    it('uses custom url', function() {
+      var s = loadSaver({url:'preview.html'});
+      assert.equal('preview.html?New%20Option%20I%20Guess=50&New%20Option=75', s.getPreviewUrl());
+    });
+    it('uses custom url with opts', function() {
+      var s = loadSaver({url:'preview.html?bar=baz'});
+      assert.equal('preview.html?bar=baz&New%20Option%20I%20Guess=50&New%20Option=75', s.getPreviewUrl());
+    });
   });
   
   describe('toHash', function() {
