@@ -30,11 +30,9 @@ exports.checkLatestRelease = function(repo, version, yes_cb, no_cb) {
       }
 
       if ( typeof(semver) !== "undefined" && semver.gt(semver.clean(tag), semver.clean(version)) ) {
-        console.log("tags dont match");
         yes_cb(body);
       }
       else if ( typeof(no_cb) !== "undefined" ) {
-        console.log("tags match");
         no_cb(body);
       } 
     });

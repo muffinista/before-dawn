@@ -309,7 +309,7 @@ var runScreenSaverOnDisplay = function(saver, s) {
     var w = new BrowserWindow(windowOpts);       
     saverWindows.push(w);
 
-    log.info("got screenshot back, let's do this");
+    //log.info("got screenshot back, let's do this");
     
     try {   
       // Emitted when the window is closed.
@@ -324,7 +324,7 @@ var runScreenSaverOnDisplay = function(saver, s) {
       
       // inject our custom JS and CSS into the screensaver window
       w.webContents.on("did-finish-load", function() {
-        log.info("did-finish-load");
+        //log.info("did-finish-load");
         if (!w.isDestroyed()) {
           w.webContents.insertCSS(globalCSSCode);
         }
@@ -342,7 +342,7 @@ var runScreenSaverOnDisplay = function(saver, s) {
       w.once("ready-to-show", () => {
         var diff;
 
-        log.info("ready-to-show");
+        //log.info("ready-to-show");
         if ( debugMode !== true ) {
           w.setFullScreen(true);
         }
@@ -383,8 +383,6 @@ var runScreenSaverOnDisplay = function(saver, s) {
       forceWindowClose(w);
     }
   };
-
-  
 
   //
   // if this screensaver uses a screengrab, get it. 
