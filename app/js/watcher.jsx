@@ -109,6 +109,9 @@ const Noty = require("noty");
   // decodeURIComponent to convert %20 to spaces
   var filePath = path.dirname(decodeURIComponent(url.parse(src).path));
 
+  // hide scrollbars on preview
+  iframe.scrolling = "no";
+
   // load screensaver object
   savers.loadFromFile(src).then((result) => {
     s = result;
