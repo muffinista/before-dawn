@@ -136,7 +136,6 @@ var onEnterState = function(s) {
       onBlankTime();
       break;
     case STATES.STATE_PAUSED:
-
       break;
   }
 };
