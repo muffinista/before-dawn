@@ -8,7 +8,7 @@
     "pack": "electron-builder --dir",
     "dist": "electron-builder--x64",
     "cleanup": "npm prune && cd app/ && npm prune",
-    "test": "nyc --reporter=html mocha test test/**",
+    "test": "mocha test test/**",
     "test-lib": "nyc --reporter=html mocha test test/lib/**"
   },
   "devDependencies": {
