@@ -1,40 +1,21 @@
 'use strict';
 
 const assert = require('assert');
-const Application = require('spectron').Application;
 const fs = require('fs-extra');
 const path = require('path');
 const tmp = require('tmp');
-const appPath = __dirname + '/../../app/node_modules/electron/dist/Electron.app/Contents/MacOS/Electron';
+const helpers = require('./setup.js');
 
-var getTempDir = function() {
-  var tmpObj = tmp.dirSync();
-  return tmpObj.name;
-};
-var workingDir = getTempDir();
+var workingDir = helpers.getTempDir();
+const app = helpers.application(workingDir);
+
 var saverJSON;
-
-const app = new Application({
-  path: appPath,
-  args: ['app/main.js'],
-  env: {
-    BEFORE_DAWN_DIR: workingDir,
-    TEST_MODE: true
-  }
-});
-
-var savedConfig = function() {
-  var data = path.join(workingDir, "config.json");
-  var json = fs.readFileSync(data);
-
-  return JSON.parse(json);
-};
 
 describe('Editor', function() {
   this.timeout(6000);
   
 	beforeEach(() => {
-    var saversDir = getTempDir();
+    var saversDir = helpers.getTempDir();
     // make a subdir in the savers directory and drop screensaver
     // config there
     var testSaverDir = path.join(saversDir, 'saver');
@@ -55,9 +36,7 @@ describe('Editor', function() {
 	});
 
 	afterEach(() => {
-		if (app && app.isRunning()) {
-			return app.stop();
-		}
+    return helpers.stopApp(app);
 	});
 
   it('opens window', function() {

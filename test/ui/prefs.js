@@ -1,41 +1,13 @@
 'use strict';
 
 const assert = require('assert');
-const chai = require('chai');
-const chaiAsPromised = require('chai-as-promised');
-const Application = require('spectron').Application;
 const fs = require('fs');
 const path = require('path');
 const tmp = require('tmp');
-const appPath = __dirname + '/../../app/node_modules/electron/dist/Electron.app/Contents/MacOS/Electron';
 
-var getTempDir = function() {
-  var tmpObj = tmp.dirSync();
-  return tmpObj.name;
-};
-var workingDir = getTempDir();
-
-var savedConfig = function() {
-  var data = path.join(workingDir, "config.json");
-  var json = fs.readFileSync(data);
-
-  return JSON.parse(json);
-};
-
-const app = new Application({
-  path: appPath,
-  args: ['app/main.js'],
-  env: {
-    BEFORE_DAWN_DIR: workingDir,
-    TEST_MODE: true
-  }
-});
-
-chai.should();
-chai.use(chaiAsPromised);
-
-chaiAsPromised.transferPromiseness = app.transferPromiseness;
-
+const helpers = require('./setup.js');
+var workingDir = helpers.getTempDir();
+const app = helpers.application(workingDir);
 
 describe('Prefs', function() {
   this.timeout(6000);
@@ -48,9 +20,7 @@ describe('Prefs', function() {
 	});
 
 	afterEach(() => {
-		if (app && app.isRunning()) {
-			return app.stop();
-		}
+    return helpers.stopApp(app);
 	});
 
   it('opens window', function() {
@@ -84,8 +54,7 @@ describe('Prefs', function() {
         then(() => app.client.click("button.save")).
         getWindowCount().should.eventually.equal(1).
         then(() => {
-          //console.log("hey!", savedConfig());
-          assert(savedConfig().saver.lastIndexOf("/cylon/") !== -1);
+          assert(helpers.savedConfig(workingDir).saver.lastIndexOf("/cylon/") !== -1);
           done();
         });
     
@@ -93,42 +62,15 @@ describe('Prefs', function() {
   
   it('allows setting path', function(done) {
     app.client.waitUntilWindowLoaded().click("#prefs-tab").
-        /* getWindowCount().
-           then((res) => {
-           console.log("COUNT", res);
-           }). */
         then(() => app.client.scroll("[name='localSource']")).
         then(() => app.client.setValue("[name='localSource']", '/tmp')).
         then(() => app.client.click("button.save")).
-        /* getWindowCount().
-           then((res) => {
-           console.log("COUNT", res);
-           }). */
-        //getWindowCount().should.eventually.equal(1).
         then(() => {
           app.client.getWindowCount().should.eventually.equal(1)
         }).
         then(() => {
-//          console.log("HI!");
-          assert.equal("/tmp", savedConfig().localSource);
+          assert.equal("/tmp", helpers.savedConfig(workingDir).localSource);
         }).
         then(() => done());
   });
-  
-  
-  /*it('lists screensaver', function(done) {
-     app.browserWindow.capturePage().then(function(imageBuffer) {
-     console.log("DUMP IT", imageBuffer);
-     fs.writeFile('page.png', imageBuffer, function(error) {
-     if (error) throw error;
-     console.info(`Screenshot saved: ${process.cwd()}/page.png`);
-     done();
-     });
-     }).catch(function (error) {
-     // Log any failures
-     console.error('Test failed', error.message);
-     console.log(error);
-     app.stop();
-     });
-  });*/
 });

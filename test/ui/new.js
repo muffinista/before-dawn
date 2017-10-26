@@ -1,56 +1,16 @@
 'use strict';
 
 const assert = require('assert');
-const chai = require('chai');
-const chaiAsPromised = require('chai-as-promised');
-const Application = require('spectron').Application;
 const fs = require('fs-extra');
 const path = require('path');
 const tmp = require('tmp');
-const appPath = __dirname + '/../../app/node_modules/electron/dist/Electron.app/Contents/MacOS/Electron';
 
+const helpers = require('./setup.js');
 
-var getTempDir = function() {
-  var tmpObj = tmp.dirSync();
-  return tmpObj.name;
-};
-var workingDir = getTempDir();
-var saversDir = getTempDir();
+var saversDir = helpers.getTempDir();
+var workingDir = helpers.getTempDir();
+const app = helpers.application(workingDir);
 
-var savedConfig = function() {
-  var data = path.join(workingDir, "config.json");
-  var json = fs.readFileSync(data);
-
-  return JSON.parse(json);
-};
-
-var addLocalSource = function() {
-  var src = path.join(workingDir, "config.json");
-  var data = savedConfig();
-  data.localSource = saversDir;
-  fs.writeFileSync(src, JSON.stringify(data));
-}
-
-var removeLocalSource = function() {
-  var src = path.join(workingDir, "config.json");
-  var data = savedConfig();
-  data.localSource = "";
-  fs.writeFileSync(src, JSON.stringify(data));
-}
-
-const app = new Application({
-  path: appPath,
-  args: ['app/main.js'],
-  env: {
-    BEFORE_DAWN_DIR: workingDir,
-    TEST_MODE: true
-  }
-});
-
-chai.should();
-chai.use(chaiAsPromised);
-
-chaiAsPromised.transferPromiseness = app.transferPromiseness;
 
 describe('Add New', function() {
   this.timeout(6000);
@@ -59,7 +19,7 @@ describe('Add New', function() {
 	  beforeEach(() => {
 		  return app.start().
                  then(() => {
-                   removeLocalSource();
+                   helpers.removeLocalSource(workingDir);
                  }).
                  then(() => app.client.waitUntilWindowLoaded() ).
 			           then(() => app.electron.ipcRenderer.
@@ -70,9 +30,7 @@ describe('Add New', function() {
 	  });
 
 	  afterEach(() => {
-		  if (app && app.isRunning()) {
-			  return app.stop();
-		  }
+      return helpers.stopApp(app);
 	  });
 
     it('shows alert if not setup', function() {
@@ -90,7 +48,8 @@ describe('Add New', function() {
 		  return app.start().
                  then(() => app.client.waitUntilWindowLoaded() ).
                  then(() => {
-                   addLocalSource();
+                   helpers.addLocalSource(workingDir, saversDir);
+
                    // tell app to reload config
                    app.electron.ipcRenderer.send("prefs-updated");
                  }).
@@ -103,9 +62,7 @@ describe('Add New', function() {
 	  });
 
 	  afterEach(() => {
-		  if (app && app.isRunning()) {
-			  return app.stop();
-		  }
+      return helpers.stopApp(app);
 	  });
 
     it('works', function(done) {
@@ -120,20 +77,6 @@ describe('Add New', function() {
           then(() => app.client.setValue("[name='name']", 'A New Name')).
           then(() => app.client.setValue("[name='description']", 'A Thing I Made?')).
           then(() => app.client.click(".save")).
-          /* then(() => {
-             app.client.getMainProcessLogs().then(function (logs) {
-             logs.forEach(function (log) {
-             console.log(log)
-             })
-             })
-             }).
-             then(() => {
-             app.client.getRenderProcessLogs().then(function (logs) {
-             logs.forEach(function (log) {
-             console.log(log.message)
-             })
-             })
-             }). */
 			    then(() => app.client.windowByIndex(1)).
           getTitle().
           then((res) => {
