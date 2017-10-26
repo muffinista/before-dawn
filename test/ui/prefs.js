@@ -10,7 +10,7 @@ var workingDir = helpers.getTempDir();
 const app = helpers.application(workingDir);
 
 describe('Prefs', function() {
-  this.timeout(6000);
+  helpers.setupTimeout(this);
   
 	beforeEach(() => {
 		return app.start().

@@ -9,7 +9,8 @@ var workingDir = helpers.getTempDir();
 const app = helpers.application(workingDir);
 
 describe('bootstrap', function() {
-  this.timeout(6000);
+  helpers.setupTimeout(this);
+
 	before(() => {
 		return app.start().
                then(() => app.client.waitUntilWindowLoaded() );

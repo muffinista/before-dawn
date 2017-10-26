@@ -65,11 +65,20 @@ exports.addLocalSource = function(workingDir, saversDir) {
   var data = exports.savedConfig(workingDir);
   data.localSource = saversDir;
   fs.writeFileSync(src, JSON.stringify(data));
-}
+};
 
 exports.removeLocalSource = function(workingDir) {
   var src = path.join(workingDir, "config.json");
   var data = exports.savedConfig(workingDir);
   data.localSource = "";
   fs.writeFileSync(src, JSON.stringify(data));
-}
+};
+
+exports.setupTimeout = function (test) {
+  if (process.env.CI) {
+    test.timeout(30000);
+  }
+  else {
+    test.timeout(10000);
+  }
+};

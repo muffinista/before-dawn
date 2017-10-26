@@ -12,8 +12,8 @@ const app = helpers.application(workingDir);
 var saverJSON;
 
 describe('Editor', function() {
-  this.timeout(6000);
-  
+  helpers.setupTimeout(this);
+ 
 	beforeEach(() => {
     var saversDir = helpers.getTempDir();
     // make a subdir in the savers directory and drop screensaver

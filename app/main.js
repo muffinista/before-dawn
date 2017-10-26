@@ -581,7 +581,7 @@ var openPrefsOnFirstLoad = function() {
 /**
  * handle initial startup of app
  */
-var bootApp = function(_basePath) {
+var bootApp = function() {
   var icons = getIcons();
   // @todo i think asar breaks this
   var menuTemplate = require("./js/menu_template.js").buildMenuTemplate(app);
@@ -589,12 +589,14 @@ var bootApp = function(_basePath) {
 
   Menu.setApplicationMenu(menu);
 
-  if ( typeof(_basePath) !== "undefined" ) {
-    global.basePath = _basePath;
-  }
-
+  global.NEW_RELEASE_AVAILABLE = false;
   trayMenu.items[3].visible = global.NEW_RELEASE_AVAILABLE;
 
+  //
+  // setup some event handlers for when screen count changes, mostly
+  // to ensure that we wake up if the user plugs in or removes a
+  // monitor
+  //
   electronScreen = electron.screen;
   electronScreen.on("display-added", handleDisplayChange);
   electronScreen.on("display-removed", handleDisplayChange);
@@ -609,10 +611,17 @@ var bootApp = function(_basePath) {
     closeRunningScreensavers();
   });
 
+  
   log.info("Load config from " + global.basePath);
   global.savers.init(global.basePath, function() {
     configLoaded = true;
     updateStateManager();
+
+    // check for a new release if this is the first time
+    // the app has been loaded
+    if ( testMode !== true && global.savers.firstLoad() ) {
+      checkForNewRelease();
+    }
     
     // check for a new release every 12 hours
     setInterval(checkForNewRelease, 1000 * 60 * 60 * 12);
@@ -949,27 +958,6 @@ app.on("quit", function() {
   log.info("quit");
 });
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-app.once("ready", function() {  
-  if ( testMode === true ) {
-    bootApp();
-    return;
-  }
-
-  /**
-   * check for a release and then boot!
-   */
-  releaseChecker.checkLatestRelease(
-    global.APP_REPO, global.APP_VERSION, 
-    function() {
-      global.NEW_RELEASE_AVAILABLE = true;
-      bootApp();
-    }, 
-    function() {
-      bootApp();
-    });
-});
 
 process.on("uncaughtException", function (ex) {
   log.info(ex);
@@ -977,4 +965,8 @@ process.on("uncaughtException", function (ex) {
     Raven.captureException(ex);
   }
 });
+
+// This method will be called when Electron has finished
+// initialization and is ready to create browser windows.
+app.once("ready", bootApp);
 

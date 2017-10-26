@@ -13,7 +13,7 @@ const app = helpers.application(workingDir);
 
 
 describe('Add New', function() {
-  this.timeout(6000);
+  helpers.setupTimeout(this);
 
   describe('when not setup', function() {
 	  beforeEach(() => {
