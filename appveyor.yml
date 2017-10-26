@@ -1,4 +1,5 @@
 version: 0.1.{build}
+os: unstable
 
 platform:
   - x64
@@ -16,8 +17,9 @@ install:
   - ps: Install-Product node 6 x64
   - git reset --hard HEAD
   - npm install npm -g
+  - set PATH=%APPDATA%\npm;%PATH%
   - npm install
-  - npm prune
+  #- npm prune
 
 build_script:
   - node --version
