@@ -22,6 +22,6 @@ install:
 build_script:
   - node --version
   - npm --version
-  - npm run release
+  - npm test
 
 test: off
