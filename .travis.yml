@@ -15,6 +15,9 @@ os:
   - linux
   - osx
 
+before_install:
+  - sudo apt-get -qq update
+  - sudo apt-get install -y libx11-dev libxss-dev icnsutils graphicsmagick libappindicator1
 
 #node_js:
 #  - '7'
