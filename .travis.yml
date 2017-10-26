@@ -10,7 +10,7 @@ matrix:
 
     - os: linux
       #services: docker
-      language: generic
+language: generic
 os:
   - linux
   - osx
