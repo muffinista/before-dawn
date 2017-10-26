@@ -3,21 +3,22 @@ matrix:
     - os: osx
       osx_image: xcode9.0
       language: node_js
-      node_js: "8"
+      node_js: "7"
       env:
         - ELECTRON_CACHE=$HOME/.cache/electron
         - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
 
     - os: linux
-      #services: docker
-language: generic
+      language: node_js
+      node_js: "7"
+
 os:
   - linux
   - osx
 
 before_install:
   - sudo apt-get -qq update
-  - sudo apt-get install -y libx11-dev libxss-dev icnsutils graphicsmagick libappindicator1
+  - sudo apt-get install -y libx11-dev libxss-dev icnsutils graphicsmagick libappindicator1 libxtst-dev
 
 #node_js:
 #  - '7'
