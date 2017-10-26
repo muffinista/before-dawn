@@ -9,6 +9,9 @@ cache:
   - app\node_modules
   - '%APPDATA%\npm-cache'
   - '%USERPROFILE%\.electron'
+environment:
+  GH_TOKEN:
+    secure: dpurh8s4ulOTEbFB2xWmG9u2zAuPpbLce9Kdc+QzGzixr//goftP0s/mbzBvEuKk
 
 init:
   - git config --global core.autocrlf input
