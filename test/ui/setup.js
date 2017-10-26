@@ -7,9 +7,18 @@ const chaiAsPromised = require('chai-as-promised');
 
 //const appPath = __dirname + '/../../app/node_modules/electron/dist/Electron.app/Contents/MacOS/Electron';
 
-var appPath = path.join(__dirname, '..', '..', 'app', 'node_modules', '.bin', 'electron')
+var appPath = path.join(__dirname, '..', '..', 'app', 'node_modules', '.bin', 'electron');
 if (process.platform === 'win32') {
   appPath += '.cmd';
+}
+
+// if app/node_modules doesn't exist, try ../node_modules instead
+// this is a hack, if it works i'll clean it up
+if ( ! fs.existsSync(appPath) {
+  appPath = path.join(__dirname, '..', '..', 'node_modules', '.bin', 'electron');
+  if (process.platform === 'win32') {
+    appPath += '.cmd';
+  }
 }
 
 global.before(() => {
