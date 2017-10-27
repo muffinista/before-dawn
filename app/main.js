@@ -808,12 +808,14 @@ globalCSSCode = fs.readFileSync( path.join(__dirname, "assets", "global.css"), "
 /**
  * make sure we're only running a single instance
  */
-shouldQuit = app.makeSingleInstance(function(commandLine, workingDirectory) {
-  return true;
-});
+if ( testMode !== true ) {
+  shouldQuit = app.makeSingleInstance(function(commandLine, workingDirectory) {
+    return true;
+  });
 
-if (shouldQuit) {
-  app.quit();
+  if (shouldQuit) {
+    app.quit();
+  }
 }
 
 // don't show app in dock

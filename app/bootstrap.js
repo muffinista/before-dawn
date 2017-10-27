@@ -1,6 +1,6 @@
 var fs = require("fs");
 var path = require("path");
-var filePath = path.join(__dirname, "package.json");
+var filePath = path.join(__dirname, "..", "package.json");
 var version = JSON.parse(fs.readFileSync( filePath )).version;
 
 
