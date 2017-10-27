@@ -622,7 +622,7 @@ var bootApp = function() {
     if ( testMode !== true && global.savers.firstLoad() ) {
       checkForNewRelease();
     }
-    
+
     // check for a new release every 12 hours
     setInterval(checkForNewRelease, 1000 * 60 * 60 * 12);
 
