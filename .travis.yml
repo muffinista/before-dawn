@@ -1,13 +1,12 @@
 matrix:
   include:
     - os: osx
-      osx_image: xcode9.0
+      osx_image: xcode9.1
       language: node_js
       node_js: "7"
       env:
         - ELECTRON_CACHE=$HOME/.cache/electron
         - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
-
     - os: linux
       language: node_js
       node_js: "7"
@@ -17,11 +16,8 @@ os:
   - osx
 
 before_install:
-  - sudo apt-get -qq update
-  - sudo apt-get install -y libx11-dev libxss-dev icnsutils graphicsmagick libappindicator1 libxtst-dev
-
-#node_js:
-#  - '7'
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo apt-get -qq update ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo apt-get install -y libx11-dev libxss-dev icnsutils graphicsmagick libappindicator1 libxtst-dev ; fi
 
 branches:
   only:
