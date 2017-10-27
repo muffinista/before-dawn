@@ -151,8 +151,6 @@ var defaultSaversDir = function() {
 };
 
 var updatePackage = function(cb) {
-  var Package = require("./package.js");
-
   var source = getSource();
   //console.log("source repo: " + source);
 
@@ -162,14 +160,19 @@ var updatePackage = function(cb) {
   var diff = now - lastCheckAt;
 
   // don't bother checking if there's no source repo specified,
-  // or if we've pinged it in the last 15 minutes
+  // or if we've pinged it recently
   if ( typeof(source.repo) === "undefined" || source.repo === "" || diff < PACKAGE_WAIT_TIME ) {
     cb({downloaded: false});
   }
-  else {
+  else {   
+    var Package = require("./package.js");
+    var p = new Package({
+      repo:source.repo,
+      updated_at:source.updated_at,
+      dest:defaultSaversDir()
+    });
+
     setUpdateCheckTimestamp(now);
-    
-    var p = new Package({repo:source.repo, updated_at:source.updated_at, dest:defaultSaversDir()});
     p.checkLatestRelease(cb);
   }
 };

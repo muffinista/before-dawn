@@ -45,10 +45,10 @@ module.exports = function(grunt) {
       
     },
     watch: {
-      options: {
-        interval: 1000,
-        spawn: false
-      },
+      /* options: {
+         interval: 1000,
+         spawn: false
+         }, */
       mocha: {
         files: ["app/**/*.js", "test/**/*.js"],
         tasks: ["mochaTest:lib"],
@@ -80,7 +80,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks("grunt-contrib-jshint");
   grunt.loadNpmTasks("grunt-mocha-test");
   grunt.loadNpmTasks("grunt-contrib-watch");
-  grunt.loadNpmTasks("grunt-eslint");
+  grunt.loadNpmTasks("gruntify-eslint");
   grunt.loadNpmTasks("grunt-sass");
   grunt.loadNpmTasks("grunt-webpack");
 
