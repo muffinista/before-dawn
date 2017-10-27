@@ -8,7 +8,7 @@ module.exports = function(grunt) {
       options: {
         configFile: "eslint.json"
       },
-      target: ["Gruntfile.js", "app/lib/**/*.js", "app.js/**/*.js?"]
+      target: ["Gruntfile.js", "app/lib/**/*.js", "app/js/**/*.js?"]
     },
     sass: {
       options: {
@@ -30,7 +30,7 @@ module.exports = function(grunt) {
     mochaTest: {
       options: {
         reporter: "spec",
-        captureFile: "results.txt", // Optionally capture the reporter output to a file
+        //captureFile: "results.txt", // Optionally capture the reporter output to a file
         quiet: false, // Optionally suppress output to standard out (defaults to false)
         clearRequireCache: true, // Optionally clear the require cache before running tests (defaults to false)
         clearCacheFilter: (key) => true, // Optionally defines which files should keep in cache
@@ -50,7 +50,7 @@ module.exports = function(grunt) {
         spawn: false
       },
       mocha: {
-        files: ["Gruntfile.js", "app/**/*.js", "test/**/*.js"],
+        files: ["app/**/*.js", "test/**/*.js"],
         tasks: ["mochaTest:lib"],
         options: {
           spawn: false
@@ -61,7 +61,7 @@ module.exports = function(grunt) {
         tasks: ["sass"]
       },
       scripts: {
-        files: ["*.js", "app/**/*.js", "app/**/*.js?", "app/js/*.js?", "!app/dist/*.*"],
+        files: ["Gruntfile.js", "app/**/*.js", "app/**/*.js?", "!app/dist/*.*"],
         tasks: ["eslint", "webpack"],
         options: {
           interval: 1000,
