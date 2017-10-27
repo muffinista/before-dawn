@@ -79,67 +79,74 @@ module.exports = function Package(_attrs) {
       cb(err);
     }).on("response", function(r) {
       _resp = r;
-    }).
-    on("end", function() {
+    }).on("end", function() {
       console.log("download over, let's trigger callback");
       
       try {
         console.log("remove stuff from " + self.dest);
-        remove.removeSync(self.dest);
-      } catch (err) {
+        //remove.removeSync(self.dest);
+      }
+      catch (err) {
         console.error(err);
       }
+
+      self.etag = _resp.headers.etag;
+      self.downloaded = true;
+      self.zipToSavers(tempName, cb);
       
-      yauzl.open(tempName, {lazyEntries: true}, function(err, zipfile) {
-        if (err) {throw err;}
-        zipfile.readEntry();
-        zipfile.on("end", function() {
-          self.etag = _resp.headers.etag;
-          self.downloaded = true;
-          
-          cb(self.attrs());
-        });
-        
-        zipfile.on("entry", function(entry) {
-          var fullPath = entry.fileName;
-          
-          // the incoming zip filename will have on extra directory on it
-          // projectName/dir/etc/file
-          //
-          // let's get rid of the projectName
-          //
-          var parts = fullPath.split(/\//);
-          parts.shift();
-          fullPath = parts.join("/");
-          
-          fullPath = self.dest + "/" + fullPath;
-          
-          if (/\/$/.test(entry.fileName)) {
-            // directory file names end with '/' 
-            mkdirp(fullPath, function(err) {
-              if (err) {throw err;}
-              zipfile.readEntry();
-            });
-          }
-          else {
-            // file entry 
-            zipfile.openReadStream(entry, function(err, readStream) {
-              if (err) {throw err;}
-              // ensure parent directory exists 
-              mkdirp(path.dirname(fullPath), function(err) {
-                if (err) {throw err;}
-                readStream.pipe(fs.createWriteStream(fullPath));
-                readStream.on("end", function() {
-                  zipfile.readEntry();
-                });
-              });
-            });
-          }
-        });
-      });
     }).pipe(fs.createWriteStream(tempName));
   };
-  
+
+
+  this.zipToSavers = function(tempName, cb) {
+    yauzl.open(tempName, {lazyEntries: true}, function(err, zipfile) {
+      if (err) {
+        throw err;
+      }
+
+      zipfile.readEntry();
+      zipfile.on("entry", function(entry) {
+        var fullPath = entry.fileName;
+        
+        // the incoming zip filename will have on extra directory on it
+        // projectName/dir/etc/file
+        //
+        // let's get rid of the projectName
+        //
+        var parts = fullPath.split(/\//);
+        parts.shift();
+
+        fullPath = path.join(self.dest, path.join(...parts));
+        
+        if (/\/$/.test(entry.fileName)) {
+          // directory file names end with '/' 
+          mkdirp(fullPath, function(err) {
+            if (err) {throw err;}
+            zipfile.readEntry();
+          });
+        }
+        else {
+          // file entry 
+          zipfile.openReadStream(entry, function(err, readStream) {
+            if (err) {throw err;}
+            // ensure parent directory exists 
+            mkdirp(path.dirname(fullPath), function(err) {
+              if (err) {throw err;}
+              readStream.pipe(fs.createWriteStream(fullPath));
+              readStream.on("end", function() {
+                zipfile.readEntry();
+              });
+            });
+          });
+        }
+      });
+
+      zipfile.on("end", function() {       
+        cb(self.attrs());
+      });
+
+    });
+  }
 };
 
 
