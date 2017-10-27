@@ -2,10 +2,11 @@
 
 var fs = require("fs");
 var path = require("path");
-var request = require("request");
+var request = require("request-promise-native");
 var yauzl = require("yauzl");
 var mkdirp = require("mkdirp");
 var remove = require("remove");
+
 
 /**
  * need source repo url
@@ -23,6 +24,10 @@ module.exports = function Package(_attrs) {
   this.downloaded = false;
   this.url = "https://api.github.com/repos/" + self.repo + "/releases/latest";
 
+  this.defaultHeaders = {
+    "User-Agent": "Before Dawn"
+  };
+  
   this.attrs = function() {
     return {
       dest: this.dest,
@@ -32,31 +37,29 @@ module.exports = function Package(_attrs) {
     };
   };
 
-  this.checkLatestRelease = function(cb) {
-    console.log(this.url);
-    request({
+  this.getReleaseInfo = async function() {
+    let data = await request({
       url: this.url,
       json: true,
-      headers: {
-        "User-Agent": "Before Dawn"
-      }
-    }, function(error, response, body) {
-      if ( error ) {
-        console.log("release check failed", error);
-      }
-      else if ( body.published_at !== self.updated_at ) {
-        console.log("let's download!");
-        console.log(body.zipball_url);
-        self.downloadFile(body.zipball_url, function() {
-          self.updated_at = body.published_at;
-          cb(self.attrs());
-        });
-      }
-      else {
-        console.log("we're good!");
-        cb(self.attrs());
-      }
+      headers: this.defaultHeaders
     });
+    return data;
+  };
+  
+  this.checkLatestRelease = async function(cb) {
+    let data = await this.getReleaseInfo();
+    //console.log(data);
+    if ( data.published_at !== self.updated_at ) {
+      //console.log("download!");
+      this.downloadFile(data.zipball_url, function() {
+        self.updated_at = data.published_at;
+        cb(self.attrs());
+      });
+    }
+    else {
+      //console.log("we're good!");
+      cb(self.attrs());
+    }
   };
 
   this.downloadFile = function(url, cb) {
@@ -66,102 +69,77 @@ module.exports = function Package(_attrs) {
     console.log("download to " + tempName);
 
     var _resp;
-
-    request({
+    var opts = {
       url:url,
-      headers: {
-        "User-Agent": "Before Dawn"
+      headers:this.defaultHeaders
+    };
+
+    request(opts).on("error", function(err) {
+      console.log(err);
+      cb(err);
+    }).on("response", function(r) {
+      _resp = r;
+    }).
+    on("end", function() {
+      console.log("download over, let's trigger callback");
+      
+      try {
+        console.log("remove stuff from " + self.dest);
+        remove.removeSync(self.dest);
+      } catch (err) {
+        console.error(err);
       }
-    })
-            .on("error", function(err) {
-              console.log(err);
-              cb(err);
-            }).
-             on("response", function(r) {
-               _resp = r;
-             }).
-             on("end", function() {
-               console.log("download over, let's trigger callback");
-
-               try {
-                 console.log("remove stuff from " + self.dest);
-                 remove.removeSync(self.dest);
-               } catch (err) {
-                 console.error(err);
-               }
-
-               yauzl.open(tempName, {lazyEntries: true}, function(err, zipfile) {
-                 if (err) {throw err;}
-                 zipfile.readEntry();
-                 zipfile.on("end", function() {
-                   self.etag = _resp.headers.etag;
-                   self.downloaded = true;
-                   
-                   cb(self.attrs());
-                 });
-
-                 zipfile.on("entry", function(entry) {
-                   var fullPath = entry.fileName;
-
-                   // the incoming zip filename will have on extra directory on it
-                   // projectName/dir/etc/file
-                   //
-                   // let's get rid of the projectName
-                   //
-                   var parts = fullPath.split(/\//);
-                   parts.shift();
-                   fullPath = parts.join("/");
-
-                   fullPath = self.dest + "/" + fullPath;
-
-                   if (/\/$/.test(entry.fileName)) {
-                     // directory file names end with '/' 
-                     mkdirp(fullPath, function(err) {
-                       if (err) {throw err;}
-                       zipfile.readEntry();
-                     });
-                   }
-                   else {
-                     // file entry 
-                     zipfile.openReadStream(entry, function(err, readStream) {
-                       if (err) {throw err;}
-                       // ensure parent directory exists 
-                       mkdirp(path.dirname(fullPath), function(err) {
-                         if (err) {throw err;}
-                         readStream.pipe(fs.createWriteStream(fullPath));
-                         readStream.on("end", function() {
-                           zipfile.readEntry();
-                         });
-                       });
-                     });
-                   }
-                 });
-               });
-             }).
-             pipe(fs.createWriteStream(tempName));        
+      
+      yauzl.open(tempName, {lazyEntries: true}, function(err, zipfile) {
+        if (err) {throw err;}
+        zipfile.readEntry();
+        zipfile.on("end", function() {
+          self.etag = _resp.headers.etag;
+          self.downloaded = true;
+          
+          cb(self.attrs());
+        });
+        
+        zipfile.on("entry", function(entry) {
+          var fullPath = entry.fileName;
+          
+          // the incoming zip filename will have on extra directory on it
+          // projectName/dir/etc/file
+          //
+          // let's get rid of the projectName
+          //
+          var parts = fullPath.split(/\//);
+          parts.shift();
+          fullPath = parts.join("/");
+          
+          fullPath = self.dest + "/" + fullPath;
+          
+          if (/\/$/.test(entry.fileName)) {
+            // directory file names end with '/' 
+            mkdirp(fullPath, function(err) {
+              if (err) {throw err;}
+              zipfile.readEntry();
+            });
+          }
+          else {
+            // file entry 
+            zipfile.openReadStream(entry, function(err, readStream) {
+              if (err) {throw err;}
+              // ensure parent directory exists 
+              mkdirp(path.dirname(fullPath), function(err) {
+                if (err) {throw err;}
+                readStream.pipe(fs.createWriteStream(fullPath));
+                readStream.on("end", function() {
+                  zipfile.readEntry();
+                });
+              });
+            });
+          }
+        });
+      });
+    }).pipe(fs.createWriteStream(tempName));
   };
   
-  this.downloadIfStale = function(cb) {
-    console.log("ETAG:" + self.etag);
-    request({
-      method: "HEAD",
-      uri: self.url,
-      headers: {
-        "if-none-match": "\"" + self.etag + "\""
-      }
-    }).on("response", function(response) {
-      console.log(response.statusCode);
-      if ( response.statusCode !== 304 ) {
-        console.log("too old, download again " + response.statusCode);
-        self.downloadFile(cb);
-      }
-      else {
-        console.log("not modified, we're done here");
-        cb(self.attrs());
-      }
-    });
-  };
-
 };
 
 
