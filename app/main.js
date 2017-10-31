@@ -815,6 +815,7 @@ if ( testMode !== true ) {
 
   if (shouldQuit) {
     app.quit();
+    process.exit();
   }
 }
 
