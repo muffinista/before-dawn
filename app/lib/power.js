@@ -10,10 +10,11 @@ module.exports.charging = function() {
       console.log(err);
       return true;
     });
-   
-  } else if ( process.platform === "linux") {
+    
+  }
+  else if ( process.platform === "linux") {
     var linuxBattery = require("linux-battery");
-
+    
     // NOTE: this is not actually tested
 	  return linuxBattery().then(res => {
       return ( res.state !== "discharging" );
@@ -44,7 +45,7 @@ module.exports.charging = function() {
         resolve(result);
       });
     });
-    return p;    
 
+    return p;    
   }
 };
