@@ -5,6 +5,7 @@ const nconf = require("nconf");
 const path = require("path");
 const _ = require("lodash");
 const mkdirp = require("mkdirp");
+const rimraf = require("rimraf");
 
 const Saver = require("./saver.js");
 
@@ -116,33 +117,17 @@ var deleteSaver = function(k, cb) {
   var p = path.dirname(k);
   //console.log("DELETE " + p);
   var s = getByKey(k);
+  var cbWrapped = function() {
+    reload(cb);
+  };
 
   // make sure we're deleting a screensaver that exists and is
   // actually editable
   if ( typeof(s) !== "undefined" && s.editable === true ) {
-    deleteFolderRecursive(p);
+    rimraf(p, cbWrapped);
   }
-  reload(cb);
-};
-
-
-/**
- * recursively delete a directory
- * cribbed from http://stackoverflow.com/questions/18052762/remove-directory-which-is-not-empty
- */
-var deleteFolderRecursive = function(path) {
-  var files = [];
-  if( fs.existsSync(path) ) {
-    files = fs.readdirSync(path);
-    files.forEach(function(file,index){
-      var curPath = path + "/" + file;
-      if(fs.lstatSync(curPath).isDirectory()) { // recurse
-        deleteFolderRecursive(curPath);
-      } else { // delete file
-        fs.unlinkSync(curPath);
-      }
-    });
-    fs.rmdirSync(path);
+  else {
+    cbWrapped();
   }
 };
 
@@ -173,6 +158,9 @@ var updatePackage = function(cb) {
     });
 
     setUpdateCheckTimestamp(now);
+
+    // @todo handle local check here
+
     p.checkLatestRelease(cb);
   }
 };
