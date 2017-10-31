@@ -34,7 +34,7 @@ matrix:
 test_script:
   - node --version
   - npm --version
-  - node_modules/.bin/mocha --recursive
+  #- node_modules/.bin/mocha --recursive
 
 skip_commits:
   message: /\[ci\s+skip\]/
