@@ -5,8 +5,8 @@ var path = require("path");
 var request = require("request-promise-native");
 var yauzl = require("yauzl");
 var mkdirp = require("mkdirp");
-var remove = require("remove");
 const util = require("util");
+const rimraf = require("rimraf");
 
 /**
  * need source repo url
@@ -110,7 +110,7 @@ module.exports = function Package(_attrs) {
     //
     try {
       //console.log("remove stuff from " + self.dest);
-      remove.removeSync(self.dest);
+      rimraf.sync(self.dest);
     }
     catch (err) {
       console.error(err);
