@@ -30,7 +30,7 @@ const config = {
         exclude: /node_modules/,
         loader: "babel-loader",
         options: {
-          presets: ["env", "es2015", "react"],
+          presets: ["env", "react"],
           plugins: [require("babel-plugin-transform-object-rest-spread")]
         }
       },
