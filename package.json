@@ -9,11 +9,9 @@
   "main": "app/main.js",
   "scripts": {
     "start": "electron app/main.js",
-    "rebuild": "./node_modules/.bin/electron-rebuild -f -w nodobjc,node-system-idle-time,ref,ffi,winctl,robotjs",
-    "postinstall": "install-app-deps",
+    "postinstall": "electron-builder install-app-deps",
     "pack": "electron-builder --dir",
     "dist": "electron-builder --x64",
-    "cleanup": "npm prune",
     "test": "mocha test test/**",
     "test-lib": "nyc --reporter=html mocha test test/lib/**"
   },
@@ -77,7 +75,6 @@
     "devtron": "^1.4.0",
     "electron": "1.8.1",
     "electron-builder": "19.37.2",
-    "electron-rebuild": "^1.6.0",
     "eslint-plugin-react": "^7.4.0",
     "expose-loader": "^0.7.3",
     "grunt": "^1.0.1",
