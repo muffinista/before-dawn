@@ -202,7 +202,6 @@ var addNewSaver = function(screenshot) {
   });
 
   w.loadURL(newUrl);
-  //w.webContents.openDevTools();
 };
 
 /**

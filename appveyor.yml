@@ -24,7 +24,7 @@ install:
   - ps: Install-Product node $env:nodejs_version
   - set CI=true
   - git reset --hard HEAD
-  - npm install
+  - yarn install
   - set PATH=%APPDATA%\npm;%PATH%
   #- npm prune
 
@@ -33,7 +33,7 @@ matrix:
 
 test_script:
   - node --version
-  - npm --version
+  #- npm --version
   #- node_modules/.bin/mocha --recursive
 
 skip_commits:
@@ -42,4 +42,4 @@ skip_commits:
 build_script:
   - node --version
   - npm --version
-  - npm run dist
+  - yarn run dist
