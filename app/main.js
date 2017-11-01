@@ -61,6 +61,7 @@ var trayMenu;
 
 var electronScreen;
 
+var testWindow;
 
 var icons = {
   "win32" : {
@@ -118,7 +119,13 @@ var grabScreen = function(s, cb) {
   }
 };
 
-var testWindow;
+
+/**
+ * open a simple window that our mocha/spectron tests can use.
+ *
+ * this exists mostly because it's basically impossible to test
+ * an app that doesn't open a window.
+ */
 var openTestShim = function() {
   testWindow = new BrowserWindow({
     width: 200,
@@ -801,10 +808,6 @@ else {
 }
 global.savers = require("./lib/savers.js");
 
-// some global CSS we'll inject into running screensavers
-globalCSSCode = fs.readFileSync( path.join(__dirname, "assets", "global.css"), "ascii");  
-
-
 /**
  * make sure we're only running a single instance
  */
@@ -814,10 +817,14 @@ if ( testMode !== true ) {
   });
 
   if (shouldQuit) {
+    log.info("looks like another copy of app is running, exiting!");
     app.quit();
     process.exit();
   }
 }
+
+// load some global CSS we'll inject into running screensavers
+globalCSSCode = fs.readFileSync( path.join(__dirname, "assets", "global.css"), "ascii");  
 
 // don't show app in dock
 if ( typeof(app.dock) !== "undefined" ) {
@@ -905,11 +912,18 @@ ipcMain.on("prefs-updated", (event, arg) => {
   });
 });
 
+//
+// handle request to open the prefs window
+//
 ipcMain.on("open-prefs", (event) => {
   log.info("open-prefs");
   openPrefsWindow();
 });
 
+
+//
+// handle request to open 'add new saver' window
+//
 ipcMain.on("open-add-screensaver", (event, screenshot) => {
   addNewSaver(screenshot);
 });
@@ -928,23 +942,34 @@ ipcMain.on("open-editor", (event, args) => {
   w.loadURL(target);
 });
 
+//
+// generate screensaver data and pass it back
+// to requester
+//
 ipcMain.on("list-savers", (event) => {
   global.savers.toList(function(data) {
     event.sender.send("list-savers", data);
   });
 });
 
+//
+// send settings data to requester
+//
 ipcMain.on("get-settings", (event) => {
   global.savers.getConfig(function(data) {
-    console.log("get-settings: " + data.localSource);
+    log.info("get-settings: " + data.localSource);
     event.sender.send("get-settings", data);
   });
 });
 
+//
+// generate screensaver template with specified attributes
+//
 ipcMain.on("generate-screensaver", (event, args) => {
   var data = global.savers.generateScreensaver(args);
   event.sender.send("generate-screensaver", data);
 });
+
 
 
 // seems like we need to catch this event to keep OSX from exiting app after screensaver runs?
