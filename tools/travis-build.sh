@@ -7,7 +7,6 @@ if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
 fi
 
 node --version
-npm --version
 
-npm install
-npm run test
+yarn install
+#npm run test
