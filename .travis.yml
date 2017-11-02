@@ -6,16 +6,15 @@ matrix:
     - os: osx
     - os: linux
 
-os:
-  - linux
-  - osx
+# os:
+#   - linux
+#   - osx
 
 osx_image: xcode9.1
 
   
 env:
-  - ELECTRON_CACHE=$HOME/.cache/electron
-  - ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
+  - ELECTRON_CACHE=$HOME/.cache/electron ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
   
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get -qq update ; fi
