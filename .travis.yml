@@ -26,6 +26,7 @@ branches:
 
 #script: ./tools/travis-build.sh
 cache: yarn
+script: yarn release
 
 #cache:
 #  directories:

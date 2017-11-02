@@ -13,7 +13,8 @@
     "pack": "electron-builder --dir",
     "dist": "electron-builder --x64",
     "test": "mocha test test/**",
-    "test-lib": "nyc --reporter=html mocha test test/lib/**"
+    "test-lib": "nyc --reporter=html mocha test test/lib/**",
+    "release": "grunt webpack && grunt sass && yarn dist"
   },
   "repository": {
     "type": "git",
