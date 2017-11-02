@@ -24,11 +24,12 @@ branches:
   only:
     - master
 
-script: ./tools/travis-build.sh
+#script: ./tools/travis-build.sh
+cache: yarn
 
-cache:
-  directories:
-    - node_modules
+#cache:
+#  directories:
+#    - node_modules
 
 notifications:
   email:
