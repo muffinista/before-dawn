@@ -6,8 +6,7 @@ platform:
   - x64
 
 cache:
-  - node_modules
-  - app\node_modules
+  - "%LOCALAPPDATA%\\Yarn"
   - '%APPDATA%\npm-cache'
   - '%USERPROFILE%\.electron'
 
@@ -26,7 +25,6 @@ install:
   - git reset --hard HEAD
   - yarn install
   - set PATH=%APPDATA%\npm;%PATH%
-  #- npm prune
 
 matrix:
   fast_finish: true
@@ -41,5 +39,4 @@ skip_commits:
 
 build_script:
   - node --version
-  - npm --version
   - yarn run dist

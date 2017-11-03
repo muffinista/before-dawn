@@ -137,7 +137,6 @@ var defaultSaversDir = function() {
 
 var updatePackage = function(cb) {
   var source = getSource();
-  //console.log("source repo: " + source);
 
   var lastCheckAt = getUpdateCheckTimestamp();
   var now = new Date().getTime();

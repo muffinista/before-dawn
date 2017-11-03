@@ -627,10 +627,10 @@ var bootApp = function() {
     // the app has been loaded
     if ( testMode !== true && global.savers.firstLoad() ) {
       checkForNewRelease();
-    }
 
-    // check for a new release every 12 hours
-    setInterval(checkForNewRelease, 1000 * 60 * 60 * 12);
+      // check for a new release every 12 hours
+      setInterval(checkForNewRelease, 1000 * 60 * 60 * 12);
+    }
 
     appIcon = new Tray(icons.active);
     appIcon.setToolTip(global.APP_NAME);

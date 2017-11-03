@@ -120,6 +120,7 @@
       ]
     },
     "linux": {
+      "category": "Amusement",
       "target": "deb",
       "executableName": "before-dawn",
       "maintainer": "Colin Mitchell <colin@muffinlabs.com>"
