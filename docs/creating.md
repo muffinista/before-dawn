@@ -1,7 +1,7 @@
 ---
 layout: page
 title: Adding Your Own Screensaver
-permalink: /creating/
+permalink: /creating.html
 ---
 
 A Before Dawn screensaver is an HTML page that runs in full screen

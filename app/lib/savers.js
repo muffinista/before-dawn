@@ -534,7 +534,10 @@ var generateScreensaver = function(opts) {
   }
 
   opts = _.merge({}, defaults, opts);
-  opts.key = opts.name.toLowerCase().replace(/[^a-z0-9]+/gi, "-").replace(/-$/, "").replace(/^-/, "");
+  opts.key = opts.name.toLowerCase().
+                  replace(/[^a-z0-9]+/gi, "-").
+                  replace(/-$/, "").
+                  replace(/^-/, "");
 
   var dest = path.join(destDir, opts.key);
   fs.mkdirpSync(dest);

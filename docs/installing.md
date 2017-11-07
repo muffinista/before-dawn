@@ -1,7 +1,7 @@
 ---
 layout: page
 title: Installing Before Dawn
-permalink: /installing/
+permalink: /installing.html
 ---
 
 You can find installers for Before Dawn on github in the

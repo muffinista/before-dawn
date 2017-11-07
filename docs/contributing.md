@@ -1,7 +1,7 @@
 ---
 layout: page
 title: Contributing
-permalink: /contributing/
+permalink: /contributing.html
 ---
 
 Contributions and suggestions are eagerly accepted. Please read the

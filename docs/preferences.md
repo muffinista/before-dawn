@@ -1,7 +1,7 @@
 ---
 layout: page
 title: Preferences
-permalink: /preferences/
+permalink: /preferences.html
 ---
 
 Before Dawn has a Preferences window where you can see the list of
