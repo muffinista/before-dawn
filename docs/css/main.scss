@@ -40,6 +40,26 @@ $on-laptop:        800px;
 @import "base", "layout";
 
 
+html {
+    height: 100%;
+}
+body {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-height: 100%; /* this helps with the sticky footer */
+}
+
+.page-content {
+    flex-grow: 1;
+    flex-shrink: 0;
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAYAAADgkQYQAAAANklEQVQoU2NkIAIwEqFGipAiKQYGhmeEFIEtwqUIbALMKdgUoSjAZxKKf5BNwjAB3TqcCkAKAW9cBSRvYfskAAAAAElFTkSuQmCC) repeat;
+}
+
+footer {
+    flex-shrink: 0;
+}
+
 .home {
     display: flex;
     p {
@@ -71,10 +91,16 @@ $on-laptop:        800px;
         .preview {
             background-image: none;
             img.saver {
-                width: auto;
+                width: 100%;
                 height: auto;
                 margin: 0px;
             }
         }
+    }
+}
+
+@include media-query($on-palm) {
+    .site-title {
+        max-width: $on-palm - 180px;
     }
 }
