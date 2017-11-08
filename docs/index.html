@@ -5,23 +5,31 @@ title: Welcome!
 
 <div class="home">
 
-  <p>Welcome to the help website for Before Dawn, a cross-platform
-  screensaver application powered by javascript. You can
-    <a href="{{ '/about' | prepend: site.baseurl }}">learn more</a> about
-    the application, find out how to install it, and learn about
-    writing your own screensaver.
-  </p>
+  <div class="main" >
+    <p>Welcome to the help website for Before Dawn, an open-source
+      screensaver application. Before Dawn runs on Windows, OSX and Linux,
+      and is powered by javascript.</p>
+
+    <p>Screensavers can be written in HTML
+      and Javascript. If it works in a browser, it can be a screensaver!</p>
+    
+    <p>You can
+      <a href="{{ '/about' | prepend: site.baseurl }}">learn more</a> about
+      Before Dawn, find out how to install it, and learn about
+      writing your own screensaver.
+    </p>
 
   
-  <ul>
-    <li><a href="{{ '/installing.html' | prepend: site.baseurl }}">How to Install</a></li>
-    <li><a href="{{ '/preferences.html' | prepend: site.baseurl }}">Settings and Preferences</a></li>
-    <li><a href="{{ '/creating.html' | prepend: site.baseurl }}">How to Add Your Own Screensaver</a></li>
-    <li><a href="{{ '/contributing.html' | prepend: site.baseurl }}">Contributing</a></li>
-    <li><a href="https://github.com/muffinista/before-dawn">Github Repository</a>
-  </ul>
+    <ul>
+      <li><a href="{{ '/installing.html' | prepend: site.baseurl }}">How to Install</a></li>
+      <li><a href="{{ '/preferences.html' | prepend: site.baseurl }}">Preferences and Options</a></li>
+      <li><a href="{{ '/creating.html' | prepend: site.baseurl }}">Creating Your Own Screensaver</a></li>
+      <li><a href="{{ '/contributing.html' | prepend: site.baseurl }}">Contributing</a></li>
+      <li><a href="https://github.com/muffinista/before-dawn">Github Repository</a></li>
+    </ul>
+  </div>
 
-  <div>
-    <img src="https://github.com/muffinista/before-dawn/raw/master/assets/emoji-on-monitor-opt.gif" />
+  <div class="preview"">
+    <img src="https://github.com/muffinista/before-dawn/raw/master/assets/emoji-screensaver.gif" class="saver" />
   </div>
 </div>

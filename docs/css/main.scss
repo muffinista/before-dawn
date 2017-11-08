@@ -37,4 +37,44 @@ $on-laptop:        800px;
 }
 
 // Import partials from `sass_dir` (defaults to `_sass`)
-@import "base", "layout", "syntax-highlighting";
+@import "base", "layout";
+
+
+.home {
+    display: flex;
+    p {
+        padding-right: 10px;
+    }
+    .main, .preview {
+        flex: 0 0 50%;
+    }
+
+    .preview {
+        height: 500px;
+        background-image: url(../background3.svg);
+        background-size: contain;
+        background-repeat: no-repeat;
+    }
+
+    img.saver {
+        margin-top: 50px;
+        margin-left: 32px;
+        width:310px;
+        height: 245px;
+    }
+}
+
+
+@media screen and (max-width: 800px) {
+    .home {
+        display: block;
+        .preview {
+            background-image: none;
+            img.saver {
+                width: auto;
+                height: auto;
+                margin: 0px;
+            }
+        }
+    }
+}
