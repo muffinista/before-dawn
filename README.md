@@ -21,7 +21,7 @@ The core of the app is built on [Electron](http://electron.atom.io/),
 a system that allows you to build desktop applications that run on
 [node.js](https://nodejs.org/) and are rendered via Chrome.
 
-There's about half a dozen screensavers right now, with more on the
+There's about a dozen screensavers right now, with more on the
 way. Here's the Flying Emoji screensaver:
 
 ![flying emoji](https://github.com/muffinista/before-dawn/raw/master/assets/emoji-on-monitor-opt.gif "Flying Emoji!")
@@ -42,16 +42,10 @@ Installers are available from the [releases](https://github.com/muffinista/befor
 
 ## Status
 
-Right now the project is still in its early stages, but this repo
-includes the main code for running the actual screensaver, a
-simple app for picking your screensaver and setting some options, and
+Right now the application itself is pretty stable. This repo includes the main code for running the actual screensaver, a simple app for picking your screensaver and setting some options, and
 a bunch of modules to pull it all together.
 
-The actual code for the screensavers is in
-[a separate repo](https://github.com/muffinista/before-dawn-screensavers).
-If you want to write a screensaver, please add it to the project via a
-PR!
-
+The actual code for the screensavers is in [a separate repo](https://github.com/muffinista/before-dawn-screensavers). If you want to write a screensaver, please add it to the project via a PR!
 
 ## Running It
 
@@ -75,9 +69,6 @@ engage your screensaver. That's all there is to it!
 Steps for generating your own build Before Dawn are listed in
 [the wiki](https://github.com/muffinista/before-dawn/wiki/Building-Before-Dawn)
 
-@TODO - document a bit about windows -- pretty much just need to
-follow https://www.npmjs.com/package/windows-build-tools
-
 ## Hacking It
 
 If you would like to hack on Before Dawn, there's some instructions on
@@ -85,15 +76,6 @@ the
 [Development page](https://github.com/muffinista/before-dawn/wiki/Development)
 in the wiki. It's pretty straightforward once you have a basic setup
 in place.
-
-## Tools Used
-
-Some of the tools used include:
-
-- [Electron](http://electron.atom.io/)
-- [Node.js](https://nodejs.org/)
-- [lodash](https://lodash.com/)
-- [React](https://facebook.github.io/react/)
 
 
 ## How to Write a Screensaver
@@ -124,21 +106,10 @@ that the content you are posting is legal and appropriate. If you need
 help or have a suggestion, please feel free to open an issue here.
 
 
-## TODO
-
-- Improve the documentation for writing screensaver code
-- Random screensaver picker
-- Screensaver collections that the user can choose from
-- An option to only run on the primary display
-- Work on a better auto-update tool
-- Do a better job of hiding the mouse
-- Catch and report errors
-
-
 ## Copyright/License
 
-Unless otherwise stated, Copyright (c) 2017 Colin Mitchell.
+Unless otherwise stated, Copyright (c) 2017 [Colin Mitchell](http://muffinlabs.com).
 
 Before Dawn is is distributed under the MIT licence -- Please see LICENSE.txt for further details.
 
-http://muffinlabs.com
+
