@@ -1,5 +1,25 @@
 # Change Log
 
+## [v0.9.9](https://github.com/muffinista/before-dawn/tree/v0.9.9) (2017-11-13)
+- Reorganize code for app, switch to a single package.json
+- Make a bunch of calls asychronous
+- Add some data caching to help performance
+- Switch to yarn
+- Add webpack and use it to build assets for windows
+- Update main process to listen for events from windows and pass data
+  around. The main process has responsibilty for opening windows,
+  saving new screensavers, etc. 
+- Tweak layout of prefs window and the preview tool
+- Update bootstrap
+- Update electron version
+- Update React version and a bunch of assorted components
+- Add mocha tests
+- Add appveyor and Travis builds
+- Update some stale packages, and remove some dead ones
+
+## [v0.9.8](https://github.com/muffinista/before-dawn/tree/v0.9.8) (2017-08-03)
+- Minor bug fixes
+
 ## [v0.9.7](https://github.com/muffinista/before-dawn/tree/v0.9.7) (2017-07-28)
 - Scroll to the currently selected screensaver when rendering prefs
   panel

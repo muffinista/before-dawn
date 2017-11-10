@@ -84,11 +84,9 @@ describe('Add New', function() {
             assert.equal('Before Dawn -- Editor!', res);
           }).
           then(() => {
-            //console.log(src, fs.existsSync(src));
             assert(fs.existsSync(src));
           }).
           then(() => {
-            //console.log("done!");
             done();
           });
       
