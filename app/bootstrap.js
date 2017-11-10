@@ -8,10 +8,18 @@ global.APP_NAME = "Before Dawn";
 global.APP_DIR = "Before Dawn";
 global.SAVER_REPO = "muffinista/before-dawn-screensavers";
 global.APP_REPO = "muffinista/before-dawn";
+global.APP_VERSION_BASE = version;
 global.APP_VERSION = "v" + version;
 global.NEW_RELEASE_AVAILABLE = false;
 global.HELP_URL = "https://muffinista.github.io/before-dawn/";
 global.ISSUES_URL = "https://github.com/muffinista/before-dawn/issues";
+
+global.RELEASE_SERVER = "https://hazel-nwmfhsakin.now.sh";
+
+// note -- this is hardcoded to win32 for now because we actually
+// don't care what platform is running
+global.RELEASE_CHECK_URL = `${global.RELEASE_SERVER}/update/win32/${global.APP_VERSION_BASE}`;
+global.IS_DEV = require('electron-is-dev');
 
 // this is a free sentry account and the URL will be in every copy of
 // the app that gets distributed, so i'm committing it to the repo for now

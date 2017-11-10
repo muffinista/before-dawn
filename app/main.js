@@ -30,7 +30,7 @@ const path = require("path");
 const parseArgs = require("minimist");
 
 const screen = require("./lib/screen.js");
-const releaseChecker = require("./lib/release_check.js");
+var releaseChecker;
 const power = require("./lib/power.js");
 let stateManager = require("./lib/state_manager.js");
 
@@ -623,15 +623,6 @@ var bootApp = function() {
     configLoaded = true;
     updateStateManager();
 
-    // check for a new release if this is the first time
-    // the app has been loaded
-    if ( testMode !== true && global.savers.firstLoad() ) {
-      checkForNewRelease();
-
-      // check for a new release every 12 hours
-      setInterval(checkForNewRelease, 1000 * 60 * 60 * 12);
-    }
-
     appIcon = new Tray(icons.active);
     appIcon.setToolTip(global.APP_NAME);
     appIcon.setContextMenu(trayMenu); 
@@ -661,6 +652,26 @@ var bootApp = function() {
       openPrefsOnFirstLoad();
     }
 
+    if ( global.IS_DEV !== true ) {
+      releaseChecker = require("./lib/release_check.js");
+      
+      releaseChecker.setFeed(global.RELEASE_CHECK_URL);
+      releaseChecker.setLogger(log.info);
+      releaseChecker.onUpdate(function() {
+        global.NEW_RELEASE_AVAILABLE = true;
+        trayMenu.items[3].visible = global.NEW_RELEASE_AVAILABLE;
+      });
+      releaseChecker.onNoUpdate(function() {
+        global.NEW_RELEASE_AVAILABLE = false;
+        trayMenu.items[3].visible = global.NEW_RELEASE_AVAILABLE;
+      });
+
+      // check for a new release every 12 hours
+      log.info("Setup release check");
+      checkForNewRelease();
+      setInterval(checkForNewRelease, 1000 * 60 * 60 * 12);
+    }
+    
   });
 };
 
@@ -746,18 +757,10 @@ var updateStateManager = function() {
 /**
  * check for a new release of the app
  */
+
 var checkForNewRelease = function() {
   log.info("checkForNewRelease");
-  releaseChecker.checkLatestRelease(
-    global.APP_REPO, global.APP_VERSION, 
-    function() {
-      global.NEW_RELEASE_AVAILABLE = true;
-      trayMenu.items[3].visible = global.NEW_RELEASE_AVAILABLE;
-    }, 
-    function() {
-      global.NEW_RELEASE_AVAILABLE = false;
-      trayMenu.items[3].visible = global.NEW_RELEASE_AVAILABLE;
-    });
+  releaseChecker.checkLatestRelease();
 };
 
 /**
@@ -797,6 +800,13 @@ if ( typeof(global.RAVEN_PRIVATE_URL) !== "undefined" ) {
 }
 
 crashReporter.start(global.CRASH_REPORTER);
+
+if (global.IS_DEV) {
+	log.info('Running in development');
+}
+else {
+	log.info('Running in production');
+}
 
 // store our root path as a global variable so we can access it from screens
 if ( process.env.BEFORE_DAWN_DIR !== undefined ) {
