@@ -8,7 +8,7 @@ import ReactDOM from "react-dom"
 import AttributesForm from "./components/attributes-form.jsx";
 import OptionsForm from "./components/options-form.jsx";
 
-const Noty = require("noty");
+import Noty from "noty";
 
 (function() {
   var electron = window.require("electron");
@@ -33,7 +33,6 @@ const Noty = require("noty");
   // parse incoming URL params -- we'll get a link to the current screen images for previews here
   var tmpParams = new URLSearchParams(document.location.search);
   window.urlParams = {};
-  //console.log("SEARCH: " + document.location.search);
 
   for(let k of tmpParams.keys() ) {
     window.urlParams[k] = tmpParams.get(k);
@@ -55,8 +54,6 @@ const Noty = require("noty");
 
     var ratio = size.height / size.width;
 
-    //console.log("reloadPreview");
-
     // set the height of the preview iframe to maintain aspect ratio
     var w = iframe.offsetWidth;
     var h = w * ratio;
@@ -72,7 +69,6 @@ const Noty = require("noty");
     if ( s !== undefined ) {
       var mergedOpts = _.merge(url_opts, s.settings);
       var previewUrl = s.getUrl(mergedOpts);
-
       iframe.src = previewUrl;
     }
 
@@ -94,12 +90,10 @@ const Noty = require("noty");
   
   var optionsUpdated = function(data) {
     saverOpts = data;
-    //console.log("optionsUpdated");
     reloadPreview();
   };
   
   var attrsUpdated = function(data) {
-    //console.log("attrsUpdated", data);
     saverAttrs = data;
     s.options = data.options;
     renderOptions();

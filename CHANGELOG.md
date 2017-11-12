@@ -1,15 +1,20 @@
 # Change Log
 
 ## [v0.9.9](https://github.com/muffinista/before-dawn/tree/v0.9.9) (2017-11-13)
+- Add a random screensaver picker, as well as basic 'system
+  screensaver' support -- ie, screensavers that are integral to the
+  application and not installed as a separate package.
 - If 'Run Now' chosen in menu, don't check power state
 - Update main process to listen for events from windows and pass data
   around. The main process has responsibilty for opening windows,
   saving new screensavers, etc. 
 - Reorganize code for app, switch to a single package.json
+- Improve dock display -- show for more windows and hide only when all
+  windows are closed
 - Make a bunch of calls asychronous
 - Add some data caching to help performance
 - Switch to yarn, cleanup build process
-- Add webpack and use it to build assets for windows
+- Add webpack and use it to build UI assets
 - Tweak layout of prefs window and the preview tool
 - Update bootstrap
 - Update electron version

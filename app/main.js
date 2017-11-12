@@ -101,6 +101,7 @@ var grabScreen = function(s, cb) {
     height:200
   });
 
+  
   grabber.on("closed", function() {
     grabber = null;
   });
@@ -134,6 +135,24 @@ var openTestShim = function() {
   testWindow.loadURL("file://" + __dirname + "/html/test-shim.html");
 };
 
+/**
+ * if we're using the dock, and all our windows are closed, hide the
+ * dock icon
+ */
+var hideDockIfInactive = function() {
+  if (  typeof(app.dock) !== "undefined" && BrowserWindow.getAllWindows().length === 0 ) {
+    app.dock.hide();
+  }
+};
+
+/**
+ * show the dock if it's available
+ */
+var showDock = function() {
+  if ( typeof(app.dock) !== "undefined" ) {
+    app.dock.show();
+  }
+};
 
 /**
  * Open the preferences window
@@ -157,10 +176,8 @@ var openPrefsWindow = function() {
       prefsUrl = prefsUrl + "?screenshot=" + encodeURIComponent("file://" + message.url);
       
       prefsWindowHandle.loadURL(prefsUrl);
-      
-      if ( typeof(app.dock) !== "undefined" ) {
-        app.dock.show();
-      }
+
+      showDock();
 
       if ( debugMode === true ) {
         prefsWindowHandle.webContents.openDevTools();
@@ -168,10 +185,7 @@ var openPrefsWindow = function() {
 
       prefsWindowHandle.on("closed", function() {
         prefsWindowHandle = null;
-
-        if ( typeof(app.dock) !== "undefined" ) {
-          app.dock.hide();
-        }
+        hideDockIfInactive();
       });
 
       // we could do something nice with either of these events
@@ -202,6 +216,12 @@ var addNewSaver = function(screenshot) {
   });
 
   w.loadURL(newUrl);
+
+  showDock();
+  w.on('closed', () => {
+    w = null;
+    hideDockIfInactive();
+  });
 };
 
 /**
@@ -217,18 +237,16 @@ var openAboutWindow = function() {
   });
 
   w.loadURL(prefsUrl);
-  if ( typeof(app.dock) !== "undefined" ) {
-    app.dock.show();
-  }
+
+  showDock();
   
   if ( debugMode === true ) {
     w.webContents.openDevTools();
   }
-  w.on("closed", function() {
+
+  w.on('closed', () => {
     w = null;
-    if ( typeof(app.dock) !== "undefined" ) {
-      app.dock.hide();
-    }
+    hideDockIfInactive();
   });
 };
 
@@ -957,6 +975,13 @@ ipcMain.on("open-editor", (event, args) => {
                "src=" + encodeURIComponent(key) +
                "&screenshot=" + encodeURIComponent(screenshot);
   w.loadURL(target);
+
+  w.on('closed', () => {
+    w = null;
+    hideDockIfInactive();
+  });
+  
+  showDock();
 });
 
 //
@@ -986,7 +1011,6 @@ ipcMain.on("generate-screensaver", (event, args) => {
   var data = global.savers.generateScreensaver(args);
   event.sender.send("generate-screensaver", data);
 });
-
 
 
 // seems like we need to catch this event to keep OSX from exiting app after screensaver runs?
