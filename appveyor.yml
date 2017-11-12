@@ -14,7 +14,7 @@ environment:
   matrix:
     - nodejs_version: '8'
   GH_TOKEN:
-    secure: dpurh8s4ulOTEbFB2xWmG9u2zAuPpbLce9Kdc+QzGzixr//goftP0s/mbzBvEuKk
+    secure: 'hWq+UymjZYRfgJPKsRQ8bBFwkcMHpLglVbYe0FH2w0zdQ6/8Dp3mo/19RFKIpZkU'
 
 init:
   - git config --global core.autocrlf input
