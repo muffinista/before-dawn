@@ -40,3 +40,10 @@ skip_commits:
 build_script:
   - node --version
   - yarn run dist
+
+only_commits:
+  message: /build/
+
+deploy:
+  draft: true
+  force_update: true
