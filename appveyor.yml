@@ -1,5 +1,5 @@
 #version: 0.1.{build}
-build: off
+#build: off
 os: unstable
 
 platform:
@@ -29,10 +29,10 @@ install:
 matrix:
   fast_finish: true
 
-test_script:
-  - node --version
-  #- npm --version
-  #- node_modules/.bin/mocha --recursive
+test: off
+
+#test_script:
+#  - node --version
 
 skip_commits:
   message: /\[ci\s+skip\]/
