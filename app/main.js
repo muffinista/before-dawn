@@ -425,6 +425,7 @@ var getDisplays = function() {
  * manually trigger screensaver by setting state to run
  */
 var setStateToRunning = function() {
+  checkPowerState = false;
   stateManager.run();
 };
 
@@ -699,6 +700,7 @@ var runScreenSaverIfNotFullscreen = function() {
  * activate the screensaver, but only if we're plugged in, or if the user
  * is fine with running on battery
  */
+var checkPowerState = true;
 var runScreenSaverIfPowered = function() {
   log.info("runScreenSaverIfPowered");
 
@@ -708,7 +710,7 @@ var runScreenSaverIfPowered = function() {
   }
   
   // check if we are on battery, and if we should be running in that case
-  if ( global.savers.getDisableOnBattery() ) {
+  if ( checkPowerState && global.savers.getDisableOnBattery() ) {
     power.charging().then((is_powered) => {
       if ( is_powered ) {       
         runScreenSaverIfNotFullscreen();
@@ -719,6 +721,7 @@ var runScreenSaverIfPowered = function() {
     });
   }
   else {
+    checkPowerState = true;
     runScreenSaverIfNotFullscreen();
   }
 };
