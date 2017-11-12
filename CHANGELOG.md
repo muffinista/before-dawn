@@ -12,9 +12,15 @@
 - Improve dock display -- show for more windows and hide only when all
   windows are closed
 - Make a bunch of calls asychronous
+- Use async/await in a few places
 - Add some data caching to help performance
 - Switch to yarn, cleanup build process
+  - I'd prefer to not have yarn as a dependency, but it does a better
+    job of handling installations across multiple platforms -- ie,
+    windows and OSX
 - Add webpack and use it to build UI assets
+  - I also might get rid of this at some point, and also React for
+    that matter
 - Tweak layout of prefs window and the preview tool
 - Update bootstrap
 - Update electron version
