@@ -1,4 +1,4 @@
-version: 0.1.{build}
+#version: 0.1.{build}
 build: off
 os: unstable
 
@@ -44,8 +44,8 @@ build_script:
 only_commits:
   message: /build/
 
-deploy:
-  - provider: GitHub
-    artifact: /*.exe/
-    draft: true
-    force_update: true
+# deploy:
+#   - provider: GitHub
+#     artifact: /*.exe/
+#     draft: true
+#     force_update: true
