@@ -45,5 +45,7 @@ only_commits:
   message: /build/
 
 deploy:
-  draft: true
-  force_update: true
+  - provider: GitHub
+    artifact: /*.exe/
+    draft: true
+    force_update: true
