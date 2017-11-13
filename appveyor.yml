@@ -1,5 +1,7 @@
-#version: 0.1.{build}
-#build: off
+#
+# NOTE: a bunch of things are actually setup on appveyor itself and
+# not in this file. i'll try and document that at some point.
+#
 os: unstable
 
 platform:
@@ -13,8 +15,8 @@ cache:
 environment:
   matrix:
     - nodejs_version: '8'
-  GH_TOKEN:
-    secure: 'hWq+UymjZYRfgJPKsRQ8bBFwkcMHpLglVbYe0FH2w0zdQ6/8Dp3mo/19RFKIpZkU'
+#  GH_TOKEN:
+#    secure: 'hWq+UymjZYRfgJPKsRQ8bBFwkcMHpLglVbYe0FH2w0zdQ6/8Dp3mo/19RFKIpZkU'
 
 init:
   - git config --global core.autocrlf input
@@ -30,9 +32,6 @@ matrix:
   fast_finish: true
 
 test: off
-
-#test_script:
-#  - node --version
 
 skip_commits:
   message: /\[ci\s+skip\]/
