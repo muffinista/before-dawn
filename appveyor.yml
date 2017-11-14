@@ -38,7 +38,7 @@ skip_commits:
 
 build_script:
   - node --version
-  - yarn run dist
+  - yarn release
 
 only_commits:
   message: /build/
