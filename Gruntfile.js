@@ -16,7 +16,7 @@ module.exports = function(grunt) {
       },
       dist: {
         files: {
-          "dist/styles.css": "css/styles.scss"
+          "app/dist/styles.css": "app/css/styles.scss"
         }
       }
     },
@@ -75,7 +75,6 @@ module.exports = function(grunt) {
   grunt.event.on("watch", function(action, filepath, target) {
     grunt.log.writeln(target + ": " + filepath + " has " + action);
   });
-
 
   grunt.loadNpmTasks("grunt-mocha-test");
   grunt.loadNpmTasks("grunt-contrib-watch");
