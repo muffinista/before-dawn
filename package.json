@@ -14,7 +14,7 @@
     "dist": "electron-builder --x64",
     "test": "mocha test test/**",
     "test-lib": "nyc --reporter=html mocha test test/lib/**",
-    "release": "grunt webpack && grunt sass && yarn dist"
+    "release": "grunt webpack && grunt sass && rm -rf app/.sass-cache && yarn dist"
   },
   "repository": {
     "type": "git",
@@ -91,6 +91,11 @@
     "webpack-node-externals": "^1.6.0"
   },
   "build": {
+    "files": [
+      "app/**/*",
+      "node_modules/**/*",
+      "package.json"
+    ],
     "appId": "Before Dawn",
     "mac": {
       "category": "public.app-category.entertainment"
