@@ -5,15 +5,18 @@
   screensaver' support -- ie, screensavers that are integral to the
   application and not installed as a separate package.
 - If 'Run Now' chosen in menu, don't check power state
+- Improve dock display -- show icon for more windows and hide only
+  when all windows are closed
+- Tweak layout of prefs window and the preview tool
 - Update main process to listen for events from windows and pass data
   around. The main process has responsibilty for opening windows,
   saving new screensavers, etc. 
 - Reorganize code for app, switch to a single package.json
-- Improve dock display -- show for more windows and hide only when all
-  windows are closed
 - Make a bunch of calls asychronous
 - Use async/await in a few places
 - Add some data caching to help performance
+- When launching screensavers, don't take screengrab unless
+  requested - this greatly speeds up launch time
 - Switch to yarn, cleanup build process
   - I'd prefer to not have yarn as a dependency, but it does a better
     job of handling installations across multiple platforms -- ie,
@@ -21,8 +24,7 @@
 - Add webpack and use it to build UI assets
   - I also might get rid of this at some point, and also React for
     that matter
-- Tweak layout of prefs window and the preview tool
-- Update bootstrap
+- Update bootstrap version and assorted styling
 - Update electron version
 - Update React version and a bunch of assorted components
 - Add mocha tests

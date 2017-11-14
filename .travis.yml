@@ -6,15 +6,10 @@ matrix:
     - os: osx
     - os: linux
 
-# os:
-#   - linux
-#   - osx
-
 osx_image: xcode9.1
-
   
-env:
-  - ELECTRON_CACHE=$HOME/.cache/electron ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
+#env:
+#  - ELECTRON_CACHE=$HOME/.cache/electron ELECTRON_BUILDER_CACHE=$HOME/.cache/electron-builder
   
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get -qq update ; fi
@@ -24,13 +19,8 @@ branches:
   only:
     - master
 
-#script: ./tools/travis-build.sh
 cache: yarn
 script: yarn release
-
-#cache:
-#  directories:
-#    - node_modules
 
 notifications:
   email:
