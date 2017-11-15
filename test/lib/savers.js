@@ -56,15 +56,20 @@ describe('Savers', function() {
       });
     });
 
-    /* it('does not set firstLoad', function(done) {
-       savers.init(workingDir, function() {
-       savers.init(workingDir, function() {
-       assert(!savers.firstLoad());
-       done();
-       });
-       });
-       });
-     */
+    it('recovers from corrupt config', function(done) {
+      var badWorkingDir = getTempDir();
+      fs.copySync(
+        path.join(__dirname, '../fixtures/bad-config.json'),
+        path.join(badWorkingDir, 'config.json')
+      );
+
+      savers.init(badWorkingDir, function() {
+        assert(savers.firstLoad());
+        done();
+      });
+    });
+
+
   });
 
   describe('loadFromFile', function() {

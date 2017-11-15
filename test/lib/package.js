@@ -25,6 +25,9 @@ describe('Package', function() {
   beforeEach(() => {
     sandbox = sinon.sandbox.create();
   });
+  afterEach(function () {
+    sandbox.restore();
+  });
 
 	describe('initialization', function() {
     it('loads data', function() {
@@ -39,10 +42,36 @@ describe('Package', function() {
   });
 
   describe('getReleaseInfo', () => {
-    it('does stuff', async () => {
-      var p = new Package(attrs);
-      let results = await p.getReleaseInfo();
-      assert.equal("muffinista", results.author.login);
+    describe('withValidResponse', () => {
+      var request = require("request-promise-native");
+      beforeEach(() => {
+        sinon.stub(request, 'get').resolves(require('../fixtures/release.json'));
+      });
+      afterEach(() => {
+        request.get.restore();
+      });
+      
+      it('does stuff', async () => {
+        var p = new Package(attrs);
+        let results = await p.getReleaseInfo();
+        assert.equal("muffinista", results.author.login);
+      });
+    });
+
+    describe('withReject', () => {
+      var request = require("request-promise-native");
+      beforeEach(() => {
+        sinon.stub(request, 'get').rejects();
+      });
+      afterEach(() => {
+        request.get.restore();
+      });
+
+      it('survives', async () => {
+        var p = new Package(attrs);
+        let results = await p.getReleaseInfo();
+        assert.deepEqual({}, results);
+      });
     });
   });
 

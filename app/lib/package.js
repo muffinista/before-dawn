@@ -27,6 +27,12 @@ module.exports = function Package(_attrs) {
   if ( typeof(this.updated_at) === "undefined" ) {
     this.updated_at = new Date(0);
   }
+
+  if ( typeof(_attrs.log) === "undefined" ) {
+    _attrs.log = console.log;
+  }
+
+  this.log = _attrs.log;
   
   this.defaultHeaders = {
     "User-Agent": "Before Dawn"
@@ -41,11 +47,23 @@ module.exports = function Package(_attrs) {
   };
 
   this.getReleaseInfo = async function() {
-    this.data = await request({
+    let self = this;
+    this.data = await request.get({
       url: this.url,
       json: true,
       headers: this.defaultHeaders
+    }).catch(function(err) {
+
+      self.log(err);
+
+      if ( typeof(self.data) !== "undefined" ) {
+        return self.data;
+      }
+      else {
+        return {};
+      }
     });
+
     return this.data;
   };
 
@@ -55,7 +73,7 @@ module.exports = function Package(_attrs) {
   
   this.checkLatestRelease = async function(cb) {
     let data = await this.getReleaseInfo();
-    if ( new Date(data.published_at) > new Date(self.updated_at) ) {
+    if ( data.published_at && new Date(data.published_at) > new Date(self.updated_at) ) {
       this.downloadFile(data.zipball_url, function() {
         self.updated_at = data.published_at;
         cb(self.attrs());

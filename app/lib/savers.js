@@ -58,9 +58,17 @@ var reload = function(cb, load_savers) {
       _firstLoad = true;
     }
 
-    nconf.remove("file").file({
-      file: configPath
-    });
+    try {
+      nconf.remove("file").file({
+        file: configPath
+      });
+    }
+    catch(e) {
+      fs.unlinkSync(configPath);
+      nconf.remove("file").file({
+        file: configPath
+      });
+    }   
 
     ensureDefaults();
 
@@ -99,7 +107,6 @@ var setupPackages = function(cb) {
         ( current === undefined || getCurrentData() === undefined ) && 
         data.length > 0
       ) {
-        //console.log("setting default saver to first in list " + data[0].key);
         setConfig("saver", data[0].key);
         writeSync();
       }
@@ -115,7 +122,6 @@ var setupPackages = function(cb) {
  */
 var deleteSaver = function(k, cb) {
   var p = path.dirname(k);
-  //console.log("DELETE " + p);
   var s = getByKey(k);
   var cbWrapped = function() {
     reload(cb);
@@ -172,7 +178,6 @@ var ensureDefaults = function() {
   var source = nconf.get("source");
   if ( source === undefined ) {
     _firstLoad = true;
-    //console.log("add default source");
     setConfig("source",{
       repo: global.SAVER_REPO,
       hash: ""
@@ -219,7 +224,6 @@ var getRandomScreensaver = function() {
       return ( typeof(s.preload) !== "undefined" );
     })
   );
-  //console.log("RANDOM", s);
 
   return s;
 };
@@ -277,7 +281,6 @@ var setLocalSource = function(x) {
  */
 var setConfig = function(k, v) {
   nconf.set(k, v);
-  //console.log("set "+ k + " to " + v);
 };
 
 /**
@@ -292,7 +295,6 @@ var setCurrent = function(x, opts) {
 };
 
 var setDelay = function(x) {
-  //console.log("setDelay: " + x);
   setConfig("delay", x);
 };
 
@@ -494,13 +496,11 @@ var listAll = function(cb, force) {
 
 var write = function(cb) {
   var configPath = baseDir + "/" + config_file;
-  //console.log("write config to " + configPath);
   nconf.save(cb);
 };
 
 var writeSync = function() {
   var configPath = baseDir + "/" + config_file;
-  //console.log("sync write config to " + configPath);
   nconf.save();
 };
 
