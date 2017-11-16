@@ -193,6 +193,9 @@ import Noty from "noty";
       return;
     }
 
+    // disable button to prevent double-clicks
+    this.setAttribute("disabled", "disabled");
+
     //console.log("SAVE", saverAttrs);
     s.write(saverAttrs);
     ipcRenderer.send("savers-updated", s.key);
@@ -201,6 +204,9 @@ import Noty from "noty";
       closeWindow(ev);
     }
     else {
+      // re-enable save button
+      this.removeAttribute("disabled");
+
       new Noty({
         type: "success",
         layout: "topRight",

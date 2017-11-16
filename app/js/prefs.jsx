@@ -325,6 +325,9 @@ const shell = window.require("electron").shell;
     var repo = document.querySelector("input[name=repo]").value;
     var localSource = document.querySelector("[name=localSource]").value;
 
+    // disable button to prevent double-clicks
+    this.setAttribute("disabled", "disabled");
+    
     if ( val !== undefined ) {
       savers.setCurrent(val, saverOpts);
     }
