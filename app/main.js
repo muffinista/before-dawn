@@ -942,6 +942,7 @@ ipcMain.on("savers-updated", (event, arg) => {
 //
 ipcMain.on("prefs-updated", (event, arg) => {
   log.info("prefs-updated");
+  global.savers.reset();
   global.savers.reload(function() {
     updateStateManager();
   });

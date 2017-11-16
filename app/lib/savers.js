@@ -35,7 +35,8 @@ var initFromList = function(_path, data, cb) {
 
 var toList = function(cb) {
   listAll(function(data) {
-    cb(_.map(data, function(s) { return s.toHash(); }));
+    var out = _.map(data, function(s) { return s.toHash(); })
+    cb(out);
   });
 };
 
@@ -46,6 +47,7 @@ var reload = function(cb, load_savers) {
   var configPath = path.join(baseDir, config_file);
   var saversDir = defaultSaversDir();
 
+  
   if ( typeof(cb) === "undefined" ) {
     cb = console.log;
   }
@@ -466,7 +468,7 @@ var listAll = function(cb, force) {
   var stream = walker(folders);
 
   var promises = [];
-  
+
   // use cached data if available
   if ( loadedScreensavers.length > 0 && ( typeof(force) === "undefined" || force === false ) ) {
     cb(loadedScreensavers);
