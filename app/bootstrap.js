@@ -23,7 +23,7 @@ global.IS_DEV = require('electron-is-dev');
 
 // this is a free sentry account and the URL will be in every copy of
 // the app that gets distributed, so i'm committing it to the repo for now
-if ( process.env.TEST_MODE === undefined ) {
+if ( process.env.TEST_MODE === undefined && ! global.IS_DEV ) {
   global.RAVEN_PRIVATE_URL = "https://b86f7b0ac5604b55b4fd03adedc5d205:9cc446fadc234baab6d825e88fe4215d@sentry.io/172824";
   global.RAVEN_URL = "https://b86f7b0ac5604b55b4fd03adedc5d205@sentry.io/172824";
 }

@@ -23,7 +23,9 @@ import Noty from "noty";
   const path = require("path");
   const url = require("url");
   const exec = require("child_process").exec;
-  var savers = require("../lib/savers.js");
+
+  var currentWindow = remote.getCurrentWindow();
+  var savers = currentWindow.savers;
   
   var ravenUrl = remote.getGlobal("RAVEN_URL");
   if ( typeof(ravenUrl) !== "undefined" ) {

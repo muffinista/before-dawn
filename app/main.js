@@ -173,6 +173,8 @@ var openPrefsWindow = function() {
         icon: path.join(__dirname, "assets", "icon.png")
       });
 
+      prefsWindowHandle.savers = global.savers;
+      
       prefsUrl = prefsUrl + "?screenshot=" + encodeURIComponent("file://" + message.url);
       
       prefsWindowHandle.loadURL(prefsUrl);
@@ -215,6 +217,7 @@ var addNewSaver = function(screenshot) {
     resizable:true
   });
 
+  w.savers = global.savers;
   w.loadURL(newUrl);
 
   showDock();
@@ -933,7 +936,9 @@ trayMenu = Menu.buildFromTemplate([
 ipcMain.on("savers-updated", (event, arg) => {
   global.savers.reset();  
   if ( prefsWindowHandle !== null ) {
-    prefsWindowHandle.send("savers-updated", arg);
+    global.savers.reload(function() {
+      prefsWindowHandle.send("savers-updated", arg);
+    });
   }
 });
 
@@ -969,7 +974,8 @@ ipcMain.on("open-editor", (event, args) => {
   var screenshot = args.screenshot;
 
   var w = new BrowserWindow();
-
+  w.savers = global.savers;
+  
   // pass the key of the screensaver we want to load
   // as well as the URL to our screenshot image
   var target = "file://" + __dirname + "/html/watcher.html?" +
@@ -985,25 +991,6 @@ ipcMain.on("open-editor", (event, args) => {
   showDock();
 });
 
-//
-// generate screensaver data and pass it back
-// to requester
-//
-ipcMain.on("list-savers", (event) => {
-  global.savers.toList(function(data) {
-    event.sender.send("list-savers", data);
-  });
-});
-
-//
-// send settings data to requester
-//
-ipcMain.on("get-settings", (event) => {
-  global.savers.getConfig(function(data) {
-    log.info("get-settings: " + data.localSource);
-    event.sender.send("get-settings", data);
-  });
-});
 
 //
 // generate screensaver template with specified attributes
@@ -1011,8 +998,14 @@ ipcMain.on("get-settings", (event) => {
 ipcMain.on("generate-screensaver", (event, args) => {
   var data = global.savers.generateScreensaver(args);
   event.sender.send("generate-screensaver", data);
-});
 
+  global.savers.reset();
+  global.savers.reload(function() {
+    if ( prefsWindowHandle !== null ) {
+      prefsWindowHandle.send("savers-updated");
+    }
+  });
+});
 
 // seems like we need to catch this event to keep OSX from exiting app after screensaver runs?
 app.on("window-all-closed", function() {

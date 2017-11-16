@@ -3,6 +3,8 @@ import "bootstrap";
 
 (function() {
   var remote = require('electron').remote;
+  var currentWindow = remote.getCurrentWindow();
+  var savers = currentWindow.savers;
   const {ipcRenderer} = window.require('electron');
 
   // parse incoming URL params -- we'll get a link to the current screen images for previews here
@@ -17,14 +19,12 @@ import "bootstrap";
     var aboutUrl = document.querySelector("[name=aboutUrl]").value;     
     var author = document.querySelector("[name=author]").value;
 
-    var me = remote.getCurrentWindow();
-
     ipcRenderer.on("generate-screensaver", (event, data) => {
       ipcRenderer.send("open-editor", {
         src: data.dest,
         screenshot: screenshot
       });
-      me.close();
+      currentWindow.close();
     });
 
     ipcRenderer.send("generate-screensaver", {
@@ -49,19 +49,17 @@ import "bootstrap";
 
   document.querySelector(".cancel").addEventListener('click', cancel, false);
 
-  ipcRenderer.on("get-settings", (event, data) => {
-    document.querySelector("body").classList.add("loaded");
+  document.querySelector("body").classList.add("loaded");
 
-    if ( typeof(data.localSource) === "undefined" || data.localSource === "" ) {
-      document.querySelector(".new").classList.add("hide");
-      document.querySelector(".need-setup").classList.remove("hide");     
-    }
-    else {
-      document.querySelector("body").classList.add("loaded");
-      document.querySelector(".save").addEventListener('click', validateForm, false);
-      document.querySelector("form").addEventListener('submit', handleSave, false);
-    }
-  });
-  ipcRenderer.send("get-settings");
+  var localSource = savers.getLocalSource();
+  if ( typeof(localSource) === "undefined" || localSource === "" ) {
+    document.querySelector(".new").classList.add("hide");
+    document.querySelector(".need-setup").classList.remove("hide");     
+  }
+  else {
+    document.querySelector("body").classList.add("loaded");
+    document.querySelector(".save").addEventListener('click', validateForm, false);
+    document.querySelector("form").addEventListener('submit', handleSave, false);
+  }
 
 })();

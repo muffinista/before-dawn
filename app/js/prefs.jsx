@@ -20,8 +20,10 @@ const shell = window.require("electron").shell;
   const {ipcRenderer} = window.require("electron");
   const {crashReporter} = window.require("electron");
 
-  var savers = require("../lib/savers.js");
   var remote = window.require("electron").remote;
+  var currentWindow = remote.getCurrentWindow();
+  var savers = currentWindow.savers;
+  
   var appName = remote.getGlobal("APP_NAME");
   var appVersion = remote.getGlobal("APP_VERSION");
   var defaultSaverRepo = remote.getGlobal("SAVER_REPO");
@@ -54,7 +56,7 @@ const shell = window.require("electron").shell;
   ipcRenderer.on("savers-updated", (event, arg) => {
     var val;
 
-    //console.log("handle savers-updated event");
+    console.log("handle savers-updated event");
     val = getCurrentScreensaver();
     renderList(false);
   });
@@ -390,35 +392,31 @@ const shell = window.require("electron").shell;
   
   var basePath = window.require("electron").remote.getGlobal("basePath");
 
-  ipcRenderer.on("list-savers", (event, data) => {
-    savers.initFromList(basePath, data, function() {
-      el = document.querySelector("[name=repo]");
-      el.value = savers.getSource().repo;
-      el.setAttribute("placeholder", defaultSaverRepo);
+  el = document.querySelector("[name=repo]");
+  el.value = savers.getSource().repo;
+  el.setAttribute("placeholder", defaultSaverRepo);
 
-      document.querySelector("[name=localSource]").value = savers.getLocalSource();
-      el = document.querySelector("select[name='delay'] option[value='" + savers.getDelay() + "']");
-      if ( el !== null ) {
-        el.setAttribute("selected", "selected");
-      }
+  document.querySelector("[name=localSource]").value = savers.getLocalSource();
+  el = document.querySelector("select[name='delay'] option[value='" + savers.getDelay() + "']");
+  if ( el !== null ) {
+    el.setAttribute("selected", "selected");
+  }
 
-      el = document.querySelector("select[name='sleep'] option[value='" + savers.getSleep() + "']");
-      if ( el !== null ) {
-        el.setAttribute("selected", "selected");
-      }
+  el = document.querySelector("select[name='sleep'] option[value='" + savers.getSleep() + "']");
+  if ( el !== null ) {
+    el.setAttribute("selected", "selected");
+  }
       
-      if ( savers.getLock() === true ) {
-        document.querySelector("input[name=lock_screen][type=checkbox]").setAttribute("checked", "checked");
-      }
+  if ( savers.getLock() === true ) {
+    document.querySelector("input[name=lock_screen][type=checkbox]").setAttribute("checked", "checked");
+  }
 
-      if ( savers.getDisableOnBattery() === true ) {
-        document.querySelector("input[name=disable_on_battery]").setAttribute("checked", "checked");
-      }
-      renderList();
-    });
-  });
-  ipcRenderer.send("list-savers");
- 
+  if ( savers.getDisableOnBattery() === true ) {
+    document.querySelector("input[name=disable_on_battery]").setAttribute("checked", "checked");
+  }
+
+  renderList();
+
   if ( updateAvailable === true ) {
     dialog.showMessageBox(
       {

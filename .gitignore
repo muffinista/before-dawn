@@ -41,3 +41,4 @@ bower_components
 .nyc_output
 
 app/dist/*
+dist/*

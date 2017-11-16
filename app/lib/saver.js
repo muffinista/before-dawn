@@ -150,7 +150,7 @@ module.exports = function Saver(_attrs) {
     for ( var i = 0 ; i < this.UNWRITABLE_KEYS.length; i++ ) {
       delete(attrs[this.UNWRITABLE_KEYS[i]]);
     }
-    
+
     var output = JSON.stringify(attrs, null, 2);
     fs.writeFileSync(configDest, output);
   };
