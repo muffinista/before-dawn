@@ -1,5 +1,9 @@
 # Change Log
 
+## [v0.9.12](https://github.com/muffinista/before-dawn/tree/v0.9.12) (2017-11-17)
+- Tweak some temp directory usage to try and fix some OSX issues
+
+
 ## [v0.9.11](https://github.com/muffinista/before-dawn/tree/v0.9.11) (2017-11-16)
 - Add some safety checks to config reading -- if it's corrupted
   somehow, just restart with a clean config
