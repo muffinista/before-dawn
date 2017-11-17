@@ -13,6 +13,7 @@
    const ipcRenderer = require('electron').ipcRenderer;
    const desktopCapturer = require('electron').desktopCapturer;
    const temp = require("temp");
+   const os = require("os");
    
    var findOrCreate = function(type, screen_id) {
      var el, id;
@@ -97,7 +98,7 @@
          
            photo.setAttribute('src', data);
 
-           var tempName = temp.path({suffix:'.png'});
+           var tempName = temp.path({dir: os.tmpdir(), suffix:'.png'});
            var fs = require('fs');
            var buffer = new Buffer(data.split(",")[1], 'base64');
            fs.writeFileSync(tempName, buffer);

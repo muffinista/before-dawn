@@ -101,8 +101,9 @@ module.exports = function Package(_attrs) {
 
   this.downloadFile = function(url, cb) {
     var temp = require("temp");
-    var tempName = temp.path({suffix: ".zip"});
-
+    var os = require("os");
+    var tempName = temp.path({dir: os.tmpdir(), suffix: ".zip"});
+    
     var _resp;
     var opts = {
       url:url,
