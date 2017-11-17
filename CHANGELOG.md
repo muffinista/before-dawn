@@ -1,6 +1,12 @@
 # Change Log
 
-## [v0.9.9](https://github.com/muffinista/before-dawn/tree/v0.9.9) (2017-11-13)
+## [v0.9.11](https://github.com/muffinista/before-dawn/tree/v0.9.11) (2017-11-16)
+- Add some safety checks to config reading -- if it's corrupted
+  somehow, just restart with a clean config
+- Pass the savers module to windows when opening them -- I think this
+  is faster than passing data back and forth
+
+## [v0.9.10](https://github.com/muffinista/before-dawn/tree/v0.9.10) (2017-11-13)
 - Add a random screensaver picker, as well as basic 'system
   screensaver' support -- ie, screensavers that are integral to the
   application and not installed as a separate package.
@@ -30,6 +36,9 @@
 - Add mocha tests
 - Add appveyor and Travis builds
 - Update some stale packages, and remove some dead ones
+
+## [v0.9.9](https://github.com/muffinista/before-dawn/tree/v0.9.9) (2017-11-13)
+- This version was yanked before it had a chance to truly shine. RIP
 
 ## [v0.9.8](https://github.com/muffinista/before-dawn/tree/v0.9.8) (2017-08-03)
 - Minor bug fixes
