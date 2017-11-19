@@ -55,7 +55,16 @@ export default class OptionsForm extends React.Component {
 
     _.each(this.props.saver.options, function(o, i) {
       var ref = "option" + i;
-      data[o.name] = self.refs[ref].state.value;
+      var val;
+
+      if ( self.refs[ref].state && self.refs[ref].state.value ) {
+        val = self.refs[ref].state.value;
+      }
+      else {
+        val = self.refs[ref].value;
+      }
+      //console.log(ref, val);
+      data[o.name] = val;
     });
     
     return data;
@@ -71,7 +80,6 @@ export default class OptionsForm extends React.Component {
     //console.log("RENDER!!!", this.props.saver);
     var nodes = this.props.saver.options.map(function(o, i) {
       var val = values[o.name];
-      //console.log("RENDER1", o, val);
       if ( typeof(val) === "undefined" ) {
         val = o.default;
       }
