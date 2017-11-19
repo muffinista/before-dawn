@@ -5,7 +5,6 @@ const Application = require('spectron').Application;
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
 
-//const appPath = __dirname + '/../../app/node_modules/electron/dist/Electron.app/Contents/MacOS/Electron';
 
 var appPath = path.join(__dirname, '..', '..', 'app', 'node_modules', '.bin', 'electron');
 if (process.platform === 'win32') {

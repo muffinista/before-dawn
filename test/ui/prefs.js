@@ -59,6 +59,33 @@ describe('Prefs', function() {
         });
     
   });
+
+  it.only('sets options for screensaver', function(done) {
+    app.client.waitUntilTextExists('body', 'Holzer', 10000).
+       getAttribute("[type=radio]","data-name").
+        then(() => console.log("here 0")).
+        then(() => app.client.click("[type=radio][data-name='Run a URL']")).
+        then(() => app.client.getText('body')).
+        then((text) => {
+          console.log(text);
+          assert(text.lastIndexOf('Load the specified URL') !== -1);
+        }).
+//        then(() => console.log("here")).
+        then(() => app.client.setValue("[name='load_url']", 'barfoo')).
+//        then(() => console.log("here 2")).
+        then(() => app.client.click("button.save")).
+//        then(() => console.log("here 3")).
+//        getWindowCount().should.eventually.equal(1).
+//        then(() => console.log("here 4")).
+        then(() => {
+          var options = helpers.savedConfig(workingDir).options;
+          var k = Object.keys(options)[0];
+                   
+          assert(options[k].load_url == 'barfoo');
+          done();
+        });
+    
+  });
   
   it('allows setting path', function(done) {
     app.client.waitUntilWindowLoaded().click("#prefs-tab").
