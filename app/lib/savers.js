@@ -496,6 +496,16 @@ var listAll = function(cb, force) {
   });
 };
 
+var updatePrefs = function(data, cb) {
+  for ( var k in data ) {
+    var v = data[k];
+    console.log(k, v);
+    nconf.set(k, v);
+  }
+
+  write(cb);
+};
+
 var write = function(cb) {
   var configPath = baseDir + "/" + config_file;
   nconf.save(cb);
@@ -516,6 +526,12 @@ var getConfig = function(cb) {
   fs.readFile(configPath, function(err, data) {
     cb(JSON.parse(data.toString()));
   });
+}
+
+var getConfigSync = function() {
+  var configPath = path.join(baseDir, config_file);
+  var data = fs.readFileSync(configPath);
+  return JSON.parse(data.toString());
 }
 
 /**
@@ -592,7 +608,9 @@ exports.setDisableOnBattery = setDisableOnBattery;
 exports.getDisableOnBattery = getDisableOnBattery;
 exports.getOptions = getOptions;
 exports.listAll = listAll;
+exports.updatePrefs = updatePrefs;
 exports.write = write;
 exports.firstLoad = firstLoad;
 exports.getConfig = getConfig;
+exports.getConfigSync = getConfigSync;
 exports.generateScreensaver = generateScreensaver;
