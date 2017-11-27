@@ -141,9 +141,6 @@ export default {
     getCurrentSaverData() {
 
     },
-    closeWindow() {
-      console.log("closeWindow");
-    },
     editSaver(s) {
       var opts = {
         src: s.src,
@@ -157,6 +154,9 @@ export default {
     updateSaverOption(saver, name, value) {
       console.log("update saver option!", saver, name, value);
       this.prefs.options[saver][name] = value;
+    },
+    closeWindow() {
+      console.log("closeWindow");
     },
     saveData() {
       var self = this;

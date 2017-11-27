@@ -10,7 +10,13 @@
       <b-tab title="Settings">
         <saver-form
            v-bind:saver="saver"
-           v-if="isLoaded"></saver-form>
+             v-if="isLoaded"></saver-form>
+        <saver-option-input
+           v-on="$listeners"
+           v-for="option in options"
+           v-bind:option="option"></saver-option-input>      
+        <button type="button" class="btn btn-positive" v-on:click="addSaverOption">Add</button>
+
       </b-tab>
     </b-tabs>
     <footer class="footer d-flex justify-content-between">
@@ -26,22 +32,24 @@
 <script>
   import SaverPreview from '@/components/SaverPreview';
   import SaverForm from '@/components/SaverForm';  
-
+  import SaverOptionInput from '@/components/SaverOptionInput';
+  
 export default {
   name: 'editor',
   components: {
-    SaverForm, SaverPreview
+    SaverForm, SaverPreview, SaverOptionInput
   },
   created() {
     var self = this;
     this.manager.loadFromFile(this.src).then((result) => {
       self.saver = result;
-      console.log("HELLO", self.saver);
+      self.options = result.options;
     });
   },
   data() {
     return {
-      saver: undefined
+      saver: undefined,
+      options: []
     }
   },
   computed: {
@@ -72,6 +80,27 @@ export default {
     onChange(e) {
       console.log(this);
     },
+    addSaverOption(e) {
+      var newOpt = {
+        "index": 1,
+        "name": "New Option",
+        "type": "slider",
+        "description": "Description",
+        "min": "1",
+        "max": "100",
+        "default": "75"
+      };
+      console.log(this.options.push({
+        "index": 1,
+        "name": "New Option",
+        "type": "slider",
+        "description": "Description",
+        "min": "1",
+        "max": "100",
+        "default": "75"
+      }));
+      console.log(this.options);
+    },   
     closeWindow() {
       console.log("closeWindow");
       this.currentWindow.close();
