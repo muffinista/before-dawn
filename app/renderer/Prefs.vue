@@ -16,7 +16,7 @@
 
             <!-- right pane -->
             <div class="col-sm-6 col-md-6">
-              <saver-preview v-bind:preview="saver"></saver-preview>
+              <saver-preview v-bind:preview="saver" v-bind:screenshot="screenshot"></saver-preview>
               <saver-options
                  :saver="saver"
                  :options="saverOptions"
@@ -66,11 +66,14 @@ export default {
       prefs: {},
       saver: undefined
     }
-  }, 
+  },
   computed: {
     manager: function() {
       var currentWindow = this.$electron.remote.getCurrentWindow();
       return currentWindow.savers;
+    },
+    ipcRenderer: function() {
+      return this.$electron.ipcRenderer;
     },
     isLoaded: function() {
       return ( this.saver !== undefined &&
@@ -102,6 +105,14 @@ export default {
       }
       return this.prefs.options[this.saver];
     },
+    params: function() {
+      // parse incoming URL params -- we'll get a link to the current screen images for previews here
+      return new URLSearchParams(document.location.search);
+    },
+    screenshot: function() {
+      // the main app will pass us a screenshot URL, here it is
+      return decodeURIComponent(this.params.get("screenshot"));
+    }
   },
   methods: {
     onChange(e) {
@@ -128,12 +139,17 @@ export default {
       this.saver = this.manager.getCurrent();
     },
     getCurrentSaverData() {
+
     },
     closeWindow() {
       console.log("closeWindow");
     },
     editSaver(s) {
-      console.log("edit!!!!!", s);
+      var opts = {
+        src: s.key,
+        screenshot: this.screenshot
+      };
+      this.ipcRenderer.send("open-editor", opts);
     },
     deleteSaver(s) {
       console.log("delete!!!!!", s);

@@ -1,6 +1,7 @@
 <template>
   <div id="wrapper">
     Preview! {{preview}}
+    Screenshot! {{screenshot}}
   </div>
 </template>
 
@@ -9,7 +10,7 @@
 
   export default {
     name: 'saver-preview',
-    props: ['preview'],
+    props: ['preview', 'screenshot'],
     components: { },
     methods: {
       open(link) {
