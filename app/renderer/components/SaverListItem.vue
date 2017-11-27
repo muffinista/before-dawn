@@ -9,8 +9,8 @@
       </label>
 
       <div>
-        <a class="watcher btn btn-outline-secondary btn-sm" href="#" role="button">edit</a>
-        <a class="delete btn btn-outline-secondary btn-sm" href="#" role="button">delete</a>
+        <a class="watcher btn btn-outline-secondary btn-sm" href="#" role="button" v-on:click="onEditClick(saver)">edit</a>
+        <a class="delete btn btn-outline-secondary btn-sm" href="#" role="button" v-on:click="onDeleteClick(saver)">delete</a>
       </div>
     </div>
   </li>
@@ -21,6 +21,14 @@
   export default {
     name: 'saver-list-item',
     props: ['saver'],
+    methods: {
+      onEditClick(s) {
+        this.$emit("editSaver", s);
+      },
+      onDeleteClick(s) {
+        this.$emit("deleteSaver", s);
+      }      
+    }
   };
 </script>
 

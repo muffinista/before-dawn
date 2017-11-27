@@ -3,7 +3,7 @@
   <saver-list-item
      v-on="$listeners"
      v-for="saver in savers"
-     :saver="saver"
+     v-bind:saver="saver"
      :key="saver.url"></saver-list-item>
 </ul>
 </template>
@@ -16,9 +16,9 @@
     components: {saverListItem: SaverListItem},
     props: ['savers'],
     methods: {
-      onChange(e) {
-        console.log("saver list changed!");
-      }
+      // onChange(e) {
+      //   console.log("saver list changed!");
+      // }
     }
   }
 </script>
