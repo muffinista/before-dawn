@@ -23,7 +23,8 @@ let whiteListedModules = ['vue']
 let rendererConfig = {
   devtool: '#cheap-module-eval-source-map',
   entry: {
-    renderer: path.join(__dirname, '../app/renderer/main.js')
+    renderer: path.join(__dirname, '../app/renderer/main.js'),
+    editor: path.join(__dirname, '../app/renderer/editor.js')
   },
   externals: [
     ...Object.keys(dependencies || {}).filter(d => !whiteListedModules.includes(d))
@@ -124,8 +125,21 @@ let rendererConfig = {
         removeComments: true
       },
       nodeModules: process.env.NODE_ENV !== 'production'
-        ? path.resolve(__dirname, '../node_modules')
-        : false
+    ? path.resolve(__dirname, '../node_modules')
+    : false
+    }),
+    new HtmlWebpackPlugin({
+      filename: 'editor.html',
+      template: path.resolve(__dirname, '../app/index.ejs'),
+      id: "editor",
+      minify: {
+        collapseWhitespace: true,
+        removeAttributeQuotes: true,
+        removeComments: true
+      },
+      nodeModules: process.env.NODE_ENV !== 'production'
+    ? path.resolve(__dirname, '../node_modules')
+    : false
     }),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin()

@@ -978,7 +978,7 @@ ipcMain.on("open-editor", (event, args) => {
   
   // pass the key of the screensaver we want to load
   // as well as the URL to our screenshot image
-  var target = "file://" + __dirname + "/html/watcher.html?" +
+  var target = "file://" + __dirname + "/html/editor.html?" +
                "src=" + encodeURIComponent(key) +
                "&screenshot=" + encodeURIComponent(screenshot);
   w.loadURL(target);
