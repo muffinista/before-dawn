@@ -209,6 +209,17 @@ var getCurrent = function() {
   return nconf.get("saver");
 };
 
+var loadCurrent = function(cb) {
+  var current = nconf.get("saver");
+  listAll(function(data) {
+    var result = _.find(data, function(obj) {
+      return obj.key === key;
+    });
+
+    cb(result);
+  });
+};
+
 /**
  * return the object/data of the current screensaver
  */
@@ -590,6 +601,7 @@ exports.delete = deleteSaver;
 exports.loadFromFile = loadFromFile;
 exports.getByKey = getByKey;
 exports.getCurrent = getCurrent;
+exports.loadCurrent = loadCurrent;
 exports.getSource = getSource;
 exports.setSource = setSource;
 exports.getLocalSource = getLocalSource;

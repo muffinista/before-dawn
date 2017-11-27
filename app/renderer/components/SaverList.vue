@@ -15,11 +15,6 @@
     name: 'saver-list',
     components: {saverListItem: SaverListItem},
     props: ['savers'],
-    methods: {
-      // onChange(e) {
-      //   console.log("saver list changed!");
-      // }
-    }
   }
 </script>
 

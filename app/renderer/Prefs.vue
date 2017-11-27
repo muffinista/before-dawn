@@ -146,7 +146,7 @@ export default {
     },
     editSaver(s) {
       var opts = {
-        src: s.key,
+        src: s.src,
         screenshot: this.screenshot
       };
       this.ipcRenderer.send("open-editor", opts);
