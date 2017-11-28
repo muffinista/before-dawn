@@ -218,48 +218,6 @@ describe('Savers', function() {
     });
   });
 
-  describe('initFromList', function() {
-    it("loads data", function(done) {
-      var list = [
-        saverData,
-        saverData,
-        saverData,
-        saverData,
-        saverData
-      ];
-
-      savers.initFromList(workingDir, list, function() {
-        savers.listAll(function(data) {
-          var s = data[0];
-          assert.equal("Screensaver One", s.name);
-          assert.equal(5, data.length);
-          done();
-        });
-      });
-    });
-  });
-
-  describe('toList', function() {
-    it("outputs data", function(done) {
-      var list = [
-        saverData,
-        saverData,
-        saverData,
-        saverData,        
-        saverData,
-        saverData
-      ];
-
-      savers.initFromList(workingDir, list, function() {
-        savers.toList(function(output) {
-          assert.deepEqual(output, list);
-          assert.equal(6, output.length);
-          done();
-        });
-      });
-    });
-  });
-
   describe('getSource/setSource', function() {
     it("works", function(done) {
       savers.init(workingDir, function() {

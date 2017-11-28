@@ -24,22 +24,6 @@ var init = function(_path, cb) {
   reload(cb);
 };
 
-var initFromList = function(_path, data, cb) {
-  baseDir = path.resolve(_path);
-  loadedScreensavers = _.map(data, function(attrs) {
-    return new Saver(attrs);
-  });
-
-  reload(cb, false);
-};
-
-var toList = function(cb) {
-  listAll(function(data) {
-    var out = _.map(data, function(s) { return s.toHash(); })
-    cb(out);
-  });
-};
-
 /**
  * reload all our data/config/etc
  */
@@ -545,9 +529,6 @@ var getConfigSync = function() {
   return JSON.parse(data.toString());
 }
 
-var getScreensaverTemplate = function() {
-  return new Saver();
-};
 
 /**
  * generate a screensaver template
@@ -596,8 +577,6 @@ var generateScreensaver = function(opts) {
 };
 
 exports.init = init;
-exports.initFromList = initFromList;
-exports.toList = toList;
 exports.reload = reload;
 exports.reset = reset;
 exports.delete = deleteSaver;
@@ -629,5 +608,4 @@ exports.write = write;
 exports.firstLoad = firstLoad;
 exports.getConfig = getConfig;
 exports.getConfigSync = getConfigSync;
-exports.getScreensaverTemplate = getScreensaverTemplate;
 exports.generateScreensaver = generateScreensaver;
