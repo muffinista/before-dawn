@@ -55,7 +55,7 @@ export default {
   components: {
     SaverList, SaverOptions, SaverPreview, PrefsForm
   },
-  created() {
+  mounted() {
     this.getConfig();
     this.getSavers();
     this.getCurrentSaver();

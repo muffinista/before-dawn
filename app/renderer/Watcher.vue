@@ -20,6 +20,7 @@
            v-for="option in options"
            track-by="$index"
            v-bind:option="option"
+           v-bind:key="option.name"
            v-on:deleteOption="deleteOption(option)"
            v-if="isLoaded"></saver-option-input>      
         <button type="button" class="btn btn-positive" v-on:click="addSaverOption">Add</button>

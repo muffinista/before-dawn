@@ -29,9 +29,6 @@ export default {
   components: {
     SaverForm
   },
-  mounted() {
-
-  },
   data() {
     return {
       saver: {}
