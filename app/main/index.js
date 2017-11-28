@@ -226,8 +226,9 @@ var addNewSaver = function(screenshot) {
     screenshot = screenshot.screenshot;
   }
 
-  newUrl = "file://" + __dirname + "/html/new.html" +
-           "?screenshot=" + encodeURIComponent(screenshot);
+  var newUrl = urlPrefix + "/new.html";
+
+  newUrl = newUrl + "?screenshot=" + encodeURIComponent(screenshot);
 
   var w = new BrowserWindow({
     width:450,
@@ -1021,6 +1022,7 @@ ipcMain.on("open-editor", (event, args) => {
 // generate screensaver template with specified attributes
 //
 ipcMain.on("generate-screensaver", (event, args) => {
+  console.log("hi!", args);
   var data = global.savers.generateScreensaver(args);
   event.sender.send("generate-screensaver", data);
 

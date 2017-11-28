@@ -11,10 +11,17 @@
         <saver-form
            v-bind:saver="saver"
              v-if="isLoaded"></saver-form>
+        <!--
+          note: is track-by ok here?
+          https://v1.vuejs.org/guide/list.html#track-by-index 
+        -->
         <saver-option-input
            v-on="$listeners"
            v-for="option in options"
-           v-bind:option="option"></saver-option-input>      
+           track-by="$index"
+           v-bind:option="option"
+           v-on:deleteOption="deleteOption(option)"
+           v-if="isLoaded"></saver-option-input>      
         <button type="button" class="btn btn-positive" v-on:click="addSaverOption">Add</button>
 
       </b-tab>
@@ -39,8 +46,13 @@ export default {
   components: {
     SaverForm, SaverPreview, SaverOptionInput
   },
-  created() {
+  mounted() {
     var self = this;
+    console.log("Watcher mounted", this);
+    if ( this.src === null ) {
+      return;
+    }
+    console.log("LOAD", this.src);
     this.manager.loadFromFile(this.src).then((result) => {
       self.saver = result;
       self.options = result.options;
@@ -80,32 +92,27 @@ export default {
     onChange(e) {
       console.log(this);
     },
+    deleteOption(opt) {
+      console.log("DELETE", opt);
+      let index = this.options.indexOf(opt);
+      this.options.splice(index, 1);
+    },
     addSaverOption(e) {
-      var newOpt = {
-        "index": 1,
+      this.options.push({
         "name": "New Option",
         "type": "slider",
         "description": "Description",
         "min": "1",
         "max": "100",
         "default": "75"
-      };
-      console.log(this.options.push({
-        "index": 1,
-        "name": "New Option",
-        "type": "slider",
-        "description": "Description",
-        "min": "1",
-        "max": "100",
-        "default": "75"
-      }));
+      });
       console.log(this.options);
     },   
     closeWindow() {
-      console.log("closeWindow");
       this.currentWindow.close();
     },
     saveData() {
+      this.saver.attrs.options = this.options;
       console.log("SAVE", this.saver.attrs);
       this.saver.write(this.saver.attrs);
       this.ipcRenderer.send("savers-updated", this.saver.key);
@@ -115,9 +122,7 @@ export default {
       this.closeWindow();
     }
   }
-}
-
-  
+} 
 </script>
 
 <style>

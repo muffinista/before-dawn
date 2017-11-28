@@ -140,6 +140,19 @@ let rendererConfig = {
     ? path.resolve(__dirname, '../node_modules')
     : false
     }),
+    new HtmlWebpackPlugin({
+      filename: 'new.html',
+      template: path.resolve(__dirname, '../app/index.ejs'),
+      id: "new",
+      minify: {
+        collapseWhitespace: true,
+        removeAttributeQuotes: true,
+        removeComments: true
+      },
+      nodeModules: process.env.NODE_ENV !== 'production'
+    ? path.resolve(__dirname, '../node_modules')
+    : false
+    }),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin()
   ],

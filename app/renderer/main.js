@@ -4,6 +4,7 @@ import BootstrapVue from 'bootstrap-vue'
 
 import Prefs from './Prefs';
 import Watcher from './Watcher';
+import NewScreensaver from './NewScreensaver';
 
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'));
 Vue.config.productionTip = false;
@@ -22,3 +23,9 @@ new Vue({
   components: { Watcher },
   template: '<Watcher/>'
 }).$mount('#editor');
+
+// eslint-disable no-new 
+new Vue({
+  components: { NewScreensaver },
+  template: '<NewScreensaver/>'
+}).$mount('#new');

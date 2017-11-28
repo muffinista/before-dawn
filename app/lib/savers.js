@@ -545,6 +545,10 @@ var getConfigSync = function() {
   return JSON.parse(data.toString());
 }
 
+var getScreensaverTemplate = function() {
+  return new Saver();
+};
+
 /**
  * generate a screensaver template
  */
@@ -625,4 +629,5 @@ exports.write = write;
 exports.firstLoad = firstLoad;
 exports.getConfig = getConfig;
 exports.getConfigSync = getConfigSync;
+exports.getScreensaverTemplate = getScreensaverTemplate;
 exports.generateScreensaver = generateScreensaver;

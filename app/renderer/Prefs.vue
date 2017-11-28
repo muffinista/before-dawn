@@ -34,7 +34,7 @@
     </b-tabs>
     <footer class="footer d-flex justify-content-between">
       <div>
-        <button class="btn btn-large btn-positive create">Create Screensaver</button>
+        <button class="btn btn-large btn-positive create" v-on:click="createNewScreensaver">Create Screensaver</button>
       </div>
       <div>
         <button class="btn btn-large btn-default cancel" v-on:click="closeWindow">Cancel</button>
@@ -141,6 +141,9 @@ export default {
     getCurrentSaverData() {
 
     },
+    createNewScreensaver() {
+      this.ipcRenderer.send("open-add-screensaver", this.screenshot);
+    },
     editSaver(s) {
       var opts = {
         src: s.src,
@@ -164,6 +167,7 @@ export default {
       console.log("SAVE", this.prefs);
       this.prefs.saver = this.saver;
       this.manager.updatePrefs(this.prefs, function() {
+        // @todo wire this up
         if ( self.prefs.auto_start === true ) {
           console.log("set auto_start == true");
           //appLauncher.enable().then(function(x) { }).then(function(err){
@@ -176,7 +180,6 @@ export default {
         }
 
         self.closeWindow();
-        console.log("done!");
       });
     }
   },

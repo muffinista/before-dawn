@@ -1,6 +1,5 @@
 <template>
-<div id="wrapper">
-  <form v-on="$listeners">
+  <form v-on="$listeners" :class="formType">
     <div class="form-group row">
       <label class="col-sm-2 col-form-label">Name</label>
       <div class="col-sm-10" >
@@ -48,7 +47,7 @@
       </div>
       
       <label class="col-sm-2 col-form-label">Default</label>
-      <div class="{renderType}">
+      <div>
         <input type="text"
                v-model="option.default"
                placeholder="Default value of this option"
@@ -58,10 +57,10 @@
     
     <div class="form-actions">
       <button type="button"
-              class="btn btn-danger">Remove this Option</button>
+              class="btn btn-danger"
+              v-on:click="onDeleteClick(option)">Remove this Option</button>
     </div>
   </form>
-</div>
 </template>
 
 <script>
@@ -70,20 +69,24 @@
     props: ['option'],
     components: { },
     computed: {
-      renderType: function() {
+      formType: function() {
         if ( this.option.type === "slider" ) {
-          return "range";
+          return "option-range";
         }
-        return "text";
+        return "option-text";
       }
     },
     methods: {
-      emitChange(saver, name, value) {
-        this.$emit("saverOption", saver, name, value);
+      onDeleteClick() {
+        this.$emit("deleteOption");
       },
     },
   };
 </script>
 
 <style>
+  // hide slider options for non-sliders
+  form:not(.option-range) .only-for-slider {
+    display: none;
+  }
 </style>
