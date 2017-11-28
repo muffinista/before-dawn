@@ -1,8 +1,11 @@
 <template>
 <div id="new">
   <template v-if="!canAdd">
-    <div class="container-fluid need-setup">
-      Hey, before you can create a new screensaver, you'll need to set a local directory in the preferences window!
+    <div class="container-fluid">
+      <p>
+        Hey, before you can create a new screensaver, you'll need to
+        set a local directory in the preferences window!
+      </p>
     </div>
   </template>  
   <saver-form
