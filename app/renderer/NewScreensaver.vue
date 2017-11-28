@@ -1,15 +1,21 @@
 <template>
-  <div id="new">
-    <saver-form
-       v-bind:saver="saver"></saver-form>
-
-    <footer class="footer d-flex justify-content-between">
-      <div>
-        <button class="btn btn-large btn-default cancel" v-on:click="closeWindow">Cancel</button>
-        <button class="btn btn-large btn-positive save" v-on:click="saveData">Save</button>
-      </div>
-    </footer>
-  </div> <!-- #new -->
+<div id="new">
+  <template v-if="!canAdd">
+    <div class="container-fluid need-setup">
+      Hey, before you can create a new screensaver, you'll need to set a local directory in the preferences window!
+    </div>
+  </template>  
+  <saver-form
+     v-bind:saver="saver"
+     v-if="canAdd"></saver-form>
+  
+  <footer class="footer d-flex justify-content-between">
+    <div>
+      <button class="btn btn-large btn-default cancel" v-on:click="closeWindow">Cancel</button>
+      <button class="btn btn-large btn-positive save" v-on:click="saveData">Save</button>
+    </div>
+  </footer>
+</div> <!-- #new -->
 </template>
 
 <script>
@@ -45,6 +51,11 @@ export default {
     screenshot: function() {
       // the main app will pass us a screenshot URL, here it is
       return decodeURIComponent(this.params.get("screenshot"));
+    },
+    canAdd: function() {
+      return this.manager !== undefined &&
+        this.manager.getLocalSource() !== undefined &&
+        this.manager.getLocalSource() !== "";
     }
   },
   methods: {
