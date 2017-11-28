@@ -1018,6 +1018,28 @@ ipcMain.on("open-editor", (event, args) => {
 });
 
 
+ipcMain.on("set-autostart", (event, value) => {
+  console.log("set-autostart", value);
+  var AutoLaunch = require("auto-launch");
+  var appName = global.APP_NAME;
+  var appLauncher = new AutoLaunch({
+    name: appName
+  });
+
+  if ( value === true ) {
+    console.log("set auto_start == true");
+    appLauncher.enable().then(function(x) { }).then(function(err){
+      console.log("ERR", err);
+    });
+  }
+  else {
+    console.log("set auto start == false");
+    appLauncher.disable().then(function(x) { });
+  }
+
+
+});
+
 //
 // generate screensaver template with specified attributes
 //

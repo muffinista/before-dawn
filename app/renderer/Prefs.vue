@@ -29,7 +29,7 @@
         </div>
       </b-tab>
       <b-tab title="Preferences">
-        <prefs-form :prefs="prefs" @change="onChange"></prefs-form>
+        <prefs-form :prefs="prefs"></prefs-form>
       </b-tab>
     </b-tabs>
     <footer class="footer d-flex justify-content-between">
@@ -115,12 +115,9 @@ export default {
     }
   },
   methods: {
-    onChange(e) {
-      console.log(this.prefs);
-    },
     onOptionsChange(e) {
-      console.log("opts change!", this.prefs);
-      console.log(this.prefs.options[this.saver]);
+      //console.log("opts change!", this.prefs);
+      //console.log(this.prefs.options[this.saver]);
     },
     onSaverPicked(e) {
       this.saver = e.target.value;
@@ -152,33 +149,23 @@ export default {
       this.ipcRenderer.send("open-editor", opts);
     },
     deleteSaver(s) {
+      // @todo implement
       console.log("delete!!!!!", s);
     },
     updateSaverOption(saver, name, value) {
-      console.log("update saver option!", saver, name, value);
+      //console.log("update saver option!", saver, name, value);
       this.prefs.options[saver][name] = value;
     },
     closeWindow() {
-      console.log("closeWindow");
+      this.currentWindow.close();
     },
     saveData() {
       var self = this;
 
-      console.log("SAVE", this.prefs);
       this.prefs.saver = this.saver;
       this.manager.updatePrefs(this.prefs, function() {
-        // @todo wire this up
-        if ( self.prefs.auto_start === true ) {
-          console.log("set auto_start == true");
-          //appLauncher.enable().then(function(x) { }).then(function(err){
-          //  console.log("ERR", err);
-          //});
-        }
-        else {
-          console.log("set auto start == false");
-          //appLauncher.disable().then(function(x) { });
-        }
-
+        console.log("!!!!!!!!!", self.prefs);
+        self.ipcRenderer.send("set-autostart", self.prefs.auto_start);
         self.closeWindow();
       });
     }

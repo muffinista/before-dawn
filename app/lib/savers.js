@@ -164,7 +164,7 @@ var ensureDefaults = function() {
   var source = nconf.get("source");
   if ( source === undefined ) {
     _firstLoad = true;
-    setConfig("source",{
+    setConfig("source", {
       repo: global.SAVER_REPO,
       hash: ""
     });
@@ -492,6 +492,7 @@ var listAll = function(cb, force) {
 };
 
 var updatePrefs = function(data, cb) {
+  console.log("updatePrefs", data);
   for ( var k in data ) {
     var v = data[k];
     console.log(k, v);
@@ -526,7 +527,15 @@ var getConfig = function(cb) {
 var getConfigSync = function() {
   var configPath = path.join(baseDir, config_file);
   var data = fs.readFileSync(configPath);
-  return JSON.parse(data.toString());
+  data = JSON.parse(data.toString());
+
+  // add anything that might not exist, because
+  // vue.js won't treat missing data properly
+  if ( data.auto_start === undefined ) {
+    data.auto_start = false;
+  }
+
+  return data;
 }
 
 

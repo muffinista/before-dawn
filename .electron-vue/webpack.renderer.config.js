@@ -53,6 +53,16 @@ let rendererConfig = {
         })
       },
       {
+        test: /\.(scss)$/,
+        use: [{
+          loader: 'style-loader', // inject CSS to page
+        }, {
+          loader: 'css-loader', // translates CSS into CommonJS modules
+        }, {
+          loader: 'sass-loader' // compiles SASS to CSS
+        }]
+      },
+      {
         test: /\.html$/,
         use: 'vue-html-loader'
       },

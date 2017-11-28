@@ -61,7 +61,7 @@
 
         <div class="form-check">
           <label for="auto_start" class="form-check-label">
-            <input type="checkbox" id="auto_start" class="form-check-input" v-model="prefs.auto_start" />
+            <input type="checkbox" class="form-check-input" v-model="prefs.auto_start" />
             Auto start on login?
           </label>
           <small class="form-text text-muted">

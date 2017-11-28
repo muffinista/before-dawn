@@ -47,6 +47,7 @@
     "request-promise-native": "^1.0.5",
     "rimraf": "^2.6.2",
     "robotjs": "^0.4.7",
+    "sass-loader": "^6.0.6",
     "temp": "^0.8.3",
     "vue": "^2.5.6",
     "vue-electron": "^1.0.6",
