@@ -16,11 +16,9 @@
           https://v1.vuejs.org/guide/list.html#track-by-index 
         -->
         <saver-option-input
-           v-on="$listeners"
            v-for="option in options"
-           track-by="$index"
            v-bind:option="option"
-           v-bind:key="option.name"
+           v-bind:key="option.index"
            v-on:deleteOption="deleteOption(option)"
            v-if="isLoaded"></saver-option-input>      
         <button type="button" class="btn btn-positive" v-on:click="addSaverOption">Add</button>
@@ -49,19 +47,19 @@ export default {
   },
   mounted() {
     var self = this;
-    console.log("Watcher mounted", this);
     if ( this.src === null ) {
       return;
     }
-    console.log("LOAD", this.src);
     this.manager.loadFromFile(this.src).then((result) => {
       self.saver = result;
       self.options = result.options;
+      self.lastIndex = result.options.length;
     });
   },
   data() {
     return {
       saver: undefined,
+      lastIndex: 0,
       options: []
     }
   },
@@ -90,16 +88,19 @@ export default {
     }
   },
   methods: {
-    onChange(e) {
-      console.log(this);
-    },
     deleteOption(opt) {
-      console.log("DELETE", opt);
       let index = this.options.indexOf(opt);
       this.options.splice(index, 1);
+
+      // rewrite indexes
+//      for(var i = 0; i < this.options.length; i++ ) {
+//        console.log(this.options[i].index, i);
+//        this.options[i].index = i;
+//      }
     },
     addSaverOption(e) {
       this.options.push({
+        "index": this.lastIndex + 1,
         "name": "New Option",
         "type": "slider",
         "description": "Description",
@@ -107,14 +108,14 @@ export default {
         "max": "100",
         "default": "75"
       });
-      console.log(this.options);
+      console.log("index", this.lastIndex);
+      this.lastIndex = this.lastIndex + 1;
     },   
     closeWindow() {
       this.currentWindow.close();
     },
     saveData() {
       this.saver.attrs.options = this.options;
-      console.log("SAVE", this.saver.attrs);
       this.saver.write(this.saver.attrs);
       this.ipcRenderer.send("savers-updated", this.saver.key);
     },
