@@ -8,6 +8,7 @@
             <!-- left pane -->
             <div class="col-sm-6 col-md-6">
               <saver-list
+                 v-if="isLoaded"
                  v-bind:savers="savers"
                  v-bind:current="saver"
                  v-on:editSaver="editSaver"
@@ -18,11 +19,13 @@
             <!-- right pane -->
             <div class="col-sm-6 col-md-6">
               <template v-if="isLoaded">
+                <saver-summary :saver="saverObj"></saver-summary>
                 <saver-preview
                    :bus="bus"
-                   :saver="saverObj"
+                   :saver="savers[saverIndex]"
                    :screenshot="screenshot"
-                   :options="prefs.options[saver]"></saver-preview>
+                   :options="prefs.options[saver]"
+                   v-if="savers[saverIndex] !== undefined"></saver-preview>
                 <saver-options
                    :saver="saver"
                    :options="saverOptions"
@@ -56,16 +59,16 @@ import Vue from 'vue';
 import SaverList from '@/components/SaverList';
 import SaverPreview from '@/components/SaverPreview';
 import SaverOptions from '@/components/SaverOptions';
+import SaverSummary from '@/components/SaverSummary';
 import PrefsForm from '@/components/PrefsForm';
 
 export default {
   name: 'prefs',
   components: {
-    SaverList, SaverOptions, SaverPreview, PrefsForm
+    SaverList, SaverOptions, SaverPreview, SaverSummary, PrefsForm
   },
   mounted() {
-    this.getConfig();
-    this.getSavers();
+    this.getData();
     this.getCurrentSaver();
   },
   data() {
@@ -92,14 +95,7 @@ export default {
                this.savers.length > 0);
     },
     saverIndex: function() {
-      var self = this;
-      if ( ! this.isLoaded ) {
-        return undefined;
-      }
-      
-      return this.savers.findIndex(function(s) {
-        return s.key == self.saver;
-      });
+      return this.savers.findIndex((s) => s.key === this.saver);
     },
     saverOptions: function() {
       var self = this;
@@ -136,15 +132,23 @@ export default {
     },
     onSaverPicked(e) {
       this.saver = e.target.value;
+      this.bus.$emit('saver-changed', this.saverObj);
     },
-    getConfig() {
-      this.prefs = this.manager.getConfigSync();
-    },
-    getSavers() {
-      var self = this;
-      
-      this.manager.listAll(function(entries) {
-        self.savers = entries;
+    getData() {
+      this.manager.listAll((entries) => {
+        this.savers = entries;
+        var tmp = this.manager.getConfigSync();
+
+        // ensure default settings in the config for all savers
+        for(var i = 0; i < this.savers.length; i++ ) {
+          var s = this.savers[i];
+          if ( tmp.options[s.key] === undefined ) {
+            this.$set(tmp.options, s.key, {});
+          }
+        }
+
+        this.prefs = tmp;       
+        this.bus.$emit('saver-changed', this.saverObj);
       });
     },
     getCurrentSaver() {

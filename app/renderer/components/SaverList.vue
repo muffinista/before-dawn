@@ -4,6 +4,7 @@
      v-on="$listeners"
      v-for="saver in savers"
      v-bind:saver="saver"
+     :checked="saver.key == current"
      :key="saver.url"></saver-list-item>
 </ul>
 </template>
@@ -14,7 +15,7 @@
   export default {
     name: 'saver-list',
     components: {saverListItem: SaverListItem},
-    props: ['savers'],
+    props: ['savers', 'current'],
   }
 </script>
 

@@ -3,7 +3,7 @@
     <div class="d-flex w-100 justify-content-between">
       <label>
         <div class="body">
-          <input type="radio" v-bind:value="saver.key" name="screensaver" v-on="$listeners" />
+          <input type="radio" v-bind:value="saver.key" name="screensaver" v-on="$listeners" :checked="checked"/>
           <b>{{saver.name}}</b>
         </div>
       </label>
@@ -20,7 +20,7 @@
 <script>
   export default {
     name: 'saver-list-item',
-    props: ['saver'],
+    props: ['saver', 'checked'],
     methods: {
       onEditClick(s) {
         this.$emit("editSaver", s);
