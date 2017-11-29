@@ -32,6 +32,7 @@
                    :values="prefs.options[saver]"
                    @change="onOptionsChange"
                    v-on:saverOption="updateSaverOption"></saver-options>
+                {{prefs.options}}
               </template>
             </div>
           </div>
@@ -143,11 +144,15 @@ export default {
         for(var i = 0; i < this.savers.length; i++ ) {
           var s = this.savers[i];
           if ( tmp.options[s.key] === undefined ) {
-            this.$set(tmp.options, s.key, {});
+            tmp.options[s.key] = {};
           }
         }
 
-        this.prefs = tmp;       
+        // https://vuejs.org/v2/guide/reactivity.html
+        // However, new properties added to the object will not
+        // trigger changes. In such cases, create a fresh object
+        // with properties from both the original object and the mixin object:
+        this.prefs = Object.assign({}, this.prefs, tmp);
         this.bus.$emit('saver-changed', this.saverObj);
       });
     },

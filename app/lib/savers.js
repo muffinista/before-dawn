@@ -450,7 +450,6 @@ var loadFromData = function(contents, stub, settings) {
     contents.settings = settings;
   }
 
-
   // ensure that all screensavers have options set
   if ( getOptions(contents.key) === {} ) {
     setOptions({}, contents.key);
