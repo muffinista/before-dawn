@@ -32,7 +32,6 @@
                    :values="prefs.options[saver]"
                    @change="onOptionsChange"
                    v-on:saverOption="updateSaverOption"></saver-options>
-                {{prefs.options}}
               </template>
             </div>
           </div>

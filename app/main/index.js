@@ -998,7 +998,13 @@ ipcMain.on("open-editor", (event, args) => {
   var key = args.src;
   var screenshot = args.screenshot;
 
-  var w = new BrowserWindow();
+  var w = new BrowserWindow({
+    // @todo i added this when switching to webpack/vue,
+    // can it be tossed again?
+    webPreferences: {
+      webSecurity: false
+    },
+  });
   w.savers = global.savers;
   
   // pass the key of the screensaver we want to load

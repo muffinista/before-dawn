@@ -16,8 +16,10 @@
       }
     },
     mounted: function () {
-      this.bus.$on('options-changed', this.debounceHandleOptionsChange);
-      this.bus.$on('saver-changed', this.handleSaverChange);      
+      if ( this.bus !== undefined ) {
+        this.bus.$on('options-changed', this.debounceHandleOptionsChange);
+        this.bus.$on('saver-changed', this.handleSaverChange);
+      }
 
       window.addEventListener('resize', this.debounceHandleResize);
 
@@ -45,13 +47,11 @@
       previewUrl: {
         get: function() {
           if ( this._previewUrl === undefined ) {
-            console.log("hey", this.saver, this.urlOpts(this.saver));
             this.$forceUpdate();
           }
           return this._previewUrl;
         },
         set: function(val) {
-          console.log("SET TO", val);
           this._previewUrl = val;
         }       
       }
@@ -63,7 +63,6 @@
           this.$nextTick(this.waitForIframe);
         }
 
-        console.log(this.aspectRatio);
         this.handleSaverChange(this.saver);
         this.$nextTick(this.handleResize);
       },
@@ -102,17 +101,12 @@
         this.handleRedraw();
       },
       handleSaverChange(s) {
-        //this.saver = s;
-        //console.log("CHANGE", s);
         this.previewUrl = s.getUrl(this.urlOpts(s));
-        //console.log("hi!!!", this.previewUrl);
         this.handleRedraw();
       },
       handleResize() {
         var iframe = this.$el.querySelector("iframe");
 
-        //        console.log("handle resize", this.$el, iframe, this.saver.getUrl(this.urlOpts()));
-        
         iframe.style.width = this.iframeWidth() + "px";
         iframe.style.height = this.iframeHeight() + "px";
 

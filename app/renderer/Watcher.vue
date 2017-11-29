@@ -3,14 +3,14 @@
     <b-tabs>
       <b-tab title="Preview" active>
         <saver-preview
-           v-bind:preview="saver"
+           v-bind:saver="saver"
            v-bind:screenshot="screenshot"
            v-if="isLoaded"></saver-preview>
       </b-tab>
       <b-tab title="Settings">
         <saver-form
            v-bind:saver="saver"
-             v-if="isLoaded"></saver-form>
+           v-if="isLoaded"></saver-form>
         <!--
           note: is track-by ok here?
           https://v1.vuejs.org/guide/list.html#track-by-index 
