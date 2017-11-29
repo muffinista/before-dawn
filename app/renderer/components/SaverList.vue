@@ -1,5 +1,5 @@
 <template>
-<ul>
+<ul class="saver-list">
   <saver-list-item
      v-on="$listeners"
      v-for="saver in savers"

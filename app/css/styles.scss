@@ -1,6 +1,40 @@
 @import "../../node_modules/noty/lib/noty.css";
 @import "loader";
 
+$nav_height: 42px;
+$footer_height: 40px;
+
+body > div > footer {
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: $footer_height;
+  background-color: #f5f5f5;
+
+  /* this should solve some input/footer overlap issues on prefs form */
+  z-index: 1000;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+body > div > .content {
+  height: calc(100vh - #{$footer_height});
+  overflow-y: scroll;
+}
+
+ul {
+  padding-left: 0px;
+}
+
+ul[role=tablist] {
+    position: fixed;
+    height: 42px;
+    margin-bottom: 42px;
+    background: white;
+}
+.tab-content {
+    padding-top: 42px;
+}
+
 .hide {
   display: none;
 }
@@ -12,29 +46,12 @@
   height: 80vh;
 }
 
-body .show-when-loaded {
-  display: none !important;
-}
-body.loaded .hide-when-loaded {
-  display: none !important;
-}
-body.loaded .show-when-loaded {
-  display: initial;
-}
-body.loaded .show-when-loaded.container-fluid {
-  display: block !important;
-}
-body.loaded .show-when-loaded.d-flex {
-  display: flex !important;
-}
-
 .navbar-header {
-  height: 42px;
+  height: $nav_height;
 }
 .navbar-header.sticky-top {
   background-color: white;
 }
-
 
 button {
   cursor: pointer;
@@ -52,33 +69,6 @@ button.add-option {
   margin-top: 12px;
 }
 
-.footer {
-  width: 100%;
-  /* Set the fixed height of the footer here */
-  height: 40px;
-  background-color: #f5f5f5;
-
-  /* this should solve some input/footer overlap issues on prefs form */
-  z-index: 1000;
-  padding-left: 5px;
-  padding-right: 5px;
-}
-
-.new {
-  .guts-wrapper {
-    height: calc(100vh - 40px);
-    overflow-y: scroll;
-  }
-  footer {
-    justify-content: flex-end;
-  }
-}
-
-.guts-wrapper {
-  height: calc(100vh - 83px);
-  overflow-y: scroll;
-}
-
 .watcher iframe {
   width: calc(100vw - 15px);
   height: calc(100vh - 90px);
@@ -86,7 +76,7 @@ button.add-option {
   margin-right: auto;
 }
 
-.scrollable {
+.saver-list {
   height: 88vh;
   overflow-y: scroll;
 }

@@ -1,5 +1,6 @@
 <template>
-  <div id="prefs">
+<div id="prefs">
+  <div class="content">
     <b-tabs>
       <b-tab title="Screensavers" active>
         <div class="container-fluid">
@@ -16,14 +17,19 @@
 
             <!-- right pane -->
             <div class="col-sm-6 col-md-6">
-              <saver-preview v-bind:preview="saver" v-bind:screenshot="screenshot"></saver-preview>
-              <saver-options
-                 :saver="saver"
-                 :options="saverOptions"
-                 :values="prefs.options[saver]"
-                 @change="onOptionsChange"
-                 v-on:saverOption="updateSaverOption"
-                 v-if="isLoaded"></saver-options>
+              <template v-if="isLoaded">
+                <saver-preview
+                   :bus="bus"
+                   :saver="saverObj"
+                   :screenshot="screenshot"
+                   :options="prefs.options[saver]"></saver-preview>
+                <saver-options
+                   :saver="saver"
+                   :options="saverOptions"
+                   :values="prefs.options[saver]"
+                   @change="onOptionsChange"
+                   v-on:saverOption="updateSaverOption"></saver-options>
+              </template>
             </div>
           </div>
         </div>
@@ -32,19 +38,21 @@
         <prefs-form :prefs="prefs"></prefs-form>
       </b-tab>
     </b-tabs>
-    <footer class="footer d-flex justify-content-between">
-      <div>
-        <button class="btn btn-large btn-positive create" v-on:click="createNewScreensaver">Create Screensaver</button>
-      </div>
-      <div>
-        <button class="btn btn-large btn-default cancel" v-on:click="closeWindow">Cancel</button>
-        <button class="btn btn-large btn-positive save" v-on:click="saveData">Save</button>
-      </div>
-    </footer>
-  </div> <!-- #prefs -->
+  </div> <!-- content -->
+  <footer class="footer d-flex justify-content-between">
+    <div>
+      <button class="btn btn-large btn-positive create" v-on:click="createNewScreensaver">Create Screensaver</button>
+    </div>
+    <div>
+      <button class="btn btn-large btn-default cancel" v-on:click="closeWindow">Cancel</button>
+      <button class="btn btn-large btn-positive save" v-on:click="saveData">Save</button>
+    </div>
+  </footer>
+</div> <!-- #prefs -->
 </template>
 
 <script>
+import Vue from 'vue';
 import SaverList from '@/components/SaverList';
 import SaverPreview from '@/components/SaverPreview';
 import SaverOptions from '@/components/SaverOptions';
@@ -68,6 +76,9 @@ export default {
     }
   },
   computed: {
+    bus: function() {
+      return new Vue();
+    },
     manager: function() {
       var currentWindow = this.$electron.remote.getCurrentWindow();
       return currentWindow.savers;
@@ -96,7 +107,6 @@ export default {
         return undefined;
       }
 
-      console.log("USE INDEX", this.saverIndex);
       return this.savers[this.saverIndex].options;
     },
     saverValues: function() {
@@ -104,6 +114,12 @@ export default {
         return {};
       }
       return this.prefs.options[this.saver];
+    },
+    saverSettings: function() {
+      return this.savers[this.saverIndex].settings;
+    },
+    saverObj: function() {
+      return this.savers[this.saverIndex];
     },
     params: function() {
       // parse incoming URL params -- we'll get a link to the current screen images for previews here
@@ -116,8 +132,7 @@ export default {
   },
   methods: {
     onOptionsChange(e) {
-      //console.log("opts change!", this.prefs);
-      //console.log(this.prefs.options[this.saver]);
+      this.bus.$emit('options-changed', this.prefs.options[this.saver]);
     },
     onSaverPicked(e) {
       this.saver = e.target.value;
@@ -164,7 +179,6 @@ export default {
 
       this.prefs.saver = this.saver;
       this.manager.updatePrefs(this.prefs, function() {
-        console.log("!!!!!!!!!", self.prefs);
         self.ipcRenderer.send("set-autostart", self.prefs.auto_start);
         self.closeWindow();
       });

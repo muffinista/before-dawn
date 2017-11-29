@@ -176,7 +176,6 @@ var openPrefsWindow = function() {
 
   // take a screenshot of the main screen for use in previews
   grabScreen(primary, function(message) {
-    console.log("HERE");
     // call savers.reload to make sure our data is properly refreshed
     // and check for any system updates
     global.savers.reload(function() {
@@ -188,6 +187,11 @@ var openPrefsWindow = function() {
         width:800,
         height:700,
         resizable:true,
+        // @todo i added this when switching to webpack/vue,
+        // can it be tossed again?
+        webPreferences: {
+          webSecurity: false
+        },
         icon: path.join(__dirname, "assets", "icon.png")
       });
 

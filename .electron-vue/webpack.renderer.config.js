@@ -119,8 +119,10 @@ let rendererConfig = {
     ]
   },
   node: {
-    __dirname: process.env.NODE_ENV !== 'production',
-    __filename: process.env.NODE_ENV !== 'production'
+//    __dirname: process.env.NODE_ENV !== 'production',
+    //    __filename: process.env.NODE_ENV !== 'production'
+    __dirname: false,
+    __filename: false
   },
   plugins: [
     new ExtractTextPlugin('styles.css'),
