@@ -1,3 +1,4 @@
+
 <template>
   <div id="prefs-form">
     <form v-on="$listeners">
@@ -92,7 +93,7 @@
           <div class="input-group">
             <input type="text" v-model="prefs.localSource" class="form-control" />
             <span class="input-group-btn">
-              <button class="btn btn-secondary pick">...</button>
+              <button type="button" class="btn btn-secondary pick" @click.stop="showPathChooser">...</button>
             </span>
           </div>
 
@@ -100,18 +101,33 @@
             We will load screensavers from any directories listed here. Use this to add your own screensavers!
           </small>
         </div>
-
+        
       </fieldset>
-    </form>   
+    </form>
   </div>
 </template>
 
 <script>
-  export default {
-    name: 'prefs-form',
-    components: {},
-    props: ['prefs'],
-  };
+const {dialog} = require("electron").remote;
+export default {
+  name: 'prefs-form',
+  components: {},
+  props: ['prefs'],
+  methods: {
+    showPathChooser() {
+      dialog.showOpenDialog(
+        {
+          properties: [ "openDirectory", "createDirectory" ]
+        },
+        this.handlePathChoice );
+    },
+    handlePathChoice(result) {
+      if ( result !== undefined ) {
+        this.prefs.localSource = result;
+      }
+    }
+  }
+};
 </script>
 
 <style>
