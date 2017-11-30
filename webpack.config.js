@@ -1,15 +1,29 @@
-'use strict'
+'use strict';
 
-process.env.BABEL_ENV = 'renderer'
+process.env.BABEL_ENV = 'renderer';
 
-const path = require('path')
-const { dependencies } = require('./package.json')
-const webpack = require('webpack')
+const path = require('path');
+const { dependencies } = require('./package.json');
+const webpack = require('webpack');
 
-const BabiliWebpackPlugin = require('babili-webpack-plugin')
-const CopyWebpackPlugin = require('copy-webpack-plugin')
-const ExtractTextPlugin = require('extract-text-webpack-plugin')
-const HtmlWebpackPlugin = require('html-webpack-plugin')
+const BabiliWebpackPlugin = require('babili-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+
+var htmlPageOptions = function(id) {
+  return {
+    filename: id + '.html',
+    template: path.resolve(__dirname, 'app/index.ejs'),
+    id: id,
+    minify: {
+      collapseWhitespace: true,
+      removeAttributeQuotes: true,
+      removeComments: true
+    },
+    nodeModules: process.env.NODE_ENV !== 'production' ? path.resolve(__dirname, 'node_modules') : false
+  }
+};
 
 /**
  * List of node_modules to include in webpack bundle
@@ -99,14 +113,6 @@ let rendererConfig = {
         }
       },
       {
-        test: /\.(mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/,
-        loader: 'url-loader',
-        options: {
-          limit: 10000,
-          name: 'media/[name]--[folder].[ext]'
-        }
-      },
-      {
         test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
         use: {
           loader: 'url-loader',
@@ -126,54 +132,10 @@ let rendererConfig = {
   },
   plugins: [
     new ExtractTextPlugin('styles.css'),
-    new HtmlWebpackPlugin({
-      filename: 'prefs.html',
-      template: path.resolve(__dirname, 'app/index.ejs'),
-      id: "prefs",
-      minify: {
-        collapseWhitespace: true,
-        removeAttributeQuotes: true,
-        removeComments: true
-      },
-      nodeModules: process.env.NODE_ENV !== 'production'
-    ? path.resolve(__dirname, 'node_modules')
-    : false
-    }),
-    new HtmlWebpackPlugin({
-      filename: 'editor.html',
-      template: path.resolve(__dirname, 'app/index.ejs'),
-      id: "editor",
-      minify: {
-        collapseWhitespace: true,
-        removeAttributeQuotes: true,
-        removeComments: true
-      },
-      nodeModules: process.env.NODE_ENV !== 'production'
-    ? path.resolve(__dirname, 'node_modules')
-    : false
-    }),
-    new HtmlWebpackPlugin({
-      filename: 'new.html',
-      template: path.resolve(__dirname, 'app/index.ejs'),
-      id: "new",
-      minify: {
-        collapseWhitespace: true,
-        removeAttributeQuotes: true,
-        removeComments: true
-      },
-      nodeModules: process.env.NODE_ENV !== 'production' ? path.resolve(__dirname, 'node_modules') : false
-    }),
-    new HtmlWebpackPlugin({
-      filename: 'about.html',
-      template: path.resolve(__dirname, 'app/index.ejs'),
-      id: "about",
-      minify: {
-        collapseWhitespace: true,
-        removeAttributeQuotes: true,
-        removeComments: true
-      },
-      nodeModules: process.env.NODE_ENV !== 'production' ? path.resolve(__dirname, 'node_modules') : false
-    }),
+    new HtmlWebpackPlugin(htmlPageOptions("prefs")),
+    new HtmlWebpackPlugin(htmlPageOptions("editor")),    
+    new HtmlWebpackPlugin(htmlPageOptions("new")),
+    new HtmlWebpackPlugin(htmlPageOptions("about")),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin()
   ],
