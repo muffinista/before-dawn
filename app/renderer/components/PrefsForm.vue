@@ -1,4 +1,3 @@
-
 <template>
   <div id="prefs-form">
     <form v-on="$listeners">

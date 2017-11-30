@@ -8,10 +8,12 @@
         </div>
       </label>
 
-      <div>
-        <a class="watcher btn btn-outline-secondary btn-sm" href="#" role="button" v-on:click="onEditClick(saver)">edit</a>
-        <a class="delete btn btn-outline-secondary btn-sm" href="#" role="button" v-on:click="onDeleteClick(saver)">delete</a>
-      </div>
+      <template v-if="saver.editable">
+        <div>
+          <a class="btn btn-outline-secondary btn-sm" href="#" role="button" v-on:click="onEditClick(saver)">edit</a>
+          <a class="btn btn-outline-secondary btn-sm" href="#" role="button" v-on:click="onDeleteClick(saver)">delete</a>
+        </div>
+      </template>
     </div>
   </li>
 </template>
