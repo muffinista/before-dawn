@@ -81,8 +81,8 @@
     <footer class="footer d-flex justify-content-between">
       <div>
         <button class="btn btn-large btn-default cancel" v-on:click="closeWindow">Cancel</button>
-        <button class="btn btn-large btn-positive save" v-on:click="saveData">Save</button>
-        <button class="btn btn-large btn-positive save" v-on:click="saveDataAndClose">Save and Close</button>        
+        <button class="btn btn-large btn-positive save" v-on:click="saveData" :disabled="disabled">Save</button>
+        <button class="btn btn-large btn-positive save" v-on:click="saveDataAndClose" :disabled="disabled">Save and Close</button>        
       </div>
     </footer>
   </div> <!-- #editor -->
@@ -124,7 +124,8 @@ export default {
       saver: undefined,
       lastIndex: 0,
       options: [],
-      optionValues: {}     
+      optionValues: {},
+      disabled: false
     }
   },
   computed: {
@@ -208,6 +209,7 @@ export default {
       this.currentWindow.close();
     },
     saveData() {
+      this.disabled = true;
       this.saver.attrs.options = this.options;
       this.saver.write(this.saver.attrs);
       this.ipcRenderer.send("savers-updated", this.saver.key);
@@ -221,6 +223,8 @@ export default {
           open: null
         }
       }).show();
+
+      this.disabled = false;
     },
     saveDataAndClose() {
       this.saveData();

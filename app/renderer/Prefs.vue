@@ -50,7 +50,7 @@
     </div>
     <div>
       <button class="btn btn-large btn-default cancel" v-on:click="closeWindow">Cancel</button>
-      <button class="btn btn-large btn-positive save" v-on:click="saveData">Save</button>
+      <button class="btn btn-large btn-positive save"  v-on:click="saveData" :disabled="disabled">Save</button>
     </div>
   </footer>
 </div> <!-- #prefs -->
@@ -82,7 +82,8 @@ export default {
     return {
       savers: [],
       prefs: {},
-      saver: undefined
+      saver: undefined,
+      disabled: false
     }
   },
   computed: {
@@ -197,12 +198,13 @@ export default {
       this.currentWindow.close();
     },
     saveData() {
-      var self = this;
+      this.disabled = true;
 
       this.prefs.saver = this.saver;
-      this.manager.updatePrefs(this.prefs, function() {
-        self.ipcRenderer.send("set-autostart", self.prefs.auto_start);
-        self.closeWindow();
+      this.manager.updatePrefs(this.prefs, () => {
+        this.disabled = false;
+        this.ipcRenderer.send("set-autostart", this.prefs.auto_start);
+        this.closeWindow();
       });
     }
   },

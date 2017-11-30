@@ -18,7 +18,7 @@
   <footer class="footer d-flex justify-content-between">
     <div>
       <button class="btn btn-large btn-default cancel" v-on:click="closeWindow">Cancel</button>
-      <button class="btn btn-large btn-positive save" v-on:click="saveData">Save</button>
+      <button class="btn btn-large btn-positive save" v-on:click="saveData" :disabled="disabled">Save</button>
     </div>
   </footer>
 </div> <!-- #new -->
@@ -44,7 +44,8 @@ export default {
   },
   data() {
     return {
-      saver: {}
+      saver: {},
+      disabled: false
     }
   },
   computed: {
@@ -82,6 +83,8 @@ export default {
 
         return;
       }
+
+      this.disabled = true;
       this.ipcRenderer.send("generate-screensaver", this.saver);
     }
   },
