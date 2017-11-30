@@ -119,7 +119,7 @@ let rendererConfig = {
     ]
   },
   node: {
-//    __dirname: process.env.NODE_ENV !== 'production',
+    //    __dirname: process.env.NODE_ENV !== 'production',
     //    __filename: process.env.NODE_ENV !== 'production'
     __dirname: false,
     __filename: false
@@ -161,9 +161,18 @@ let rendererConfig = {
         removeAttributeQuotes: true,
         removeComments: true
       },
-      nodeModules: process.env.NODE_ENV !== 'production'
-    ? path.resolve(__dirname, '../node_modules')
-    : false
+      nodeModules: process.env.NODE_ENV !== 'production' ? path.resolve(__dirname, '../node_modules') : false
+    }),
+    new HtmlWebpackPlugin({
+      filename: 'about.html',
+      template: path.resolve(__dirname, '../app/index.ejs'),
+      id: "about",
+      minify: {
+        collapseWhitespace: true,
+        removeAttributeQuotes: true,
+        removeComments: true
+      },
+      nodeModules: process.env.NODE_ENV !== 'production' ? path.resolve(__dirname, '../node_modules') : false
     }),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin()

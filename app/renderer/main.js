@@ -5,6 +5,7 @@ import BootstrapVue from 'bootstrap-vue'
 import Prefs from './Prefs';
 import Watcher from './Watcher';
 import NewScreensaver from './NewScreensaver';
+import About from './About';
 
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
@@ -34,3 +35,9 @@ new Vue({
   components: { NewScreensaver },
   template: '<NewScreensaver/>'
 }).$mount('#new');
+
+// eslint-disable no-new 
+new Vue({
+  components: { About },
+  template: '<About/>'
+}).$mount('#about');

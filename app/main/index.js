@@ -254,7 +254,7 @@ var addNewSaver = function(screenshot) {
  * Open the About window for the app
  */
 var openAboutWindow = function() {
-  var prefsUrl = "file://" + __dirname + "/html/about.html";
+  var aboutUrl = urlPrefix + "/about.html";
   var w = new BrowserWindow({
     width:500,
     height:400,
@@ -262,7 +262,8 @@ var openAboutWindow = function() {
     icon: path.join(__dirname, "assets", "icon.png")
   });
 
-  w.loadURL(prefsUrl);
+  console.log(aboutUrl);
+  w.loadURL(aboutUrl);
 
   showDock();
   

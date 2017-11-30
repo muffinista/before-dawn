@@ -75,8 +75,13 @@ export default {
       this.getData();
     });
 
+    if ( this.manager === undefined ) {
+      return;
+    }
+
     this.getData();
     this.getCurrentSaver();
+    
   },
   data() {
     return {
