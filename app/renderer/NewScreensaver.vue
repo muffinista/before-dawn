@@ -1,17 +1,20 @@
 <template>
 <div id="new">
-  <template v-if="!canAdd">
+  <div class="content">
     <div class="container-fluid">
-      <p>
-        Hey, before you can create a new screensaver, you'll need to
-        set a local directory in the preferences window!
-      </p>
+      <template v-if="!canAdd">
+        <div class="container-fluid">
+          <p>
+            Hey, before you can create a new screensaver, you'll need to
+            set a local directory in the preferences window!
+          </p>
+        </div>
+      </template>  
+      <saver-form
+         v-bind:saver="saver"
+         v-if="canAdd"></saver-form>
     </div>
-  </template>  
-  <saver-form
-     v-bind:saver="saver"
-     v-if="canAdd"></saver-form>
-  
+  </div>
   <footer class="footer d-flex justify-content-between">
     <div>
       <button class="btn btn-large btn-default cancel" v-on:click="closeWindow">Cancel</button>
@@ -28,6 +31,16 @@ export default {
   name: 'new-screensaver',
   components: {
     SaverForm
+  },
+  mounted() {
+    this.ipcRenderer.on("generate-screensaver", (event, data) => {
+      console.log("hi!", this.params, data);
+      this.ipcRenderer.send("open-editor", {
+        src: data.dest,
+        screenshot: this.screenshot
+      });
+      this.currentWindow.close();
+    });
   },
   data() {
     return {
@@ -63,16 +76,12 @@ export default {
       this.currentWindow.close();
     },
     saveData() {
-      var self = this;
-      this.ipcRenderer.on("generate-screensaver", (event, data) => {
-        console.log("hi!", self.params, data);
-        self.ipcRenderer.send("open-editor", {
-          src: data.dest,
-          screenshot: self.screenshot
-        });
-        self.currentWindow.close();
-      });
+      if ( document.querySelectorAll(":invalid").length > 0 ) {
+        var form = document.querySelector("form");
+        form.classList.add("submit-attempt");
 
+        return;
+      }
       this.ipcRenderer.send("generate-screensaver", this.saver);
     }
   },

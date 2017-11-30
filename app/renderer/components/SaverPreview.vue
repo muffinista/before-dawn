@@ -98,6 +98,7 @@
       },
       handleOptionsChange(data) {
         this.options = data;
+        this.previewUrl = this.saver.getUrl(this.urlOpts(this.saver));
         this.handleRedraw();
       },
       handleSaverChange(s) {

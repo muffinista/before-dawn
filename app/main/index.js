@@ -1038,13 +1038,20 @@ ipcMain.on("set-autostart", (event, value) => {
 
   if ( value === true ) {
     console.log("set auto_start == true");
-    appLauncher.enable().then(function(x) { }).then(function(err){
+    // then(function(x) { }).
+    appLauncher.enable().then((err) =>{
       console.log("ERR", err);
+    }).catch((err) => {
+      console.log("appLauncher enable failed", err);
     });
   }
   else {
     console.log("set auto start == false");
-    appLauncher.disable().then(function(x) { });
+    appLauncher.disable().
+                then(function(x) { }).
+                catch((err) => {
+                  console.log("appLauncher enable failed", err);
+                });
   }
 
 

@@ -38,7 +38,9 @@
         </div>
       </b-tab>
       <b-tab title="Preferences">
-        <prefs-form :prefs="prefs"></prefs-form>
+        <div class="container-fluid">
+          <prefs-form :prefs="prefs"></prefs-form>
+        </div>
       </b-tab>
     </b-tabs>
   </div> <!-- content -->
@@ -68,6 +70,13 @@ export default {
     SaverList, SaverOptions, SaverPreview, SaverSummary, PrefsForm
   },
   mounted() {
+    this.ipcRenderer.on("savers-updated", (event, arg) => {
+      var val;
+
+      console.log("handle savers-updated event");
+      this.getData();
+    });
+
     this.getData();
     this.getCurrentSaver();
   },
@@ -82,9 +91,11 @@ export default {
     bus: function() {
       return new Vue();
     },
+    currentWindow: function() {
+      return this.$electron.remote.getCurrentWindow();
+    },
     manager: function() {
-      var currentWindow = this.$electron.remote.getCurrentWindow();
-      return currentWindow.savers;
+      return this.currentWindow.savers;
     },
     ipcRenderer: function() {
       return this.$electron.ipcRenderer;

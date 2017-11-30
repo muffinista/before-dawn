@@ -3,6 +3,7 @@
 
 $nav_height: 42px;
 $footer_height: 40px;
+$tab_padding:12px;
 
 body > div > footer {
   width: 100%;
@@ -33,7 +34,7 @@ ul[role=tablist] {
     background: white;
 }
 .tab-content {
-    padding-top: $nav_height+12px;
+    padding-top: $nav_height+$tab_padding;
 }
 
 .hide {
@@ -78,7 +79,8 @@ button.add-option {
 }
 
 .saver-list {
-  height: 88vh;
+  height: calc(100vh - #{$nav_height+$tab_padding+$footer_height});
+  margin-bottom: 0px;
   overflow-y: scroll;
 }
 
