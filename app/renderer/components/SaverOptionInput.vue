@@ -47,7 +47,7 @@
       </div>
       
       <label class="col-sm-2 col-form-label">Default</label>
-      <div>
+      <div :class="defaultInputClass">
         <input type="text"
                v-model="option.default"
                placeholder="Default value of this option"
@@ -74,6 +74,13 @@
           return "option-range";
         }
         return "option-text";
+      },
+      defaultInputClass: function() {
+        if ( this.option.type === "slider" ) {
+          return "col-sm-2";
+        }
+
+        return "col-sm-10";
       }
     },
     methods: {
@@ -85,8 +92,4 @@
 </script>
 
 <style>
-  // hide slider options for non-sliders
-  form:not(.option-range) .only-for-slider {
-    display: none;
-  }
 </style>

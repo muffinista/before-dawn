@@ -1,30 +1,50 @@
 <template>
   <div id="editor">
-    <b-tabs>
-      <b-tab title="Preview" active>
-        <saver-preview
-           v-bind:saver="saver"
-           v-bind:screenshot="screenshot"
-           v-if="isLoaded"></saver-preview>
-      </b-tab>
-      <b-tab title="Settings">
-        <saver-form
-           v-bind:saver="saver"
-           v-if="isLoaded"></saver-form>
-        <!--
-          note: is track-by ok here?
-          https://v1.vuejs.org/guide/list.html#track-by-index 
-        -->
-        <saver-option-input
-           v-for="option in options"
-           v-bind:option="option"
-           v-bind:key="option.index"
-           v-on:deleteOption="deleteOption(option)"
-           v-if="isLoaded"></saver-option-input>      
-        <button type="button" class="btn btn-positive" v-on:click="addSaverOption">Add</button>
+    <div class="content">
+      <b-tabs>
+        <b-tab title="Preview" active>
+          <saver-preview
+             v-bind:saver="saver"
+             v-bind:screenshot="screenshot"
+             v-if="isLoaded"></saver-preview>
+        </b-tab>
+        <b-tab title="Settings">
+          <div class="container-fluid">
+            <h4>Basic Information</h4>
+            <small>You can enter the basics about this screensaver
+              here.</small>
+        
+            <saver-form
+               v-bind:saver="saver"
+               v-if="isLoaded"></saver-form>
 
-      </b-tab>
-    </b-tabs>
+
+            <h4>Configurable Options</h4>
+            <small>You can offer users configurable options to control
+              your screensaver. Manage those here.</small>
+            
+            
+            <!--
+            note: is track-by ok here?
+            https://v1.vuejs.org/guide/list.html#track-by-index 
+            -->
+            <saver-option-input
+               v-for="option in options"
+               v-bind:option="option"
+               v-bind:key="option.index"
+               v-on:deleteOption="deleteOption(option)"
+               v-if="isLoaded"></saver-option-input>      
+
+            <div class="padded-top padded-bottom">
+              <button
+                 type="button"
+                 class="btn btn-positive"
+                 v-on:click="addSaverOption">Add Option</button>
+            </div>
+          </div>
+        </b-tab>
+      </b-tabs>
+    </div>
     <footer class="footer d-flex justify-content-between">
       <div>
         <button class="btn btn-large btn-default cancel" v-on:click="closeWindow">Cancel</button>

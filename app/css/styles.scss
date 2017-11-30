@@ -26,13 +26,14 @@ ul {
 }
 
 ul[role=tablist] {
+    width: 100%;
     position: fixed;
-    height: 42px;
+    height: $nav_height;
     margin-bottom: 42px;
     background: white;
 }
 .tab-content {
-    padding-top: 42px;
+    padding-top: $nav_height+12px;
 }
 
 .hide {
@@ -132,6 +133,19 @@ fieldset {
 
 .window > footer {
   padding: 5px;
+}
+
+// hide slider options for non-sliders
+form.option-text .only-for-slider {
+  display: none;
+}
+
+.padded-top {
+    margin-top: 20px;
+}
+
+.padded-bottom {
+    margin-bottom: 60px;
 }
 
 body.about {
