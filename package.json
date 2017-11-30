@@ -9,7 +9,7 @@
   "main": "app/main.js",
   "scripts": {
     "start": "electron app/main.js",
-    "dev": "node .electron-vue/dev-runner.js",
+    "dev": "node bin/dev-runner.js",
     "postinstall": "electron-builder install-app-deps",
     "pack": "electron-builder --dir",
     "dist": "electron-builder --x64",

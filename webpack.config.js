@@ -1,57 +1,50 @@
-'use strict';
+'use strict'
 
-process.env.BABEL_ENV = 'renderer';
+process.env.BABEL_ENV = 'renderer'
 
-const path = require("path");
-const webpack = require("webpack");
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-//const nodeExternals = require("webpack-node-externals");
+const path = require('path')
+const { dependencies } = require('./package.json')
+const webpack = require('webpack')
 
-const pkg = require('./package.json')
-/*
-const externals = nodeExternals({
-//  whitelist:["jquery", "bootstrap", "popper.js"]
-  whitelist:["bootstrap", "popper.js"]  
-});
-*/
-const appDir = path.resolve(__dirname, "app");
-const outputDir = path.resolve(__dirname, "output");
+const BabiliWebpackPlugin = require('babili-webpack-plugin')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
+const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 
-let config = {
-  context: __dirname,
+/**
+ * List of node_modules to include in webpack bundle
+ *
+ * Required for specific packages like Vue UI libraries
+ * that provide pure *.vue files that need compiling
+ * https://simulatedgreg.gitbooks.io/electron-vue/content/en/webpack-configurations.html#white-listing-externals
+ */
+let whiteListedModules = ['vue']
+
+let rendererConfig = {
+  devtool: '#cheap-module-eval-source-map',
   entry: {
-    prefs: path.resolve(appDir, "js", "prefs.js"),
-    //    editor: path.resolve(appDir, "js", "watcher.jsx"),
-    //    new: path.resolve(appDir, "js", "new.js"),    
+    renderer: path.join(__dirname, 'app/renderer/main.js')
   },
-  target: "electron-renderer",
-//  externals: externals,
-//  externals: Object.keys(pkg.dependencies || {}),
-  output: {
-    filename: "[name].js",
-    libraryTarget: 'commonjs2',
-    path: outputDir
-  },
-  //  devtool: "source-map",  
-  devtool: '#eval-source-map',
-  devServer: { overlay: true },
-  externals: Object.keys(pkg.dependencies || {}),
-  stats: "verbose",
-  resolve: {
-    alias: {
-      'components': path.join(__dirname, 'app/js/components'),
-      'renderer': path.join(__dirname, 'app/js/renderer'),
-      '@': path.join(__dirname, '../src/renderer'),
-      'vue$': 'vue/dist/vue.esm.js'
-    },
-    extensions: ['.js', '.vue', '.json', '.scss', '.node'],
-    modules: [
-      path.join(__dirname, 'node_modules')
-    ]
-  },
+  externals: [
+    ...Object.keys(dependencies || {}).filter(d => !whiteListedModules.includes(d))
+  ],
   module: {
     rules: [
+      {
+        test: /\.(js|vue)$/,
+        enforce: 'pre',
+        exclude: /node_modules/,
+        include: [ // use `include` vs `exclude` to white-list vs black-list
+                   path.resolve(__dirname, "src"), // white-list your app source files
+                   require.resolve("bootstrap-vue"), // white-list bootstrap-vue
+        ],
+        use: {
+          loader: 'eslint-loader',
+          options: {
+            formatter: require('eslint-friendly-formatter')
+          }
+        }
+      },
       {
         test: /\.css$/,
         use: ExtractTextPlugin.extract({
@@ -60,18 +53,23 @@ let config = {
         })
       },
       {
+        test: /\.(scss)$/,
+        use: [{
+          loader: 'style-loader', // inject CSS to page
+        }, {
+          loader: 'css-loader', // translates CSS into CommonJS modules
+        }, {
+          loader: 'sass-loader' // compiles SASS to CSS
+        }]
+      },
+      {
         test: /\.html$/,
         use: 'vue-html-loader'
       },
       {
         test: /\.js$/,
         use: 'babel-loader',
-        include: [ path.resolve(__dirname, 'app/js') ],
         exclude: /node_modules/
-      },
-      {
-        test: /\.json$/,
-        use: 'json-loader'
       },
       {
         test: /\.node$/,
@@ -82,6 +80,7 @@ let config = {
         use: {
           loader: 'vue-loader',
           options: {
+            extractCSS: process.env.NODE_ENV === 'production',
             loaders: {
               sass: 'vue-style-loader!css-loader!sass-loader?indentedSyntax=1',
               scss: 'vue-style-loader!css-loader!sass-loader'
@@ -95,8 +94,16 @@ let config = {
           loader: 'url-loader',
           query: {
             limit: 10000,
-            name: 'imgs/[name].[ext]'
+            name: 'imgs/[name]--[folder].[ext]'
           }
+        }
+      },
+      {
+        test: /\.(mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/,
+        loader: 'url-loader',
+        options: {
+          limit: 10000,
+          name: 'media/[name]--[folder].[ext]'
         }
       },
       {
@@ -105,88 +112,119 @@ let config = {
           loader: 'url-loader',
           query: {
             limit: 10000,
-            name: 'fonts/[name].[ext]'
+            name: 'fonts/[name]--[folder].[ext]'
           }
         }
-      },
-/*      {
-        test: /\.jsx?$/,
-        exclude: /node_modules/,
-        loader: "babel-loader",
-        options: {
-          presets: ["env", "react"],
-          plugins: [require("babel-plugin-transform-object-rest-spread")]
-        }
-      },*/
-/*      {
-        test: require.resolve("jquery"),
-        use: [
-          { loader: "expose-loader", options: "jQuery" },
-          { loader: "expose-loader", options: "$" }
-        ]
-      },*/
+      }
     ]
+  },
+  node: {
+    //    __dirname: process.env.NODE_ENV !== 'production',
+    //    __filename: process.env.NODE_ENV !== 'production'
+    __dirname: false,
+    __filename: false
   },
   plugins: [
     new ExtractTextPlugin('styles.css'),
     new HtmlWebpackPlugin({
       filename: 'prefs.html',
-      template: './app/index.ejs',
-      appModules: process.env.NODE_ENV !== 'production',
-      nodeModules: process.env.NODE_ENV === 'production'
-    ? path.resolve(__dirname, 'app/node_modules')
-    : false,
+      template: path.resolve(__dirname, 'app/index.ejs'),
+      id: "prefs",
+      minify: {
+        collapseWhitespace: true,
+        removeAttributeQuotes: true,
+        removeComments: true
+      },
+      nodeModules: process.env.NODE_ENV !== 'production'
+    ? path.resolve(__dirname, 'node_modules')
+    : false
     }),
-    new webpack.NoEmitOnErrorsPlugin(),
+    new HtmlWebpackPlugin({
+      filename: 'editor.html',
+      template: path.resolve(__dirname, 'app/index.ejs'),
+      id: "editor",
+      minify: {
+        collapseWhitespace: true,
+        removeAttributeQuotes: true,
+        removeComments: true
+      },
+      nodeModules: process.env.NODE_ENV !== 'production'
+    ? path.resolve(__dirname, 'node_modules')
+    : false
+    }),
+    new HtmlWebpackPlugin({
+      filename: 'new.html',
+      template: path.resolve(__dirname, 'app/index.ejs'),
+      id: "new",
+      minify: {
+        collapseWhitespace: true,
+        removeAttributeQuotes: true,
+        removeComments: true
+      },
+      nodeModules: process.env.NODE_ENV !== 'production' ? path.resolve(__dirname, 'node_modules') : false
+    }),
+    new HtmlWebpackPlugin({
+      filename: 'about.html',
+      template: path.resolve(__dirname, 'app/index.ejs'),
+      id: "about",
+      minify: {
+        collapseWhitespace: true,
+        removeAttributeQuotes: true,
+        removeComments: true
+      },
+      nodeModules: process.env.NODE_ENV !== 'production' ? path.resolve(__dirname, 'node_modules') : false
+    }),
     new webpack.HotModuleReplacementPlugin(),
-    new webpack.ProvidePlugin({
-//      $: "jquery",
-//      jQuery: "jquery",
-//      "window.jQuery": "jquery",
-      "Popper": ["popper.js", "default"],
+    new webpack.NoEmitOnErrorsPlugin()
+  ],
+  output: {
+    filename: '[name].js',
+    libraryTarget: 'commonjs2',
+    path: path.join(__dirname, 'output/electron')
+  },
+  resolve: {
+    alias: {
+      '@': path.join(__dirname, 'app/renderer'),
+      'vue$': 'vue/dist/vue.esm.js'
+    },
+    extensions: ['.js', '.vue', '.json', '.css', '.node']
+  },
+  target: 'electron-renderer'
+}
+
+/**
+ * Adjust rendererConfig for development settings
+ */
+if (process.env.NODE_ENV !== 'production') {
+  rendererConfig.plugins.push(
+    new webpack.DefinePlugin({
+      '__static': `"${path.join(__dirname, 'static').replace(/\\/g, '\\\\')}"`
     })
-  ]
-};
-
-
-if (false && process.env.NODE_ENV !== 'production') {
-  /**
-   * Apply ESLint
-   */
-  config.module.rules.push(
-    {
-      test: /\.(js|vue)$/,
-      enforce: 'pre',
-      exclude: /node_modules/,
-      use: {
-        loader: 'eslint-loader',
-        options: {
-          formatter: require('eslint-friendly-formatter')
-        }
-      }
-    }
   )
 }
 
 /**
- * Adjust config for production settings
+ * Adjust rendererConfig for production settings
  */
 if (process.env.NODE_ENV === 'production') {
-  config.devtool = ''
+  rendererConfig.devtool = ''
 
-  config.plugins.push(
+  rendererConfig.plugins.push(
+    new BabiliWebpackPlugin(),
+    new CopyWebpackPlugin([
+      {
+        from: path.join(__dirname, 'static'),
+        to: path.join(__dirname, 'output/electron/static'),
+        ignore: ['.*']
+      }
+    ]),
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': '"production"'
     }),
     new webpack.LoaderOptionsPlugin({
       minimize: true
-    }),
-    new webpack.optimize.UglifyJsPlugin({
-      compress: {
-        warnings: false
-      }
     })
   )
 }
 
-module.exports = config;
+module.exports = rendererConfig
