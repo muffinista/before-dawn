@@ -1,6 +1,6 @@
 <template>
   <div class="saver-description">
-    <h1>{{name}} <a :href="aboutUrl" v-if="hasUrl">learn more</a></h1>
+    <h1>{{name}} <a :href="aboutUrl" v-on:click="open" v-if="hasUrl">learn more</a></h1>
     <p>{{description}}</p>
     <span v-if="hasAuthor">
       {{author}}
@@ -36,6 +36,12 @@
           this.saver.author !== "";
       }
     },
+    methods: {
+      open(evt) {
+        evt.preventDefault();
+        this.$electron.shell.openExternal(event.target.href);
+      }
+    }
   };
 </script>
 
