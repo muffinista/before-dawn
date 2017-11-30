@@ -20,18 +20,34 @@
 
 
 <script>
-  export default {
-    name: 'saver-list-item',
-    props: ['saver', 'checked'],
-    methods: {
-      onEditClick(s) {
-        this.$emit("editSaver", s);
-      },
-      onDeleteClick(s) {
-        this.$emit("deleteSaver", s);
-      }      
-    }
-  };
+const {dialog} = require("electron").remote;
+export default {
+  name: 'saver-list-item',
+  props: ['saver', 'checked'],
+  methods: {
+    onEditClick(s) {
+      this.$emit("editSaver", s);
+    },
+    onDeleteClick(s) {
+      dialog.showMessageBox(
+        {
+          type: "info",
+          title: "Are you sure?",
+          message: "Are you sure you want to delete this screensaver?",
+          detail: "Deleting screensaver " + s.name,
+          buttons: ["No", "Yes"],
+          defaultId: 0
+        },
+        (result) => {
+          if ( result === 1 ) {
+            this.$emit("deleteSaver", s);
+          }
+        }
+      );
+      
+    }      
+  }
+};
 </script>
 
 <style>

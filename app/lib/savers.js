@@ -106,13 +106,14 @@ var setupPackages = function(cb) {
  * delete a screensaver -- this removes the directory that contains all files
  * for the screensaver.
  */
-var deleteSaver = function(k, cb) {
+var deleteSaver = function(s, cb) {
+  var k = s.key;
   var p = path.dirname(k);
-  var s = getByKey(k);
+
   var cbWrapped = function() {
     reload(cb);
   };
-
+  
   // make sure we're deleting a screensaver that exists and is
   // actually editable
   if ( typeof(s) !== "undefined" && s.editable === true ) {
@@ -469,8 +470,14 @@ var listAll = function(cb, force) {
 
   var promises = [];
 
+  // exclude system screensavers from the cache check
+  // @todo get rid of this
+  var systemScreensaverCount = 1;
+
+  force = true;
+  
   // use cached data if available
-  if ( loadedScreensavers.length > 0 && ( typeof(force) === "undefined" || force === false ) ) {
+  if ( loadedScreensavers.length > systemScreensaverCount && ( typeof(force) === "undefined" || force === false ) ) {
     cb(loadedScreensavers);
     return;
   }

@@ -122,7 +122,7 @@ export default {
     },
     handlePathChoice(result) {
       if ( result !== undefined ) {
-        this.prefs.localSource = result;
+        this.prefs.localSource = result[0];
       }
     }
   }

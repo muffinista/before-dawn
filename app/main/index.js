@@ -1061,7 +1061,6 @@ ipcMain.on("set-autostart", (event, value) => {
 // generate screensaver template with specified attributes
 //
 ipcMain.on("generate-screensaver", (event, args) => {
-  console.log("hi!", args);
   var data = global.savers.generateScreensaver(args);
   event.sender.send("generate-screensaver", data);
 

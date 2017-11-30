@@ -71,9 +71,7 @@ export default {
   },
   mounted() {
     this.ipcRenderer.on("savers-updated", (event, arg) => {
-      var val;
-
-      console.log("handle savers-updated event");
+      console.log("handle savers-updated event", arg);
       this.getData();
     });
 
@@ -183,8 +181,13 @@ export default {
       this.ipcRenderer.send("open-editor", opts);
     },
     deleteSaver(s) {
-      // @todo implement
-      console.log("delete!!!!!", s);
+      var index = this.savers.indexOf(s);
+      this.savers.splice(index, 1);
+
+      this.manager.delete(s, () => {
+        this.ipcRenderer.send("savers-updated", s.key);
+      });
+
     },
     updateSaverOption(saver, name, value) {
       //console.log("update saver option!", saver, name, value);
