@@ -39,6 +39,7 @@ let whiteListedModules = ['vue'];
 let rendererConfig = {
   devtool: '#cheap-module-eval-source-map',
   entry: {
+    //main: path.join(__dirname, 'app/main/index.js'),
     renderer: path.join(__dirname, 'app/renderer/main.js')
   },
   externals: [

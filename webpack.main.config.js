@@ -3,17 +3,19 @@
 process.env.BABEL_ENV = 'main'
 
 const path = require('path')
-const { dependencies } = require('../package.json')
+const { dependencies, optionalDependencies } = require('./package.json')
 const webpack = require('webpack')
 
 const BabiliWebpackPlugin = require('babili-webpack-plugin')
 
+const deps = [].concat(Object.keys(dependencies),Object.keys(optionalDependencies));
+
 let mainConfig = {
   entry: {
-    main: path.join(__dirname, '../app/main/index.js')
+    main: path.join(__dirname, 'app/main/index.js')
   },
   externals: [
-    ...Object.keys(dependencies || {})
+    deps
   ],
   module: {
     rules: [
@@ -49,7 +51,7 @@ let mainConfig = {
   output: {
     filename: '[name].js',
     libraryTarget: 'commonjs2',
-    path: path.join(__dirname, '../output/electron')
+    path: path.join(__dirname, 'output/electron')
   },
   plugins: [
     new webpack.NoEmitOnErrorsPlugin()
