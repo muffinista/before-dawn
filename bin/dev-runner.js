@@ -7,8 +7,8 @@ const webpack = require('webpack')
 const WebpackDevServer = require('webpack-dev-server')
 const webpackHotMiddleware = require('webpack-hot-middleware')
 
-//const mainConfig = require('./webpack.main.config')
-const rendererConfig = require('../webpack.config')
+const mainConfig = require('../webpack.main.config')
+const rendererConfig = require('../webpack.renderer.config')
 
 let electronProcess = null
 let manualRestart = false
@@ -75,6 +75,42 @@ function startRenderer () {
   })
 }
 
+function startMain () {
+  return new Promise((resolve, reject) => {
+    //mainConfig.entry.main = [path.join(__dirname, '../src/main/index.js')].concat(mainConfig.entry.main)
+
+    const compiler = webpack(mainConfig)
+
+    compiler.plugin('watch-run', (compilation, done) => {
+      logStats('Main', 'compiling...')
+      hotMiddleware.publish({ action: 'compiling' })
+      done()
+    })
+
+    compiler.watch({}, (err, stats) => {
+      if (err) {
+        console.log(err)
+        return
+      }
+
+      logStats('Main', stats)
+
+      if (electronProcess && electronProcess.kill) {
+        manualRestart = true
+        process.kill(electronProcess.pid)
+        electronProcess = null
+        startElectron()
+
+        setTimeout(() => {
+          manualRestart = false
+        }, 5000)
+      }
+
+      resolve()
+    })
+  })
+}
+
 function startElectron () {
   electronProcess = spawn(electron, ['--inspect=5858', path.join(__dirname, '../src/main/index.dev.js')])
 
@@ -92,7 +128,7 @@ function startElectron () {
 function init () {
   console.log("booting up!");
 
-  Promise.all([startRenderer()])
+  Promise.all([startRenderer(), startMain()])
     .then(() => {
       startElectron()
     })
