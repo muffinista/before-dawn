@@ -29,10 +29,10 @@ const fs = require("fs");
 const path = require("path");
 const parseArgs = require("minimist");
 
-const screen = require("../lib/screen.js");
+const screen = require("./screen.js");
 var releaseChecker;
-const power = require("../lib/power.js");
-let stateManager = require("../lib/state_manager.js");
+const power = require("./power.js");
+let stateManager = require("./state_manager.js");
 
 const robot = require("robotjs");
 
@@ -637,7 +637,7 @@ var openPrefsOnFirstLoad = function() {
 var bootApp = function() {
   var icons = getIcons();
   // @todo i think asar breaks this
-  var menuTemplate = require("../js/menu_template.js").buildMenuTemplate(app);
+  var menuTemplate = require("./menu_template.js").buildMenuTemplate(app);
   var menu = Menu.buildFromTemplate(menuTemplate);
 
   Menu.setApplicationMenu(menu);
@@ -699,7 +699,7 @@ var bootApp = function() {
     }
 
     if ( global.CHECK_FOR_RELEASE === true ) {
-      releaseChecker = require("../lib/release_check.js");
+      releaseChecker = require("./release_check.js");
       
       releaseChecker.setFeed(global.RELEASE_CHECK_URL);
       releaseChecker.setLogger(log.info);
@@ -727,7 +727,7 @@ var bootApp = function() {
 /**
  * try and guess if we are in fullscreen mode or not
  */
-var inFullscreen = require("../lib/fullscreen.js").inFullscreen;
+var inFullscreen = require("./fullscreen.js").inFullscreen;
 
 /**
  * run the screensaver, but only if there isn't an app in fullscreen mode right now

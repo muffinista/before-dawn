@@ -76,7 +76,7 @@ function startRenderer () {
 }
 
 function startElectron () {
-  electronProcess = spawn(electron, ['--inspect=5858', path.join(__dirname, '../app/main/index.dev.js')])
+  electronProcess = spawn(electron, ['--inspect=5858', path.join(__dirname, '../src/main/index.dev.js')])
 
   electronProcess.stdout.on('data', data => {
     process.stdout.write(data.toString());

@@ -16,7 +16,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 var htmlPageOptions = function(id) {
   return {
     filename: id + '.html',
-    template: path.resolve(__dirname, 'app/index.ejs'),
+    template: path.resolve(__dirname, 'src/index.ejs'),
     id: id,
     minify: {
       collapseWhitespace: true,
@@ -39,8 +39,8 @@ let whiteListedModules = ['vue'];
 let rendererConfig = {
   devtool: '#cheap-module-eval-source-map',
   entry: {
-    //main: path.join(__dirname, 'app/main/index.js'),
-    renderer: path.join(__dirname, 'app/renderer/main.js')
+    //main: path.join(__dirname, 'src/main/index.js'),
+    renderer: path.join(__dirname, 'src/renderer/main.js')
   },
   externals: [
     ...Object.keys(dependencies || {}).filter(d => !whiteListedModules.includes(d))
@@ -150,7 +150,7 @@ let rendererConfig = {
   },
   resolve: {
     alias: {
-      '@': path.join(__dirname, 'app/renderer'),
+      '@': path.join(__dirname, 'src/renderer'),
       'vue$': 'vue/dist/vue.esm.js'
     },
     extensions: ['.js', '.vue', '.json', '.css', '.node']

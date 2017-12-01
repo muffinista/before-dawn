@@ -12,7 +12,7 @@ const deps = [].concat(Object.keys(dependencies),Object.keys(optionalDependencie
 
 let mainConfig = {
   entry: {
-    main: path.join(__dirname, 'app/main/index.js')
+    main: path.join(__dirname, 'src/main/index.js')
   },
   externals: [
     deps
