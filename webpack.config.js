@@ -10,7 +10,7 @@ const webpack = require('webpack');
 
 const BabiliWebpackPlugin = require('babili-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-//const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 var htmlPageOptions = function(id) {
@@ -62,15 +62,15 @@ let rendererConfig = {
           }
         }
       },
-      /* {
-         test: /\.css$/,
-         use: ExtractTextPlugin.extract({
-         fallback: 'style-loader',
-         use: 'css-loader'
-         })
-         }, */
       {
-        test: /\.(s?css)$/,
+        test: /\.css$/,
+        use: ExtractTextPlugin.extract({
+          fallback: 'style-loader',
+          use: 'css-loader'
+        })
+      },
+      {
+        test: /\.(scss)$/,
         use: [{
           loader: 'style-loader', // inject CSS to page
         }, {
@@ -134,7 +134,7 @@ let rendererConfig = {
     __filename: false
   },
   plugins: [
-    //    new ExtractTextPlugin('styles.css'),
+    new ExtractTextPlugin('styles.css'),
     new HtmlWebpackPlugin(htmlPageOptions("prefs")),
     new HtmlWebpackPlugin(htmlPageOptions("editor")),    
     new HtmlWebpackPlugin(htmlPageOptions("new")),
@@ -160,13 +160,13 @@ let rendererConfig = {
 /**
  * Adjust rendererConfig for development settings
  */
-if (process.env.NODE_ENV !== 'production') {
+/*if (process.env.NODE_ENV !== 'production') {
   rendererConfig.plugins.push(
     new webpack.DefinePlugin({
       '__static': `"${path.join(__dirname, 'static').replace(/\\/g, '\\\\')}"`
     })
   )
-}
+}*/
 
 /**
  * Adjust rendererConfig for production settings
@@ -176,13 +176,13 @@ if (process.env.NODE_ENV === 'production') {
 
   rendererConfig.plugins.push(
     new BabiliWebpackPlugin(),
-    new CopyWebpackPlugin([
+    /*new CopyWebpackPlugin([
       {
         from: path.join(__dirname, 'static'),
         to: path.join(__dirname, 'output/electron/static'),
         ignore: ['.*']
       }
-    ]),
+    ]),*/
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': '"production"'
     }),

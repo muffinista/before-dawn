@@ -698,7 +698,6 @@ var bootApp = function() {
       openPrefsOnFirstLoad();
     }
 
-
     if ( global.CHECK_FOR_RELEASE === true ) {
       releaseChecker = require("../lib/release_check.js");
       
