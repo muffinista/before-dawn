@@ -373,9 +373,9 @@ var sources = function() {
   var source = getSource();
   var local = getLocalSource();
   var root = path.join(baseDir, "savers");
-  var system = path.join(baseDir, "system-savers");
-  var system2 = path.join(__dirname, "..", "system-savers");  
 
+  var system = path.join(baseDir, "system-savers");
+  var system2 = path.join(__dirname, "system-savers");  
   
   var folders = [];
 
@@ -504,10 +504,8 @@ var listAll = function(cb, force) {
 };
 
 var updatePrefs = function(data, cb) {
-  console.log("updatePrefs", data);
   for ( var k in data ) {
     var v = data[k];
-    console.log(k, v);
     nconf.set(k, v);
   }
 

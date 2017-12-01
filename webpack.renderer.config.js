@@ -8,6 +8,8 @@ const path = require('path');
 const { dependencies } = require('./package.json');
 const webpack = require('webpack');
 
+const outputDir = path.join(__dirname, "output");
+
 const BabiliWebpackPlugin = require('babili-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
@@ -140,13 +142,21 @@ let rendererConfig = {
     new HtmlWebpackPlugin(htmlPageOptions("editor")),    
     new HtmlWebpackPlugin(htmlPageOptions("new")),
     new HtmlWebpackPlugin(htmlPageOptions("about")),
+    new CopyWebpackPlugin([
+      {
+        from: path.join(__dirname, 'src', 'renderer', 'assets'),
+        to: path.join(outputDir, 'assets'),
+        ignore: ['.*']
+      }
+    ]),
+
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin()
   ],
   output: {
     filename: '[name].js',
     libraryTarget: 'commonjs2',
-    path: path.join(__dirname, 'output/electron')
+    path: outputDir
   },
   resolve: {
     alias: {
@@ -178,12 +188,12 @@ if (process.env.NODE_ENV === 'production') {
   rendererConfig.plugins.push(
     new BabiliWebpackPlugin(),
     /*new CopyWebpackPlugin([
-      {
-        from: path.join(__dirname, 'static'),
-        to: path.join(__dirname, 'output/electron/static'),
-        ignore: ['.*']
-      }
-    ]),*/
+       {
+       from: path.join(__dirname, 'static'),
+       to: path.join(__dirname, 'output/electron/static'),
+       ignore: ['.*']
+       }
+       ]),*/
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': '"production"'
     }),

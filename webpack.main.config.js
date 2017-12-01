@@ -1,12 +1,18 @@
 'use strict'
 
-process.env.BABEL_ENV = 'main'
+//process.env.BABEL_ENV = 'main'
 
 const path = require('path')
-const { dependencies, optionalDependencies } = require('./package.json')
+const packageJSON = require('./package.json')
+
+const dependencies = packageJSON.dependencies
+const optionalDependencies = packageJSON.optionalDependencies;
 const webpack = require('webpack')
 
+const outputDir = path.join(__dirname, "output");
+
 const BabiliWebpackPlugin = require('babili-webpack-plugin')
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const deps = [].concat(Object.keys(dependencies),Object.keys(optionalDependencies));
 
@@ -45,15 +51,32 @@ let mainConfig = {
     ]
   },
   node: {
-    __dirname: process.env.NODE_ENV !== 'production',
-    __filename: process.env.NODE_ENV !== 'production'
+    __dirname: false, //process.env.NODE_ENV !== 'production',
+    __filename: false // process.env.NODE_ENV !== 'production'
   },
   output: {
     filename: '[name].js',
     libraryTarget: 'commonjs2',
-    path: path.join(__dirname, 'output/electron')
+    path: outputDir
   },
   plugins: [
+    new CopyWebpackPlugin([
+      {
+        from: path.join(__dirname, 'src', 'main', 'assets'),
+        to: path.join(outputDir, 'assets'),
+        ignore: ['.*']
+      }
+    ]),
+    new CopyWebpackPlugin([
+      {
+        from: path.join(__dirname, 'src', 'system-savers'),
+        to: path.join(outputDir, 'system-savers'),
+        ignore: ['.*']
+      }
+    ]),
+    new webpack.DefinePlugin({
+      'process.env.PACKAGE_VERSION': JSON.stringify(packageJSON.version)
+    }),
     new webpack.NoEmitOnErrorsPlugin()
   ],
   resolve: {

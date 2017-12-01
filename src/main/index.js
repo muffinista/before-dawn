@@ -69,8 +69,8 @@ var icons = {
     paused: __dirname + "/assets/icon-paused.ico"
   },
   "default": {
-    active: __dirname + "/../assets/icon.png",
-    paused: __dirname + "/../assets/icon-paused.png"
+    active: __dirname + "/assets/icon.png",
+    paused: __dirname + "/assets/icon-paused.png"
   }
 };
 
@@ -85,8 +85,7 @@ if (process.env.NODE_ENV !== 'development') {
 
 const urlPrefix = process.env.NODE_ENV === 'development'
              ? 'http://localhost:9080'
-             : `file://${__dirname}`;
-
+             : 'file://' + __dirname
 
 /**
  * open our screen grabber tool and issue a screengrab request
@@ -104,7 +103,7 @@ var grabScreen = function(s, cb) {
     return;
   }
 
-  var grabberUrl = "file://" + __dirname + "/../html/grabber.html?id=" + s.id +
+  var grabberUrl = "file://" + __dirname + "/assets/grabber.html?id=" + s.id +
                    "&width=" + s.bounds.width +
                    "&height=" + s.bounds.height;
 
@@ -171,7 +170,6 @@ var showDock = function() {
  * Open the preferences window
  */
 var openPrefsWindow = function() {
-  console.log("openPrefsWindow");
   var primary = electronScreen.getPrimaryDisplay();
 
   // take a screenshot of the main screen for use in previews
@@ -179,9 +177,7 @@ var openPrefsWindow = function() {
     // call savers.reload to make sure our data is properly refreshed
     // and check for any system updates
     global.savers.reload(function() {
-      //      var prefsUrl = "file://" + __dirname + "/html/prefs.html";
       var prefsUrl = urlPrefix + "/prefs.html";
-      console.log(prefsUrl);
            
       prefsWindowHandle = new BrowserWindow({
         width:800,
@@ -259,10 +255,12 @@ var openAboutWindow = function() {
     width:500,
     height:400,
     resizable:false,
-    icon: path.join(__dirname, "assets", "icon.png")
+    icon: path.join(__dirname, "assets", "icon.png"),
+    webPreferences: {
+      webSecurity: false
+    }
   });
 
-  console.log(aboutUrl);
   w.loadURL(aboutUrl);
 
   showDock();
@@ -887,7 +885,7 @@ if ( testMode !== true ) {
 }
 
 // load some global CSS we'll inject into running screensavers
-globalCSSCode = fs.readFileSync( path.join(__dirname, "..", "assets", "global.css"), "ascii");  
+globalCSSCode = fs.readFileSync( path.join(__dirname, "assets", "global.css"), "ascii");  
 
 // don't show app in dock
 if ( typeof(app.dock) !== "undefined" ) {
@@ -1011,8 +1009,6 @@ ipcMain.on("open-editor", (event, args) => {
   // as well as the URL to our screenshot image
 
   var editorUrl = urlPrefix + "/editor.html";
-  console.log(editorUrl);
-
  
   var target = editorUrl + "?" +
                "src=" + encodeURIComponent(key) +
@@ -1029,7 +1025,6 @@ ipcMain.on("open-editor", (event, args) => {
 
 
 ipcMain.on("set-autostart", (event, value) => {
-  console.log("set-autostart", value);
   var AutoLaunch = require("auto-launch");
   var appName = global.APP_NAME;
   var appLauncher = new AutoLaunch({
@@ -1037,20 +1032,19 @@ ipcMain.on("set-autostart", (event, value) => {
   });
 
   if ( value === true ) {
-    console.log("set auto_start == true");
     // then(function(x) { }).
     appLauncher.enable().then((err) =>{
-      console.log("ERR", err);
+      log.info("ERR", err);
     }).catch((err) => {
-      console.log("appLauncher enable failed", err);
+      log.info("appLauncher enable failed", err);
     });
   }
   else {
-    console.log("set auto start == false");
+    log.info("set auto start == false");
     appLauncher.disable().
                 then(function(x) { }).
                 catch((err) => {
-                  console.log("appLauncher enable failed", err);
+                  log.info("appLauncher enable failed", err);
                 });
   }
 
