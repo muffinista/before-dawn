@@ -8,7 +8,7 @@ const webpack = require('webpack');
 
 const BabiliWebpackPlugin = require('babili-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
+//const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 var htmlPageOptions = function(id) {
@@ -48,9 +48,10 @@ let rendererConfig = {
         test: /\.(js|vue)$/,
         enforce: 'pre',
         exclude: /node_modules/,
-        include: [ // use `include` vs `exclude` to white-list vs black-list
-                   path.resolve(__dirname, "src"), // white-list your app source files
-                   require.resolve("bootstrap-vue"), // white-list bootstrap-vue
+        include: [
+          // use `include` vs `exclude` to white-list vs black-list
+          //path.resolve(__dirname, "src"), // white-list your app source files
+          require.resolve("bootstrap-vue"), // white-list bootstrap-vue
         ],
         use: {
           loader: 'eslint-loader',
@@ -59,15 +60,15 @@ let rendererConfig = {
           }
         }
       },
+      /* {
+         test: /\.css$/,
+         use: ExtractTextPlugin.extract({
+         fallback: 'style-loader',
+         use: 'css-loader'
+         })
+         }, */
       {
-        test: /\.css$/,
-        use: ExtractTextPlugin.extract({
-          fallback: 'style-loader',
-          use: 'css-loader'
-        })
-      },
-      {
-        test: /\.(scss)$/,
+        test: /\.(s?css)$/,
         use: [{
           loader: 'style-loader', // inject CSS to page
         }, {
@@ -76,19 +77,19 @@ let rendererConfig = {
           loader: 'sass-loader' // compiles SASS to CSS
         }]
       },
-      {
-        test: /\.html$/,
-        use: 'vue-html-loader'
-      },
+//      {
+//        test: /\.html$/,
+//        use: 'vue-html-loader'
+//      },
       {
         test: /\.js$/,
         use: 'babel-loader',
         exclude: /node_modules/
       },
-      {
-        test: /\.node$/,
-        use: 'node-loader'
-      },
+//      {
+//        test: /\.node$/,
+//        use: 'node-loader'
+//      },
       {
         test: /\.vue$/,
         use: {
@@ -112,16 +113,16 @@ let rendererConfig = {
           }
         }
       },
-      {
-        test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
-        use: {
-          loader: 'url-loader',
-          query: {
-            limit: 10000,
-            name: 'fonts/[name]--[folder].[ext]'
-          }
-        }
-      }
+      /* {
+         test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
+         use: {
+         loader: 'url-loader',
+         query: {
+         limit: 10000,
+         name: 'fonts/[name]--[folder].[ext]'
+         }
+         }
+         } */
     ]
   },
   node: {
@@ -131,7 +132,7 @@ let rendererConfig = {
     __filename: false
   },
   plugins: [
-    new ExtractTextPlugin('styles.css'),
+//    new ExtractTextPlugin('styles.css'),
     new HtmlWebpackPlugin(htmlPageOptions("prefs")),
     new HtmlWebpackPlugin(htmlPageOptions("editor")),    
     new HtmlWebpackPlugin(htmlPageOptions("new")),
