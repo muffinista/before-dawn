@@ -7,7 +7,7 @@ const rimraf = require("rimraf");
 const sinon = require('sinon');
 
 
-const Package = require('../../app/lib/package.js');
+const Package = require('../../src/lib/package.js');
 
 const helpers = require('./setup.js');
 var workingDir = helpers.getTempDir();

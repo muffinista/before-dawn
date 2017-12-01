@@ -8,12 +8,12 @@
   "options": [
     {
       "index": 0,
-      "name": "New Option I Guess",
-      "type": "slider",
-      "description": "Description",
+      "name": "load_url",
+      "type": "text",
+      "description": "Load the specified URL",
       "min": "1",
       "max": "100",
-      "default": "75"
+      "default": ""
     }
   ],
   "editable": true

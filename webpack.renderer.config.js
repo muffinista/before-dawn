@@ -5,7 +5,7 @@ if ( typeof(process.env.BABEL_ENV) === "undefined" ) {
 }
 
 const path = require('path');
-const { dependencies } = require('./package.json');
+const { dependencies, productName } = require('./package.json');
 const webpack = require('webpack');
 
 const outputDir = path.join(__dirname, "output");
@@ -15,11 +15,12 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-var htmlPageOptions = function(id) {
+var htmlPageOptions = function(id, title) {
   return {
     filename: id + '.html',
     template: path.resolve(__dirname, 'src/index.ejs'),
     id: id,
+    title: productName + ": " + title,
     minify: {
       collapseWhitespace: true,
       removeAttributeQuotes: true,
@@ -41,7 +42,6 @@ let whiteListedModules = ['vue'];
 let rendererConfig = {
   devtool: '#cheap-module-eval-source-map',
   entry: {
-    //main: path.join(__dirname, 'src/main/index.js'),
     renderer: path.join(__dirname, 'src/renderer/main.js')
   },
   externals: [
@@ -138,10 +138,10 @@ let rendererConfig = {
   },
   plugins: [
     new ExtractTextPlugin('styles.css'),
-    new HtmlWebpackPlugin(htmlPageOptions("prefs")),
-    new HtmlWebpackPlugin(htmlPageOptions("editor")),    
-    new HtmlWebpackPlugin(htmlPageOptions("new")),
-    new HtmlWebpackPlugin(htmlPageOptions("about")),
+    new HtmlWebpackPlugin(htmlPageOptions("prefs", "Preferences")),
+    new HtmlWebpackPlugin(htmlPageOptions("editor", "Editor")),    
+    new HtmlWebpackPlugin(htmlPageOptions("new", "Create Screensaver!")),
+    new HtmlWebpackPlugin(htmlPageOptions("about", "About!")),
     new CopyWebpackPlugin([
       {
         from: path.join(__dirname, 'src', 'renderer', 'assets'),

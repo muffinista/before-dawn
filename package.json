@@ -6,9 +6,8 @@
   "author": "Colin Mitchell <colin@muffinlabs.com> (http://muffinlabs.com)",
   "license": "MIT",
   "homepage": "https://github.com/muffinista/before-dawn/",
-  "main": "app/main.js",
+  "main": "src/main.js",
   "scripts": {
-    "start": "electron app/main.js",
     "dev": "node bin/dev-runner.js",
     "postinstall": "electron-builder install-app-deps",
     "pack": "electron-builder --dir",

@@ -10,9 +10,13 @@
           </p>
         </div>
       </template>  
-      <saver-form
-         v-bind:saver="saver"
-         v-if="canAdd"></saver-form>
+
+      <template v-if="canAdd">
+        <p>Use this form to create a new screensaver. A template will be
+          added to the system that you can fill in with your code.</p>
+        <saver-form
+           v-bind:saver="saver"></saver-form>
+      </template>
     </div>
   </div>
   <footer class="footer d-flex justify-content-between">
@@ -34,7 +38,6 @@ export default {
   },
   mounted() {
     this.ipcRenderer.on("generate-screensaver", (event, data) => {
-      console.log("hi!", this.params, data);
       this.ipcRenderer.send("open-editor", {
         src: data.dest,
         screenshot: this.screenshot

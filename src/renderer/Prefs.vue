@@ -204,8 +204,16 @@ export default {
 
     },
     updateSaverOption(saver, name, value) {
-      //console.log("update saver option!", saver, name, value);
-      this.prefs.options[saver][name] = value;
+      console.log("update saver option: " + saver + " - " + name + " - " + value);
+
+      var tmp = this.prefs.options;
+      var update = {};
+      update[saver] = {};
+      update[saver][name] = value;
+   
+      this.prefs.options = Object.assign({}, tmp, update);
+      //this.prefs.options[saver][name] = value;
+      
     },
     closeWindow() {
       this.currentWindow.close();
@@ -214,6 +222,7 @@ export default {
       this.disabled = true;
 
       this.prefs.saver = this.saver;
+
       this.manager.updatePrefs(this.prefs, () => {
         this.disabled = false;
         this.ipcRenderer.send("set-autostart", this.prefs.auto_start);

@@ -3,7 +3,7 @@
     <div class="d-flex w-100 justify-content-between">
       <label>
         <div class="body">
-          <input type="radio" v-bind:value="saver.key" name="screensaver" v-on="$listeners" :checked="checked"/>
+          <input type="radio" v-bind:value="saver.key" :data-name="saver.name" name="screensaver" v-on="$listeners" :checked="checked"/>
           <b>{{saver.name}}</b>
         </div>
       </label>

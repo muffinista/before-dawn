@@ -1,7 +1,7 @@
 'use strict';
 
 const assert = require('assert');
-const Saver = require('../../app/lib/savers.js');
+const Saver = require('../../src/lib/savers.js');
 const _ = require('lodash');
 const tmp = require('tmp');
 const rimraf = require('rimraf');
@@ -9,7 +9,7 @@ const fs = require('fs-extra');
 const path = require('path');
 
 describe('Savers', function() {
-  var savers = require('../../app/lib/savers.js');
+  var savers = require('../../src/lib/savers.js');
   var saverData;
   var configData;
 

@@ -506,25 +506,37 @@ var listAll = function(cb, force) {
 var updatePrefs = function(data, cb) {
   for ( var k in data ) {
     var v = data[k];
+    console.log("*** " + k + " => " + v);
     nconf.set(k, v);
   }
 
+  for ( var k in data.options ) {
+    var v = data.options[k];
+    console.log("*** " + k + " => " + v);
+    //    nconf.set(k, v);
+  }
+  
   write(cb);
 };
 
 var write = function(cb) {
   var configPath = baseDir + "/" + config_file;
-  nconf.save(cb);
+  console.log("save config to " + configPath);
+  nconf.save(() => {
+    cb();
+    console.log(fs.readFileSync(configPath).toString());
+  });
 };
 
 var writeSync = function() {
   var configPath = baseDir + "/" + config_file;
+  console.log("save config to " + configPath);
   nconf.save();
 };
 
 var getTemplatePath = function() {
   //  return path.join(defaultSaversDir(), "__template");
-  return path.join(__dirname, "..", "system-savers", "__template");
+  return path.join(__dirname, "system-savers", "__template");
 };
 
 var getConfig = function(cb) {

@@ -1,5 +1,5 @@
 <template>
-  <form v-on="$listeners" :class="formType">
+  <form v-on="$listeners" :class="formType" v-on:submit.prevent="noop">
     <div class="form-group row">
       <label class="col-sm-2 col-form-label">Name</label>
       <div class="col-sm-10" >
@@ -84,6 +84,7 @@
       }
     },
     methods: {
+      noop() {},
       onDeleteClick() {
         this.$emit("deleteOption");
       },

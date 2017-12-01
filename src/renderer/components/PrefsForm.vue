@@ -90,7 +90,7 @@
         <div class="form-group">
           <label for="localSource">Local Source:</label>
           <div class="input-group">
-            <input type="text" v-model="prefs.localSource" class="form-control" />
+            <input type="text" v-model="prefs.localSource" name="localSource" class="form-control" />
             <span class="input-group-btn">
               <button type="button" class="btn btn-secondary pick" @click.stop="showPathChooser">...</button>
             </span>
