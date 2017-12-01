@@ -680,38 +680,38 @@ var bootApp = function() {
       appIcon.popUpContextMenu();
     });
     
-    if ( argv.screen === "prefs" ) {
-      openPrefsWindow();
-    }
-    else if ( argv.screen === "about" ) {
-      openAboutWindow();
-    }
-    else if ( argv.screen === "saver" ) {
-      setStateToRunning();
-    }
-    
     appReady = true;
-    
+        
     if ( testMode === true ) {
       openTestShim();
     }
     else {
-      //      openPrefsOnFirstLoad();
-      openPrefsWindow();
+      if ( argv.screen === "prefs" ) {
+        openPrefsWindow();
+      }
+      else if ( argv.screen === "about" ) {
+        openAboutWindow();
+      }
+      else if ( argv.screen === "saver" ) {
+        setStateToRunning();
+      }
+      openPrefsOnFirstLoad();
     }
 
-    
-    if ( global.IS_DEV !== true ) {
+
+    if ( global.CHECK_FOR_RELEASE === true ) {
       releaseChecker = require("../lib/release_check.js");
       
       releaseChecker.setFeed(global.RELEASE_CHECK_URL);
       releaseChecker.setLogger(log.info);
-      releaseChecker.onUpdate(function() {
+      releaseChecker.onUpdate(() => {
         global.NEW_RELEASE_AVAILABLE = true;
+        log.info("new release");
         trayMenu.items[3].visible = global.NEW_RELEASE_AVAILABLE;
       });
-      releaseChecker.onNoUpdate(function() {
+      releaseChecker.onNoUpdate(() => {
         global.NEW_RELEASE_AVAILABLE = false;
+        log.info("no new release");
         trayMenu.items[3].visible = global.NEW_RELEASE_AVAILABLE;
       });
 
@@ -843,7 +843,7 @@ var updateTrayIcon = function() {
 };
 
 // load a few global variables
-require("../bootstrap.js");
+require("./bootstrap.js");
 
 log.transports.file.maxSize = 1 * 1024 * 1024;
 log.transports.file.file = path.join(__dirname, "/log.txt");

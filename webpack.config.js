@@ -1,6 +1,8 @@
 'use strict';
 
-process.env.BABEL_ENV = 'renderer';
+if ( typeof(process.env.BABEL_ENV) === "undefined" ) {
+  process.env.BABEL_ENV = 'renderer';
+}
 
 const path = require('path');
 const { dependencies } = require('./package.json');
@@ -132,7 +134,7 @@ let rendererConfig = {
     __filename: false
   },
   plugins: [
-//    new ExtractTextPlugin('styles.css'),
+    //    new ExtractTextPlugin('styles.css'),
     new HtmlWebpackPlugin(htmlPageOptions("prefs")),
     new HtmlWebpackPlugin(htmlPageOptions("editor")),    
     new HtmlWebpackPlugin(htmlPageOptions("new")),

@@ -64,6 +64,8 @@ import SaverOptions from '@/components/SaverOptions';
 import SaverSummary from '@/components/SaverSummary';
 import PrefsForm from '@/components/PrefsForm';
 
+const {dialog} = require("electron").remote;
+
 export default {
   name: 'prefs',
   components: {
@@ -81,6 +83,12 @@ export default {
 
     this.getData();
     this.getCurrentSaver();
+
+    if ( this.$electron.remote.getGlobal("NEW_RELEASE_AVAILABLE") ) {
+      this.$nextTick(() => {
+        this.renderUpdateNotice();
+      });
+    }
     
   },
   data() {
@@ -211,6 +219,23 @@ export default {
         this.ipcRenderer.send("set-autostart", this.prefs.auto_start);
         this.closeWindow();
       });
+    },
+    renderUpdateNotice() {
+      dialog.showMessageBox(
+        {
+          type: "info",
+          title: "Update Available!",
+          message: "There's a new update available! Would you like to download it?",
+          buttons: ["No", "Yes"],
+          defaultId: 0
+        },
+        (result) => {
+          if ( result === 1 ) {
+            var appRepo = this.$electron.remote.getGlobal("APP_REPO");
+            this.$electron.shell.openExternal("https://github.com/" + appRepo + "/releases/latest");
+          }
+        }
+      );
     }
   },
 };

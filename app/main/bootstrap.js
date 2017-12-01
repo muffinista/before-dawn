@@ -1,6 +1,6 @@
 var fs = require("fs");
 var path = require("path");
-var filePath = path.join(__dirname, "..", "package.json");
+var filePath = path.join(__dirname, "..", "..", "package.json");
 var version = JSON.parse(fs.readFileSync( filePath )).version;
 
 
@@ -20,6 +20,8 @@ global.RELEASE_SERVER = "https://hazel-nwmfhsakin.now.sh";
 // don't care what platform is running
 global.RELEASE_CHECK_URL = `${global.RELEASE_SERVER}/update/win32/${global.APP_VERSION_BASE}`;
 global.IS_DEV = require('electron-is-dev');
+
+global.CHECK_FOR_RELEASE = !global.IS_DEV;
 
 // this is a free sentry account and the URL will be in every copy of
 // the app that gets distributed, so i'm committing it to the repo for now
