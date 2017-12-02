@@ -45,8 +45,9 @@
             https://v1.vuejs.org/guide/list.html#track-by-index 
             -->
             <saver-option-input
-               v-for="option in options"
+               v-for="option, index in options"
                v-bind:option="option"
+               :index="index"
                v-bind:key="option.index"
                v-on:deleteOption="deleteOption(option)"
                v-if="isLoaded"></saver-option-input>      
@@ -54,7 +55,7 @@
             <div class="padded-top padded-bottom">
               <button
                  type="button"
-                 class="btn btn-positive"
+                 class="btn btn-positive add-option"
                  v-on:click="addSaverOption">Add Option</button>
             </div>
           </div>
@@ -211,7 +212,6 @@ export default {
     },
     saveData() {
       this.disabled = true;
-
 
       this.saver.attrs.options = this.options;
       console.log("YO", this.saver);

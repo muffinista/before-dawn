@@ -1,5 +1,8 @@
 <template>
-  <form v-on="$listeners" :class="formType" v-on:submit.prevent="noop">
+<form v-on="$listeners"
+      :class="formType"
+      v-on:submit.prevent="noop"
+      :data-index="index">
     <div class="form-group row">
       <label class="col-sm-2 col-form-label">Name</label>
       <div class="col-sm-10" >
@@ -15,6 +18,7 @@
       <div class="col-sm-10" >
         <input type="text"
                v-model="option.description"
+               name="description"
                placeholder="Describe what this option does"
                class="form-control" required />
       </div>
@@ -57,7 +61,7 @@
     
     <div class="form-actions">
       <button type="button"
-              class="btn btn-danger"
+              class="btn btn-danger remove-option"
               v-on:click="onDeleteClick(option)">Remove this Option</button>
     </div>
   </form>
@@ -66,14 +70,14 @@
 <script>
   export default {
     name: 'saver-option-input',
-    props: ['option'],
+    props: ['option', 'index'],
     components: { },
     computed: {
       formType: function() {
         if ( this.option.type === "slider" ) {
-          return "option-range";
+          return "entry option-range";
         }
-        return "option-text";
+        return "entry option-text";
       },
       defaultInputClass: function() {
         if ( this.option.type === "slider" ) {

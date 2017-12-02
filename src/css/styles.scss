@@ -32,6 +32,7 @@ ul[role=tablist] {
     height: $nav_height;
     margin-bottom: 42px;
     background: white;
+    z-index: 99999;
 }
 .tab-content {
     padding-top: $nav_height+$tab_padding;
