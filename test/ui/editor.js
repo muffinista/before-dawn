@@ -43,28 +43,44 @@ describe('Editor', function() {
     return app.client.waitUntilWindowLoaded().
                getTitle().
                then((res) => {
-                 assert.equal('Before Dawn -- Editor!', res);
+                 assert.equal('Before Dawn: Editor', res);
                });
   });
   
   it('shows settings form', function(done) {
     app.client.waitUntilWindowLoaded().
-        then(() => app.client.click("a.settings")).
-        then(() => app.client.getText('body')).
-        then((text) => {
-          assert(text.lastIndexOf('You can enter the basics about this screensaver here') !== -1);
-        }).
-        then(() => app.client.getValue(".basic-attributes [name='name']")).
+        then(() => app.client.click("=Settings")).
+        then(() => app.client.getValue("#saver-form [name='name']")).
         then((res) => {
           assert.equal('Screensaver One', res);
         }).
-        then(() => app.client.setValue(".basic-attributes [name='name']", 'A New Name!!!')).
-        then(() => app.client.setValue(".basic-attributes [name='description']", 'A Thing I Made?')).
+        then(() => app.client.setValue("#saver-form [name='name']", 'A New Name!!!')).
+        then(() => app.client.setValue("#saver-form [name='description']", 'A Thing I Made?')).
         then(() => app.client.click("button.save")).
+        /* then(() => app.client.getMainProcessLogs()).
+           then(function (logs) {
+           logs.forEach(function (log) {
+           console.log(log);
+           })
+           }).
+        then(() => app.client.getRenderProcessLogs()).
+        then(function (logs) {
+          logs.forEach(function (log) {
+            console.log(log.message)
+          })
+        }).*/
+                   
         then(() => {
-          var data = JSON.parse(fs.readFileSync(saverJSON));
-          assert.equal('A New Name!!!', data.name);
+          var p = new Promise( (resolve, reject) => {
+            setTimeout(() => {
+              var x = JSON.parse(fs.readFileSync(saverJSON)).name;
+              resolve(x);
+            }, 1000);
+          });
+
+          return p;
         }).
+        then((res) => { assert.equal(res, "A New Name!!!"); }).
         then(() => {
           done();
         });
@@ -72,19 +88,27 @@ describe('Editor', function() {
 
   it('adds and removes options', function(done) {
     app.client.waitUntilWindowLoaded().
-        then(() => app.client.click("a.settings")).
-        then(() => app.client.setValue(".entry[data-key='0'] [name='name']", 'My Option')).
-        then(() => app.client.setValue(".entry [name='description']", 'An Option I Guess?')).
+        then(() => app.client.click("=Settings")).
+        then(() => app.client.setValue(".entry[data-index='0'] [name='name']", 'My Option')).
+        then(() => app.client.setValue(".entry[data-index='0'] [name='description']", 'An Option I Guess?')).
         then(() => app.client.click("button.add-option")).
-        then(() => app.client.setValue(".entry[data-key='1'] [name='name']", 'My Second Option')).
-        then(() => app.client.setValue(".entry[data-key='1'] [name='description']", 'Another Option I Guess?')).        
+        then(() => app.client.setValue(".entry[data-index='1'] [name='name']", 'My Second Option')).
+        then(() => app.client.setValue(".entry[data-index='1'] [name='description']", 'Another Option I Guess?')).        
         then(() => app.client.click("button.add-option")).
-        then(() => app.client.setValue(".entry[data-key='2'] [name='name']", 'My Third Option')).
-        then(() => app.client.setValue(".entry[data-key='2'] [name='description']", 'Here We Go Again')).
+        then(() => app.client.setValue(".entry[data-index='2'] [name='name']", 'My Third Option')).
+        then(() => app.client.setValue(".entry[data-index='2'] [name='description']", 'Here We Go Again')).
         then(() => app.client.click("button.save")).
         then(() => {
-          var data = JSON.parse(fs.readFileSync(saverJSON));
+          var p = new Promise( (resolve, reject) => {
+            setTimeout(() => {
+              var x = JSON.parse(fs.readFileSync(saverJSON));
+              resolve(x);
+            }, 1000);
+          });
 
+          return p;
+        }).
+        then((data) => {
           var opt = data.options[0];
           assert.equal('My Option', opt.name);
           assert.equal('An Option I Guess?', opt.description);
@@ -93,11 +117,19 @@ describe('Editor', function() {
           assert.equal('My Second Option', opt.name);
           assert.equal('Another Option I Guess?', opt.description);
         }).
-        then(() => app.client.click(".entry[data-key='1'] button.remove-option")).
+        then(() => app.client.click(".entry[data-index='1'] button.remove-option")).
         then(() => app.client.click("button.save")).
         then(() => {
-          var data = JSON.parse(fs.readFileSync(saverJSON));
+          var p = new Promise( (resolve, reject) => {
+            setTimeout(() => {
+              var x = JSON.parse(fs.readFileSync(saverJSON));
+              resolve(x);
+            }, 1000);
+          });
 
+          return p;
+        }).
+        then((data) => {
           var opt = data.options[0];
           assert.equal('My Option', opt.name);
           assert.equal('An Option I Guess?', opt.description);

@@ -7,7 +7,14 @@ const tmp = require('tmp');
 
 const helpers = require('./setup.js');
 var workingDir = helpers.getTempDir();
+var saversDir = helpers.getTempDir();
+
+
 const app = helpers.application(workingDir);
+
+helpers.setupConfig(workingDir);
+helpers.addLocalSource(workingDir, saversDir);
+helpers.addSaver(saversDir, "saver-one", "saver.json");
 
 describe('Prefs', function() {
   helpers.setupTimeout(this);
@@ -29,66 +36,63 @@ describe('Prefs', function() {
 
   it('sets title', function(done) {
     app.client.waitUntilWindowLoaded().getTitle().then((res) => {
-      assert.equal('Before Dawn -- screensaver fun', res);
+      assert.equal('Before Dawn: Preferences', res);
       done();
     });
   });
 
   it('lists screensavers', function(done) {
-    app.client.waitUntilTextExists('body', 'Holzer').getText('body').then((text) => {
-      assert(text.lastIndexOf('Holzer') !== -1);
+    app.client.waitUntilTextExists('body', 'Screensaver One').getText('body').then((text) => {
+      assert(text.lastIndexOf('Screensaver One') !== -1);
       done();
     });
   });
 
   it('allows picking a screensaver', function(done) {
-    app.client.waitUntilTextExists('body', 'Holzer', 10000)
+    app.client.waitUntilTextExists('body', 'Screensaver One', 10000)
        .getAttribute("[type=radio]","data-name")
        .then(() => {
-         app.client.click("[type=radio][data-name='Cylon']").
+         app.client.click("[type=radio][data-name='Screensaver One']").
              getText('body').
              then((text) => {
-               assert(text.lastIndexOf('lights on your screen') !== -1);
+               assert(text.lastIndexOf('A Screensaver') !== -1);
              });
        }).
         then(() => app.client.click("button.save")).
-        getWindowCount().should.eventually.equal(1).
         then(() => {
-          assert(helpers.savedConfig(workingDir).saver.lastIndexOf("/cylon/") !== -1);
+          app.client.getWindowCount().should.eventually.equal(1)
+        }).
+        then(() => {
+          assert(helpers.savedConfig(workingDir).saver.lastIndexOf("/saver-one/") !== -1);
           done();
         });
     
   });
 
-  it.only('sets options for screensaver', function(done) {
-    app.client.waitUntilTextExists('body', 'Holzer', 10000).
+  it('sets options for screensaver', function(done) {
+    app.client.waitUntilTextExists('body', 'Screensaver One', 10000).
        getAttribute("[type=radio]","data-name").
-        then(() => console.log("here 0")).
-        then(() => app.client.click("[type=radio][data-name='Run a URL']")).
+        then(() => app.client.click("[type=radio][data-name='Screensaver One']")).
         then(() => app.client.getText('body')).
         then((text) => {
-          console.log(text);
           assert(text.lastIndexOf('Load the specified URL') !== -1);
         }).
-//        then(() => console.log("here")).
         then(() => app.client.setValue("[name='load_url']", 'barfoo')).
-//        then(() => console.log("here 2")).
-        then(() => app.client.click("button.save")).
-//        then(() => console.log("here 3")).
-//        getWindowCount().should.eventually.equal(1).
-//        then(() => console.log("here 4")).
+        then(() => app.client.click("button.save")).       
         then(() => {
           var options = helpers.savedConfig(workingDir).options;
-          var k = Object.keys(options)[0];
-                   
+          var k = Object.keys(options).find((i) => {
+            return i.indexOf("saver-one") !== -1;
+          });
+
           assert(options[k].load_url == 'barfoo');
           done();
         });
-    
+   
   });
   
   it('allows setting path', function(done) {
-    app.client.waitUntilWindowLoaded().click("#prefs-tab").
+    app.client.waitUntilWindowLoaded().click("=Preferences").
         then(() => app.client.scroll("[name='localSource']")).
         then(() => app.client.setValue("[name='localSource']", '/tmp')).
         then(() => app.client.click("button.save")).

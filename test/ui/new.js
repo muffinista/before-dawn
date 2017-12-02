@@ -49,7 +49,7 @@ describe('Add New', function() {
                  then(() => app.client.waitUntilWindowLoaded() ).
                  then(() => {
                    helpers.addLocalSource(workingDir, saversDir);
-
+                   
                    // tell app to reload config
                    app.electron.ipcRenderer.send("prefs-updated");
                  }).
@@ -77,11 +77,11 @@ describe('Add New', function() {
           then(() => app.client.setValue("[name='name']", 'A New Name')).
           then(() => app.client.setValue("[name='description']", 'A Thing I Made?')).
           then(() => app.client.click(".save")).
-			    then(() => app.client.windowByIndex(1)).
+          then(() => app.client.waitUntilWindowLoaded()).
+          then(() => app.client.windowByIndex(1)).
           getTitle().
           then((res) => {
-            // wait for the editor to load
-            assert.equal('Before Dawn -- Editor!', res);
+            assert.equal('Before Dawn: Editor', res);
           }).
           then(() => {
             assert(fs.existsSync(src));

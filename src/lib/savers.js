@@ -24,22 +24,6 @@ var init = function(_path, cb) {
   reload(cb);
 };
 
-var initFromList = function(_path, data, cb) {
-  baseDir = path.resolve(_path);
-  loadedScreensavers = _.map(data, function(attrs) {
-    return new Saver(attrs);
-  });
-
-  reload(cb, false);
-};
-
-var toList = function(cb) {
-  listAll(function(data) {
-    var out = _.map(data, function(s) { return s.toHash(); })
-    cb(out);
-  });
-};
-
 /**
  * reload all our data/config/etc
  */
@@ -122,13 +106,14 @@ var setupPackages = function(cb) {
  * delete a screensaver -- this removes the directory that contains all files
  * for the screensaver.
  */
-var deleteSaver = function(k, cb) {
+var deleteSaver = function(s, cb) {
+  var k = s.key;
   var p = path.dirname(k);
-  var s = getByKey(k);
+
   var cbWrapped = function() {
     reload(cb);
   };
-
+  
   // make sure we're deleting a screensaver that exists and is
   // actually editable
   if ( typeof(s) !== "undefined" && s.editable === true ) {
@@ -180,7 +165,7 @@ var ensureDefaults = function() {
   var source = nconf.get("source");
   if ( source === undefined ) {
     _firstLoad = true;
-    setConfig("source",{
+    setConfig("source", {
       repo: global.SAVER_REPO,
       hash: ""
     });
@@ -207,6 +192,17 @@ var getByKey = function(key) {
  */
 var getCurrent = function() {
   return nconf.get("saver");
+};
+
+var loadCurrent = function(cb) {
+  var current = nconf.get("saver");
+  listAll(function(data) {
+    var result = _.find(data, function(obj) {
+      return obj.key === key;
+    });
+
+    cb(result);
+  });
 };
 
 /**
@@ -377,9 +373,9 @@ var sources = function() {
   var source = getSource();
   var local = getLocalSource();
   var root = path.join(baseDir, "savers");
-  var system = path.join(baseDir, "system-savers");
-  var system2 = path.join(__dirname, "..", "system-savers");  
 
+  var system = path.join(baseDir, "system-savers");
+  var system2 = path.join(__dirname, "system-savers");  
   
   var folders = [];
 
@@ -455,6 +451,11 @@ var loadFromData = function(contents, stub, settings) {
     contents.settings = settings;
   }
 
+  // ensure that all screensavers have options set
+  if ( getOptions(contents.key) === {} ) {
+    setOptions({}, contents.key);
+  }
+  
   return new Saver(contents);
 };
 
@@ -469,8 +470,14 @@ var listAll = function(cb, force) {
 
   var promises = [];
 
+  // exclude system screensavers from the cache check
+  // @todo get rid of this
+  var systemScreensaverCount = 1;
+
+  force = true;
+  
   // use cached data if available
-  if ( loadedScreensavers.length > 0 && ( typeof(force) === "undefined" || force === false ) ) {
+  if ( loadedScreensavers.length > systemScreensaverCount && ( typeof(force) === "undefined" || force === false ) ) {
     cb(loadedScreensavers);
     return;
   }
@@ -496,19 +503,40 @@ var listAll = function(cb, force) {
   });
 };
 
+var updatePrefs = function(data, cb) {
+  for ( var k in data ) {
+    var v = data[k];
+    console.log("*** " + k + " => " + v);
+    nconf.set(k, v);
+  }
+
+  for ( var k in data.options ) {
+    var v = data.options[k];
+    console.log("*** " + k + " => " + v);
+    //    nconf.set(k, v);
+  }
+  
+  write(cb);
+};
+
 var write = function(cb) {
   var configPath = baseDir + "/" + config_file;
-  nconf.save(cb);
+  console.log("save config to " + configPath);
+  nconf.save(() => {
+    cb();
+    console.log(fs.readFileSync(configPath).toString());
+  });
 };
 
 var writeSync = function() {
   var configPath = baseDir + "/" + config_file;
+  console.log("save config to " + configPath);
   nconf.save();
 };
 
 var getTemplatePath = function() {
   //  return path.join(defaultSaversDir(), "__template");
-  return path.join(__dirname, "..", "system-savers", "__template");
+  return path.join(__dirname, "system-savers", "__template");
 };
 
 var getConfig = function(cb) {
@@ -517,6 +545,21 @@ var getConfig = function(cb) {
     cb(JSON.parse(data.toString()));
   });
 }
+
+var getConfigSync = function() {
+  var configPath = path.join(baseDir, config_file);
+  var data = fs.readFileSync(configPath);
+  data = JSON.parse(data.toString());
+
+  // add anything that might not exist, because
+  // vue.js won't treat missing data properly
+  if ( data.auto_start === undefined ) {
+    data.auto_start = false;
+  }
+
+  return data;
+}
+
 
 /**
  * generate a screensaver template
@@ -565,8 +608,6 @@ var generateScreensaver = function(opts) {
 };
 
 exports.init = init;
-exports.initFromList = initFromList;
-exports.toList = toList;
 exports.reload = reload;
 exports.reset = reset;
 exports.delete = deleteSaver;
@@ -574,6 +615,7 @@ exports.delete = deleteSaver;
 exports.loadFromFile = loadFromFile;
 exports.getByKey = getByKey;
 exports.getCurrent = getCurrent;
+exports.loadCurrent = loadCurrent;
 exports.getSource = getSource;
 exports.setSource = setSource;
 exports.getLocalSource = getLocalSource;
@@ -592,7 +634,9 @@ exports.setDisableOnBattery = setDisableOnBattery;
 exports.getDisableOnBattery = getDisableOnBattery;
 exports.getOptions = getOptions;
 exports.listAll = listAll;
+exports.updatePrefs = updatePrefs;
 exports.write = write;
 exports.firstLoad = firstLoad;
 exports.getConfig = getConfig;
+exports.getConfigSync = getConfigSync;
 exports.generateScreensaver = generateScreensaver;

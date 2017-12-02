@@ -1,7 +1,7 @@
 'use strict';
 
 const assert = require('assert');
-const Saver = require('../../app/lib/savers.js');
+const Saver = require('../../src/lib/savers.js');
 const _ = require('lodash');
 const tmp = require('tmp');
 const rimraf = require('rimraf');
@@ -9,7 +9,7 @@ const fs = require('fs-extra');
 const path = require('path');
 
 describe('Savers', function() {
-  var savers = require('../../app/lib/savers.js');
+  var savers = require('../../src/lib/savers.js');
   var saverData;
   var configData;
 
@@ -213,48 +213,6 @@ describe('Savers', function() {
               done();
             });
           });
-        });
-      });
-    });
-  });
-
-  describe('initFromList', function() {
-    it("loads data", function(done) {
-      var list = [
-        saverData,
-        saverData,
-        saverData,
-        saverData,
-        saverData
-      ];
-
-      savers.initFromList(workingDir, list, function() {
-        savers.listAll(function(data) {
-          var s = data[0];
-          assert.equal("Screensaver One", s.name);
-          assert.equal(5, data.length);
-          done();
-        });
-      });
-    });
-  });
-
-  describe('toList', function() {
-    it("outputs data", function(done) {
-      var list = [
-        saverData,
-        saverData,
-        saverData,
-        saverData,        
-        saverData,
-        saverData
-      ];
-
-      savers.initFromList(workingDir, list, function() {
-        savers.toList(function(output) {
-          assert.deepEqual(output, list);
-          assert.equal(6, output.length);
-          done();
         });
       });
     });

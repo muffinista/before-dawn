@@ -29,10 +29,10 @@ const fs = require("fs");
 const path = require("path");
 const parseArgs = require("minimist");
 
-const screen = require("./lib/screen.js");
+const screen = require("./screen.js");
 var releaseChecker;
-const power = require("./lib/power.js");
-let stateManager = require("./lib/state_manager.js");
+const power = require("./power.js");
+let stateManager = require("./state_manager.js");
 
 const robot = require("robotjs");
 
@@ -75,6 +75,10 @@ var icons = {
 };
 
 
+const urlPrefix = process.env.NODE_ENV === 'development'
+             ? 'http://localhost:9080'
+             : 'file://' + __dirname
+
 /**
  * open our screen grabber tool and issue a screengrab request
  */
@@ -91,7 +95,7 @@ var grabScreen = function(s, cb) {
     return;
   }
 
-  var grabberUrl = "file://" + __dirname + "/html/grabber.html?id=" + s.id +
+  var grabberUrl = "file://" + __dirname + "/assets/grabber.html?id=" + s.id +
                    "&width=" + s.bounds.width +
                    "&height=" + s.bounds.height;
 
@@ -165,11 +169,17 @@ var openPrefsWindow = function() {
     // call savers.reload to make sure our data is properly refreshed
     // and check for any system updates
     global.savers.reload(function() {
-      var prefsUrl = "file://" + __dirname + "/html/prefs.html";
+      var prefsUrl = urlPrefix + "/prefs.html";
+           
       prefsWindowHandle = new BrowserWindow({
         width:800,
         height:700,
         resizable:true,
+        // @todo i added this when switching to webpack/vue,
+        // can it be tossed again?
+        webPreferences: {
+          webSecurity: false
+        },
         icon: path.join(__dirname, "assets", "icon.png")
       });
 
@@ -208,8 +218,9 @@ var addNewSaver = function(screenshot) {
     screenshot = screenshot.screenshot;
   }
 
-  newUrl = "file://" + __dirname + "/html/new.html" +
-           "?screenshot=" + encodeURIComponent(screenshot);
+  var newUrl = urlPrefix + "/new.html";
+
+  newUrl = newUrl + "?screenshot=" + encodeURIComponent(screenshot);
 
   var w = new BrowserWindow({
     width:450,
@@ -231,15 +242,18 @@ var addNewSaver = function(screenshot) {
  * Open the About window for the app
  */
 var openAboutWindow = function() {
-  var prefsUrl = "file://" + __dirname + "/html/about.html";
+  var aboutUrl = urlPrefix + "/about.html";
   var w = new BrowserWindow({
     width:500,
     height:400,
     resizable:false,
-    icon: path.join(__dirname, "assets", "icon.png")
+    icon: path.join(__dirname, "assets", "icon.png"),
+    webPreferences: {
+      webSecurity: false
+    }
   });
 
-  w.loadURL(prefsUrl);
+  w.loadURL(aboutUrl);
 
   showDock();
   
@@ -613,7 +627,7 @@ var openPrefsOnFirstLoad = function() {
 var bootApp = function() {
   var icons = getIcons();
   // @todo i think asar breaks this
-  var menuTemplate = require("./js/menu_template.js").buildMenuTemplate(app);
+  var menuTemplate = require("./menu_template.js").buildMenuTemplate(app);
   var menu = Menu.buildFromTemplate(menuTemplate);
 
   Menu.setApplicationMenu(menu);
@@ -656,36 +670,37 @@ var bootApp = function() {
       appIcon.popUpContextMenu();
     });
     
-    if ( argv.screen === "prefs" ) {
-      openPrefsWindow();
-    }
-    else if ( argv.screen === "about" ) {
-      openAboutWindow();
-    }
-    else if ( argv.screen === "saver" ) {
-      setStateToRunning();
-    }
-    
     appReady = true;
-    
+        
     if ( testMode === true ) {
       openTestShim();
     }
     else {
+      if ( argv.screen === "prefs" ) {
+        openPrefsWindow();
+      }
+      else if ( argv.screen === "about" ) {
+        openAboutWindow();
+      }
+      else if ( argv.screen === "saver" ) {
+        setStateToRunning();
+      }
       openPrefsOnFirstLoad();
     }
 
-    if ( global.IS_DEV !== true ) {
-      releaseChecker = require("./lib/release_check.js");
+    if ( global.CHECK_FOR_RELEASE === true ) {
+      releaseChecker = require("./release_check.js");
       
       releaseChecker.setFeed(global.RELEASE_CHECK_URL);
       releaseChecker.setLogger(log.info);
-      releaseChecker.onUpdate(function() {
+      releaseChecker.onUpdate(() => {
         global.NEW_RELEASE_AVAILABLE = true;
+        log.info("new release");
         trayMenu.items[3].visible = global.NEW_RELEASE_AVAILABLE;
       });
-      releaseChecker.onNoUpdate(function() {
+      releaseChecker.onNoUpdate(() => {
         global.NEW_RELEASE_AVAILABLE = false;
+        log.info("no new release");
         trayMenu.items[3].visible = global.NEW_RELEASE_AVAILABLE;
       });
 
@@ -702,7 +717,7 @@ var bootApp = function() {
 /**
  * try and guess if we are in fullscreen mode or not
  */
-var inFullscreen = require("./lib/fullscreen.js").inFullscreen;
+var inFullscreen = require("./fullscreen.js").inFullscreen;
 
 /**
  * run the screensaver, but only if there isn't an app in fullscreen mode right now
@@ -844,7 +859,7 @@ if ( process.env.BEFORE_DAWN_DIR !== undefined ) {
 else {
   global.basePath = path.join(app.getPath("appData"), global.APP_DIR);
 }
-global.savers = require("./lib/savers.js");
+global.savers = require("../lib/savers.js");
 
 /**
  * make sure we're only running a single instance
@@ -908,7 +923,7 @@ trayMenu = Menu.buildFromTemplate([
   },
   {
     label: "Preferences",
-    click: function() { openPrefsWindow(); }
+    click: function() {openPrefsWindow(); }
   },
   {
     label: "About " + global.APP_NAME,
@@ -973,12 +988,21 @@ ipcMain.on("open-editor", (event, args) => {
   var key = args.src;
   var screenshot = args.screenshot;
 
-  var w = new BrowserWindow();
+  var w = new BrowserWindow({
+    // @todo i added this when switching to webpack/vue,
+    // can it be tossed again?
+    webPreferences: {
+      webSecurity: false
+    },
+  });
   w.savers = global.savers;
   
   // pass the key of the screensaver we want to load
   // as well as the URL to our screenshot image
-  var target = "file://" + __dirname + "/html/watcher.html?" +
+
+  var editorUrl = urlPrefix + "/editor.html";
+ 
+  var target = editorUrl + "?" +
                "src=" + encodeURIComponent(key) +
                "&screenshot=" + encodeURIComponent(screenshot);
   w.loadURL(target);
@@ -991,6 +1015,33 @@ ipcMain.on("open-editor", (event, args) => {
   showDock();
 });
 
+
+ipcMain.on("set-autostart", (event, value) => {
+  var AutoLaunch = require("auto-launch");
+  var appName = global.APP_NAME;
+  var appLauncher = new AutoLaunch({
+    name: appName
+  });
+
+  if ( value === true ) {
+    // then(function(x) { }).
+    appLauncher.enable().then((err) =>{
+      log.info("ERR", err);
+    }).catch((err) => {
+      log.info("appLauncher enable failed", err);
+    });
+  }
+  else {
+    log.info("set auto start == false");
+    appLauncher.disable().
+                then(function(x) { }).
+                catch((err) => {
+                  log.info("appLauncher enable failed", err);
+                });
+  }
+
+
+});
 
 //
 // generate screensaver template with specified attributes
@@ -1032,4 +1083,7 @@ process.on("uncaughtException", function (ex) {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 app.once("ready", bootApp);
+
+
+
 

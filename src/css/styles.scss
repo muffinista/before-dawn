@@ -1,6 +1,42 @@
-@import "../../node_modules/bootstrap/scss/bootstrap.scss";
 @import "../../node_modules/noty/lib/noty.css";
 @import "loader";
+
+$nav_height: 42px;
+$footer_height: 40px;
+$tab_padding:12px;
+
+body > div > footer {
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: $footer_height;
+  background-color: #f5f5f5;
+
+  /* this should solve some input/footer overlap issues on prefs form */
+  z-index: 1000;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+body > div > .content {
+  height: calc(100vh - #{$footer_height});
+  overflow-y: scroll;
+}
+
+ul {
+  padding-left: 0px;
+}
+
+ul[role=tablist] {
+    width: 100%;
+    position: fixed;
+    height: $nav_height;
+    margin-bottom: 42px;
+    background: white;
+    z-index: 99999;
+}
+.tab-content {
+    padding-top: $nav_height+$tab_padding;
+}
 
 .hide {
   display: none;
@@ -13,29 +49,12 @@
   height: 80vh;
 }
 
-body .show-when-loaded {
-  display: none !important;
-}
-body.loaded .hide-when-loaded {
-  display: none !important;
-}
-body.loaded .show-when-loaded {
-  display: initial;
-}
-body.loaded .show-when-loaded.container-fluid {
-  display: block !important;
-}
-body.loaded .show-when-loaded.d-flex {
-  display: flex !important;
-}
-
 .navbar-header {
-  height: 42px;
+  height: $nav_height;
 }
 .navbar-header.sticky-top {
   background-color: white;
 }
-
 
 button {
   cursor: pointer;
@@ -53,33 +72,6 @@ button.add-option {
   margin-top: 12px;
 }
 
-.footer {
-  width: 100%;
-  /* Set the fixed height of the footer here */
-  height: 40px;
-  background-color: #f5f5f5;
-
-  /* this should solve some input/footer overlap issues on prefs form */
-  z-index: 1000;
-  padding-left: 5px;
-  padding-right: 5px;
-}
-
-.new {
-  .guts-wrapper {
-    height: calc(100vh - 40px);
-    overflow-y: scroll;
-  }
-  footer {
-    justify-content: flex-end;
-  }
-}
-
-.guts-wrapper {
-  height: calc(100vh - 83px);
-  overflow-y: scroll;
-}
-
 .watcher iframe {
   width: calc(100vw - 15px);
   height: calc(100vh - 90px);
@@ -87,8 +79,9 @@ button.add-option {
   margin-right: auto;
 }
 
-.scrollable {
-  height: 88vh;
+.saver-list {
+  height: calc(100vh - #{$nav_height+$tab_padding+$footer_height});
+  margin-bottom: 0px;
   overflow-y: scroll;
 }
 
@@ -103,7 +96,8 @@ iframe {
 }
 
 iframe.preview {
-  width: 100%;
+    width: 100%;
+    overflow:hidden;
 }
 
 .form-control[name=repo] {
@@ -131,35 +125,39 @@ fieldset {
   border: none;
 }
 
-//.wrapper {
-//  margin-right: 5px;
-//  margin-left: 5px;
-//}
-//.pane h1 {
-//  margin-top: 0px;
-//  font-size: 1.5em;
-//}
-
 .window > footer {
   padding: 5px;
 }
 
-body.about {
+// hide slider options for non-sliders
+form.option-text .only-for-slider {
+  display: none;
+}
+
+.padded-top {
+    margin-top: 20px;
+}
+
+.padded-bottom {
+    margin-bottom: 60px;
+}
+
+#about {
   overflow-x: hidden;
 }
-.about {
+#about {
   margin-left: 5px;
   text-align: center;
 }
-.about h1, .about h2, .about h3, about p {
+#about h1, #about h2, #about h3, #about p {
   overflow: visible;
   margin-top: 5px;
   margin-bottom: 5px;  
 }
-.about h2 {
+#about h2 {
   font-size: 175%;
 }
-.about p {
+#about p {
   font-size: 120%;
 }
 
@@ -167,25 +165,13 @@ body.about {
   white-space: normal;
 }
 
-.only-for-slider {
-  display: none;
-}
-
-.slider .only-for-slider {
-  display: block;
-}
-
 #details {
   min-height: 120px;
 }
 
-#details h1, #options h1, #preview-wrapper h1 {
+#details h1, #options h1, .saver-description h1 {
   font-size: 125%;
   margin-top: 5px;
-}
-
-#preview-wrapper h1 {
-  padding-left: 15px;
 }
 
 p.description {
@@ -222,12 +208,6 @@ p.description {
 .prefs-wrapper {
   padding-left: 5px;
 }
-
-.spaced-buttons button {
-  margin-left: 2px;
-  margin-right: 2px;
-}
-
 
 form.submit-attempt {
   input:invalid {

@@ -1,7 +1,7 @@
 'use strict';
 
 const assert = require('assert');
-const Saver = require('../../app/lib/saver.js');
+const Saver = require('../../src/lib/saver.js');
 const _ = require('lodash');
 const tmp = require('tmp');
 const path = require('path');
