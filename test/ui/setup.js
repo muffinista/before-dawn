@@ -5,6 +5,8 @@ const Application = require('spectron').Application;
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
 
+const chaiFiles = require('chai-files');
+
 
 var appPath = path.join(__dirname, '..', '..', 'app', 'node_modules', '.bin', 'electron');
 if (process.platform === 'win32') {
@@ -23,6 +25,7 @@ if ( ! fs.existsSync(appPath) ) {
 global.before(() => {
   chai.should();
   chai.use(chaiAsPromised);
+  chai.use(chaiFiles);
 });
 
 exports.getTempDir = function() {

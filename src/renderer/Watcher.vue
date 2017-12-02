@@ -26,9 +26,12 @@
             <h4>Basic Information</h4>
             <small>You can enter the basics about this screensaver
               here.</small>
-        
+
+            <!-- NOTE: passing the attrs here because it's really all
+              we need for this form and makes saving the data later a
+              lot easier -->
             <saver-form
-               v-bind:saver="saver"
+               v-bind:saver="saver.attrs"
                v-if="isLoaded"></saver-form>
 
 
@@ -107,16 +110,14 @@ export default {
     SaverForm, SaverPreview, SaverOptionInput, SaverOptions
   },
   mounted() {
-    var self = this;
-
     if ( this.src === null ) {
       return;
     }
 
     this.manager.loadFromFile(this.src).then((result) => {
-      self.saver = result;
-      self.options = result.options;
-      self.lastIndex = result.options.length;
+      this.saver = result;
+      this.options = result.options;
+      this.lastIndex = result.options.length;
     });
   },
   data() {
@@ -210,7 +211,10 @@ export default {
     },
     saveData() {
       this.disabled = true;
+
+
       this.saver.attrs.options = this.options;
+      console.log("YO", this.saver);
       this.saver.write(this.saver.attrs);
       this.ipcRenderer.send("savers-updated", this.saver.key);
 
