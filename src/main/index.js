@@ -136,7 +136,9 @@ var openTestShim = function() {
     width: 200,
     height: 200
   });
-  testWindow.loadURL("file://" + __dirname + "/html/test-shim.html");
+
+  // just open an empty window
+  testWindow.loadURL("file:///");  
 };
 
 /**
