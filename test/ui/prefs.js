@@ -59,7 +59,9 @@ describe('Prefs', function() {
              });
        }).
         then(() => app.client.click("button.save")).
-        getWindowCount().should.eventually.equal(1).
+        then(() => {
+          app.client.getWindowCount().should.eventually.equal(1)
+        }).
         then(() => {
           assert(helpers.savedConfig(workingDir).saver.lastIndexOf("/saver-one/") !== -1);
           done();
