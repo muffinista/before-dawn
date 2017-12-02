@@ -69,6 +69,13 @@ let mainConfig = {
     ]),
     new CopyWebpackPlugin([
       {
+        from: path.join(__dirname, 'src', 'bin'),
+        to: path.join(outputDir, 'bin'),
+        ignore: ['.*']
+      }
+    ]),
+    new CopyWebpackPlugin([
+      {
         from: path.join(__dirname, 'src', 'system-savers'),
         to: path.join(outputDir, 'system-savers'),
         ignore: ['.*']

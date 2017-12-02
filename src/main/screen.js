@@ -37,7 +37,6 @@ var doSleep = function() {
   var exec = require("child_process").exec;
   var cmd;
 
-  console.log("doSleep");
   if ( process.platform === "darwin" ) {
     cmd = "pmset displaysleepnow";
   }
@@ -54,7 +53,7 @@ var doSleep = function() {
     //console.log('stdout: ' + stdout);
     //console.log('stderr: ' + stderr);
     if (error !== null) {
-      console.log("exec error: " + error);
+      console.log("doSleep exec error: " + error);
     }
   });
 };
