@@ -9,13 +9,13 @@
   "main": "output/main.js",
   "scripts": {
     "dev": "node bin/dev-runner.js",
-    "compile": "webpack --config webpack.main.config.js && webpack --config webpack.renderer.config.js",
+    "compile": "webpack --config webpack.config.js",
     "postinstall": "electron-builder install-app-deps",
     "pack": "yarn compile && electron-builder --dir",
     "dist": "yarn compile && electron-builder --x64",
     "test": "mocha test test/**",
     "test-lib": "nyc --reporter=html mocha test test/lib/**",
-    "release": "grunt webpack && grunt sass && rm -rf app/.sass-cache && yarn dist"
+    "release": "yarn compile && yarn dist"
   },
   "repository": {
     "type": "git",

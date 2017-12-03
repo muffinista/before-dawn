@@ -1,8 +1,3 @@
-//var fs = require("fs");
-//var path = require("path");
-//var filePath = path.join(__dirname, "..", "..", "package.json");
-//var version = JSON.parse(fs.readFileSync( filePath )).version;
-
 var version = process.env.PACKAGE_VERSION;
 
 global.APP_NAME = "Before Dawn";
