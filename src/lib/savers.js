@@ -15,12 +15,27 @@ const PACKAGE_WAIT_TIME = 60 * 60 * 1000;
 
 var config_file = "config.json";
 var baseDir;
+var systemDir;
 var loadedScreensavers = [];
 
 var _firstLoad = false;
 
-var init = function(_path, cb) {
-  baseDir = path.resolve(_path);
+var init = function(opts, cb) {
+  if ( typeof(opts) === "string" ) {
+    opts = {
+      base: opts
+    }
+  }
+
+
+  baseDir = opts.base;
+  if ( opts.systemDir ) {
+    systemDir = opts.systemDir;
+  }
+  else {
+    systemDir = baseDir;
+  }
+  
   reload(cb);
 };
 
@@ -273,19 +288,9 @@ var setLocalSource = function(x) {
   return nconf.set("localSource", x);
 };
 
+
 var systemSource = function() {
-  var system = path.join(baseDir, "system-savers");
-  var system2 = path.join(__dirname, "system-savers");  
-
-  // if there's a system source, use that
-  if ( fs.existsSync(system2) ) {
-    return system2;
-  }
-
-  if ( fs.existsSync(system) ) {
-    return system;    
-  }
-
+  return path.join(systemDir, "system-savers");
 }
 
 
@@ -388,10 +393,9 @@ var skipFolder = function(p) {
 var sources = function() {
   var source = getSource();
   var local = getLocalSource();
-  var root = path.join(baseDir, "savers");
+  var system = systemSource();
 
-  var system = path.join(baseDir, "system-savers");
-  var system2 = path.join(__dirname, "system-savers");  
+  var root = path.join(baseDir, "savers");
   
   var folders = [];
 
@@ -406,11 +410,7 @@ var sources = function() {
     folders = folders.concat( local );
   }
 
-  // if there's a system source, use that
-  if ( fs.existsSync(system2) ) {
-    folders = folders.concat( system2 );
-  }
-  else if ( fs.existsSync(system) ) {
+  if ( fs.existsSync(system) ) {
     folders = folders.concat( system );
   }
 
