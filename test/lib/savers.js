@@ -10,7 +10,6 @@ const path = require('path');
 
 describe('Savers', function() {
   var savers = require('../../src/lib/savers.js');
-  var saverData;
   var configData;
 
   var getTempDir = function() {
@@ -18,28 +17,40 @@ describe('Savers', function() {
     return tmpObj.name;
   };
 
+  var addSaver = function(dest, name) {
+    // make a subdir in the savers directory and drop screensaver
+    // config there
+    var src = path.join(__dirname, '../fixtures/saver.json');
+    var testSaverDir = path.join(dest, name);
+    fs.mkdirSync(testSaverDir);
+
+    saverJSONFile = path.join(testSaverDir, 'saver.json');
+    fs.copySync(src, saverJSONFile);
+  };
+  
   var workingDir;
   var saversDir;
+  var systemDir;
   var saverJSONFile;
   
   beforeEach(function() {
     var testSaverDir;
 
+    // this will be the working directory of the app
     workingDir = getTempDir();
+
+    // this will be the separate directory to hold screensavers
     saversDir = getTempDir();
 
-    // make a subdir in the savers directory and drop screensaver
-    // config there
-    testSaverDir = path.join(saversDir, 'saver');
-    fs.mkdirSync(testSaverDir);
-    saverJSONFile = path.join(testSaverDir, 'saver.json');
-    fs.copySync(path.join(__dirname, '../fixtures/saver.json'), saverJSONFile);
+    addSaver(saversDir, 'saver');
+    addSaver(saversDir, 'saver2');    
 
-    testSaverDir = path.join(saversDir, 'saver2');
-    fs.mkdirSync(testSaverDir);
-    fs.copySync(path.join(__dirname, '../fixtures/saver2.json'), path.join(testSaverDir, 'saver.json'));
 
-    saverData = require('../fixtures/saver.json');
+    systemDir = path.join(workingDir, 'system-savers');
+    fs.mkdirSync(systemDir);
+
+    addSaver(systemDir, 'random-saver');
+    addSaver(systemDir, '__template');    
   });
 
   afterEach(function() {

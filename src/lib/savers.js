@@ -273,6 +273,22 @@ var setLocalSource = function(x) {
   return nconf.set("localSource", x);
 };
 
+var systemSource = function() {
+  var system = path.join(baseDir, "system-savers");
+  var system2 = path.join(__dirname, "system-savers");  
+
+  // if there's a system source, use that
+  if ( fs.existsSync(system2) ) {
+    return system2;
+  }
+
+  if ( fs.existsSync(system) ) {
+    return system;    
+  }
+
+}
+
+
 
 /**
  * set config var k to value v
@@ -521,22 +537,17 @@ var updatePrefs = function(data, cb) {
 
 var write = function(cb) {
   var configPath = baseDir + "/" + config_file;
-  console.log("save config to " + configPath);
-  nconf.save(() => {
-    cb();
-    console.log(fs.readFileSync(configPath).toString());
-  });
+  nconf.save(cb);
 };
 
 var writeSync = function() {
   var configPath = baseDir + "/" + config_file;
-  console.log("save config to " + configPath);
   nconf.save();
 };
 
 var getTemplatePath = function() {
-  //  return path.join(defaultSaversDir(), "__template");
-  return path.join(__dirname, "system-savers", "__template");
+  var d = systemSource();
+  return path.join(d, "__template");
 };
 
 var getConfig = function(cb) {
