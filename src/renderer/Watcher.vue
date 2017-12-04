@@ -6,7 +6,7 @@
           <template v-if="options.length > 0">
             <h4>Options</h4>
             <small>Tweak the values here and they will be sent along
-            to your preview.</small>
+              to your preview.</small>
             <saver-options
                :saver="saver"
                :options="options"
@@ -27,7 +27,7 @@
             <small>You can enter the basics about this screensaver
               here.</small>
 
-            <!-- NOTE: passing the attrs here because it's really all
+            <!-- NOTE: passing the attrs here because its really all
               we need for this form and makes saving the data later a
               lot easier -->
             <saver-form
@@ -41,8 +41,8 @@
             
             
             <!--
-            note: is track-by ok here?
-            https://v1.vuejs.org/guide/list.html#track-by-index 
+                note: is track-by ok here?
+                https://v1.vuejs.org/guide/list.html#track-by-index 
             -->
             <saver-option-input
                v-for="option, index in options"
@@ -51,7 +51,7 @@
                v-bind:key="option.index"
                v-on:deleteOption="deleteOption(option)"
                v-if="isLoaded"></saver-option-input>      
-
+            
             <div class="padded-top padded-bottom">
               <button
                  type="button"
@@ -93,14 +93,14 @@
 </template>
 
 <script>
-  const fs = require("fs");
-  const path = require("path");
-  const url = require("url");
-  const exec = require("child_process").exec;
-  
-  import Vue from 'vue';
-  import SaverPreview from '@/components/SaverPreview';
-  import SaverForm from '@/components/SaverForm';  
+const fs = require("fs");
+const path = require("path");
+const url = require("url");
+const exec = require("child_process").exec;
+
+import Vue from 'vue';
+import SaverPreview from '@/components/SaverPreview';
+import SaverForm from '@/components/SaverForm';  
 import SaverOptionInput from '@/components/SaverOptionInput';
 import SaverOptions from '@/components/SaverOptions';
 import Noty from "noty";
@@ -114,7 +114,7 @@ export default {
     if ( this.src === null ) {
       return;
     }
-
+    
     this.manager.loadFromFile(this.src).then((result) => {
       this.saver = result;
       this.options = result.options;
@@ -214,7 +214,6 @@ export default {
       this.disabled = true;
 
       this.saver.attrs.options = this.options;
-      console.log("YO", this.saver);
       this.saver.write(this.saver.attrs);
       this.ipcRenderer.send("savers-updated", this.saver.key);
 

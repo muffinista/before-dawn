@@ -78,7 +78,7 @@ export default {
   },
   mounted() {
     this.ipcRenderer.on("savers-updated", (event, arg) => {
-      console.log("handle savers-updated event", arg);
+      //console.log("handle savers-updated event", arg);
       this.getData();
     });
 
