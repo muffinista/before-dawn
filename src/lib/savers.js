@@ -46,7 +46,6 @@ var reload = function(cb, load_savers) {
   var configPath = path.join(baseDir, config_file);
   var saversDir = defaultSaversDir();
 
-  
   if ( typeof(cb) === "undefined" ) {
     cb = console.log;
   }
@@ -75,7 +74,7 @@ var reload = function(cb, load_savers) {
 
     if ( _firstLoad === true ) {
       writeSync();
-      setupPackages(function() {
+      setupPackages(() => {
         cb();
         _firstLoad = false;
       });
@@ -151,7 +150,7 @@ var updatePackage = function(cb) {
   var now = new Date().getTime();
 
   var diff = now - lastCheckAt;
-
+  
   // don't bother checking if there's no source repo specified,
   // or if we've pinged it recently
   if ( typeof(source) === "undefined" || source === "" || diff < PACKAGE_WAIT_TIME ) {
