@@ -40,5 +40,6 @@ bower_components
 .sass-cache
 .nyc_output
 
-app/dist/*
+output/*
 dist/*
+
