@@ -233,7 +233,7 @@ describe('Savers', function() {
     it("works", function(done) {
       savers.init(workingDir, function() {
         savers.setSource("foo");
-        assert.deepEqual({repo: "foo"}, savers.getSource());
+        assert.deepEqual("foo", savers.getSource());
         done();
       });
     });
