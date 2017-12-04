@@ -160,7 +160,7 @@ module.exports = function Package(_attrs) {
         if (/\/$/.test(entry.fileName)) {
           // directory file names end with '/' 
           mkdirp(fullPath, function(err) {
-            if (err) {throw err;}
+            //if (err) {throw err;}
             zipfile.readEntry();
           });
         }
@@ -170,7 +170,7 @@ module.exports = function Package(_attrs) {
             if (err) {throw err;}
             // ensure parent directory exists 
             mkdirp(path.dirname(fullPath), function(err) {
-              if (err) {throw err;}
+              //if (err) {throw err;}
               readStream.pipe(fs.createWriteStream(fullPath));
               readStream.on("end", function() {
                 zipfile.readEntry();

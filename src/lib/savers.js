@@ -99,7 +99,7 @@ var reset = function() {
 var setupPackages = function(cb) {
   updatePackage(function(data) {
     if ( data.downloaded === true ) {
-      setConfig("source:updated_at", data.updated_at);
+      setConfig("sourceUpdatedAt", data.updated_at);
     }
 
     listAll(function(data) {
@@ -145,6 +145,7 @@ var defaultSaversDir = function() {
 
 var updatePackage = function(cb) {
   var source = getSource();
+  var sourceUpdatedAt = getSourceUpdatedAt();
 
   var lastCheckAt = getUpdateCheckTimestamp();
   var now = new Date().getTime();
@@ -153,14 +154,14 @@ var updatePackage = function(cb) {
 
   // don't bother checking if there's no source repo specified,
   // or if we've pinged it recently
-  if ( typeof(source.repo) === "undefined" || source.repo === "" || diff < PACKAGE_WAIT_TIME ) {
+  if ( typeof(source) === "undefined" || source === "" || diff < PACKAGE_WAIT_TIME ) {
     cb({downloaded: false});
   }
   else {   
     var Package = require("./package.js");
     var p = new Package({
-      repo:source.repo,
-      updated_at:source.updated_at,
+      repo:source,
+      updated_at:sourceUpdatedAt,
       dest:defaultSaversDir()
     });
 
@@ -177,13 +178,10 @@ var updatePackage = function(cb) {
  * setup some reasonable defaults
  */
 var ensureDefaults = function() {
-  var source = nconf.get("source");
+  var source = nconf.get("sourceRepo");
   if ( source === undefined ) {
     _firstLoad = true;
-    setConfig("source", {
-      repo: global.SAVER_REPO,
-      hash: ""
-    });
+    setConfig("sourceRepo", global.SAVER_REPO);
   }
 };
 
@@ -258,18 +256,21 @@ var applyPreload = function(saver) {
  * return the URL of a zip file that is the source we will check to update our screensavers
  */
 var getSource = function() {
-  return nconf.get("source");
+  return nconf.get("sourceRepo");
+};
+var getSourceUpdatedAt = function() {
+  return nconf.get("sourceUpdatedAt");
 };
 
 var setSource = function(x) {
   var s = getSource();
-  if ( x !== s.repo ) {
-    return nconf.set("source", {
-      repo: x
-    });
+  if ( x !== s ) {
+    reset();
+    setUpdateCheckTimestamp(undefined);
+    return nconf.set("sourceRepo", x);
   }
   else { 
-    return nconf.get("source");
+    return nconf.get("sourceRepo");
   }
 };
 
@@ -401,7 +402,7 @@ var sources = function() {
 
   // if we're pulling savers from a git repo, this is where
   // they will be located
-  if ( source !== undefined && typeof(source.repo) !== "undefined" && source.repo !== "" ) {
+  if ( source !== undefined && source !== "" ) {
     folders.push(root);
   }
 
@@ -481,58 +482,61 @@ var loadFromData = function(contents, stub, settings) {
  */
 var listAll = function(cb, force) {
   var folders = sources();
-  var walker = require("folder-walker");
-  var stream = walker(folders);
-
+  var glob, pattern, savers;
+  
   var promises = [];
 
   // exclude system screensavers from the cache check
   // @todo get rid of this
   var systemScreensaverCount = 1;
 
-  force = true;
-  
   // use cached data if available
   if ( loadedScreensavers.length > systemScreensaverCount && ( typeof(force) === "undefined" || force === false ) ) {
     cb(loadedScreensavers);
     return;
   }
-  
-  stream.on("data", function(opts) {
-    var f = opts.filepath;
-    var folder = path.dirname(f);
-    var doLoad = f.match(/saver.json$/) &&
-                 ! folder.split(path.sep).reverse()[0].match(/^__/) &&
-                 ! skipFolder(folder);
 
-   
+  glob = require("glob");
+
+  // note: using /**/ here instead of /*/ would
+  // also match all subdirectories, which might be desirable
+  // or even required, but is a lot slower, so not doing it
+  // for now
+  pattern = "{" + folders.join(",") + ",}/*/saver.json";
+  savers = glob.sync(pattern);
+
+  for ( var i = 0; i < savers.length; i++ ) {
+    var f = savers[i];
+    var folder = path.dirname(f);
+    var doLoad = ! folder.split(path.sep).reverse()[0].match(/^__/) &&
+                 ! skipFolder(folder);
+    
     if ( doLoad ) {
       promises.push(loadFromFile(f));
     }
+  }
+
+  Promise.all(promises).then(function(data) {
+    loadedScreensavers = _.sortBy(data, function(s) { return s.name.toLowerCase(); });
+    cb(loadedScreensavers);
   });
 
-  stream.on("end", function() {
-    Promise.all(promises).then(function(data) {
-      loadedScreensavers = _.sortBy(data, function(s) { return s.name.toLowerCase(); });
-      cb(loadedScreensavers);
-    });
-  });
 };
 
 var updatePrefs = function(data, cb) {
   for ( var k in data ) {
     var v = data[k];
-    console.log("*** " + k + " => " + v);
-    nconf.set(k, v);
-  }
-
-  for ( var k in data.options ) {
-    var v = data.options[k];
-    console.log("*** " + k + " => " + v);
-    //    nconf.set(k, v);
+    if ( k === "repo" ) {
+      setSource(v);
+    }
+    else {
+      nconf.set(k, v);
+    }
   }
   
-  write(cb);
+  write(() => {
+    setupPackages(cb);
+  });
 };
 
 var write = function(cb) {
@@ -618,6 +622,19 @@ var generateScreensaver = function(opts) {
   return opts;
 };
 
+var getDefaults = function() {
+  return {
+    sourceRepo: global.SAVER_REPO,
+    delay: 5,
+    sleep: 10,
+    lock: false,
+    disable_on_battery: true,
+    auto_start: false,
+    localSource: ""
+  };
+};
+
+
 exports.init = init;
 exports.reload = reload;
 exports.reset = reset;
@@ -628,6 +645,7 @@ exports.getByKey = getByKey;
 exports.getCurrent = getCurrent;
 exports.loadCurrent = loadCurrent;
 exports.getSource = getSource;
+  
 exports.setSource = setSource;
 exports.getLocalSource = getLocalSource;
 exports.setLocalSource = setLocalSource;
@@ -651,3 +669,4 @@ exports.firstLoad = firstLoad;
 exports.getConfig = getConfig;
 exports.getConfigSync = getConfigSync;
 exports.generateScreensaver = generateScreensaver;
+exports.getDefaults = getDefaults;
