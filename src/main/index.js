@@ -102,9 +102,10 @@ var grabScreen = function(s, cb) {
   var grabber = new BrowserWindow({
     show: debugMode === true,
     width:200,
-    height:200
+    height:200,
+    x: 1000,
+    y: 1000
   });
-
   
   grabber.on("closed", function() {
     grabber = null;
@@ -118,10 +119,6 @@ var grabScreen = function(s, cb) {
   });
   
   grabber.loadURL(grabberUrl);
-
-  if ( debugMode === true ) {
-    grabber.webContents.openDevTools();
-  }
 };
 
 
@@ -166,6 +163,7 @@ var showDock = function() {
 var openPrefsWindow = function() {
   var primary = electronScreen.getPrimaryDisplay();
 
+
   // take a screenshot of the main screen for use in previews
   grabScreen(primary, function(message) {
     // call savers.reload to make sure our data is properly refreshed
@@ -192,10 +190,6 @@ var openPrefsWindow = function() {
       prefsWindowHandle.loadURL(prefsUrl);
 
       showDock();
-
-      if ( debugMode === true ) {
-        prefsWindowHandle.webContents.openDevTools();
-      }
 
       prefsWindowHandle.on("closed", function() {
         prefsWindowHandle = null;
@@ -258,10 +252,6 @@ var openAboutWindow = function() {
   w.loadURL(aboutUrl);
 
   showDock();
-  
-  if ( debugMode === true ) {
-    w.webContents.openDevTools();
-  }
 
   w.on('closed', () => {
     w = null;
@@ -837,7 +827,7 @@ var updateTrayIcon = function() {
 require("./bootstrap.js");
 
 log.transports.file.maxSize = 1 * 1024 * 1024;
-log.transports.file.file = path.join(__dirname, "/log.txt");
+log.transports.file.file = path.join(__dirname, "log.txt");
 
 if ( typeof(global.RAVEN_PRIVATE_URL) !== "undefined" ) {
   Raven = require("raven");
@@ -925,7 +915,7 @@ trayMenu = Menu.buildFromTemplate([
   },
   {
     label: "Preferences",
-    click: function() {openPrefsWindow(); }
+    click: function() { openPrefsWindow(); }
   },
   {
     label: "About " + global.APP_NAME,
