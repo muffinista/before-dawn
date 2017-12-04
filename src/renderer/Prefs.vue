@@ -41,6 +41,10 @@
         <div class="container-fluid">
           <prefs-form :prefs="prefs"></prefs-form>
         </div>
+        <div class="container-fluid">
+          <button class="btn btn-large btn-positive reset-to-defaults"
+                  v-on:click="resetToDefaults">Reset to Defaults</button>
+          </div>
       </b-tab>
     </b-tabs>
   </div> <!-- content -->
@@ -63,6 +67,7 @@ import SaverPreview from '@/components/SaverPreview';
 import SaverOptions from '@/components/SaverOptions';
 import SaverSummary from '@/components/SaverSummary';
 import PrefsForm from '@/components/PrefsForm';
+import Noty from "noty";
 
 const {dialog} = require("electron").remote;
 
@@ -157,11 +162,48 @@ export default {
       this.saver = e.target.value;
       this.bus.$emit('saver-changed', this.saverObj);
     },
+    resetToDefaults(e) {
+      dialog.showMessageBox(
+        {
+          type: "info",
+          title: "Are you sure?",
+          message: "Are you sure you want to reset to the default settings?",
+          buttons: ["No", "Yes"],
+          defaultId: 0
+        },
+        (result) => {
+          if ( result === 1 ) {
+            var tmp = this.manager.getDefaults();
+            this.prefs = Object.assign(this.prefs, tmp);
+
+            this.saveData(false);
+
+            this.manager.reload(() => {
+              this.getData();
+
+              new Noty({
+                type: "success",
+                layout: "topRight",
+                timeout: 1000,
+                text: "Settings reset!",
+                animation: {
+                  open: null
+                }
+              }).show();
+            });
+          }
+        }
+      );
+    },  
     getData() {
       this.manager.listAll((entries) => {
         this.savers = entries;
         var tmp = this.manager.getConfigSync();
 
+        if ( tmp.source && tmp.source.repo ) {
+          tmp.repo = tmp.source;
+        }
+        
         // ensure default settings in the config for all savers
         for(var i = 0; i < this.savers.length; i++ ) {
           var s = this.savers[i];
@@ -180,9 +222,6 @@ export default {
     },
     getCurrentSaver() {
       this.saver = this.manager.getCurrent();
-    },
-    getCurrentSaverData() {
-
     },
     createNewScreensaver() {
       this.ipcRenderer.send("open-add-screensaver", this.screenshot);
@@ -204,29 +243,30 @@ export default {
 
     },
     updateSaverOption(saver, name, value) {
-      console.log("update saver option: " + saver + " - " + name + " - " + value);
-
       var tmp = this.prefs.options;
       var update = {};
       update[saver] = {};
       update[saver][name] = value;
    
       this.prefs.options = Object.assign({}, tmp, update);
-      //this.prefs.options[saver][name] = value;
-      
     },
     closeWindow() {
       this.currentWindow.close();
     },
-    saveData() {
+    saveData(doClose) {
+      if ( typeof(doClose) === "undefined" ) {
+        doClose = true;
+      }
+      
       this.disabled = true;
-
       this.prefs.saver = this.saver;
 
       this.manager.updatePrefs(this.prefs, () => {
         this.disabled = false;
         this.ipcRenderer.send("set-autostart", this.prefs.auto_start);
-        this.closeWindow();
+        if ( doClose ) {
+          this.closeWindow();
+        }
       });
     },
     renderUpdateNotice() {
@@ -246,8 +286,10 @@ export default {
         }
       );
     }
-  },
+  }
 };
+
+  
 </script>
 
 <style>

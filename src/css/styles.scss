@@ -68,7 +68,7 @@ button.btn-default:hover {
   color: white;
 }
 
-button.add-option {
+button.add-option, button.reset-to-defaults {
   margin-top: 12px;
 }
 
@@ -217,4 +217,8 @@ form.submit-attempt {
 
 .tab-content {
   width: 100%;
+}
+
+#prefs .tab-content > .tab-pane:last-child {
+    margin-bottom: 30px;
 }

@@ -80,7 +80,7 @@
           <label for="repo">Github Repo URL:</label>
           <div class="input-group">
             <div class="input-group-addon">github.com/</div>
-            <input type="text" v-model="prefs.repo" class="form-control" placeholder="muffinista/before-dawn-screensavers" />
+            <input type="text" v-model="prefs.sourceRepo" class="form-control" placeholder="muffinista/before-dawn-screensavers" />
           </div>
           <small class="form-text text-muted">
             We will download releases from this repository instead of the default repo if specified.
