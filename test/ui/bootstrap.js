@@ -21,7 +21,7 @@ describe('bootstrap', function() {
 	});
 
   it('creates config file', function(done) {
-    assert.equal("muffinista/before-dawn-screensavers", helpers.savedConfig(workingDir).source.repo);
+    assert.equal("muffinista/before-dawn-screensavers", helpers.savedConfig(workingDir).sourceRepo);
     done();
   });
 

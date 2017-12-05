@@ -973,7 +973,7 @@ ipcMain.on("open-prefs", (event) => {
 // handle request to open 'add new saver' window
 //
 ipcMain.on("open-add-screensaver", (event, screenshot) => {
-  console.log("HERE", screenshot);
+  log.info("open-add-screensaver");
   addNewSaver(screenshot);
 });
 
