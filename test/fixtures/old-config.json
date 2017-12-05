@@ -1,0 +1,15 @@
+{
+  "source": {
+    "repo": "muffinista/before-dawn-screensavers"
+  },
+  "sourceCheckTimestamp": 2512407042366,
+  "saver": "before-dawn-screensavers/emoji/index.html",
+  "options": {
+    "/Users/colin/Projects/before-dawn-screensavers/emoji/index.html": {}
+  },
+  "delay": 10,
+  "lock": false,
+  "localSource": "/Users/colin/Dropbox/Projects/before-dawn-screensavers",
+  "disable_on_battery": true,
+  "sleep": 10
+}
