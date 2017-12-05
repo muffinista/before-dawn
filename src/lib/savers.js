@@ -27,7 +27,6 @@ var init = function(opts, cb) {
     }
   }
 
-
   baseDir = opts.base;
   if ( opts.systemDir ) {
     systemDir = opts.systemDir;
@@ -150,7 +149,7 @@ var updatePackage = function(cb) {
   var now = new Date().getTime();
 
   var diff = now - lastCheckAt;
-  
+
   // don't bother checking if there's no source repo specified,
   // or if we've pinged it recently
   if ( typeof(source) === "undefined" || source === "" || diff < PACKAGE_WAIT_TIME ) {
@@ -177,10 +176,21 @@ var updatePackage = function(cb) {
  * setup some reasonable defaults
  */
 var ensureDefaults = function() {
-  var source = nconf.get("sourceRepo");
-  if ( source === undefined ) {
-    _firstLoad = true;
-    setConfig("sourceRepo", global.SAVER_REPO);
+  var source;
+
+  // check for our old repo config setup
+  source = nconf.get("source:repo");
+  if ( source !== undefined ) {
+    setConfig("sourceRepo", source);
+    setConfig("source", undefined);
+    writeSync();
+  }
+  else {
+    source = nconf.get("sourceRepo");
+    if ( source === undefined ) {
+      _firstLoad = true;
+      setConfig("sourceRepo", global.SAVER_REPO);
+    }
   }
 };
 

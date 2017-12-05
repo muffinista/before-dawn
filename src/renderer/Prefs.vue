@@ -201,10 +201,6 @@ export default {
       this.manager.listAll((entries) => {
         this.savers = entries;
         var tmp = this.manager.getConfigSync();
-
-        if ( tmp.source && tmp.source.repo ) {
-          tmp.repo = tmp.source;
-        }
         
         // ensure default settings in the config for all savers
         for(var i = 0; i < this.savers.length; i++ ) {

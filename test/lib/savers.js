@@ -79,10 +79,24 @@ describe('Savers', function() {
         done();
       });
     });
-
-
   });
 
+	describe('ensureDefaults', function() {
+    it('updates old repo config', function(done) {
+      var workingDir = getTempDir();
+      fs.copySync(
+        path.join(__dirname, '../fixtures/old-config.json'),
+        path.join(workingDir, 'config.json')
+      );
+
+      savers.init(workingDir, function() {
+        assert.equal("muffinista/before-dawn-screensavers", savers.getSource());
+        assert.equal(undefined, savers.getConfigSync().source);
+        done();
+      });
+    });
+  });
+  
   describe('loadFromFile', function() {
     it('loads data', function(done) {
       savers.loadFromFile(saverJSONFile).then((s) => {
