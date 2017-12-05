@@ -75,9 +75,9 @@ var icons = {
 };
 
 
-const urlPrefix = process.env.NODE_ENV === 'development'
-             ? 'http://localhost:9080'
-             : 'file://' + __dirname
+const urlPrefix = process.env.NODE_ENV === "development"
+             ? "http://localhost:9080"
+             : "file://" + __dirname
 
 /**
  * open our screen grabber tool and issue a screengrab request
@@ -228,7 +228,7 @@ var addNewSaver = function(screenshot) {
   w.loadURL(newUrl);
 
   showDock();
-  w.on('closed', () => {
+  w.on("closed", () => {
     w = null;
     hideDockIfInactive();
   });
@@ -253,7 +253,7 @@ var openAboutWindow = function() {
 
   showDock();
 
-  w.on('closed', () => {
+  w.on("closed", () => {
     w = null;
     hideDockIfInactive();
   });
@@ -838,10 +838,10 @@ if ( typeof(global.RAVEN_PRIVATE_URL) !== "undefined" ) {
 crashReporter.start(global.CRASH_REPORTER);
 
 if (global.IS_DEV) {
-	log.info('Running in development');
+	log.info("Running in development");
 }
 else {
-	log.info('Running in production');
+	log.info("Running in production");
 }
 
 // store our root path as a global variable so we can access it from screens
@@ -973,6 +973,7 @@ ipcMain.on("open-prefs", (event) => {
 // handle request to open 'add new saver' window
 //
 ipcMain.on("open-add-screensaver", (event, screenshot) => {
+  console.log("HERE", screenshot);
   addNewSaver(screenshot);
 });
 
@@ -999,7 +1000,7 @@ ipcMain.on("open-editor", (event, args) => {
                "&screenshot=" + encodeURIComponent(screenshot);
   w.loadURL(target);
 
-  w.on('closed', () => {
+  w.on("closed", () => {
     w = null;
     hideDockIfInactive();
   });

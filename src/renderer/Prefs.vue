@@ -78,8 +78,10 @@ export default {
   },
   mounted() {
     this.ipcRenderer.on("savers-updated", (event, arg) => {
-      //console.log("handle savers-updated event", arg);
       this.getData();
+    });
+    this.ipcRenderer.on("request-open-add-screensaver", (event, arg) => {
+      this.createNewScreensaver();
     });
 
     if ( this.manager === undefined ) {

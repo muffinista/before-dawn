@@ -15,7 +15,7 @@ global.RELEASE_SERVER = "https://hazel-nwmfhsakin.now.sh";
 // note -- this is hardcoded to win32 for now because we actually
 // don't care what platform is running
 global.RELEASE_CHECK_URL = `${global.RELEASE_SERVER}/update/win32/${global.APP_VERSION_BASE}`;
-global.IS_DEV = require('electron-is-dev');
+global.IS_DEV = require("electron-is-dev");
 
 global.CHECK_FOR_RELEASE = !global.IS_DEV;
 

@@ -8,17 +8,7 @@ module.exports = function(grunt) {
       options: {
         configFile: "eslint.json"
       },
-      target: ["Gruntfile.js", "app/lib/**/*.js", "app/js/**/*.js?"]
-    },
-    sass: {
-      options: {
-        sourceMap: true
-      },
-      dist: {
-        files: {
-          "app/dist/styles.css": "app/css/styles.scss"
-        }
-      }
+      target: ["Gruntfile.js", "src/**/*.js", "src/**/*.vue"]
     },
     webpack: {
       options: {
@@ -50,18 +40,14 @@ module.exports = function(grunt) {
          spawn: false
          }, */
       mocha: {
-        files: ["app/**/*.js", "test/**/*.js"],
+        files: ["src/**/*.js", "test/**/*.js"],
         tasks: ["mochaTest:lib"],
         options: {
           spawn: false
         }
       },
-      sass: {
-        files: ["app/css/**/*"],
-        tasks: ["sass"]
-      },
       scripts: {
-        files: ["Gruntfile.js", "app/**/*.js", "app/**/*.js?", "!app/dist/*.*"],
+        files: ["Gruntfile.js", "src/**/*.js", "src/**/*.js?"],
         tasks: ["eslint", "webpack"],
         options: {
           interval: 1000,
@@ -79,7 +65,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks("grunt-mocha-test");
   grunt.loadNpmTasks("grunt-contrib-watch");
   grunt.loadNpmTasks("gruntify-eslint");
-  grunt.loadNpmTasks("grunt-sass");
   grunt.loadNpmTasks("grunt-webpack");
   
   // Default task(s).
