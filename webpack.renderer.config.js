@@ -1,8 +1,8 @@
 'use strict';
 
-if ( typeof(process.env.BABEL_ENV) === "undefined" ) {
-  process.env.BABEL_ENV = 'renderer';
-}
+//if ( typeof(process.env.BABEL_ENV) === "undefined" ) {
+//  process.env.BABEL_ENV = 'renderer';
+//}
 
 const path = require('path');
 const { dependencies, productName } = require('./package.json');

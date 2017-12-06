@@ -62,20 +62,20 @@
         </b-tab>
         <template slot="tabs">
           <b-button-group>
-            <b-button data-toggle="tooltip" data-placement="bottom" title="Open screensaver folder"
-                      @click="openFolder">
+            <b-button variant="default" @click="openFolder"
+                      v-b-tooltip.hover title="Open screensaver folder">
               <span class="icon"><img src="assets/img/folder.svg" width="14" height="14" /></span>
             </b-button>
-            <b-button class="btn btn-default save" data-toggle="tooltip" data-placement="bottom" title="Save changes"
-                      @click="saveData">
+            <b-button variant="default" @click="saveData"
+                      v-b-tooltip.hover title="Save changes">
               <span class="icon"><img src="assets/img/save.svg" width="14" height="14" /></span>
             </b-button>
-            <b-button class="btn btn-default reload" data-toggle="tooltip" data-placement="bottom" title="Reload preview"
-                      @click="reloadPreview">
+            <b-button variant="default" @click="reloadPreview"
+                      v-b-tooltip.hover title="Reload preview">
               <span class="icon"><img src="assets/img/cycle.svg" width="14" height="14" /></span>
             </b-button>
-            <b-button class="btn btn-default console" data-toggle="tooltip" data-placement="bottom" title="View Developer Console"
-                      @click="openConsole">
+            <b-button variant="default" @click="openConsole"
+                      v-b-tooltip.hover title="View Developer Console">
               <span class="icon"><img src="assets/img/bug.svg" width="14" height="14" /></span>
             </b-button>
           </b-button-group>
