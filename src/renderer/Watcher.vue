@@ -64,19 +64,19 @@
           <b-button-group>
             <b-button data-toggle="tooltip" data-placement="bottom" title="Open screensaver folder"
                       @click="openFolder">
-              <span class="icon"><img src="../img/folder.svg" width="14" height="14" /></span>
+              <span class="icon"><img src="assets/img/folder.svg" width="14" height="14" /></span>
             </b-button>
             <b-button class="btn btn-default save" data-toggle="tooltip" data-placement="bottom" title="Save changes"
                       @click="saveData">
-              <span class="icon"><img src="../img/save.svg" width="14" height="14" /></span>
+              <span class="icon"><img src="assets/img/save.svg" width="14" height="14" /></span>
             </b-button>
             <b-button class="btn btn-default reload" data-toggle="tooltip" data-placement="bottom" title="Reload preview"
                       @click="reloadPreview">
-              <span class="icon"><img src="../img/cycle.svg" width="14" height="14" /></span>
+              <span class="icon"><img src="assets/img/cycle.svg" width="14" height="14" /></span>
             </b-button>
             <b-button class="btn btn-default console" data-toggle="tooltip" data-placement="bottom" title="View Developer Console"
                       @click="openConsole">
-              <span class="icon"><img src="../img/bug.svg" width="14" height="14" /></span>
+              <span class="icon"><img src="assets/img/bug.svg" width="14" height="14" /></span>
             </b-button>
           </b-button-group>
         </template>

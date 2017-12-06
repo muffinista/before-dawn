@@ -143,14 +143,15 @@ let rendererConfig = {
     new HtmlWebpackPlugin(htmlPageOptions("editor", "Editor")),    
     new HtmlWebpackPlugin(htmlPageOptions("new", "Create Screensaver!")),
     new HtmlWebpackPlugin(htmlPageOptions("about", "About!")),
-    new CopyWebpackPlugin([
-      {
-        from: path.join(__dirname, 'src', 'renderer', 'assets'),
-        to: path.join(outputDir, 'assets'),
-        ignore: ['.*']
-      }
-    ]),
-
+    new CopyWebpackPlugin(
+      [
+        {
+          from: path.join(__dirname, 'src', 'renderer', 'assets'),
+          to: path.join(outputDir, 'assets'),
+          ignore: ['.*']
+        }
+      ]
+    ),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin()
   ],
