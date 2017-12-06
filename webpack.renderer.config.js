@@ -83,19 +83,11 @@ let rendererConfig = {
           loader: 'sass-loader' // compiles SASS to CSS
         }]
       },
-//      {
-//        test: /\.html$/,
-//        use: 'vue-html-loader'
-//      },
       {
         test: /\.js$/,
         use: 'babel-loader',
         exclude: /node_modules/
       },
-//      {
-//        test: /\.node$/,
-//        use: 'node-loader'
-//      },
       {
         test: /\.vue$/,
         use: {
@@ -119,16 +111,6 @@ let rendererConfig = {
           }
         }
       },
-      /* {
-         test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
-         use: {
-         loader: 'url-loader',
-         query: {
-         limit: 10000,
-         name: 'fonts/[name]--[folder].[ext]'
-         }
-         }
-         } */
     ]
   },
   node: {
@@ -189,13 +171,6 @@ if (process.env.NODE_ENV === 'production') {
 
   rendererConfig.plugins.push(
     new BabiliWebpackPlugin(),
-    /*new CopyWebpackPlugin([
-       {
-       from: path.join(__dirname, 'static'),
-       to: path.join(__dirname, 'output/electron/static'),
-       ignore: ['.*']
-       }
-       ]),*/
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': '"production"'
     }),
@@ -205,4 +180,4 @@ if (process.env.NODE_ENV === 'production') {
   )
 }
 
-module.exports = rendererConfig
+module.exports = rendererConfig;
