@@ -1,7 +1,5 @@
 'use strict'
 
-//process.env.BABEL_ENV = 'main'
-
 const path = require('path')
 const packageJSON = require('./package.json')
 
@@ -17,6 +15,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const deps = [].concat(Object.keys(dependencies),Object.keys(optionalDependencies));
 
 let mainConfig = {
+  devtool: '#source-map',
   entry: {
     main: path.join(__dirname, 'src/main/index.js')
   },

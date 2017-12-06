@@ -9,7 +9,7 @@
   "main": "output/main.js",
   "scripts": {
     "dev": "node bin/dev-runner.js",
-    "compile": "webpack --config webpack.config.js",
+    "compile": "NODE_ENV='production' webpack --config webpack.config.js",
     "postinstall": "electron-builder install-app-deps",
     "pack": "yarn compile && electron-builder --dir",
     "dist": "yarn compile && electron-builder --x64",
