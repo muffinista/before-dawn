@@ -9,7 +9,7 @@
   "main": "output/main.js",
   "scripts": {
     "dev": "node bin/dev-runner.js",
-    "compile": "NODE_ENV='production' webpack --config webpack.config.js",
+    "compile": "cross-env NODE_ENV=production webpack --config webpack.config.js",
     "postinstall": "electron-builder install-app-deps",
     "pack": "yarn compile && electron-builder --dir",
     "dist": "yarn compile && electron-builder --x64",
@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "auto-launch": "^5.0.1",
+    "cross-env": "^5.1.1",
     "electron-is-dev": "^0.3.0",
     "electron-log": "^2.2.3",
     "eslint-plugin-vue": "^4.0.0-beta.2",
