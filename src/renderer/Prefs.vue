@@ -199,8 +199,12 @@ export default {
     },  
     getData() {
       this.manager.listAll((entries) => {
+
         this.savers = entries;
         var tmp = this.manager.getConfigSync();
+        if ( tmp.options === undefined ) {
+          tmp.options = {};
+        }
         
         // ensure default settings in the config for all savers
         for(var i = 0; i < this.savers.length; i++ ) {

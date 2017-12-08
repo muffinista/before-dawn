@@ -19,6 +19,15 @@ global.IS_DEV = require("electron-is-dev");
 
 global.CHECK_FOR_RELEASE = !global.IS_DEV;
 
+global.CONFIG_DEFAULTS = {
+  options: {},
+  delay: 15,
+  sleep: 15,
+  auto_start: false,
+  sourceRepo: global.SAVER_REPO
+};
+
+
 // this is a free sentry account and the URL will be in every copy of
 // the app that gets distributed, so i'm committing it to the repo for now
 if ( process.env.TEST_MODE === undefined && ! global.IS_DEV ) {

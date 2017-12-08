@@ -192,6 +192,14 @@ var ensureDefaults = function() {
       setConfig("sourceRepo", global.SAVER_REPO);
     }
   }
+
+  if ( typeof(global.CONFIG_DEFAULTS) !== undefined ) {
+    for ( var k in global.CONFIG_DEFAULTS ) {
+      if ( nconf.get(k) === undefined ) {
+        setConfig(k, global.CONFIG_DEFAULTS[k]);
+      }
+    }
+  }
 };
 
 var firstLoad = function() {
