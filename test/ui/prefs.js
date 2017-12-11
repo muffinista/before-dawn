@@ -104,4 +104,21 @@ describe('Prefs', function() {
         }).
         then(() => done());
   });
+
+  it('allows setting path via dialog', function(done) {
+    app.fakeDialog.mock([ { method: 'showOpenDialog', value: ['/not/a/real/path'] } ]);
+    
+    app.client.waitUntilWindowLoaded().click("=Preferences").
+        then(() => app.client.click("button.pick")).
+        then(() => app.client.click("button.save")).
+        then(() => {
+          app.client.getWindowCount().should.eventually.equal(1)
+        }).
+        then(() => {
+          assert.equal("/not/a/real/path", helpers.savedConfig(workingDir).localSource);
+        }).
+        then(() => done());
+  });
+
+
 });

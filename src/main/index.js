@@ -613,6 +613,19 @@ var openPrefsOnFirstLoad = function() {
 };
 
 
+var getSystemDir = function() {
+  if ( process.env.BEFORE_DAWN_SYSTEM_DIR !== undefined ) {
+    return process.env.BEFORE_DAWN_SYSTEM_DIR;
+  }
+  
+  if ( global.IS_DEV ) {
+    return __dirname;
+  }
+
+  return app.getAppPath();
+}
+
+
 /**
  * handle initial startup of app
  */
@@ -644,9 +657,14 @@ var bootApp = function() {
     closeRunningScreensavers();
   });
 
+
+  let saverOpts = {
+    base: global.basePath,
+    systemDir: getSystemDir()
+  };
   
-  log.info("Load config from " + global.basePath);
-  global.savers.init(global.basePath, function() {
+  log.info("Load config with", saverOpts);
+  global.savers.init(saverOpts, function() {
     configLoaded = true;
     updateStateManager();
 
@@ -1215,7 +1233,8 @@ ipcMain.on("set-autostart", (event, value) => {
 // generate screensaver template with specified attributes
 //
 ipcMain.on("generate-screensaver", (event, args) => {
-  var data = global.savers.generateScreensaver(args);
+  var src = path.join(getSystemDir(), "__template");
+  var data = global.savers.generateScreensaver(src, args);
   event.sender.send("generate-screensaver", data);
 
   global.savers.reset();

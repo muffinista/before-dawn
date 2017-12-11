@@ -182,12 +182,16 @@ describe('Savers', function() {
   
   describe('generateScreensaver', function() {
     it('works', function(done) {
+
+      // this should be the path to our __template in the main app
+      var src = path.join(__dirname, "..", "..", "src", "main", "__template");
       savers.init(workingDir, function() {
         savers.setLocalSource(saversDir);
-        savers.generateScreensaver({
-          name:"New Screensaver"
-        });
-
+        savers.generateScreensaver(src,
+                                   {
+                                     name:"New Screensaver"
+                                   });
+        
         savers.listAll(function(data) {
           assert.equal(4, data.length);
           done();

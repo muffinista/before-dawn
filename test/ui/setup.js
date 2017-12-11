@@ -2,6 +2,8 @@ const tmp = require('tmp');
 const path = require('path');
 const fs = require('fs-extra');
 const Application = require('spectron').Application;
+const fakeDialog = require('spectron-fake-dialog');
+
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
 
@@ -45,6 +47,10 @@ exports.application = function(workingDir) {
     }
   });
 
+  fakeDialog.apply(a);
+
+  a.fakeDialog = fakeDialog;
+  
   chaiAsPromised.transferPromiseness = a.transferPromiseness;
 
   return a;

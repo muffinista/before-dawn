@@ -39,7 +39,9 @@
       </b-tab>
       <b-tab title="Preferences">
         <div class="container-fluid">
-          <prefs-form :prefs="prefs"></prefs-form>
+          <prefs-form
+             :prefs="prefs"
+             v-on:localSourceChange="localSourceChange"></prefs-form>
         </div>
         <div class="container-fluid">
           <button class="btn btn-large btn-positive reset-to-defaults"
@@ -287,8 +289,21 @@ export default {
           }
         }
       );
+    },
+    localSourceChange(ls) {
+      console.log("hey", this.prefs);
+      console.log("set local source to", ls);
+      var tmp = {
+        localSource: ls
+      };
+      this.prefs = Object.assign(this.prefs, tmp);
+
+//      this.prefs.localSource = ls;
+
     }
   }
+
+
 };
 
   

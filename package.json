@@ -1,7 +1,7 @@
 {
   "name": "before-dawn",
   "productName": "Before Dawn",
-  "version": "0.9.13",
+  "version": "0.9.14",
   "description": "A desktop screensaver app using web technologies",
   "author": "Colin Mitchell <colin@muffinlabs.com> (http://muffinlabs.com)",
   "license": "MIT",
@@ -111,6 +111,7 @@
     "sass-loader": "^6.0.6",
     "sinon": "^4.0.2",
     "spectron": "^3.7.2",
+    "spectron-fake-dialog": "^0.0.1",
     "style-loader": "^0.18.2",
     "url-loader": "^0.5.9",
     "vue": "^2.5.6",

@@ -50,8 +50,8 @@ let mainConfig = {
     ]
   },
   node: {
-    __dirname: false, //process.env.NODE_ENV !== 'production',
-    __filename: false // process.env.NODE_ENV !== 'production'
+    __dirname: false,
+    __filename: false
   },
   output: {
     filename: '[name].js',
@@ -77,6 +77,13 @@ let mainConfig = {
       {
         from: path.join(__dirname, 'src', 'system-savers'),
         to: path.join(outputDir, 'system-savers'),
+        ignore: ['.*']
+      }
+    ]),
+    new CopyWebpackPlugin([
+      {
+        from: path.join(__dirname, 'src', 'main', '__template'),
+        to: path.join(outputDir, '__template'),
         ignore: ['.*']
       }
     ]),

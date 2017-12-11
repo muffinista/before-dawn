@@ -312,7 +312,6 @@ var systemSource = function() {
 }
 
 
-
 /**
  * set config var k to value v
  */
@@ -566,11 +565,6 @@ var writeSync = function() {
   nconf.save();
 };
 
-var getTemplatePath = function() {
-  var d = systemSource();
-  return path.join(d, "__template");
-};
-
 var getConfig = function(cb) {
   var configPath = path.join(baseDir, config_file);
   fs.readFile(configPath, function(err, data) {
@@ -596,8 +590,7 @@ var getConfigSync = function() {
 /**
  * generate a screensaver template
  */
-var generateScreensaver = function(opts) {
-  var src = getTemplatePath();
+var generateScreensaver = function(src, opts) {
   var destDir = getLocalSource();
 
   var contents = fs.readdirSync(src);

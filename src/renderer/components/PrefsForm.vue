@@ -58,7 +58,7 @@
             instead.
           </small>
         </div>
-
+        <!-- ' -->
         <div class="form-check">
           <label for="auto_start" class="form-check-label">
             <input type="checkbox" class="form-check-input" v-model="prefs.auto_start" />
@@ -121,9 +121,11 @@ export default {
         this.handlePathChoice );
     },
     handlePathChoice(result) {
-      if ( result !== undefined ) {
-        this.prefs.localSource = result[0];
-      }
+      this.$emit("localSourceChange", result[0]);
+
+      // blah this is weird
+      this.prefs.localSource = result[0];
+      document.querySelector("[name=localSource]").value = this.prefs.localSource;
     }
   }
 };
