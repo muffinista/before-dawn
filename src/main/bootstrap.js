@@ -33,6 +33,17 @@ global.CONFIG_DEFAULTS = {
 if ( process.env.TEST_MODE === undefined && ! global.IS_DEV ) {
   global.RAVEN_PRIVATE_URL = "https://b86f7b0ac5604b55b4fd03adedc5d205:9cc446fadc234baab6d825e88fe4215d@sentry.io/172824";
   global.RAVEN_URL = "https://b86f7b0ac5604b55b4fd03adedc5d205@sentry.io/172824";
+  global.RAVEN_OPTIONS = {
+    captureUnhandledRejections: true,
+    tags: {
+      process: process.type,
+      electron: process.versions.electron,
+      chrome: process.versions.chrome,
+      platform: os.platform(),
+      platform_release: os.release(),
+      version: global.APP_VERSION
+    }
+  };
 }
 
 global.CRASH_REPORTER = {

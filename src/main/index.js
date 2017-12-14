@@ -1025,7 +1025,7 @@ log.transports.file.file = path.join(__dirname, "log.txt");
 if ( typeof(global.RAVEN_PRIVATE_URL) !== "undefined" ) {
   Raven = require("raven");
   log.info("Setup sentry logging with " + global.RAVEN_PRIVATE_URL);
-  Raven.config(global.RAVEN_PRIVATE_URL).install();
+  Raven.config(global.RAVEN_PRIVATE_URL, global.RAVEN_OPTIONS).install();
 }
 
 crashReporter.start(global.CRASH_REPORTER);

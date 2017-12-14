@@ -6,7 +6,21 @@
     <% if (htmlWebpackPlugin.options.nodeModules) { %>
       <!-- Add `node_modules/` to global paths so `require` works properly in development -->
       <script>
-        require('module').globalPaths.push('<%= htmlWebpackPlugin.options.nodeModules.replace(/\\/g, '\\\\') %>')
+        const remote = require('electron').remote;
+        require('module').globalPaths.push('<%= htmlWebpackPlugin.options.nodeModules.replace(/\\/g, '\\\\') %>');
+
+        var is_dev = remote.getGlobal('IS_DEV');
+
+        if ( process.env.TEST_MODE === undefined && ! global.IS_DEV ) {
+          var Raven = require('raven-js');
+          var raven_url = remote.getGlobal('RAVEN_URL');
+
+          Raven.config(raven_url).install();
+        
+          window.addEventListener('unhandledrejection', function (event) {
+            Raven.captureException(event.reason);
+          });
+        }
       </script>
     <% } %>
   </head>
