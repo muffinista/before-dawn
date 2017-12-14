@@ -622,7 +622,7 @@ var getSystemDir = function() {
     return __dirname;
   }
 
-  return app.getAppPath();
+  return path.join(app.getAppPath(), "output");
 }
 
 
