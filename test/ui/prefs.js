@@ -107,7 +107,6 @@ describe('Prefs', function() {
 
   it('allows setting path via dialog', function(done) {
     app.fakeDialog.mock([ { method: 'showOpenDialog', value: ['/not/a/real/path'] } ]);
-    
     app.client.waitUntilWindowLoaded().click("=Preferences").
         then(() => app.client.click("button.pick")).
         then(() => app.client.click("button.save")).

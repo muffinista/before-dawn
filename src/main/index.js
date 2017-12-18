@@ -15,7 +15,6 @@
  */
 
 const electron = require("electron");
-const {crashReporter} = require("electron");
 const log = require("electron-log");
 
 const app = electron.app;  // Module to control application life.
@@ -1027,7 +1026,6 @@ if ( typeof(global.RAVEN_PRIVATE_URL) !== "undefined" ) {
   Raven.config(global.RAVEN_PRIVATE_URL, global.RAVEN_OPTIONS).install();
 }
 
-crashReporter.start(global.CRASH_REPORTER);
 
 if (global.IS_DEV) {
 	log.info("Running in development");

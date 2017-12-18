@@ -47,10 +47,3 @@ if ( process.env.TEST_MODE === undefined && ! global.IS_DEV ) {
     }
   };
 }
-
-global.CRASH_REPORTER = {
-  productName: "Before Dawn",
-  companyName: "Before Dawn",
-  submitURL: "http://beforedawn.muffinlabs.com:1127/post",
-  uploadToServer: true
-};
