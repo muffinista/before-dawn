@@ -5,6 +5,7 @@
 - Notify main process when user preferences have been updated
 - Disable 'Save' button when creating new screensaver, but local
   directory isn't setup.
+- Remove crash reporter, since it's basically unused
 
 ## [v0.9.15](https://github.com/muffinista/before-dawn/tree/v0.9.15) (2017-12-14)
 - Update raven/sentry setup, fix some issues with paths in the app
