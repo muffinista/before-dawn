@@ -267,6 +267,7 @@ export default {
 
       this.manager.updatePrefs(this.prefs, () => {
         this.disabled = false;
+        this.ipcRenderer.send("prefs-updated", this.prefs);
         this.ipcRenderer.send("set-autostart", this.prefs.auto_start);
         if ( doClose ) {
           this.closeWindow();
@@ -291,15 +292,10 @@ export default {
       );
     },
     localSourceChange(ls) {
-      console.log("hey", this.prefs);
-      console.log("set local source to", ls);
       var tmp = {
         localSource: ls
       };
       this.prefs = Object.assign(this.prefs, tmp);
-
-//      this.prefs.localSource = ls;
-
     }
   }
 
