@@ -13,9 +13,9 @@
     "postinstall": "electron-builder install-app-deps",
     "pack": "yarn compile && electron-builder --dir",
     "dist": "yarn compile && electron-builder --x64",
-    "test": "mocha test test/**",
+    "test": "yarn compile && mocha test test/**",
     "test-lib": "nyc --reporter=html mocha test test/lib/**",
-    "release": "yarn compile && yarn dist"
+    "release": "yarn dist"
   },
   "repository": {
     "type": "git",
@@ -25,7 +25,7 @@
     "auto-launch": "^5.0.1",
     "cross-env": "^5.1.1",
     "electron-is-dev": "^0.3.0",
-    "electron-log": "^2.2.3",
+    "electron-log": "^2.2.12",
     "eslint-plugin-vue": "^4.0.0-beta.2",
     "ffi": "^2.2.0",
     "folder-walker": "^3.1.0",

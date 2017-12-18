@@ -1018,9 +1018,8 @@ var buildMenuTemplate = function(a) {
 // load a few global variables
 require("./bootstrap.js");
 
-
+log.transports.file.level = "debug";
 log.transports.file.maxSize = 1 * 1024 * 1024;
-log.transports.file.file = path.join(__dirname, "log.txt");
 
 if ( typeof(global.RAVEN_PRIVATE_URL) !== "undefined" ) {
   Raven = require("raven");
