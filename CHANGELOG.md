@@ -1,5 +1,29 @@
 # Change Log
 
+
+## [v0.9.16](https://github.com/muffinista/before-dawn/tree/v0.9.16) (2017-12-14)
+- Notify main process when user preferences have been updated
+- Disable 'Save' button when creating new screensaver, but local
+  directory isn't setup.
+
+## [v0.9.15](https://github.com/muffinista/before-dawn/tree/v0.9.15) (2017-12-14)
+- Update raven/sentry setup, fix some issues with paths in the app
+
+## [v0.9.14](https://github.com/muffinista/before-dawn/tree/v0.9.14) (2017-12-11)
+- Fix some issues with setting local directory properly
+
+## [v0.9.13](https://github.com/muffinista/before-dawn/tree/v0.9.13) (2017-12-08)
+- Replaced React with Vue.js, and did a lot of refactoring and cleanup
+  of javascript in general. Most of the UI code is in Vue components
+  now. Previously, it was a mix of React, vanilla JS, and some jQuery.
+- Moved code/asset compilation into webpack. This makes development a
+  little easier to manage.
+- Updated how data and objects get passed between the UI and the main
+  process, which should help make the app more performant.
+- Added some tweaks to hopefully take care of some annoying OSX
+  security issues.
+
+
 ## [v0.9.12](https://github.com/muffinista/before-dawn/tree/v0.9.12) (2017-11-17)
 - Tweak some temp directory usage to try and fix some OSX issues
 
