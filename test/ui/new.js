@@ -41,6 +41,14 @@ describe('Add New', function() {
             done();
           });
     });
+
+    it('prevents save', function() {
+      app.client.waitUntilWindowLoaded().
+          then(() => {
+            assert(!app.browserWindow.isEnabled('.save'));
+            done();
+          })
+    });
   });
 
   describe('when setup', function() {
