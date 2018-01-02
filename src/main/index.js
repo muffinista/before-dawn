@@ -659,7 +659,8 @@ var bootApp = function() {
 
   let saverOpts = {
     base: global.basePath,
-    systemDir: getSystemDir()
+    systemDir: getSystemDir(),
+    logger: log.info
   };
   
   log.info("Load config with", saverOpts);
@@ -1259,6 +1260,8 @@ app.on("quit", function() {
 
 process.on("uncaughtException", function (ex) {
   log.info(ex);
+  log.info(ex.stack);
+
   if ( typeof(Raven) !== "undefined" ) {
     Raven.captureException(ex);
   }

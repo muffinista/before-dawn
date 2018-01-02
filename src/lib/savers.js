@@ -17,7 +17,7 @@ var config_file = "config.json";
 var baseDir;
 var systemDir;
 var loadedScreensavers = [];
-
+var logger;
 var _firstLoad = false;
 
 var init = function(opts, cb) {
@@ -34,6 +34,13 @@ var init = function(opts, cb) {
   else {
     systemDir = baseDir;
   }
+
+  if ( opts.logger ) {
+    logger = opts.logger;
+  }
+  else {
+    logger = function() {};
+  }
   
   reload(cb);
 };
@@ -49,6 +56,8 @@ var reload = function(cb, load_savers) {
     cb = console.log;
   }
 
+  logger("savers.reload");
+  
   // check for/create our main directory
   // and our savers directory (which is a subdir
   // of the main dir)
@@ -72,6 +81,7 @@ var reload = function(cb, load_savers) {
     ensureDefaults();
 
     if ( _firstLoad === true ) {
+      logger("savers.reload -- firstLoad!");
       writeSync();
       setupPackages(() => {
         cb();
@@ -167,6 +177,7 @@ var updatePackage = function(cb) {
 
     // @todo handle local check here
 
+    logger("check package: " + source);
     p.checkLatestRelease(cb);
   }
 };
@@ -441,6 +452,7 @@ var loadFromFile = function(src, settings) {
   return new Promise(function (resolve, reject) {
     fs.readFile(src, {encoding: "utf8"}, function (err, content) {
       if ( err ) {
+        logger("loadFromFile err", src, err);
         reject(err);
       }
       else {
@@ -453,10 +465,12 @@ var loadFromFile = function(src, settings) {
             resolve(s);
           }
           else {
+            logger("loadFromFile not valid! " + src);
             reject();
           }
         }
         catch(e) {
+          logger("loadFromFile exception", e);
           reject(e);
         }
       }
@@ -507,7 +521,8 @@ var listAll = function(cb, force) {
   var systemScreensaverCount = 1;
 
   // use cached data if available
-  if ( loadedScreensavers.length > systemScreensaverCount && ( typeof(force) === "undefined" || force === false ) ) {
+  if ( loadedScreensavers.length > systemScreensaverCount &&
+       ( typeof(force) === "undefined" || force === false ) ) {
     cb(loadedScreensavers);
     return;
   }
@@ -532,11 +547,16 @@ var listAll = function(cb, force) {
     }
   }
 
+  // filter out failed promises here
+  // @see https://davidwalsh.name/promises-results
+  promises = promises.map(p => p.catch(() => undefined))
+
   Promise.all(promises).then(function(data) {
+    // remove any undefined screensavers
+    data = data.filter(s => s !== undefined);
     loadedScreensavers = _.sortBy(data, function(s) { return s.name.toLowerCase(); });
     cb(loadedScreensavers);
   });
-
 };
 
 var updatePrefs = function(data, cb) {

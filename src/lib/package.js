@@ -73,7 +73,7 @@ module.exports = function Package(_attrs) {
   
   this.checkLatestRelease = async function(cb) {
     let data = await this.getReleaseInfo();
-    if ( data.published_at && new Date(data.published_at) > new Date(self.updated_at) ) {
+    if ( data && data.published_at && new Date(data.published_at) > new Date(self.updated_at) ) {
       this.downloadFile(data.zipball_url, function() {
         self.updated_at = data.published_at;
         cb(self.attrs());
