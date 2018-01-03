@@ -1,5 +1,9 @@
 # Change Log
 
+## [v0.9.17](https://github.com/muffinista/before-dawn/tree/v0.9.17) (2018-??-??)
+- Add some logging code to savers library
+- Handle screensaver load/parse errors rather than entirely failing
+- Update Electron version
 
 ## [v0.9.16](https://github.com/muffinista/before-dawn/tree/v0.9.16) (2017-12-14)
 - Notify main process when user preferences have been updated

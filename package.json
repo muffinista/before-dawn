@@ -1,7 +1,7 @@
 {
   "name": "before-dawn",
   "productName": "Before Dawn",
-  "version": "0.9.16",
+  "version": "0.9.17",
   "description": "A desktop screensaver app using web technologies",
   "author": "Colin Mitchell <colin@muffinlabs.com> (http://muffinlabs.com)",
   "license": "MIT",
@@ -76,7 +76,7 @@
     "css-loader": "^0.28.4",
     "del": "^3.0.0",
     "devtron": "^1.4.0",
-    "electron": "1.8.2-beta.2",
+    "electron": "1.8.2-beta.3",
     "electron-builder": "19.47.1",
     "electron-debug": "^1.4.0",
     "electron-devtools-installer": "^2.2.0",
