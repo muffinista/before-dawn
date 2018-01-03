@@ -328,9 +328,11 @@ var runScreenSaverOnDisplay = function(saver, s) {
     windowOpts.fullscreen = true;
   }
   
-  log.info("runScreenSaverOnDisplay");
+  log.info("runScreenSaverOnDisplay", s.id, windowOpts);
+
   // don't do anything if we don't actually have a screensaver
   if ( typeof(saver) === "undefined" || saver === null ) {
+    log.info("no saver, exiting");
     return;
   }
 
@@ -341,7 +343,7 @@ var runScreenSaverOnDisplay = function(saver, s) {
     var w = new BrowserWindow(windowOpts);       
     saverWindows.push(w);
 
-    //log.info("got screenshot back, let's do this");
+    log.info("got screenshot back, let's do this", s.id);
     
     try {   
       // Emitted when the window is closed.
@@ -349,14 +351,14 @@ var runScreenSaverOnDisplay = function(saver, s) {
         saverWindows = _.filter(saverWindows, function(w2) {
           return (w2 !== w);
         });
-        log.info("running windows: " + saverWindows.length);
+        log.info("running windows: " + saverWindows.length + " closed: " + s.id);
 
         forceWindowClose(w);
       });
       
       // inject our custom JS and CSS into the screensaver window
       w.webContents.on("did-finish-load", function() {
-        //log.info("did-finish-load");
+        log.info("did-finish-load", s.id);
         if (!w.isDestroyed()) {
           w.webContents.insertCSS(globalCSSCode);
         }
@@ -374,16 +376,12 @@ var runScreenSaverOnDisplay = function(saver, s) {
       w.once("ready-to-show", () => {
         var diff;
 
-        //log.info("ready-to-show");
+        log.info("ready-to-show", s.id);
         if ( debugMode !== true ) {
           w.setFullScreen(true);
         }
 
-        if (process.platform !== "darwin") {
-          w.show();
-        }
-
-        //w.minimize();       
+        w.show();
         w.focus();
 
         diff = process.hrtime(tickCount);
@@ -401,7 +399,7 @@ var runScreenSaverOnDisplay = function(saver, s) {
 
       url = saver.getUrl(url_opts);
 
-      log.info("Loading " + url);
+      log.info("Loading " + url, s.id);
 
       if ( debugMode === true ) {
         w.webContents.openDevTools();
