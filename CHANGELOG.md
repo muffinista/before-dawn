@@ -1,6 +1,9 @@
 # Change Log
 
-## [v0.9.17](https://github.com/muffinista/before-dawn/tree/v0.9.17) (2018-??-??)
+## [v0.9.17](https://github.com/muffinista/before-dawn/tree/v0.9.17) (2018-01-03)
+- Update method of displaying screensaver windows since things seem to
+  have broken in High Sierra
+- Tweak fullscreen.js to handle OSX issues
 - Add some logging code to savers library
 - Handle screensaver load/parse errors rather than entirely failing
 - Update Electron version
