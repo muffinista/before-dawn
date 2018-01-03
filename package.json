@@ -79,7 +79,7 @@
     "electron": "1.8.2-beta.3",
     "electron-builder": "19.47.1",
     "electron-debug": "^1.4.0",
-    "electron-devtools-installer": "^2.2.0",
+    "electron-devtools-installer": "^2.2.3",
     "eslint": "^4.10.0",
     "eslint-config-standard": "^10.2.1",
     "eslint-friendly-formatter": "^3.0.0",
