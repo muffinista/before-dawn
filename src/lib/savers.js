@@ -350,7 +350,7 @@ var getDelay = function() {
   if ( typeof(val) === "undefined" ) {
     val = 15;
   }
-  return val;
+  return parseInt(val, 10);
 };
 
 
@@ -363,7 +363,7 @@ var getSleep = function() {
   if ( typeof(val) === "undefined" ) {
     val = 15;
   }
-  return val;
+  return parseInt(val, 10);
 };
 
 var setLock = function(x) {

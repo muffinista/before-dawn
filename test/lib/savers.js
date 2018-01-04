@@ -303,6 +303,16 @@ describe('Savers', function() {
       });
     });
 
+    it("returns a number", function(done) {
+      savers.init(workingDir, function() {
+        savers.setDelay("420");
+        assert.equal(420, savers.getDelay());
+        done();
+      });
+    });
+
+
+    
     it("defaults", function(done) {
       savers.init(workingDir, function() {
         assert.equal(15, savers.getDelay());
@@ -315,6 +325,14 @@ describe('Savers', function() {
     it("works", function(done) {
       savers.init(workingDir, function() {
         savers.setSleep(420);
+        assert.equal(420, savers.getSleep());
+        done();
+      });
+    });
+
+    it("returns a number", function(done) {
+      savers.init(workingDir, function() {
+        savers.setSleep("420");
         assert.equal(420, savers.getSleep());
         done();
       });

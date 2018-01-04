@@ -791,8 +791,10 @@ var blankScreenIfNeeded = function() {
  * timeout values, etc
  */
 var updateStateManager = function() {
-  log.info("updateStateManager idleTime: " +
-           global.savers.getDelay());
+  log.info("updateStateManager",
+           "idleTime: " + global.savers.getDelay(),
+           "blankTime: " + (global.savers.getDelay() + global.savers.getSleep())
+  );
 
   stateManager.setup({
     idleTime: global.savers.getDelay() * 60000,
