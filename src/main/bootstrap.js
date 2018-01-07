@@ -19,7 +19,7 @@ global.NEW_RELEASE_AVAILABLE = false;
 global.HELP_URL = "https://muffinista.github.io/before-dawn/";
 global.ISSUES_URL = "https://github.com/muffinista/before-dawn/issues";
 
-global.RELEASE_SERVER = "https://hazel-nwmfhsakin.now.sh";
+global.RELEASE_SERVER = "https://before-dawn.now.sh";
 
 // note -- this is hardcoded to win32 for now because we actually
 // don't care what platform is running
