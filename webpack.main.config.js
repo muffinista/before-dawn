@@ -1,11 +1,11 @@
 'use strict'
 
-const path = require('path')
-const packageJSON = require('./package.json')
+const path = require('path');
+const packageJSON = require('./package.json');
 
-const dependencies = packageJSON.dependencies
+const dependencies = packageJSON.dependencies;
 const optionalDependencies = packageJSON.optionalDependencies;
-const webpack = require('webpack')
+const webpack = require('webpack');
 
 const outputDir = path.join(__dirname, "output");
 
@@ -61,6 +61,12 @@ let mainConfig = {
   plugins: [
     new CopyWebpackPlugin([
       {
+        from: path.join(__dirname, 'package.json'),
+        to: path.join(outputDir)
+      }
+    ]),
+    new CopyWebpackPlugin([
+      {
         from: path.join(__dirname, 'src', 'main', 'assets'),
         to: path.join(outputDir, 'assets'),
         ignore: ['.*']
@@ -87,9 +93,6 @@ let mainConfig = {
         ignore: ['.*']
       }
     ]),
-    new webpack.DefinePlugin({
-      'process.env.PACKAGE_VERSION': JSON.stringify(packageJSON.version)
-    }),
     new webpack.NoEmitOnErrorsPlugin()
   ],
   resolve: {

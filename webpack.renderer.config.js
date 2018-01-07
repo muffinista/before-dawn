@@ -5,7 +5,12 @@
 //}
 
 const path = require('path');
-const { dependencies, productName } = require('./package.json');
+const packageJSON = require('./package.json');
+
+const productName = packageJSON.productName;
+const dependencies = packageJSON.dependencies;
+const optionalDependencies = packageJSON.optionalDependencies;
+
 const webpack = require('webpack');
 
 const outputDir = path.join(__dirname, "output");

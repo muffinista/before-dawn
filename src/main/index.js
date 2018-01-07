@@ -1028,6 +1028,8 @@ if ( typeof(global.RAVEN_PRIVATE_URL) !== "undefined" ) {
 }
 
 
+log.info("Hello from version: " + global.APP_VERSION_BASE);
+
 if (global.IS_DEV) {
 	log.info("Running in development");
 }

@@ -1,5 +1,8 @@
 # Change Log
 
+## [v0.9.19](https://github.com/muffinista/before-dawn/tree/v0.9.19) (2018-01-06)
+- Fix issue with missing version data
+
 ## [v0.9.18](https://github.com/muffinista/before-dawn/tree/v0.9.18) (2018-01-04)
 - Make sure delay/sleep values are integers
 

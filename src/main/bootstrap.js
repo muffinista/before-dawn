@@ -1,4 +1,13 @@
-var version = process.env.PACKAGE_VERSION;
+var version = undefined;
+var packageJSON;
+
+try {
+  packageJSON = require('../../package.json');
+  version = packageJSON.version;
+}
+catch(e) {
+  console.log("Unable to set version!", e);
+}
 
 global.APP_NAME = "Before Dawn";
 global.APP_DIR = "Before Dawn";
