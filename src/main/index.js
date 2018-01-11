@@ -317,17 +317,19 @@ var runScreenSaverOnDisplay = function(saver, s) {
     x: s.bounds.x,
     y: s.bounds.y,
     show: false,
-    frame: false
+//    frame: false
   };
 
   var tickCount;
+  var diff;
+
   
   // osx will display window immediately if fullscreen is true
   // so we default it to false there
   if (process.platform !== "darwin") {
     windowOpts.fullscreen = true;
   }
-  
+
   log.info("runScreenSaverOnDisplay", s.id, windowOpts);
 
   // don't do anything if we don't actually have a screensaver
@@ -343,7 +345,8 @@ var runScreenSaverOnDisplay = function(saver, s) {
     var w = new BrowserWindow(windowOpts);       
     saverWindows.push(w);
 
-    log.info("got screenshot back, let's do this", s.id);
+    diff = process.hrtime(tickCount);
+    log.info("got screenshot back, let's do this", s.id, diff[0] * 1e9 + diff[1]);
     
     try {   
       // Emitted when the window is closed.
@@ -374,15 +377,13 @@ var runScreenSaverOnDisplay = function(saver, s) {
 
       
       w.once("ready-to-show", () => {
-        var diff;
-
         log.info("ready-to-show", s.id);
         if ( debugMode !== true ) {
-          w.setFullScreen(true);
+           w.setFullScreen(true);
         }
 
         w.show();
-        w.focus();
+//        w.focus();
 
         diff = process.hrtime(tickCount);
         log.info(`rendered in ${diff[0] * 1e9 + diff[1]} nanoseconds`);

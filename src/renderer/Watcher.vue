@@ -123,6 +123,16 @@ export default {
       this.saver = result;
       this.options = result.options;
       this.lastIndex = result.options.length;
+
+      // make sure folder actually exists
+      if ( fs.existsSync(this.folderPath) ) {
+        fs.watch(this.folderPath, (eventType, filename) => {
+          if (filename) {
+            this.reloadPreview();
+          }
+        });
+      }
+      
     });
   },
   data() {
@@ -160,6 +170,9 @@ export default {
     screenshot: function() {
       return this.params.get("screenshot");
     },
+    folderPath: function() {
+      return path.dirname(this.src);
+    }
   },
   methods: {
     optionDefaults: function() {
