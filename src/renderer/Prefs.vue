@@ -24,12 +24,12 @@
                    :bus="bus"
                    :saver="savers[saverIndex]"
                    :screenshot="screenshot"
-                   :options="prefs.options[saver]"
+                   :options="options[saver]"
                    v-if="savers[saverIndex] !== undefined"></saver-preview>
                 <saver-options
                    :saver="saver"
                    :options="saverOptions"
-                   :values="prefs.options[saver]"
+                   :values="options[saver]"
                    @change="onOptionsChange"
                    v-on:saverOption="updateSaverOption"></saver-options>
               </template>
@@ -104,6 +104,7 @@ export default {
     return {
       savers: [],
       prefs: {},
+      options: {},
       saver: undefined,
       disabled: false
     }
@@ -141,7 +142,7 @@ export default {
       if ( typeof(this.prefs) === "undefined" ) {
         return {};
       }
-      return this.prefs.options[this.saver];
+      return this.options[this.saver];
     },
     saverSettings: function() {
       return this.savers[this.saverIndex].settings;
@@ -160,7 +161,7 @@ export default {
   },
   methods: {
     onOptionsChange(e) {
-      this.bus.$emit('options-changed', this.prefs.options[this.saver]);
+      this.bus.$emit('options-changed', this.options[this.saver]);
     },
     onSaverPicked(e) {
       this.saver = e.target.value;
@@ -211,11 +212,17 @@ export default {
         // ensure default settings in the config for all savers
         for(var i = 0; i < this.savers.length; i++ ) {
           var s = this.savers[i];
+
           if ( tmp.options[s.key] === undefined ) {
             tmp.options[s.key] = {};
           }
+          console.log("!!!!!!!!!!!", tmp.options[s.key], s.settings);
+
+          tmp.options[s.key] = s.settings;
         }
 
+        this.options = Object.assign({}, this.options, tmp.options);
+console.log("******", this.options);        
         // https://vuejs.org/v2/guide/reactivity.html
         // However, new properties added to the object will not
         // trigger changes. In such cases, create a fresh object
@@ -247,12 +254,19 @@ export default {
 
     },
     updateSaverOption(saver, name, value) {
-      var tmp = this.prefs.options;
+      var tmp = this.options;
       var update = {};
-      update[saver] = {};
+      console.log("PREFS", this.prefs);
+      console.log("OLD", this.options[saver]);
+      
+      //update[saver] = {};
+      update[saver] = Object.assign({}, tmp[saver]);    
       update[saver][name] = value;
-   
-      this.prefs.options = Object.assign({}, tmp, update);
+    
+
+      //this.prefs.options = Object.assign({}, tmp, update);
+      this.options = Object.assign({}, this.options, update);
+      console.log("NEW", this.options[saver]);
     },
     closeWindow() {
       this.currentWindow.close();
@@ -264,7 +278,8 @@ export default {
       
       this.disabled = true;
       this.prefs.saver = this.saver;
-
+      this.prefs.options = this.options;
+      
       this.manager.updatePrefs(this.prefs, () => {
         this.disabled = false;
         this.ipcRenderer.send("prefs-updated", this.prefs);

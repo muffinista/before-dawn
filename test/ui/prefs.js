@@ -69,7 +69,7 @@ describe('Prefs', function() {
     
   });
 
-  it('sets options for screensaver', function(done) {
+  it.only('sets options for screensaver', function(done) {
     app.client.waitUntilTextExists('body', 'Screensaver One', 10000).
        getAttribute("[type=radio]","data-name").
         then(() => app.client.click("[type=radio][data-name='Screensaver One']")).
@@ -77,8 +77,12 @@ describe('Prefs', function() {
         then((text) => {
           assert(text.lastIndexOf('Load the specified URL') !== -1);
         }).
+        then(() => app.client.click("[name='sound'][value='false']")).
         then(() => app.client.setValue("[name='load_url']", 'barfoo')).
-        then(() => app.client.click("button.save")).       
+        then(() => app.client.click("button.save")).
+        then(() => {
+          app.client.getWindowCount().should.eventually.equal(1)
+        }).
         then(() => {
           var options = helpers.savedConfig(workingDir).options;
           var k = Object.keys(options).find((i) => {
@@ -86,6 +90,7 @@ describe('Prefs', function() {
           });
 
           assert(options[k].load_url == 'barfoo');
+          assert(options[k].sound == false);
           done();
         });
    
