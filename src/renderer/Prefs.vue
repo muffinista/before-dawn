@@ -272,6 +272,8 @@ export default {
       }
       
       this.disabled = true;
+
+      // @todo should this use Object.assign?
       this.prefs.saver = this.saver;
       this.prefs.options = this.options;
       

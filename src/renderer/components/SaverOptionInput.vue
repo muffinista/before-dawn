@@ -53,7 +53,7 @@
         </div>
       
         <label class="col-sm-2 col-form-label">Default</label>
-        <div :class="defaultInputClass">
+        <div class="col-sm-2">
           <input type="text"
                  v-model="option.default"
                  placeholder="Default value of this option"
@@ -64,7 +64,7 @@
     <template v-if="option.type === 'text'">
       <div class="form-group row">
         <label class="col-sm-2 col-form-label">Default</label>
-        <div :class="defaultInputClass">
+        <div class="col-sm-10">
           <input type="text"
                  v-model="option.default"
                  placeholder="Default value of this option"
@@ -76,7 +76,7 @@
     <template v-if="option.type ==='boolean'">
       <div class="form-group row">
         <label class="col-sm-2 col-form-label">Default</label>
-        <div :class="defaultInputClass">
+        <div class="col-sm-2">
           <select v-model="option.default" class="form-control">
             <option disabled value="">Please select one</option>
             <option value="true">Yes</option>
@@ -108,13 +108,6 @@
         }
 
         return "entry option-text";
-      },
-      defaultInputClass: function() {
-        if ( this.option.type === "slider" ) {
-          return "col-sm-2";
-        }
-
-        return "col-sm-10";
       }
     },
     methods: {
