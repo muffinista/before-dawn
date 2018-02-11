@@ -69,7 +69,7 @@ describe('Prefs', function() {
     
   });
 
-  it.only('sets options for screensaver', function(done) {
+  it('sets options for screensaver', function(done) {
     app.client.waitUntilTextExists('body', 'Screensaver One', 10000).
        getAttribute("[type=radio]","data-name").
         then(() => app.client.click("[type=radio][data-name='Screensaver One']")).

@@ -216,13 +216,11 @@ export default {
           if ( tmp.options[s.key] === undefined ) {
             tmp.options[s.key] = {};
           }
-          console.log("!!!!!!!!!!!", tmp.options[s.key], s.settings);
 
           tmp.options[s.key] = s.settings;
         }
 
         this.options = Object.assign({}, this.options, tmp.options);
-console.log("******", this.options);        
         // https://vuejs.org/v2/guide/reactivity.html
         // However, new properties added to the object will not
         // trigger changes. In such cases, create a fresh object
@@ -256,8 +254,6 @@ console.log("******", this.options);
     updateSaverOption(saver, name, value) {
       var tmp = this.options;
       var update = {};
-      console.log("PREFS", this.prefs);
-      console.log("OLD", this.options[saver]);
       
       //update[saver] = {};
       update[saver] = Object.assign({}, tmp[saver]);    
@@ -266,7 +262,6 @@ console.log("******", this.options);
 
       //this.prefs.options = Object.assign({}, tmp, update);
       this.options = Object.assign({}, this.options, update);
-      console.log("NEW", this.options[saver]);
     },
     closeWindow() {
       this.currentWindow.close();

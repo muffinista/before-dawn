@@ -93,10 +93,12 @@ describe('Editor', function() {
         then(() => app.client.setValue(".entry[data-index='0'] [name='description']", 'An Option I Guess?')).
         then(() => app.client.click("button.add-option")).
         then(() => app.client.setValue(".entry[data-index='1'] [name='name']", 'My Second Option')).
-        then(() => app.client.setValue(".entry[data-index='1'] [name='description']", 'Another Option I Guess?')).        
+        then(() => app.client.setValue(".entry[data-index='1'] [name='description']", 'Another Option I Guess?')).
+        then(() => app.client.selectByVisibleText(".entry[data-index='1'] select", 'yes/no')).
         then(() => app.client.click("button.add-option")).
         then(() => app.client.setValue(".entry[data-index='2'] [name='name']", 'My Third Option')).
         then(() => app.client.setValue(".entry[data-index='2'] [name='description']", 'Here We Go Again')).
+        then(() => app.client.selectByVisibleText(".entry[data-index='2'] select", 'slider')).
         then(() => app.client.click("button.save")).
         then(() => {
           var p = new Promise( (resolve, reject) => {
@@ -112,10 +114,17 @@ describe('Editor', function() {
           var opt = data.options[0];
           assert.equal('My Option', opt.name);
           assert.equal('An Option I Guess?', opt.description);
+          assert.equal('text', opt.type);
 
           opt = data.options[1];
           assert.equal('My Second Option', opt.name);
           assert.equal('Another Option I Guess?', opt.description);
+          assert.equal('boolean', opt.type);
+
+          opt = data.options[2];
+          assert.equal('My Third Option', opt.name);
+          assert.equal('Here We Go Again', opt.description);
+          assert.equal('slider', opt.type);
         }).
         then(() => app.client.click(".entry[data-index='1'] button.remove-option")).
         then(() => app.client.click("button.save")).
@@ -133,12 +142,13 @@ describe('Editor', function() {
           var opt = data.options[0];
           assert.equal('My Option', opt.name);
           assert.equal('An Option I Guess?', opt.description);
-
+          assert.equal('text', opt.type);
+          
           opt = data.options[1];
           assert.equal('My Third Option', opt.name);
           assert.equal('Here We Go Again', opt.description);
+          assert.equal('slider', opt.type);
         }).
-
         then(done);
   });
 

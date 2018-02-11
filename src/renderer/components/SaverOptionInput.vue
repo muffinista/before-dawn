@@ -106,6 +106,7 @@
         else if ( this.option.type === "boolean" ) {
           return "entry option-boolean";
         }
+
         return "entry option-text";
       },
       defaultInputClass: function() {
