@@ -1,65 +1,65 @@
 <template>
-<div id="prefs">
-  <div class="content">
-    <b-tabs>
-      <b-tab title="Screensavers" active>
-        <div class="container-fluid">
-          <div class="row">
-            <!-- left pane -->
-            <div class="col-sm-6 col-md-6">
-              <saver-list
-                 v-if="isLoaded"
-                 v-bind:savers="savers"
-                 v-bind:current="saver"
-                 v-on:editSaver="editSaver"
-                 v-on:deleteSaver="deleteSaver"
-                 @change="onSaverPicked"></saver-list>
-            </div>
-
-            <!-- right pane -->
-            <div class="col-sm-6 col-md-6">
-              <template v-if="isLoaded">
-                <saver-summary :saver="saverObj"></saver-summary>
-                <saver-preview
-                   :bus="bus"
-                   :saver="savers[saverIndex]"
-                   :screenshot="screenshot"
-                   :options="options[saver]"
-                   v-if="savers[saverIndex] !== undefined"></saver-preview>
-                <saver-options
-                   :saver="saver"
-                   :options="saverOptions"
-                   :values="options[saver]"
-                   @change="onOptionsChange"
-                   v-on:saverOption="updateSaverOption"></saver-options>
-              </template>
+  <div id="prefs">
+    <div class="content">
+      <b-tabs>
+        <b-tab title="Screensavers" active>
+          <div class="container-fluid">
+            <div class="row">
+              <!-- left pane -->
+              <div class="col-sm-6 col-md-6">
+                <saver-list
+                  v-if="isLoaded"
+                  v-bind:savers="savers"
+                  v-bind:current="saver"
+                  v-on:editSaver="editSaver"
+                  v-on:deleteSaver="deleteSaver"
+                  @change="onSaverPicked"></saver-list>
+              </div>
+              
+              <!-- right pane -->
+              <div class="col-sm-6 col-md-6">
+                <template v-if="isLoaded">
+                  <saver-summary :saver="saverObj"></saver-summary>
+                  <saver-preview
+                    :bus="bus"
+                    :saver="savers[saverIndex]"
+                    :screenshot="screenshot"
+                    :options="options[saver]"
+                    v-if="savers[saverIndex] !== undefined"></saver-preview>
+                  <saver-options
+                    :saver="saver"
+                    :options="saverOptions"
+                    :values="options[saver]"
+                    @change="onOptionsChange"
+                    v-on:saverOption="updateSaverOption"></saver-options>
+                </template>
+              </div>
             </div>
           </div>
-        </div>
-      </b-tab>
-      <b-tab title="Preferences">
-        <div class="container-fluid">
-          <prefs-form
-             :prefs="prefs"
-             v-on:localSourceChange="localSourceChange"></prefs-form>
-        </div>
-        <div class="container-fluid">
-          <button class="btn btn-large btn-positive reset-to-defaults"
-                  v-on:click="resetToDefaults">Reset to Defaults</button>
+        </b-tab>
+        <b-tab title="Preferences">
+          <div class="container-fluid">
+            <prefs-form
+              :prefs="prefs"
+              v-on:localSourceChange="localSourceChange"></prefs-form>
           </div>
-      </b-tab>
-    </b-tabs>
-  </div> <!-- content -->
-  <footer class="footer d-flex justify-content-between">
-    <div>
-      <button class="btn btn-large btn-positive create" v-on:click="createNewScreensaver">Create Screensaver</button>
-    </div>
-    <div>
-      <button class="btn btn-large btn-default cancel" v-on:click="closeWindow">Cancel</button>
-      <button class="btn btn-large btn-positive save"  v-on:click="saveData" :disabled="disabled">Save</button>
-    </div>
-  </footer>
-</div> <!-- #prefs -->
+          <div class="container-fluid">
+            <button class="btn btn-large btn-positive reset-to-defaults"
+                    v-on:click="resetToDefaults">Reset to Defaults</button>
+          </div>
+        </b-tab>
+      </b-tabs>
+    </div> <!-- content -->
+    <footer class="footer d-flex justify-content-between">
+      <div>
+        <button class="btn btn-large btn-positive create" v-on:click="createNewScreensaver">Create Screensaver</button>
+      </div>
+      <div>
+        <button class="btn btn-large btn-default cancel" v-on:click="closeWindow">Cancel</button>
+        <button class="btn btn-large btn-positive save"  v-on:click="saveData" :disabled="disabled">Save</button>
+      </div>
+    </footer>
+  </div> <!-- #prefs -->
 </template>
 
 <script>

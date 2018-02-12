@@ -3,38 +3,40 @@
     <div class="content">
       <b-tabs>
         <b-tab title="Preview" active>
-          <template v-if="options.length > 0">
-            <h4>Options</h4>
-            <small>Tweak the values here and they will be sent along
-              to your preview.</small>
-            <saver-options
-               :saver="saver"
-               :options="options"
-               :values="optionDefaults"
-               @change="onOptionsChange"></saver-options>
-          </template>
-
-          <h4>Preview</h4>
-          <saver-preview
-             :bus="bus"
-             v-bind:saver="saver"
-             v-bind:screenshot="screenshot"
-             v-if="isLoaded"></saver-preview>
+          <div class="container-fluid">
+            <template v-if="options.length > 0">
+              <h4>Options</h4>
+              <small>Tweak the values here and they will be sent along
+                to your preview.</small>
+              <saver-options
+                :saver="saver"
+                :options="options"
+                :values="optionDefaults"
+                @change="onOptionsChange"></saver-options>
+            </template>
+            
+            <h4>Preview</h4>
+            <saver-preview
+              :bus="bus"
+              v-bind:saver="saver"
+              v-bind:screenshot="screenshot"
+              v-if="isLoaded"></saver-preview>
+          </div>
         </b-tab>
         <b-tab title="Settings">
           <div class="container-fluid">
             <h4>Basic Information</h4>
             <small>You can enter the basics about this screensaver
               here.</small>
-
+            
             <!-- NOTE: passing the attrs here because its really all
-              we need for this form and makes saving the data later a
-              lot easier -->
+                 we need for this form and makes saving the data later a
+                 lot easier -->
             <saver-form
-               v-bind:saver="saver.attrs"
-               v-if="isLoaded"></saver-form>
-
-
+              v-bind:saver="saver.attrs"
+              v-if="isLoaded"></saver-form>
+            
+            
             <h4>Configurable Options</h4>
             <small>You can offer users configurable options to control
               your screensaver. Manage those here.</small>
@@ -43,20 +45,20 @@
             <!--
                 note: is track-by ok here?
                 https://v1.vuejs.org/guide/list.html#track-by-index 
-            -->
+              -->
             <saver-option-input
-               v-for="option, index in options"
-               v-bind:option="option"
-               :index="index"
-               v-bind:key="option.index"
-               v-on:deleteOption="deleteOption(option)"
-               v-if="isLoaded"></saver-option-input>      
+              v-for="option, index in options"
+              v-bind:option="option"
+              :index="index"
+              v-bind:key="option.index"
+              v-on:deleteOption="deleteOption(option)"
+              v-if="isLoaded"></saver-option-input>      
             
             <div class="padded-top padded-bottom">
               <button
-                 type="button"
-                 class="btn btn-positive add-option"
-                 v-on:click="addSaverOption">Add Option</button>
+                type="button"
+                class="btn btn-positive add-option"
+                v-on:click="addSaverOption">Add Option</button>
             </div>
           </div>
         </b-tab>
@@ -93,18 +95,18 @@
 </template>
 
 <script>
-const fs = require("fs");
-const path = require("path");
-const url = require("url");
-const exec = require("child_process").exec;
+  const fs = require("fs");
+  const path = require("path");
+  const url = require("url");
+  const exec = require("child_process").exec;
 
-import Vue from 'vue';
-import SaverPreview from '@/components/SaverPreview';
-import SaverForm from '@/components/SaverForm';  
-import SaverOptionInput from '@/components/SaverOptionInput';
-import SaverOptions from '@/components/SaverOptions';
-import Noty from "noty";
-
+  import Vue from 'vue';
+  import SaverPreview from '@/components/SaverPreview';
+  import SaverForm from '@/components/SaverForm';  
+  import SaverOptionInput from '@/components/SaverOptionInput';
+  import SaverOptions from '@/components/SaverOptions';
+  import Noty from "noty";
+  
 export default {
   name: 'editor',
   components: {
@@ -172,17 +174,18 @@ export default {
     },
     folderPath: function() {
       return path.dirname(this.src);
-    }
-  },
-  methods: {
+    },
     optionDefaults: function() {
       var result = {};
       for ( var i = 0; i < this.options.length; i++ ) {
         var opt = this.options[i];
-        result[opt.name] = opt.value;
+        result[opt.name] = opt.default;
       }
+
       return result;
     },
+  },
+  methods: {
     onOptionsChange(e) {
       var name = e.target.name;
       var value = e.target.value;

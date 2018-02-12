@@ -23,7 +23,8 @@ body > div > .content {
 }
 
 ul {
-  padding-left: 0px;
+    padding-left: 0px;
+    list-style-type: none;
 }
 
 ul[role=tablist] {
@@ -221,4 +222,14 @@ form.submit-attempt {
 
 #prefs .tab-content > .tab-pane:last-child {
     margin-bottom: 30px;
+}
+
+
+form.entry {
+    margin-bottom: 10px;
+}
+
+label.for-option {
+    font-weight: bold;
+    width: 250px;
 }

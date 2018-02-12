@@ -1,6 +1,7 @@
 <template>
   <div id="wrapper">
     <form v-on="$listeners">
+      <label class="for-option">{{option.description}}</label>
       <label>Yes
         <input
           type="radio"
@@ -23,7 +24,7 @@
 <script>
   export default {
     name: 'boolean-input',
-    props: ['saver', 'name', 'value'],
+    props: ['saver', 'option', 'name', 'value'],
   
     components: { },
     computed: {

@@ -1,7 +1,7 @@
 <template>
   <div id="wrapper">
     <form v-on="$listeners">
-      <label>{{option.description}}</label>
+      <label class="for-option">{{option.description}}</label>
       <input
         :type="renderType"
         :name="option.name"
