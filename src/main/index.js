@@ -52,6 +52,7 @@ var appReady = false;
 var configLoaded = false;
 
 var shouldQuit = false;
+var exitOnQuit = false;
 
 var globalCSSCode;
 
@@ -1005,7 +1006,10 @@ var buildMenuTemplate = function(a) {
         {
           label: "Quit",
           accelerator: "Command+Q",
-          click: function() { app.quit(); }
+          click: function() {
+            exitOnQuit = false;
+            app.quit();
+          }
         }
       ]
     });
@@ -1125,7 +1129,10 @@ trayMenu = Menu.buildFromTemplate([
   },
   {
     label: "Quit",
-    click: function() { app.quit(); }
+    click: function() {
+      exitOnQuit = true;
+      app.quit();
+    }
   }
 ]);
 
@@ -1250,11 +1257,16 @@ ipcMain.on("generate-screensaver", (event, args) => {
 app.on("window-all-closed", function() {
   log.info("window-all-closed");
 });
-app.on("before-quit", function() {
+app.on("before-quit", function(e) {
   log.info("before-quit");
 });
-app.on("will-quit", function() {
+app.on("will-quit", function(e) {
   log.info("will-quit");
+  log.info("quit", exitOnQuit);
+  if ( exitOnQuit !== true ) {
+    console.log("don't quit yet!");
+    e.preventDefault();
+  }
 });
 app.on("quit", function() {
   log.info("quit");
