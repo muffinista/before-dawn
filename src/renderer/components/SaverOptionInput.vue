@@ -38,15 +38,15 @@
 
     <template v-if="option.type === 'slider'">
       <div class="form-group row">
-        <label class="col-sm-2 col-form-label only-for-slider">Min</label>
-        <div class="col-sm-2 only-for-slider">
+        <label class="col-sm-2 col-form-label">Min</label>
+        <div class="col-sm-2">
           <input type="number"
                  v-model="option.min"
                  class="form-control" />
         </div>
         
-        <label class="col-sm-2 col-form-label only-for-slider">Max</label>
-        <div class="col-sm-2 only-for-slider">
+        <label class="col-sm-2 col-form-label">Max</label>
+        <div class="col-sm-2">
           <input type="number"
                  v-model="option.max"
                  class="form-control" />

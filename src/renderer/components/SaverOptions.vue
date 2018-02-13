@@ -25,21 +25,18 @@
 </template>
 
 <script>
-  import OptionInput from '@/components/OptionInput';
-  import BooleanInput from '@/components/BooleanInput';
+import OptionInput from '@/components/OptionInput';
+import BooleanInput from '@/components/BooleanInput';
 export default {
   name: 'saver-options',
   props: ['saver', 'options', 'values'],
   components: {
-  optionInput: OptionInput,
-  booleanInput: BooleanInput
+    optionInput: OptionInput,
+    booleanInput: BooleanInput
   },
   methods: {
   }
 }
-
-
-  
 </script>
 
 <style>

@@ -1263,7 +1263,7 @@ app.on("before-quit", function(e) {
 app.on("will-quit", function(e) {
   log.info("will-quit");
   log.info("quit", exitOnQuit);
-  if ( exitOnQuit !== true ) {
+  if ( testMode !== true && global.IS_DEV !== true && exitOnQuit !== true ) {
     console.log("don't quit yet!");
     e.preventDefault();
   }

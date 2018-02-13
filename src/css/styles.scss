@@ -4,22 +4,37 @@
 $nav_height: 42px;
 $footer_height: 40px;
 $tab_padding:12px;
+$grid_gap:10px;
 
-body > div > footer {
-  width: 100%;
-  /* Set the fixed height of the footer here */
-  height: $footer_height;
-  background-color: #f5f5f5;
+html {
+    height: 100%;
+}
+body {
+    min-height: 100%;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    font-size: 0.9rem;
+}
 
-  /* this should solve some input/footer overlap issues on prefs form */
-  z-index: 1000;
-  padding-left: 5px;
-  padding-right: 5px;
+.form-control {
+    font-size: 0.9rem;
 }
 
 body > div > .content {
   height: calc(100vh - #{$footer_height});
   overflow-y: scroll;
+}
+
+body > div > footer {
+    height: $footer_height;
+    background-color: #f5f5f5;
+    grid-row-start: 2;
+    grid-row-end: 3;
+    padding-left: 5px;
+    padding-right: 5px;
+
+  // this should solve some input/footer overlap issues on prefs form 
+  //z-index: 1000;
 }
 
 ul {
@@ -50,12 +65,12 @@ ul[role=tablist] {
   height: 80vh;
 }
 
-.navbar-header {
-  height: $nav_height;
-}
-.navbar-header.sticky-top {
-  background-color: white;
-}
+// .navbar-header {
+//   height: $nav_height;
+// }
+// .navbar-header.sticky-top {
+//   background-color: white;
+// }
 
 button {
   cursor: pointer;
@@ -105,10 +120,6 @@ iframe.preview {
   width: 80%;
 }
 
-input[type=range] {
-  width: 100%;
-}
-
 input[type=radio], div.body > a {
   margin: 4px;
 }
@@ -130,9 +141,12 @@ fieldset {
   padding: 5px;
 }
 
-// hide slider options for non-sliders
-form.option-text .only-for-slider {
-  display: none;
+
+form.input {
+    margin-bottom: 10px;
+}
+form.input input[type=text], input[type=range] {
+    width: 100%;
 }
 
 .padded-top {
@@ -206,6 +220,10 @@ p.description {
   background: white;
 }
 
+#prefs-form h1 {
+    font-size: 2.0rem;
+}
+
 .prefs-wrapper {
   padding-left: 5px;
 }
@@ -232,4 +250,7 @@ form.entry {
 label.for-option {
     font-weight: bold;
     width: 250px;
+}
+.saver-detail > * {
+    margin-bottom: 10px;
 }

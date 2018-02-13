@@ -17,7 +17,7 @@
               </div>
               
               <!-- right pane -->
-              <div class="col-sm-6 col-md-6">
+              <div class="col-sm-6 col-md-6 saver-detail">
                 <template v-if="isLoaded">
                   <saver-summary :saver="saverObj"></saver-summary>
                   <saver-preview

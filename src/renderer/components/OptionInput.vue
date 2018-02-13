@@ -1,7 +1,7 @@
 <template>
-  <div id="wrapper">
-    <form v-on="$listeners">
-      <label class="for-option">{{option.description}}</label>
+  <div class="wrapper">
+    <form class="input" v-on="$listeners">
+      <label class="for-option">{{option.name}}: {{option.description}}</label>
       <input
         :type="renderType"
         :name="option.name"

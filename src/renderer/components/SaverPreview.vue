@@ -1,7 +1,7 @@
 <template>
-<div>
+  <div>
     <iframe class="preview" :src="previewUrl" scrolling="no" />
-</div>
+  </div>
 </template>
 
 <script>
