@@ -32,7 +32,7 @@ module.exports = function Package(_attrs) {
     _attrs.log = console.log;
   }
 
-  this.log = _attrs.log;
+  this.logger = _attrs.log;
   
   this.defaultHeaders = {
     "User-Agent": "Before Dawn"
@@ -54,7 +54,7 @@ module.exports = function Package(_attrs) {
       headers: this.defaultHeaders
     }).catch(function(err) {
 
-      self.log(err);
+      self.logger(err);
 
       if ( typeof(self.data) !== "undefined" ) {
         return self.data;
@@ -94,7 +94,7 @@ module.exports = function Package(_attrs) {
       this.zipToSavers(zipSrc, cb);
     }
     else {
-      //console.log("we're good!");
+      self.logger("Local release is up to date");
       cb(self.attrs());
     }
   };
@@ -111,7 +111,7 @@ module.exports = function Package(_attrs) {
     };
 
     request(opts).on("error", function(err) {
-      console.log(err);
+      this.logger(err);
       cb(err);
     }).on("response", function(r) {
       _resp = r;
@@ -128,11 +128,11 @@ module.exports = function Package(_attrs) {
     // clean out existing files
     //
     try {
-      //console.log("remove stuff from " + self.dest);
+      this.logger("remove stuff from " + self.dest);
       rimraf.sync(self.dest);
     }
     catch (err) {
-      console.error(err);
+      this.logger(err);
     }
 
     yauzl.open(tempName, {lazyEntries: true}, function(err, zipfile) {
