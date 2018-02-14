@@ -300,6 +300,31 @@ var forceWindowClose = function(w) {
   }
 };
 
+
+/**
+ * get the BrowserWindow options we'll use to launch
+ * on the given screen.
+ */
+var getWindowOpts = function(s) {
+  var opts = {
+    backgroundColor: "#000000",
+    autoHideMenuBar: true,
+    alwaysOnTop: true,
+    x: s.bounds.x,
+    y: s.bounds.y,
+    show: false
+  };
+
+  // osx will display window immediately if fullscreen is true
+  // so we default it to false there
+  if (process.platform !== "darwin") {
+    opts.fullscreen = true;
+  }
+
+  return opts;
+
+};
+
 /**
  * run the specified screensaver on the specified screen
  */
@@ -311,25 +336,11 @@ var runScreenSaverOnDisplay = function(saver, s) {
     platform: process.platform
   };
   
-  var windowOpts = {
-    backgroundColor: "#000000",
-    autoHideMenuBar: true,
-    alwaysOnTop: true,
-    x: s.bounds.x,
-    y: s.bounds.y,
-    show: false,
-//    frame: false
-  };
+  var windowOpts = getWindowOpts(s);
 
   var tickCount;
   var diff;
 
-  
-  // osx will display window immediately if fullscreen is true
-  // so we default it to false there
-  if (process.platform !== "darwin") {
-    windowOpts.fullscreen = true;
-  }
 
   log.info("runScreenSaverOnDisplay", s.id, windowOpts);
 
@@ -380,11 +391,11 @@ var runScreenSaverOnDisplay = function(saver, s) {
       w.once("ready-to-show", () => {
         log.info("ready-to-show", s.id);
         if ( debugMode !== true ) {
-           w.setFullScreen(true);
+          w.setFullScreen(true);
         }
 
         w.show();
-//        w.focus();
+        //        w.focus();
 
         diff = process.hrtime(tickCount);
         log.info(`rendered in ${diff[0] * 1e9 + diff[1]} nanoseconds`);
@@ -426,15 +437,30 @@ var runScreenSaverOnDisplay = function(saver, s) {
   else {
     runSaver();
   }
-
 };
+
+/**
+ * blank out the given screen
+ */
+var blankScreen = function(s) {
+  var windowOpts = getWindowOpts(s);
+  var w = new BrowserWindow(windowOpts);       
+  w.setFullScreen(true);
+
+  log.info("blankScreen", s.id, windowOpts);
+
+  saverWindows.push(w);
+
+  w.show();
+};
+
 
 /**
  * get a list of displays connected to the computer.
  */
 var getDisplays = function() {
   var displays = [];
-  if ( debugMode === true ) {
+  if ( debugMode === true  || global.savers.getRunOnSingleDisplay() === true ) {
     displays = [
       electronScreen.getPrimaryDisplay()
     ];
@@ -446,6 +472,15 @@ var getDisplays = function() {
   return displays;
 };
 
+/**
+ * get a list of the non primary displays connected to the computer
+ */
+var getNonPrimaryDisplays = function() {
+  var primary = electronScreen.getPrimaryDisplay()
+  return electronScreen.getAllDisplays().filter((d) => {
+    return d.id !== primary.id;
+  });
+}
 
 /**
  * manually trigger screensaver by setting state to run
@@ -477,8 +512,6 @@ var runScreenSaver = function() {
   // move cursor so far off screen, it isn't even funny
   robot.moveMouse(30000, 30000);
   
-  // @todo maybe add an option to only run on a single display?
-  
   // limit to a single screen when debugging
   if ( debugMode === true ) {
     if ( typeof(app.dock) !== "undefined" ) {
@@ -493,6 +526,14 @@ var runScreenSaver = function() {
     for ( var i in displays ) {
       runScreenSaverOnDisplay(saver, displays[i]);
     } // for
+
+    // if we're only running on primary display, blank out the other ones
+    if ( debugMode !== true && global.savers.getRunOnSingleDisplay() === true ) {
+      var otherDisplays = getNonPrimaryDisplays();
+      for ( var i in otherDisplays ) {
+        blankScreen(otherDisplays[i]);
+      }
+    }
   }
   catch (e) {
     stateManager.ignoreReset(false);

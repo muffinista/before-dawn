@@ -69,6 +69,18 @@
           </small>
         </div>
         
+
+        <div class="form-check">
+          <label for="lock" class="form-check-label">
+            <input type="checkbox" id="lock" class="form-check-input"
+                   v-model="prefs.run_on_single_display" />
+            Only run on the primary display?
+          </label>
+          <small class="form-text text-muted">
+            If you have multiple displays, only run on the primary one.
+          </small>
+        </div>
+
       </fieldset>
     </form>
 
@@ -80,7 +92,9 @@
           <label for="repo">Github Repo URL:</label>
           <div class="input-group">
             <div class="input-group-addon">github.com/</div>
-            <input type="text" v-model="prefs.sourceRepo" class="form-control" placeholder="muffinista/before-dawn-screensavers" />
+            <input type="text" v-model="prefs.sourceRepo"
+                   class="form-control"
+                   placeholder="muffinista/before-dawn-screensavers" />
           </div>
           <small class="form-text text-muted">
             We will download releases from this repository instead of the default repo if specified.

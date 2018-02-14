@@ -12,8 +12,8 @@ if ( platform === "darwin" ) {
 
   $.framework("Foundation");
   $.framework("Cocoa");
-  $.framework('CoreGraphics')
-  $.framework('CoreFoundation')
+  $.framework("CoreGraphics");
+  $.framework("CoreFoundation");
   
   pool = $.NSAutoreleasePool("alloc")("init");
 

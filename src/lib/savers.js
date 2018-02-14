@@ -382,6 +382,14 @@ var getDisableOnBattery = function() {
   return nconf.get("disable_on_battery") || false;
 };
 
+var setRunOnSingleDisplay = function(x) {
+  setConfig("run_on_single_display", x);
+};
+
+var getRunOnSingleDisplay = function() {
+  return nconf.get("run_on_single_display") || false;
+};
+
 
 /**
  * set options for the specified screensaver
@@ -660,6 +668,7 @@ var getDefaults = function() {
     lock: false,
     disable_on_battery: true,
     auto_start: false,
+    run_on_single_display: false,
     localSource: ""
   };
 };
@@ -691,6 +700,10 @@ exports.setLock = setLock;
 exports.getLock = getLock;
 exports.setDisableOnBattery = setDisableOnBattery;
 exports.getDisableOnBattery = getDisableOnBattery;
+
+exports.getRunOnSingleDisplay = getRunOnSingleDisplay;
+exports.setRunOnSingleDisplay = setRunOnSingleDisplay;
+
 exports.getOptions = getOptions;
 exports.listAll = listAll;
 exports.updatePrefs = updatePrefs;
