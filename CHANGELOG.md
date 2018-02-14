@@ -1,5 +1,23 @@
 # Change Log
 
+## [v0.9.21](https://github.com/muffinista/before-dawn/tree/v0.9.21) (2018-01-07)
+
+- Add preferences option to run on a single display -- this helps keep
+  CPU load down
+- Add a 'yes/no' boolean option for screensavers -- this can be used
+  to add boolean fields for screensavers.
+- Minor updates to styles -- I'm working on cleaning up the app styles
+  and CSS
+- Keep app running if user quits the main window
+- Activate asar for builds -- this should make downloads smaller and
+  maybe help a bit with performance.
+- Cleanup logging output and the code used to setup auto launching
+- Update electron version
+
+
+## [v0.9.20](https://github.com/muffinista/before-dawn/tree/v0.9.20) (2018-01-07)
+- Fix some issues with proper release checking -- it was broken before
+
 ## [v0.9.19](https://github.com/muffinista/before-dawn/tree/v0.9.19) (2018-01-06)
 - Fix issue with missing version data
 
