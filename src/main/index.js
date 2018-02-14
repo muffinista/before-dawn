@@ -701,7 +701,8 @@ var bootApp = function() {
       
       releaseChecker.setFeed(global.RELEASE_CHECK_URL);
       releaseChecker.setLogger(log.info);
-      releaseChecker.onUpdate(() => {
+      releaseChecker.onUpdate((x) => {
+        console.log(x);
         global.NEW_RELEASE_AVAILABLE = true;
         log.info("new release");
         trayMenu.items[3].visible = global.NEW_RELEASE_AVAILABLE;
@@ -1218,20 +1219,31 @@ ipcMain.on("set-autostart", (event, value) => {
   });
 
   if ( value === true ) {
-    // then(function(x) { }).
-    appLauncher.enable().then((err) =>{
-      log.info("ERR", err);
-    }).catch((err) => {
-      log.info("appLauncher enable failed", err);
+    appLauncher.isEnabled().then((isEnabled) => {
+      if ( isEnabled ) {
+        return;
+      }
+      
+      appLauncher.enable().
+                  then((err) =>{
+                    log.info("appLauncher enable", err);
+                  }).catch((err) => {
+                    log.info("appLauncher enable failed", err);
+                  });
     });
   }
   else {
     log.info("set auto start == false");
-    appLauncher.disable().
-                then(function(x) { }).
-                catch((err) => {
-                  log.info("appLauncher enable failed", err);
-                });
+    appLauncher.isEnabled().then((isEnabled) => {
+      if ( !isEnabled ) {
+        return;
+      }
+      appLauncher.disable().
+                  then(function(x) { }).
+                  catch((err) => {
+                    log.info("appLauncher disable failed", err);
+                  });
+    });
   }
 
 
@@ -1262,7 +1274,6 @@ app.on("before-quit", function(e) {
 });
 app.on("will-quit", function(e) {
   log.info("will-quit");
-  log.info("quit", exitOnQuit);
   if ( testMode !== true && global.IS_DEV !== true && exitOnQuit !== true ) {
     console.log("don't quit yet!");
     e.preventDefault();
