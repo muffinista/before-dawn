@@ -83,8 +83,8 @@
     to-fast-properties "^2.0.0"
 
 "@types/node@^8.0.24":
-  version "8.0.47"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.0.47.tgz#968e596f91acd59069054558a00708c445ca30c2"
+  version "8.9.4"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.9.4.tgz#dfd327582a06c114eb6e0441fa3d6fab35edad48"
 
 abbrev@1:
   version "1.1.1"

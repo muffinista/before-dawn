@@ -145,7 +145,7 @@
       "target": "nsis",
       "icon": "build/icon.ico"
     },
-    "asar": false,
+    "asar": true,
     "dmg": {
       "contents": [
         {
