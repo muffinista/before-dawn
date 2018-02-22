@@ -577,10 +577,14 @@ var updatePrefs = function(data, cb) {
       nconf.set(k, v);
     }
   }
-  
-  write(() => {
-    setupPackages(cb);
-  });
+
+  // just write our data out -- setupPackages will
+  // be called from the UI separately and we don't
+  // want it to be called twice
+  write(cb);
+  //  write(() => {
+  //    setupPackages(cb);
+  //  });
 };
 
 var write = function(cb) {
