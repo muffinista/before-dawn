@@ -1,7 +1,7 @@
 {
   "name": "before-dawn",
   "productName": "Before Dawn",
-  "version": "0.9.21",
+  "version": "0.9.22",
   "description": "A desktop screensaver app using web technologies",
   "author": "Colin Mitchell <colin@muffinlabs.com> (http://muffinlabs.com)",
   "license": "MIT",
@@ -48,9 +48,7 @@
     "yauzl": "^2.9.1"
   },
   "#depnotes": [
-    "nodobjc is optional because it won't compile on windows, but is needed on OSX.",
-    "however, ref is a dependency of nodobjc that won't be rebuilt by electron-rebuild",
-    "unless specified as a dep so that's why it is in the rebuild command."
+    "nodobjc is optional because it won't compile on windows, but is needed on OSX."
   ],
   "optionalDependencies": {
     "nodobjc": "^2.1.0",
