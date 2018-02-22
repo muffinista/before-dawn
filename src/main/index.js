@@ -21,7 +21,7 @@ const app = electron.app;  // Module to control application life.
 const BrowserWindow = electron.BrowserWindow;  // Module to create native browser window.
 const Menu = electron.Menu;
 const Tray = electron.Tray;
-const {ipcMain} = require("electron");
+const {ipcMain, crashReporter} = require("electron");
 
 const _ = require("lodash");
 const fs = require("fs");
@@ -1073,6 +1073,12 @@ if ( typeof(global.RAVEN_PRIVATE_URL) !== "undefined" ) {
   log.info("Setup sentry logging with " + global.RAVEN_PRIVATE_URL);
   Raven.config(global.RAVEN_PRIVATE_URL, global.RAVEN_OPTIONS).install();
 }
+
+
+if ( typeof(global.CRASH_REPORTER) !== "undefined" ) {
+  crashReporter.start(global.CRASH_REPORTER);
+}
+  
 
 
 log.info("Hello from version: " + global.APP_VERSION_BASE);

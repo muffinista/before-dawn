@@ -33,7 +33,8 @@ global.CONFIG_DEFAULTS = {
   delay: 15,
   sleep: 15,
   auto_start: false,
-  sourceRepo: global.SAVER_REPO
+  sourceRepo: global.SAVER_REPO,
+  run_on_single_display: true
 };
 
 
@@ -55,4 +56,21 @@ if ( process.env.TEST_MODE === undefined && ! global.IS_DEV ) {
       version: global.APP_VERSION
     }
   };
+
+  /**
+  const minidumpEndpoint = `${proto}://${site}/api/${project}/minidump?sentry_key=${key}`;
+
+  
+  global.CRASH_REPORTER = {
+    productName: global.APP_NAME,
+    companyName: global.APP_NAME,
+    submitURL: "",
+    uploadToServer: true,
+    extra: {
+      'sentry[release]': version,
+      'sentry[environment]': 'production',
+      'sentry[arch]']: os.platform(),
+      'sentry[platform_release]']: os.release()
+    }
+  }*/
 }
