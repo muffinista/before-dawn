@@ -1,6 +1,12 @@
 # Change Log
 
-## [v0.9.21](https://github.com/muffinista/before-dawn/tree/v0.9.21) (2018-01-07)
+
+## [v0.9.22](https://github.com/muffinista/before-dawn/tree/v0.9.22) (2018-02-22)
+
+- Fix issue where screensaver package would be downloaded twice at the
+  same time, which is definitely a bad thing.
+
+## [v0.9.21](https://github.com/muffinista/before-dawn/tree/v0.9.21) (2018-02-19)
 
 - Add preferences option to run on a single display -- this helps keep
   CPU load down
