@@ -111,7 +111,6 @@ module.exports = function Package(_attrs) {
     };
 
     request(opts).on("error", function(err) {
-      this.logger(err);
       cb(err);
     }).on("response", function(r) {
       _resp = r;
@@ -128,7 +127,6 @@ module.exports = function Package(_attrs) {
     // clean out existing files
     //
     try {
-      this.logger("remove stuff from " + self.dest);
       rimraf.sync(self.dest);
     }
     catch (err) {

@@ -1,6 +1,10 @@
 # Change Log
 
 
+## [v0.9.23](https://github.com/muffinista/before-dawn/tree/v0.9.23) (2018-02-23)
+
+- Fix logging issue
+
 ## [v0.9.22](https://github.com/muffinista/before-dawn/tree/v0.9.22) (2018-02-22)
 
 - Fix issue where screensaver package would be downloaded twice at the
