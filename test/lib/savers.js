@@ -1,15 +1,23 @@
 'use strict';
 
 const assert = require('assert');
+const sinon = require('sinon');
+
 const Saver = require('../../src/lib/savers.js');
+const Package = require('../../src/lib/package.js');
+var savers = require('../../src/lib/savers.js');
+
 const _ = require('lodash');
 const tmp = require('tmp');
 const rimraf = require('rimraf');
 const fs = require('fs-extra');
 const path = require('path');
 
-describe('Savers', function() {
-  var savers = require('../../src/lib/savers.js');
+var attrs;
+var sandbox;
+
+
+describe('Savers', function() { 
   var configData;
 
   var getTempDir = function() {
@@ -32,9 +40,13 @@ describe('Savers', function() {
   var saversDir;
   var systemDir;
   var saverJSONFile;
+  var fakePackage;
+  var zipPath;
   
   beforeEach(function() {
     var testSaverDir;
+
+    sandbox = sinon.sandbox.create();
 
     // this will be the working directory of the app
     workingDir = getTempDir();
@@ -51,18 +63,30 @@ describe('Savers', function() {
 
     addSaver(systemDir, 'random-saver');
     addSaver(systemDir, '__template');    
+
+
+    attrs = {
+      repo: "muffinista/before-dawn-screensavers",
+      dest:workingDir
+    }
+
+    zipPath = path.join(__dirname, "..", "fixtures", "test-savers.zip");
+    
+    fakePackage = new Package(attrs);
   });
 
   afterEach(function() {
     if ( fs.existsSync(workingDir) ) {
       rimraf.sync(workingDir);
     }
+    sandbox.restore();
   });
-  
+
 	describe('initialization', function() {
     it('sets firstLoad', function(done) {
-      savers.init(workingDir, function() {
+      savers.init(workingDir).then((fl) => {
         assert(savers.firstLoad());
+        assert(fl);
         done();
       });
     });
@@ -74,14 +98,52 @@ describe('Savers', function() {
         path.join(badWorkingDir, 'config.json')
       );
 
-      savers.init(badWorkingDir, function() {
+      savers.init(badWorkingDir).then(() => {
         assert(savers.firstLoad());
         done();
       });
     });
   });
 
-	describe('ensureDefaults', function() {
+  describe('updatePackage', function() {
+    it('gets package if stale', (done) => {
+      savers.init(workingDir).then(() => {
+        var oldCheckTime = savers.getUpdateCheckTimestamp();
+        var df = sandbox.stub(fakePackage, 'downloadFile').resolves();
+        var zts = sandbox.stub(fakePackage, 'zipToSavers').resolves({});
+        
+        savers.updatePackage(fakePackage).then((result) => {
+          assert(result.downloaded);
+          assert(savers.getUpdateCheckTimestamp() > oldCheckTime);
+          done();
+        }).catch((err) => {
+          console.log("BOOO", err);
+        });
+      });
+    });
+
+    it('skips download if fresh', (done) => {
+      savers.init(workingDir).then(() => {
+        var now = new Date().getTime();
+        savers.setUpdateCheckTimestamp(now);
+        savers.updatePackage(fakePackage).then((result) => {
+          assert(!result.downloaded);
+          done();
+        });
+      });
+    });
+
+    it('handles package failure', (done) => {
+      savers.init(workingDir).then(() => {
+        var df = sandbox.stub(fakePackage, 'downloadFile').rejects();
+        savers.updatePackage(fakePackage).catch((err) => {
+          done();
+        });
+      });
+    });
+  });
+
+  describe('ensureDefaults', function() {
     it('updates old repo config', function(done) {
       var workingDir = getTempDir();
       fs.copySync(
@@ -89,7 +151,7 @@ describe('Savers', function() {
         path.join(workingDir, 'config.json')
       );
 
-      savers.init(workingDir, function() {
+      savers.init(workingDir).then(() => {
         assert.equal("muffinista/before-dawn-screensavers", savers.getSource());
         assert.equal(undefined, savers.getConfigSync().source);
         done();
@@ -128,7 +190,7 @@ describe('Savers', function() {
   
   describe('listAll', function() {
     it('loads data', function(done) {
-      savers.init(workingDir, function() {
+      savers.init(workingDir).then(() => {
         savers.setLocalSource(saversDir);
         savers.listAll(function(data) {
           assert.equal(3, data.length);
@@ -140,7 +202,7 @@ describe('Savers', function() {
 
   describe('applyPreload/getRandomScreensaver', function() {
     it('works for random', function(done) {
-      savers.init(workingDir, function() {
+      savers.init(workingDir).then(() => {
         savers.listAll(function(data) {
           var s = {
             preload:"random"
@@ -153,7 +215,7 @@ describe('Savers', function() {
     });
 
     it('works for non-random', function(done) {
-      savers.init(workingDir, function() {
+      savers.init(workingDir).then(() => {
         savers.listAll(function(data) {
           var s = {
             name:"hello"
@@ -168,7 +230,7 @@ describe('Savers', function() {
 
   describe('getConfig', function() {
     it('returns object', function(done) {
-      savers.init(workingDir, function() {
+      savers.init(workingDir).then(() => {
         savers.setLocalSource(saversDir);
         savers.write(function() {
           savers.getConfig(function(data) {
@@ -185,7 +247,7 @@ describe('Savers', function() {
 
       // this should be the path to our __template in the main app
       var src = path.join(__dirname, "..", "..", "src", "main", "__template");
-      savers.init(workingDir, function() {
+      savers.init(workingDir).then(() => {
         savers.setLocalSource(saversDir);
         savers.generateScreensaver(src,
                                    {
@@ -200,7 +262,7 @@ describe('Savers', function() {
     });
 
     it('throws exception', function(done) {
-      savers.init(workingDir, function() {
+      savers.init(workingDir).then(() => {
         assert.throws(
           () => {
             savers.generateScreensaver({
@@ -216,7 +278,7 @@ describe('Savers', function() {
 
   describe('getByKey', function() {
     it("returns saver", function(done) {
-      savers.init(workingDir, function() {
+      savers.init(workingDir).then(() => {
         savers.setLocalSource(saversDir);
         savers.listAll(function(data) {
           var key = data[2].key;
@@ -230,14 +292,14 @@ describe('Savers', function() {
 
   describe('setCurrent', function() {
     it("sets a key", function(done) {
-      savers.init(workingDir, function() {
+      savers.init(workingDir).then(() => {
         savers.setLocalSource(saversDir);
         savers.listAll(function(data) {
           var key = data[2].key;
           savers.setCurrent(key);
           assert.equal(key, savers.getCurrent());
           savers.write(function() {
-            savers.reload(function() {
+            savers.reload().then(() => {
               assert.equal(key, savers.getCurrent());
               done();
             });
@@ -249,7 +311,7 @@ describe('Savers', function() {
 
   describe('getSource/setSource', function() {
     it("works", function(done) {
-      savers.init(workingDir, function() {
+      savers.init(workingDir).then(() => {
         savers.setSource("foo");
         assert.deepEqual("foo", savers.getSource());
         done();
@@ -259,7 +321,7 @@ describe('Savers', function() {
   
   describe('getCurrent/setCurrent', function() {
     it("works", function(done) {
-      savers.init(workingDir, function() {
+      savers.init(workingDir).then(() => {
         savers.setCurrent("foo");
         assert.equal("foo", savers.getCurrent());
         done();
@@ -267,7 +329,7 @@ describe('Savers', function() {
     });
 
     it("also applies options", function(done) {
-      savers.init(workingDir, function() {
+      savers.init(workingDir).then(() => {
         savers.setCurrent("foo", {bar: "baz"});
         assert.equal("foo", savers.getCurrent());
         assert.deepEqual({bar:"baz"}, savers.getOptions("foo"));
@@ -278,7 +340,7 @@ describe('Savers', function() {
 
   describe('getOptions/setOptions', function() {
     it("works", function(done) {
-      savers.init(workingDir, function() {
+      savers.init(workingDir).then(() => {
         savers.setOptions({bar: "baz"}, "foo");
         assert.deepEqual({bar:"baz"}, savers.getOptions("foo"));
         done();
@@ -286,7 +348,7 @@ describe('Savers', function() {
     });
 
     it("updates default", function(done) {
-      savers.init(workingDir, function() {
+      savers.init(workingDir).then(() => {
         savers.setOptions({bar: "baz"});
         assert.deepEqual({bar:"baz"}, savers.getOptions());
         done();
@@ -296,7 +358,7 @@ describe('Savers', function() {
   
   describe('getDelay/setDelay', function() {
     it("works", function(done) {
-      savers.init(workingDir, function() {
+      savers.init(workingDir).then(() => {
         savers.setDelay(420);
         assert.equal(420, savers.getDelay());
         done();
@@ -304,7 +366,7 @@ describe('Savers', function() {
     });
 
     it("returns a number", function(done) {
-      savers.init(workingDir, function() {
+      savers.init(workingDir).then(() => {
         savers.setDelay("420");
         assert.equal(420, savers.getDelay());
         done();
@@ -314,7 +376,7 @@ describe('Savers', function() {
 
     
     it("defaults", function(done) {
-      savers.init(workingDir, function() {
+      savers.init(workingDir).then(() => {
         assert.equal(15, savers.getDelay());
         done();
       });
@@ -323,7 +385,7 @@ describe('Savers', function() {
   
   describe('getSleep/setSleep', function() {
     it("works", function(done) {
-      savers.init(workingDir, function() {
+      savers.init(workingDir).then(() => {
         savers.setSleep(420);
         assert.equal(420, savers.getSleep());
         done();
@@ -331,7 +393,7 @@ describe('Savers', function() {
     });
 
     it("returns a number", function(done) {
-      savers.init(workingDir, function() {
+      savers.init(workingDir).then(() => {
         savers.setSleep("420");
         assert.equal(420, savers.getSleep());
         done();
@@ -339,7 +401,7 @@ describe('Savers', function() {
     });
 
     it("defaults", function(done) {
-      savers.init(workingDir, function() {
+      savers.init(workingDir).then(() => {
         assert.equal(15, savers.getSleep());
         done();
       });
@@ -348,7 +410,7 @@ describe('Savers', function() {
   
   describe('getLock/setLock', function() {
     it("works", function(done) {
-      savers.init(workingDir, function() {
+      savers.init(workingDir).then(() => {
         savers.setLock(true);
         assert.equal(true, savers.getLock());
         done();
@@ -356,7 +418,7 @@ describe('Savers', function() {
     });
 
     it("defaults", function(done) {
-      savers.init(workingDir, function() {
+      savers.init(workingDir).then(() => {
         assert.equal(false, savers.getLock());
         done();
       });
@@ -365,7 +427,7 @@ describe('Savers', function() {
   
   describe('getDisableOnBattery/setDisableOnBattery', function() {
     it("works", function(done) {
-      savers.init(workingDir, function() {
+      savers.init(workingDir).then(() => {
         savers.setDisableOnBattery(true);
         assert.equal(true, savers.getDisableOnBattery());
         done();
@@ -373,7 +435,7 @@ describe('Savers', function() {
     });
 
     it("defaults", function(done) {
-      savers.init(workingDir, function() {
+      savers.init(workingDir).then(() => {
         assert.equal(false, savers.getDisableOnBattery());
         done();
       });
@@ -382,7 +444,7 @@ describe('Savers', function() {
 
   describe('getCurrent/setCurrent', function() {
     it("works", function(done) {
-      savers.init(workingDir, function() {
+      savers.init(workingDir).then(() => {
         done();
       });
     });
@@ -390,7 +452,7 @@ describe('Savers', function() {
 
   describe('getCurrent/setCurrent', function() {
     it("works", function(done) {
-      savers.init(workingDir, function() {
+      savers.init(workingDir).then(() => {
         done();
       });
     });

@@ -8,6 +8,7 @@ const mkdirp = require("mkdirp");
 const rimraf = require("rimraf");
 
 const Saver = require("./saver.js");
+const Package = require("./package.js");
 
 // wait for awhile before checking for a new package
 const PACKAGE_WAIT_TIME = 60 * 60 * 1000;
@@ -20,7 +21,7 @@ var loadedScreensavers = [];
 var logger;
 var _firstLoad = false;
 
-var init = function(opts, cb) {
+var init = function(opts) {
   if ( typeof(opts) === "string" ) {
     opts = {
       base: opts
@@ -41,60 +42,79 @@ var init = function(opts, cb) {
   else {
     logger = function() {};
   }
-  
-  reload(cb);
+
+  return setupFiles();
 };
+
+var setupFiles = function() {
+  return new Promise(function (resolve, reject) {
+    var configPath = path.join(baseDir, config_file);
+    var saversDir = defaultSaversDir();
+    var results = {
+      first: false,
+      setup: false
+    };
+    
+    // check for/create our main directory
+    // and our savers directory (which is a subdir
+    // of the main dir)
+    mkdirp(saversDir, function(err, made) {
+      if ( err ) {
+        return reject(err);
+      }
+
+      if ( made === true || ! fs.existsSync(configPath) ) {
+        _firstLoad = true;
+        results.first = true;
+      }
+
+      try {
+        nconf.remove("file").file({
+          file: configPath
+        });
+      }
+      catch(e) {
+        fs.unlinkSync(configPath);
+        nconf.remove("file").file({
+          file: configPath
+        });
+      }   
+
+      ensureDefaults();
+      
+      if ( _firstLoad === true ) {
+        writeSync();
+      }
+      else if ( typeof(load_savers) === "undefined" || load_savers === true ) {
+        results.setup = true;
+      }
+
+      resolve(results);
+    });
+  });
+};
+
+var handlePackageChecks = function(opts) {
+  var first = opts.first;
+  var setup = opts.setup;
+  
+  if ( first || setup ) {
+    logger("need to setup packages");
+    return setupPackages();
+  }
+  return Promise.resolve();
+}
 
 /**
  * reload all our data/config/etc
  */
-var reload = function(cb, load_savers) {
+var reload = function(load_savers) {
   var configPath = path.join(baseDir, config_file);
   var saversDir = defaultSaversDir();
 
-  if ( typeof(cb) === "undefined" ) {
-    cb = console.log;
-  }
-
   logger("savers.reload");
-  
-  // check for/create our main directory
-  // and our savers directory (which is a subdir
-  // of the main dir)
-  mkdirp(saversDir, function(err, made) {
-    if ( made === true || ! fs.existsSync(configPath) ) {
-      _firstLoad = true;
-    }
 
-    try {
-      nconf.remove("file").file({
-        file: configPath
-      });
-    }
-    catch(e) {
-      fs.unlinkSync(configPath);
-      nconf.remove("file").file({
-        file: configPath
-      });
-    }   
-
-    ensureDefaults();
-
-    if ( _firstLoad === true ) {
-      logger("savers.reload -- firstLoad!");
-      writeSync();
-      setupPackages(() => {
-        cb();
-        _firstLoad = false;
-      });
-    }
-    else if ( typeof(load_savers) === "undefined" || load_savers === true ) {
-      setupPackages(cb);
-    }
-    else {
-      cb();
-    }
-  });
+  return setupFiles().then(handlePackageChecks);  
 };
 
 var reset = function() {
@@ -104,23 +124,27 @@ var reset = function() {
 /**
  * reload all our data/config/etc
  */
-var setupPackages = function(cb) {
-  updatePackage(function(data) {
-    if ( data.downloaded === true ) {
-      setConfig("sourceUpdatedAt", data.updated_at);
-    }
-
-    listAll(function(data) {
-      var current = nconf.get("saver");
-      if (
-        ( current === undefined || getCurrentData() === undefined ) && 
-        data.length > 0
-      ) {
-        setConfig("saver", data[0].key);
-        writeSync();
+var setupPackages = function() {
+  return new Promise((resolve, reject) => {
+    updatePackage().then((data) => {
+      _firstLoad = false;
+      
+      if ( data.downloaded === true ) {
+        setConfig("sourceUpdatedAt", data.updated_at);
       }
 
-      cb();
+      listAll(function(data) {
+        var current = nconf.get("saver");
+        if (
+          ( current === undefined || getCurrentData() === undefined ) && 
+          data.length > 0
+        ) {
+          setConfig("saver", data[0].key);
+          writeSync();
+        }
+        
+        resolve();
+      });
     });
   });
 };
@@ -151,34 +175,37 @@ var defaultSaversDir = function() {
   return path.join(baseDir, "savers");
 };
 
-var updatePackage = function(cb) {
+var getPackage = function() {
   var source = getSource();
   var sourceUpdatedAt = getSourceUpdatedAt();
+  return new Package({
+    repo:source,
+    updated_at:sourceUpdatedAt,
+    dest:defaultSaversDir()
+  });
+};
 
+var updatePackage = function(p) {
   var lastCheckAt = getUpdateCheckTimestamp();
   var now = new Date().getTime();
-
   var diff = now - lastCheckAt;
 
+  if ( p === undefined ) {
+    p = getPackage();
+  }
+  
   // don't bother checking if there's no source repo specified,
   // or if we've pinged it recently
-  if ( typeof(source) === "undefined" || source === "" || diff < PACKAGE_WAIT_TIME ) {
-    cb({downloaded: false});
+  if ( typeof(p.repo) === "undefined" || p.repo === "" || diff < PACKAGE_WAIT_TIME ) {
+    return Promise.resolve({downloaded: false});
   }
-  else {   
-    var Package = require("./package.js");
-    var p = new Package({
-      repo:source,
-      updated_at:sourceUpdatedAt,
-      dest:defaultSaversDir()
-    });
-
+  else {
     setUpdateCheckTimestamp(now);
-
+    
     // @todo handle local check here
-
-    logger("check package: " + source);
-    p.checkLatestRelease(cb);
+    
+    logger("check package: " + p.repo);
+    return p.checkLatestRelease();
   }
 };
 
@@ -582,9 +609,6 @@ var updatePrefs = function(data, cb) {
   // be called from the UI separately and we don't
   // want it to be called twice
   write(cb);
-  //  write(() => {
-  //    setupPackages(cb);
-  //  });
 };
 
 var write = function(cb) {
@@ -717,3 +741,9 @@ exports.getConfig = getConfig;
 exports.getConfigSync = getConfigSync;
 exports.generateScreensaver = generateScreensaver;
 exports.getDefaults = getDefaults;
+
+exports.getPackage = getPackage;
+exports.updatePackage = updatePackage;
+exports.setupPackages = setupPackages;
+exports.setUpdateCheckTimestamp = setUpdateCheckTimestamp;
+exports.getUpdateCheckTimestamp = getUpdateCheckTimestamp;

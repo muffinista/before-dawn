@@ -3,6 +3,7 @@
 var fs = require("fs");
 var path = require("path");
 var request = require("request-promise-native");
+const request_streaming = require("request");
 var yauzl = require("yauzl");
 var mkdirp = require("mkdirp");
 const util = require("util");
@@ -71,35 +72,55 @@ module.exports = function Package(_attrs) {
     this.data = d;
   };
   
-  this.checkLatestRelease = async function(cb) {
+  this.checkLatestRelease = async function(force) {
     let data = await this.getReleaseInfo();
-    if ( data && data.published_at && new Date(data.published_at) > new Date(self.updated_at) ) {
-      this.downloadFile(data.zipball_url, function() {
-        self.updated_at = data.published_at;
-        cb(self.attrs());
-      });
-    }
-    else {
-      cb(self.attrs());
-    }
+    return new Promise((resolve, reject) => {
+      if ( data && (
+        force === true ||
+        data.published_at && new Date(data.published_at) > new Date(self.updated_at) )
+      ) {
+        console.log("download", data);
+        this.downloadFile(data.zipball_url).
+             then((dest) => {
+               self.zipToSavers(dest)
+             }).
+             then(() => {
+               self.downloaded = true;
+               self.updated_at = data.published_at;
+               resolve(self.attrs());
+             }).catch((err) => {
+               self.logger("downloadFile error: " + err);
+               reject(err);
+             });
+      }
+      else {
+        resolve(self.attrs());
+      }
+    });
   };
   
-  this.checkLocalRelease = async function(dataSrc, zipSrc, cb) {
+  this.checkLocalRelease = async function(dataSrc, zipSrc) {
     let rf = util.promisify(fs.readFile);
     let data = await rf(dataSrc);
     data = JSON.parse(data);
 
-    if ( new Date(data.published_at) > (self.updated_at) ) {
-      self.updated_at = data.published_at;
-      this.zipToSavers(zipSrc, cb);
-    }
-    else {
-      self.logger("Local release is up to date");
-      cb(self.attrs());
-    }
+    return new Promise((resolve, reject) => {
+      if ( new Date(data.published_at) > (self.updated_at) ) {
+        self.updated_at = data.published_at;
+        this.zipToSavers(zipSrc).then(() => {
+          resolve(self.attrs());
+        }).catch((err) => {
+          self.logger("checkLocalRelease error: " + err);
+          reject(err);
+        })
+      }
+      else {
+        resolve(self.attrs());
+      }
+    });
   };
 
-  this.downloadFile = function(url, cb) {
+  this.downloadFile = async function(url) {
     var temp = require("temp");
     var os = require("os");
     var tempName = temp.path({dir: os.tmpdir(), suffix: ".zip"});
@@ -110,78 +131,80 @@ module.exports = function Package(_attrs) {
       headers:this.defaultHeaders
     };
 
-    request(opts).on("error", function(err) {
-      cb(err);
-    }).on("response", function(r) {
-      _resp = r;
-    }).on("end", function() {
-      self.downloaded = true;
-      self.zipToSavers(tempName, cb);
-      
-    }).pipe(fs.createWriteStream(tempName));
+    return new Promise((resolve, reject) => {
+      request_streaming(opts).
+                              on("error", reject).
+                              on("end", function() {
+                                resolve(tempName);
+                              }).pipe(fs.createWriteStream(tempName));
+    });
   };
 
 
-  this.zipToSavers = function(tempName, cb) {
-    //
-    // clean out existing files
-    //
-    try {
-      rimraf.sync(self.dest);
-    }
-    catch (err) {
-      this.logger(err);
-    }
-
-    yauzl.open(tempName, {lazyEntries: true}, function(err, zipfile) {
-      if (err) {
-        throw err;
-      }
-
-      zipfile.readEntry();
-      zipfile.on("entry", function(entry) {
-        var fullPath = entry.fileName;
-        
-        // the incoming zip filename will have on extra directory on it
-        // projectName/dir/etc/file
-        //
-        // example: muffinista-before-dawn-screensavers-d388377/starfield/index.html
-        //
-        // let's get rid of the projectName
-        //
-        var parts = fullPath.split(/\//);
-        parts.shift();
-
-        fullPath = path.join(self.dest, path.join(...parts));
-        //console.log(self.dest + " -> " + fullPath);
-        
-        if (/\/$/.test(entry.fileName)) {
-          // directory file names end with '/' 
-          mkdirp(fullPath, function(err) {
-            //if (err) {throw err;}
-            zipfile.readEntry();
-          });
+  this.zipToSavers = (tempName) => {
+    return new Promise(function (resolve, reject) {
+      yauzl.open(tempName, {lazyEntries: true}, (err, zipfile) => {
+        if (err) {
+          return reject(err);
         }
-        else {
-          // file entry 
-          zipfile.openReadStream(entry, function(err, readStream) {
-            if (err) {throw err;}
-            // ensure parent directory exists 
-            mkdirp(path.dirname(fullPath), function(err) {
+
+        //
+        // clean out existing files
+        //
+        try {
+          rimraf.sync(self.dest);
+        }
+        catch (err) {
+          self.logger(err);
+        }
+
+        
+        zipfile.readEntry();
+        zipfile.on("entry", function(entry) {
+          var fullPath = entry.fileName;
+          
+          // the incoming zip filename will have on extra directory on it
+          // projectName/dir/etc/file
+          //
+          // example: muffinista-before-dawn-screensavers-d388377/starfield/index.html
+          //
+          // let's get rid of the projectName
+          //
+          var parts = fullPath.split(/\//);
+          parts.shift();
+          
+          fullPath = path.join(self.dest, path.join(...parts));
+          
+          if (/\/$/.test(entry.fileName)) {
+            // directory file names end with '/' 
+            mkdirp(fullPath, function(err) {
               //if (err) {throw err;}
-              readStream.pipe(fs.createWriteStream(fullPath));
-              readStream.on("end", function() {
-                zipfile.readEntry();
+              zipfile.readEntry();
+            });
+          }
+          else {
+            // file entry 
+            zipfile.openReadStream(entry, function(err, readStream) {
+              if (err) {
+                return reject(err);
+              }
+              
+              // ensure parent directory exists 
+              mkdirp(path.dirname(fullPath), function(err) {
+                //if (err) {throw err;}
+                readStream.pipe(fs.createWriteStream(fullPath));
+                readStream.on("end", function() {
+                  zipfile.readEntry();
+                });
               });
             });
-          });
-        }
+          }
+        });
+        
+        zipfile.on("end", function() {
+          resolve(self.attrs());
+        });
       });
-
-      zipfile.on("end", function() {       
-        cb(self.attrs());
-      });
-
     });
   }
 };

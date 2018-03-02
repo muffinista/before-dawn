@@ -168,7 +168,7 @@ var openPrefsWindow = function() {
   grabScreen(primary, function(message) {
     // call savers.reload to make sure our data is properly refreshed
     // and check for any system updates
-    global.savers.reload(function() {
+    global.savers.reload().then(() => {
       var prefsUrl = urlPrefix + "/prefs.html";
            
       prefsWindowHandle = new BrowserWindow({
@@ -705,14 +705,16 @@ var bootApp = function() {
   };
   
   log.info("Load config with", saverOpts);
-  global.savers.init(saverOpts, function() {
+  global.savers.init(saverOpts).then(
+    global.savers.handlePackageChecks
+  ).then(() => {
     configLoaded = true;
     updateStateManager();
-
+    
     appIcon = new Tray(icons.active);
     appIcon.setToolTip(global.APP_NAME);
     appIcon.setContextMenu(trayMenu); 
-
+    
     // show tray menu on right click
     // @todo should this be osx only?
     appIcon.on("right-click", () => {
@@ -720,7 +722,7 @@ var bootApp = function() {
     });
     
     appReady = true;
-        
+    
     if ( testMode === true ) {
       openTestShim();
     }
@@ -743,14 +745,11 @@ var bootApp = function() {
       releaseChecker.setFeed(global.RELEASE_CHECK_URL);
       releaseChecker.setLogger(log.info);
       releaseChecker.onUpdate((x) => {
-        console.log(x);
         global.NEW_RELEASE_AVAILABLE = true;
-        log.info("new release");
         trayMenu.items[3].visible = global.NEW_RELEASE_AVAILABLE;
       });
       releaseChecker.onNoUpdate(() => {
         global.NEW_RELEASE_AVAILABLE = false;
-        log.info("no new release");
         trayMenu.items[3].visible = global.NEW_RELEASE_AVAILABLE;
       });
 
@@ -1192,7 +1191,7 @@ trayMenu = Menu.buildFromTemplate([
 ipcMain.on("savers-updated", (event, arg) => {
   global.savers.reset();  
   if ( prefsWindowHandle !== null ) {
-    global.savers.reload(function() {
+    global.savers.reload().then(() => {
       prefsWindowHandle.send("savers-updated", arg);
     });
   }
@@ -1204,7 +1203,7 @@ ipcMain.on("savers-updated", (event, arg) => {
 ipcMain.on("prefs-updated", (event, arg) => {
   log.info("prefs-updated");
   global.savers.reset();
-  global.savers.reload(function() {
+  global.savers.reload().then(() => {
     updateStateManager();
   });
 });
@@ -1305,7 +1304,7 @@ ipcMain.on("generate-screensaver", (event, args) => {
   event.sender.send("generate-screensaver", data);
 
   global.savers.reset();
-  global.savers.reload(function() {
+  global.savers.reload().then(() => {
     if ( prefsWindowHandle !== null ) {
       prefsWindowHandle.send("savers-updated");
     }

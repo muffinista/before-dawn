@@ -10,20 +10,27 @@ const sinon = require('sinon');
 const Package = require('../../src/lib/package.js');
 
 const helpers = require('./setup.js');
-var workingDir = helpers.getTempDir();
-var dataPath = path.join(__dirname, "..", "fixtures", "release.json");
-var zipPath = path.join(__dirname, "..", "fixtures", "test-savers.zip");
 
-var attrs = {
-  repo: "muffinista/before-dawn-screensavers",
-  dest:workingDir
-}
+var attrs;
+
+var workingDir;
+var dataPath;
+var zipPath;
 
 var sandbox;
 
 describe('Package', function() {
   beforeEach(() => {
     sandbox = sinon.sandbox.create();
+
+    workingDir = helpers.getTempDir();
+    dataPath = path.join(__dirname, "..", "fixtures", "release.json");
+    zipPath = path.join(__dirname, "..", "fixtures", "test-savers.zip");
+
+    attrs = {
+      repo: "muffinista/before-dawn-screensavers",
+      dest:workingDir
+    }
   });
   afterEach(function () {
     sandbox.restore();
@@ -85,12 +92,10 @@ describe('Package', function() {
     });
      
     it('calls downloadFile', async () => {
-      var cb = sinon.spy();
-      var df = sandbox.stub(p, 'downloadFile');
+      var df = sandbox.stub(p, 'downloadFile').resolves(zipPath);
 
-      let results = await p.checkLatestRelease(cb);
+      let results = await p.checkLatestRelease();
       assert(df.calledOnce);
-      //assert(cb.called);
     });
 
     it('doesnt call if not needed', async () => {
@@ -103,35 +108,33 @@ describe('Package', function() {
       assert(!df.calledOnce);
     });
   });
-
+   
   describe('checkLocalRelease', () => {
     var p;
-
+    
     beforeEach(() => {
       p = new Package(attrs);
     });
-
+    
     it('calls zipToSavers', async () => {
-      var cb = sinon.spy();
-      var df = sandbox.stub(p, 'zipToSavers');
+      var zts = sandbox.stub(p, 'zipToSavers').resolves({});
+      
+      let results = await p.checkLocalRelease(dataPath, zipPath);
+      assert(zts.calledOnce);
 
-      let results = await p.checkLocalRelease(dataPath, zipPath, cb);
-      assert(df.calledOnce);
+      assert.equal(results.updated_at, '2017-06-06T23:55:44Z');
     });
-
+    
     it('doesnt call if not needed', async () => {
-      var cb = sinon.spy();
-      var df = sandbox.stub(p, 'zipToSavers');
-
+      var zts = sandbox.stub(p, 'zipToSavers');
+      
       p.updated_at = "2017-06-06T23:55:44Z";
       
-      let results = await p.checkLocalRelease(dataPath, zipPath, cb);
-      assert(!df.calledOnce);
+      let results = await p.checkLocalRelease(dataPath, zipPath);
+      assert(!zts.calledOnce);
     });
-
-    it('updates attrs');
   });
-
+   
   describe('zipToSavers', () => {
     var p;
 
@@ -142,12 +145,44 @@ describe('Package', function() {
     });
 
     it('unzips files', (done) => {
-      p.zipToSavers(zipPath, function(attrs) {
+      p.zipToSavers(zipPath).then((attrs) => {
         var testDest = path.resolve(workingDir, "sparks", "index.html");
         assert(fs.existsSync(testDest));
         done();
-      });      
-    });   
+      });
+    });
+
+    it('recovers from errors', (done) => {
+      p.zipToSavers(dataPath).then((attrs) => {}).catch( (err) => {
+        done();
+      });
+    });
+
+    it('keeps files on failure', (done) => {
+      helpers.addSaver(workingDir, "saver-one", "saver.json");
+      
+      var testDest = path.resolve(workingDir, "saver-one", "saver.json");
+      assert(fs.existsSync(testDest));
+      
+      p.zipToSavers(dataPath).catch( (err) => {
+        assert(fs.existsSync(testDest));
+        done();
+      });
+    });
+
+
+    it('removes files that arent needed', (done) => {
+      helpers.addSaver(workingDir, "saver-one", "saver.json");
+      
+      var testDest = path.resolve(workingDir, "saver-one", "saver.json");
+      assert(fs.existsSync(testDest));
+
+
+      p.zipToSavers(zipPath).then((attrs) => {
+        assert(!fs.existsSync(testDest));
+        done();
+      });     
+    });
   });
   
 });
