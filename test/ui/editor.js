@@ -63,12 +63,12 @@ describe('Editor', function() {
            console.log(log);
            })
            }).
-        then(() => app.client.getRenderProcessLogs()).
-        then(function (logs) {
-          logs.forEach(function (log) {
-            console.log(log.message)
-          })
-        }).*/
+           then(() => app.client.getRenderProcessLogs()).
+           then(function (logs) {
+           logs.forEach(function (log) {
+           console.log(log.message)
+           })
+           }).*/
                    
         then(() => {
           var p = new Promise( (resolve, reject) => {

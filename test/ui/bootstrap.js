@@ -29,6 +29,20 @@ describe('bootstrap', function() {
     var source = helpers.savedConfig(workingDir).saver;
     assert(fs.existsSync(source));
     done();
+/*
+    app.client.getMainProcessLogs().
+        then(function (logs) {
+          logs.forEach(function (log) {
+            console.log(log);
+          })
+        }).
+        then(() => app.client.getRenderProcessLogs()).
+        then(function (logs) {
+          logs.forEach(function (log) {
+            console.log(log.message)
+          })
+        }).then(() => {
+        });*/
   });
 });
 

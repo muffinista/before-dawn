@@ -135,7 +135,9 @@ var openTestShim = function() {
   });
 
   // just open an empty window
-  testWindow.loadURL("file:///");  
+  global.savers.reload().then(() => {
+    testWindow.loadURL("file:///");
+  });
 };
 
 /**

@@ -79,7 +79,6 @@ module.exports = function Package(_attrs) {
         force === true ||
         data.published_at && new Date(data.published_at) > new Date(self.updated_at) )
       ) {
-        console.log("download", data);
         this.downloadFile(data.zipball_url).
              then((dest) => {
                self.zipToSavers(dest)

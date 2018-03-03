@@ -54,16 +54,23 @@ var setupFiles = function() {
       first: false,
       setup: false
     };
+
+    logger("saversDir: " + saversDir, fs.existsSync(saversDir));
+    logger("configPath: " + configPath);
     
     // check for/create our main directory
     // and our savers directory (which is a subdir
     // of the main dir)
     mkdirp(saversDir, function(err, made) {
       if ( err ) {
+        logger("err!", err);
         return reject(err);
       }
 
-      if ( made === true || ! fs.existsSync(configPath) ) {
+      // check if we just created the folder,
+      // if there's no config yet,
+      // or if the savers folder was empty
+      if ( made === true || ! fs.existsSync(configPath) || fs.readdirSync(saversDir).length === 0 ) {
         _firstLoad = true;
         results.first = true;
       }
@@ -97,7 +104,8 @@ var setupFiles = function() {
 var handlePackageChecks = function(opts) {
   var first = opts.first;
   var setup = opts.setup;
-  
+
+  logger("handlePackageChecks", opts);
   if ( first || setup ) {
     logger("need to setup packages");
     return setupPackages();
@@ -125,6 +133,7 @@ var reset = function() {
  * reload all our data/config/etc
  */
 var setupPackages = function() {
+  logger("setupPackages");
   return new Promise((resolve, reject) => {
     updatePackage().then((data) => {
       _firstLoad = false;
