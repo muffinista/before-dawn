@@ -26,7 +26,6 @@ const {ipcMain, crashReporter} = require("electron");
 const _ = require("lodash");
 const fs = require("fs");
 const path = require("path");
-const parseArgs = require("minimist");
 
 const screen = require("./screen.js");
 var releaseChecker;
@@ -41,8 +40,7 @@ var Raven;
 // garbage collected and won't show up in the system tray
 let appIcon = null;
 
-let argv = parseArgs(process.argv);
-let debugMode = ( argv.debug === true );
+let debugMode = ( process.env.DEBUG_MODE !== undefined );
 let testMode = ( process.env.TEST_MODE !== undefined );
 
 let saverWindows = [];
@@ -578,7 +576,7 @@ var closeRunningScreensavers = function() {
   log.info("closeRunningScreensavers");
   if ( debugMode !== true ) {
     if ( oldMousePosition.x !== 0 && oldMousePosition.y !== 0 ) {
-      log.info("restore mouse to", oldMousePosition.x, oldMousePosition.y); 
+      //log.info("restore mouse to", oldMousePosition.x, oldMousePosition.y); 
       robot.moveMouse(oldMousePosition.x, oldMousePosition.y);
     }
 
@@ -729,15 +727,6 @@ var bootApp = function() {
       openTestShim();
     }
     else {
-      if ( argv.screen === "prefs" ) {
-        openPrefsWindow();
-      }
-      else if ( argv.screen === "about" ) {
-        openAboutWindow();
-      }
-      else if ( argv.screen === "saver" ) {
-        setStateToRunning();
-      }
       openPrefsOnFirstLoad();
     }
 

@@ -32,7 +32,6 @@
     "fs-extra": "^2.0.0",
     "glob": "^7.1.2",
     "linux-battery": "^3.0.1",
-    "minimist": "^1.2.0",
     "mkdirp": "^0.5.1",
     "nconf": "^0.10.0",
     "node-system-idle-time": "muffinista/node-system-idle-time.git#master",
