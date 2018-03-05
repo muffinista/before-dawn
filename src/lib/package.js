@@ -79,6 +79,7 @@ module.exports = function Package(_attrs) {
         force === true ||
         data.published_at && new Date(data.published_at) > new Date(self.updated_at) )
       ) {
+        self.logger("download package updates!");
         this.downloadFile(data.zipball_url).
              then((dest) => {
                self.zipToSavers(dest)
@@ -93,6 +94,7 @@ module.exports = function Package(_attrs) {
              });
       }
       else {
+        self.logger("no package update available");
         resolve(self.attrs());
       }
     });

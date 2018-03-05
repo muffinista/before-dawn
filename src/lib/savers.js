@@ -46,7 +46,7 @@ var init = function(opts) {
   return setupFiles();
 };
 
-var setupFiles = function() {
+var setupFiles = function(load_savers) {
   return new Promise(function (resolve, reject) {
     var configPath = path.join(baseDir, config_file);
     var saversDir = defaultSaversDir();
@@ -122,7 +122,7 @@ var reload = function(load_savers) {
 
   logger("savers.reload");
 
-  return setupFiles().then(handlePackageChecks);  
+  return setupFiles(load_savers).then(handlePackageChecks);  
 };
 
 var reset = function() {
@@ -202,17 +202,19 @@ var updatePackage = function(p) {
   if ( p === undefined ) {
     p = getPackage();
   }
-  
+
+  logger("lastCheckAt: " + lastCheckAt + " - " + diff + " - " + PACKAGE_WAIT_TIME);
   // don't bother checking if there's no source repo specified,
   // or if we've pinged it recently
   if ( typeof(p.repo) === "undefined" || p.repo === "" || diff < PACKAGE_WAIT_TIME ) {
+    logger("skip package check for now: " + diff);
     return Promise.resolve({downloaded: false});
   }
   else {
     setUpdateCheckTimestamp(now);
-    
+    writeSync();
+
     // @todo handle local check here
-    
     logger("check package: " + p.repo);
     return p.checkLatestRelease();
   }
