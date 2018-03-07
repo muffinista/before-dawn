@@ -1,5 +1,12 @@
 # Change Log
 
+## [v0.9.24](https://github.com/muffinista/before-dawn/tree/v0.9.24) (2018-03-??)
+- Remove lodash from codebase
+- Add environment variable toggle for running in development mode without hot reload
+- Fix issue with updating timestamp of package update checks
+- Remove command-line argument parsing
+- Switch a lot of callback-based code to use promises
+- Attempt to deal with failed download issues
 
 ## [v0.9.23](https://github.com/muffinista/before-dawn/tree/v0.9.23) (2018-02-23)
 
