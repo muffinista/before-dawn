@@ -72,10 +72,9 @@ var icons = {
   }
 };
 
+// set the prefix we'll use for loading UI windows
+var urlPrefix = getUrlPrefix();
 
-const urlPrefix = process.env.NODE_ENV === "development"
-             ? "http://localhost:9080"
-             : "file://" + __dirname
 
 /**
  * open our screen grabber tool and issue a screengrab request
@@ -170,7 +169,8 @@ var openPrefsWindow = function() {
     // and check for any system updates
     global.savers.reload().then(() => {
       var prefsUrl = urlPrefix + "/prefs.html";
-           
+
+      log.info("loading " + prefsUrl);
       prefsWindowHandle = new BrowserWindow({
         width:800,
         height:700,
@@ -207,6 +207,9 @@ var openPrefsWindow = function() {
   });
 };
 
+/**
+ * handle new screensaver event. open the window to create a screensaver
+ */
 var addNewSaver = function(screenshot) {
   var newUrl;
 
@@ -395,17 +398,11 @@ var runScreenSaverOnDisplay = function(saver, s) {
         }
 
         w.show();
-        //        w.focus();
 
         diff = process.hrtime(tickCount);
         log.info(`rendered in ${diff[0] * 1e9 + diff[1]} nanoseconds`);
       });
       
-      // windows is having some issues with putting the window behind existing
-      // stuff -- @see https://github.com/atom/electron/issues/2867
-      // w.minimize();
-      // w.focus();
-
       if ( typeof(message) !== "undefined" ) {
         url_opts.screenshot = encodeURIComponent("file://" + message.url);
       }
@@ -653,6 +650,11 @@ var openPrefsOnFirstLoad = function() {
 };
 
 
+/**
+ * determine what our system directory is. this should basically be
+ * where the app exists, and where the system-savers directory and
+ * other critical files exist.
+ */
 var getSystemDir = function() {
   if ( process.env.BEFORE_DAWN_SYSTEM_DIR !== undefined ) {
     return process.env.BEFORE_DAWN_SYSTEM_DIR;
@@ -664,6 +666,25 @@ var getSystemDir = function() {
 
   return path.join(app.getAppPath(), "output");
 }
+
+/**
+ * return the URL prefix we should use when loading app windows. if
+ * running in development mode with hot reload enabled, we'll use an
+ * HTTP request, otherwise we'll use a file:// url.
+ */
+var getUrlPrefix = function() {
+  if ( process.env.NODE_ENV === "development" ) {
+    if ( ! process.env.DISABLE_RELOAD ) {
+      return "http://localhost:9080";
+    }
+    else {
+      return "file://" + __dirname + "/../../output";
+    }
+  }
+
+  return "file://" + __dirname;
+};
+
 
 
 /**
