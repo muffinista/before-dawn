@@ -3,11 +3,10 @@
 const electron = require("electron");
 var platform = process.platform;
 
-var _, $, pool, winctl;
+var $, pool, winctl;
 
 if ( platform === "darwin" ) {
 
-  _ = require("lodash");
   $ = require("nodobjc");
 
   $.framework("Foundation");
@@ -41,10 +40,9 @@ var methods = {
       "error", error);
     
     var jsonString = $.NSString("alloc")("initWithData", jsonData, "encoding", $.NSUTF8StringEncoding);
-    //console.log(jsonString);
+    var objects = JSON.parse(jsonString);
     
-    var visibleMenubars = _.filter(JSON.parse(jsonString), function(x) {
-      //return x["kCGWindowName"] == "Menubar";
+    var visibleMenubars = objects.filter((x) => {
       return x.kCGWindowName === "Menubar";      
     });
     

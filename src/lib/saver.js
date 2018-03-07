@@ -2,7 +2,6 @@
  * simple class for a screen saver
  */
 
-var _ = require("lodash");
 
 // we will generate a list of requirements that screensavers need
 // to work. for now, it's just a screengrab. to maintain
@@ -84,7 +83,7 @@ module.exports = function Saver(_attrs) {
       o[v[0]] = v[1];
       return o; 
     }, {});
-    this.settings = _.merge({}, this.settings, _attrs.settings);
+    this.settings = Object.assign({}, this.settings, _attrs.settings);
     
     // allow for custom preview URL -- if not specified, just use the default
     // if it is specified, do some checks to see if it's a full URL or a filename
@@ -124,7 +123,7 @@ module.exports = function Saver(_attrs) {
       opts = {};
     }
     
-    opts = _.merge({}, this.settings, opts);
+    opts = Object.assign({}, this.settings, opts);
     
     if ( url.lastIndexOf("?") !== -1 ) {
       joiner = "&";

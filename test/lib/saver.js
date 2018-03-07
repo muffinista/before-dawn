@@ -2,7 +2,6 @@
 
 const assert = require('assert');
 const Saver = require('../../src/lib/saver.js');
-const _ = require('lodash');
 const tmp = require('tmp');
 const path = require('path');
 const fs = require('fs');
@@ -47,7 +46,7 @@ describe('Saver', function() {
       opts = {};
     }
 
-    var vals = _.merge({}, attrs, opts);
+    var vals = Object.assign({}, attrs, opts);
     return new Saver(vals);
   };
   

@@ -9,7 +9,6 @@
 </template>
 
 <script>
-  const _ = require('lodash');
   export default {
     name: 'saver-summary',
     props: ['saver'],

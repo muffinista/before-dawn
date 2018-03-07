@@ -23,7 +23,6 @@ const Menu = electron.Menu;
 const Tray = electron.Tray;
 const {ipcMain, crashReporter} = require("electron");
 
-const _ = require("lodash");
 const fs = require("fs");
 const path = require("path");
 
@@ -73,7 +72,7 @@ var icons = {
 };
 
 // set the prefix we'll use for loading UI windows
-var urlPrefix = getUrlPrefix();
+var urlPrefix;
 
 
 /**
@@ -343,6 +342,7 @@ var runScreenSaverOnDisplay = function(saver, s) {
 
   var tickCount;
   var diff;
+  var reqs;
 
 
   log.info("runScreenSaverOnDisplay", s.id, windowOpts);
@@ -366,7 +366,7 @@ var runScreenSaverOnDisplay = function(saver, s) {
     try {   
       // Emitted when the window is closed.
       w.on("closed", function() {
-        saverWindows = _.filter(saverWindows, function(w2) {
+        saverWindows = saverWindows.filter((w2) => {
           return (w2 !== w);
         });
         log.info("running windows: " + saverWindows.length + " closed: " + s.id);
@@ -428,7 +428,8 @@ var runScreenSaverOnDisplay = function(saver, s) {
   // if this screensaver uses a screengrab, get it. 
   // otherwise just boot it
   //
-  if ( _.findIndex(saver.getRequirements(), function(x) { return x === "screen"; }) > -1 ) {
+  reqs = saver.getRequirements();
+  if ( reqs.findIndex((x) => { return x === "screen"; }) > -1 ) {
     grabScreen(s, runSaver);
   }
   else {
@@ -587,7 +588,7 @@ var closeRunningScreensavers = function() {
  * to close them nicely
  */
 var attemptToStopScreensavers = function() {
-  _.forEach(saverWindows, function(w) {
+  saverWindows.forEach((w) => {
     if ( activeWindowHandle(w) ) {
       w.close();
     }    
@@ -599,7 +600,7 @@ var attemptToStopScreensavers = function() {
  * them forcefully if needed
  */
 var forcefullyCloseScreensavers = function() {
-  _.forEach(saverWindows, function(w) {
+  saverWindows.forEach((w) => {
     if ( activeWindowHandle(w) ) {
       w.destroy();
     }
@@ -1089,7 +1090,6 @@ if ( typeof(global.RAVEN_PRIVATE_URL) !== "undefined" ) {
 if ( typeof(global.CRASH_REPORTER) !== "undefined" ) {
   crashReporter.start(global.CRASH_REPORTER);
 }
-  
 
 
 log.info("Hello from version: " + global.APP_VERSION_BASE);
@@ -1124,6 +1124,10 @@ if ( testMode !== true ) {
     process.exit();
   }
 }
+
+
+urlPrefix = getUrlPrefix();
+
 
 // load some global CSS we'll inject into running screensavers
 globalCSSCode = fs.readFileSync( path.join(__dirname, "assets", "global.css"), "ascii");  

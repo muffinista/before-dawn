@@ -7,7 +7,6 @@ const Saver = require('../../src/lib/savers.js');
 const Package = require('../../src/lib/package.js');
 var savers = require('../../src/lib/savers.js');
 
-const _ = require('lodash');
 const tmp = require('tmp');
 const rimraf = require('rimraf');
 const fs = require('fs-extra');

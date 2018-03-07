@@ -5,7 +5,7 @@
 </template>
 
 <script>
-  const _ = require('lodash');
+  const debounce = require('lodash.debounce');
   export default {
     name: 'saver-preview',
     props: ['screenshot', 'bus', 'saver'],
@@ -39,10 +39,10 @@
         return this.saver !== undefined;
       },
       debounceHandleResize() {
-        return _.debounce(this.handleResize, 200);
+        return debounce(this.handleResize, 200);
       },
       debounceHandleOptionsChange() {
-        return _.debounce(this.handleOptionsChange, 200);
+        return debounce(this.handleOptionsChange, 200);
       },
       previewUrl: {
         get: function() {

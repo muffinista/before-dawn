@@ -3,7 +3,6 @@
 const fs = require("fs-extra");
 const nconf = require("nconf");
 const path = require("path");
-const _ = require("lodash");
 const mkdirp = require("mkdirp");
 const rimraf = require("rimraf");
 
@@ -260,7 +259,7 @@ var firstLoad = function() {
  * look up a screensaver by key, and return it
  */
 var getByKey = function(key) {
-  var result = _.find(loadedScreensavers, function(obj) {
+  var result = loadedScreensavers.find((obj) => {
     return obj.key === key;
   });
   return result;
@@ -276,7 +275,7 @@ var getCurrent = function() {
 var loadCurrent = function(cb) {
   var current = nconf.get("saver");
   listAll(function(data) {
-    var result = _.find(data, function(obj) {
+    var result = data.find((obj) => {
       return obj.key === key;
     });
 
@@ -296,13 +295,12 @@ var getCurrentData = function() {
  * pick a random screensaver
  */
 var getRandomScreensaver = function() {
-  var s = _.sample(
-    _.reject(loadedScreensavers, function(s) {
-      return ( typeof(s.preload) !== "undefined" );
-    })
-  );
+  var tmp = loadedScreensavers.filter((s) => {
+    return ( typeof(s.preload) === "undefined" );
+  });
+  var idx = Math.floor(Math.random() * tmp.length);
 
-  return s;
+  return tmp[idx];
 };
 
 /**
@@ -600,7 +598,7 @@ var listAll = function(cb, force) {
   Promise.all(promises).then(function(data) {
     // remove any undefined screensavers
     data = data.filter(s => s !== undefined);
-    loadedScreensavers = _.sortBy(data, function(s) { return s.name.toLowerCase(); });
+    loadedScreensavers = data.sort((s) => { return s.name.toLowerCase(); });
     cb(loadedScreensavers);
   });
 };
@@ -670,7 +668,7 @@ var generateScreensaver = function(src, opts) {
     throw new Error("No local directory specified!");
   }
 
-  opts = _.merge({}, defaults, opts);
+  opts = Object.assign({}, defaults, opts);
   opts.key = opts.name.toLowerCase().
                   replace(/[^a-z0-9]+/gi, "-").
                   replace(/-$/, "").
@@ -688,7 +686,7 @@ var generateScreensaver = function(src, opts) {
   //
   var configDest = path.join(dest, "saver.json");
   var content = fs.readFileSync( configDest );
-  contents = _.merge({}, JSON.parse(content), opts);
+  contents = Object.assign({}, JSON.parse(content), opts);
 
   fs.writeFileSync(configDest, JSON.stringify(contents, null, 2));
 
