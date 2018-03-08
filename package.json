@@ -1,7 +1,7 @@
 {
   "name": "before-dawn",
   "productName": "Before Dawn",
-  "version": "0.9.23",
+  "version": "0.9.24",
   "description": "A desktop screensaver app using web technologies",
   "author": "Colin Mitchell <colin@muffinlabs.com> (http://muffinlabs.com)",
   "license": "MIT",
@@ -9,6 +9,7 @@
   "main": "output/main.js",
   "scripts": {
     "dev": "node bin/dev-runner.js",
+    "dev-no-reload": "cross-env DISABLE_RELOAD=1 node bin/dev-runner.js",
     "compile": "cross-env NODE_ENV=production webpack --config webpack.config.js",
     "postinstall": "electron-builder install-app-deps",
     "pack": "yarn compile && electron-builder --dir",
