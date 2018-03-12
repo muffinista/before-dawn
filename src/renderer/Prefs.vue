@@ -70,9 +70,9 @@ import SaverOptions from '@/components/SaverOptions';
 import SaverSummary from '@/components/SaverSummary';
 import PrefsForm from '@/components/PrefsForm';
 import Noty from "noty";
-
+  
 const {dialog} = require("electron").remote;
-
+  
 export default {
   name: 'prefs',
   components: {
@@ -181,21 +181,21 @@ export default {
             var tmp = this.manager.getDefaults();
             this.prefs = Object.assign(this.prefs, tmp);
 
-            this.saveData(false);
+            this.saveData(false).then(() => {
+              this.manager.reload(() => {
+                this.getData();
 
-            this.manager.reload(() => {
-              this.getData();
-
-              new Noty({
-                type: "success",
-                layout: "topRight",
-                timeout: 1000,
-                text: "Settings reset!",
-                animation: {
-                  open: null
-                }
-              }).show();
-            });
+                new Noty({
+                  type: "success",
+                  layout: "topRight",
+                  timeout: 1000,
+                  text: "Settings reset!",
+                  animation: {
+                    open: null
+                  }
+                }).show();
+              }); // reload
+            }); // saveData
           }
         }
       );
@@ -233,6 +233,7 @@ export default {
       this.saver = this.manager.getCurrent();
     },
     createNewScreensaver() {
+      this.saveData(false);
       this.ipcRenderer.send("open-add-screensaver", this.screenshot);
     },
     editSaver(s) {
@@ -284,6 +285,9 @@ export default {
         if ( doClose ) {
           this.closeWindow();
         }
+        else {
+          return Promise.resolve();
+        }
       });
     },
     renderUpdateNotice() {
@@ -310,13 +314,6 @@ export default {
       this.prefs = Object.assign(this.prefs, tmp);
     }
   }
-
-
-};
-
-  
+}; 
 </script>
 
-<style>
-  /* CSS */
-</style>
