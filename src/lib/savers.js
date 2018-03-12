@@ -756,3 +756,4 @@ exports.updatePackage = updatePackage;
 exports.setupPackages = setupPackages;
 exports.setUpdateCheckTimestamp = setUpdateCheckTimestamp;
 exports.getUpdateCheckTimestamp = getUpdateCheckTimestamp;
+exports.handlePackageChecks = handlePackageChecks;

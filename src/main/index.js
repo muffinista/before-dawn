@@ -500,6 +500,7 @@ var runScreenSaver = function() {
 
   // make sure we have something to display
   if ( typeof(saver) === "undefined" ) {
+    log.info("No screensaver defined!");
     return;
   }
 
@@ -727,9 +728,9 @@ var bootApp = function() {
   };
   
   log.info("Load config with", saverOpts);
-  global.savers.init(saverOpts).then(
-    global.savers.handlePackageChecks
-  ).then(() => {
+  global.savers.init(saverOpts).then((r) => {
+    global.savers.handlePackageChecks(r);
+  }).then(() => {
     configLoaded = true;
     updateStateManager();
     
