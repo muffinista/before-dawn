@@ -1,6 +1,8 @@
 # Change Log
 
-## [v0.9.24](https://github.com/muffinista/before-dawn/tree/v0.9.24) (2018-03-??)
+## [v0.9.24](https://github.com/muffinista/before-dawn/tree/v0.9.24) (2018-03-15)
+- Save settings when 'create screensaver' button is clicked
+- Fix issue where screensaver data wasn't loading properly
 - Remove lodash from codebase
 - Add environment variable toggle for running in development mode without hot reload
 - Fix issue with updating timestamp of package update checks
