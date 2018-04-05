@@ -1,5 +1,9 @@
 # Change Log
 
+## [v0.9.25](https://github.com/muffinista/before-dawn/tree/v0.9.24) (2018-04-05)
+- Fix some issues with the preview tool, which wasn't properly passing
+  params to the screensaver preview
+
 ## [v0.9.24](https://github.com/muffinista/before-dawn/tree/v0.9.24) (2018-03-15)
 - Save settings when 'create screensaver' button is clicked
 - Fix issue where screensaver data wasn't loading properly
