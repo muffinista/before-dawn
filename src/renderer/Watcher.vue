@@ -99,7 +99,7 @@
   const path = require("path");
   const url = require("url");
   const exec = require("child_process").exec;
-
+  
   import Vue from 'vue';
   import SaverPreview from '@/components/SaverPreview';
   import SaverForm from '@/components/SaverForm';  
@@ -191,11 +191,18 @@ export default {
       var value = e.target.value;
       var result = {};
 
+      //console.log("optionsChange", name, value, e);
+
       // rebuild the option value hash so that if a key is
       // renamed it isn't left behind in the data
       for ( var i = 0; i < this.options.length; i++ ) {
         var opt = this.options[i];
-        result[opt.name] = opt.value;
+        if ( this.optionValues[opt.name]) {
+          result[opt.name] = this.optionValues[opt.name];
+        }
+        else {
+          result[opt.name] = opt.default;
+        }
       }
 
       // add the new name/value
@@ -207,12 +214,6 @@ export default {
     deleteOption(opt) {
       let index = this.options.indexOf(opt);
       this.options.splice(index, 1);
-
-      // rewrite indexes -- i dont think we need to do this
-      //      for(var i = 0; i < this.options.length; i++ ) {
-      //        console.log(this.options[i].index, i);
-      //        this.options[i].index = i;
-      //      }
     },
     addSaverOption(e) {
       this.options.push({
