@@ -218,9 +218,9 @@ export default {
     addSaverOption(e) {
       this.options.push({
         "index": this.lastIndex + 1,
-        "name": "New Option",
+        "name": "", //New Option,
         "type": "slider",
-        "description": "Description",
+        "description": "", //Description,
         "min": "1",
         "max": "100",
         "default": "75"
