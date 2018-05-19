@@ -100,7 +100,11 @@ var grabScreen = function(s, cb) {
     width:200,
     height:200,
     x: 1000,
-    y: 1000
+    y: 1000,
+    webPreferences: {
+      nodeIntegration: true,
+      webSecurity: !global.IS_DEV
+    }
   });
   
   grabber.on("closed", function() {
@@ -127,7 +131,10 @@ var grabScreen = function(s, cb) {
 var openTestShim = function() {
   testWindow = new BrowserWindow({
     width: 200,
-    height: 200
+    height: 200,
+    webPreferences: {
+      nodeIntegration: testMode
+    }
   });
 
   // just open an empty window
@@ -174,10 +181,9 @@ var openPrefsWindow = function() {
         width:800,
         height:700,
         resizable:true,
-        // @todo i added this when switching to webpack/vue,
-        // can it be tossed again?
         webPreferences: {
-          webSecurity: false
+          webSecurity: !global.IS_DEV,
+          nodeIntegration: true
         },
         icon: path.join(__dirname, "assets", "icon.png")
       });
@@ -247,7 +253,8 @@ var openAboutWindow = function() {
     resizable:false,
     icon: path.join(__dirname, "assets", "icon.png"),
     webPreferences: {
-      webSecurity: false
+      nodeIntegration: true,
+      webSecurity: !global.IS_DEV
     }
   });
 
@@ -314,7 +321,10 @@ var getWindowOpts = function(s) {
     alwaysOnTop: true,
     x: s.bounds.x,
     y: s.bounds.y,
-    show: false
+    show: false,
+    webPreferences: {
+      nodeIntegration: testMode
+    }
   };
 
   // osx will display window immediately if fullscreen is true
@@ -359,7 +369,7 @@ var runScreenSaverOnDisplay = function(saver, s) {
     var url;
     var w = new BrowserWindow(windowOpts);       
     saverWindows.push(w);
-
+   
     diff = process.hrtime(tickCount);
     log.info("got screenshot back, let's do this", s.id, diff[0] * 1e9 + diff[1]);
     
@@ -1247,10 +1257,9 @@ ipcMain.on("open-editor", (event, args) => {
   var screenshot = args.screenshot;
 
   var w = new BrowserWindow({
-    // @todo i added this when switching to webpack/vue,
-    // can it be tossed again?
     webPreferences: {
-      webSecurity: false
+      nodeIntegration: true,
+      webSecurity: !global.IS_DEV
     },
   });
   w.savers = global.savers;

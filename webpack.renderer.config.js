@@ -1,9 +1,5 @@
 'use strict';
 
-//if ( typeof(process.env.BABEL_ENV) === "undefined" ) {
-//  process.env.BABEL_ENV = 'renderer';
-//}
-
 const path = require('path');
 const packageJSON = require('./package.json');
 
@@ -45,8 +41,7 @@ var htmlPageOptions = function(id, title) {
 let whiteListedModules = ['vue'];
 
 let rendererConfig = {
-  //devtool: '#cheap-module-eval-source-map',
-  devtool: '#source-map',
+  devtool: 'inline-source-map',
   entry: {
     renderer: path.join(__dirname, 'src/renderer/main.js')
   },
@@ -119,8 +114,6 @@ let rendererConfig = {
     ]
   },
   node: {
-    //    __dirname: process.env.NODE_ENV !== 'production',
-    //    __filename: process.env.NODE_ENV !== 'production'
     __dirname: false,
     __filename: false
   },
@@ -145,7 +138,8 @@ let rendererConfig = {
   output: {
     filename: '[name].js',
     libraryTarget: 'commonjs2',
-    path: outputDir
+    path: outputDir,
+    sourceMapFilename: "[name].js.map"
   },
   resolve: {
     alias: {
@@ -157,22 +151,12 @@ let rendererConfig = {
   target: 'electron-renderer'
 }
 
-/**
- * Adjust rendererConfig for development settings
- */
-/*if (process.env.NODE_ENV !== 'production') {
-  rendererConfig.plugins.push(
-    new webpack.DefinePlugin({
-      '__static': `"${path.join(__dirname, 'static').replace(/\\/g, '\\\\')}"`
-    })
-  )
-}*/
 
 /**
  * Adjust rendererConfig for production settings
  */
 if (process.env.NODE_ENV === 'production') {
-  rendererConfig.devtool = ''
+  //rendererConfig.devtool = ''
 
   rendererConfig.plugins.push(
     new BabiliWebpackPlugin(),

@@ -5,13 +5,12 @@
     <h2>// screensaver fun //</h2>
     <h3>{{version}}</h3>
 
-    <p>An open-source screensaver
-      project.<br /> <a href="http://muffinista.github.io/before-dawn/"
-                        v-on:click="open">learn more</a></p>
+    <p>An open-source screensaver project.<br />
+      <a href="http://muffinista.github.io/before-dawn/" v-on:click="open">learn more</a></p>
     
-    <p>Having
-    trouble? <a href="http://github.com/muffinista/before-dawn/issues"
-                v-on:click="open">please let us know!</a></p>
+    <p>Having trouble?
+      <a href="http://github.com/muffinista/before-dawn/issues" v-on:click="open">please let us know!</a>
+    </p>
 
     <hr />
 
@@ -43,7 +42,3 @@ export default {
   },
 };
 </script>
-
-<style>
-  /* CSS */
-</style>

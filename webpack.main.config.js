@@ -56,7 +56,8 @@ let mainConfig = {
   output: {
     filename: '[name].js',
     libraryTarget: 'commonjs2',
-    path: outputDir
+    path: outputDir,
+    sourceMapFilename: "[name].js.map"
   },
   plugins: [
     new CopyWebpackPlugin([
