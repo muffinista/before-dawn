@@ -598,7 +598,7 @@ var listAll = function(cb, force) {
   Promise.all(promises).then(function(data) {
     // remove any undefined screensavers
     data = data.filter(s => s !== undefined);
-    loadedScreensavers = data.sort((s) => { return s.name.toLowerCase(); });
+    loadedScreensavers = data.sort((a, b) => { return a.name.toLowerCase().localeCompare(b.name.toLowerCase()) });
     cb(loadedScreensavers);
   });
 };
