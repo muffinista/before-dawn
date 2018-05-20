@@ -99,8 +99,8 @@ var grabScreen = function(s, cb) {
     show: debugMode === true,
     width:200,
     height:200,
-    x: 1000,
-    y: 1000,
+    x: 2000,
+    y: 2000,
     webPreferences: {
       nodeIntegration: true,
       webSecurity: !global.IS_DEV
@@ -229,7 +229,12 @@ var addNewSaver = function(screenshot) {
   var w = new BrowserWindow({
     width:450,
     height:620,
-    resizable:true
+    resizable:true,
+    webPreferences: {
+      webSecurity: !global.IS_DEV,
+      nodeIntegration: true
+    },
+    icon: path.join(__dirname, "assets", "icon.png")
   });
 
   w.savers = global.savers;
