@@ -1,6 +1,6 @@
 <template>
   <div>
-    <iframe class="preview" :src="previewUrl" scrolling="no" />
+    <webview class="preview" :src="previewUrl" />
   </div>
 </template>
 
@@ -23,7 +23,7 @@
 
       window.addEventListener('resize', this.debounceHandleResize);
 
-      this.$nextTick(this.waitForIframe);
+      this.$nextTick(this.waitForWebview);
     },
     beforeDestroy: function () {
       window.removeEventListener('resize', this.debounceHandleResize);
@@ -58,28 +58,37 @@
      
     },
     methods: {
-      waitForIframe() {
-        if ( this.iframeWidth() === 0 ) {
-          this.$nextTick(this.waitForIframe);
+      waitForWebview() {
+        var webview;
+        if ( this.webviewWidth() === 0 ) {
+          this.$nextTick(this.waitForWebview);
         }
+
+        // webview will have scrollbars by default and you can't
+        // easily hide them like with an webview
+        webview = this.$el.querySelector("webview");
+        webview.addEventListener('dom-ready', () => {
+          webview.insertCSS('html,body{ overflow: hidden !important; }');
+
+        });
 
         this.handleSaverChange(this.saver);
         this.$nextTick(this.handleResize);
       },
-      iframeWidth() {
+      webviewWidth() {
         if ( this.$el === undefined ) {
           return 0;
         }
 
         return this.$el.clientWidth - 4;
       },
-      iframeHeight() {
-        return this.iframeWidth() * this.aspectRatio;
+      webviewHeight() {
+        return this.webviewWidth() * this.aspectRatio;
       },
       urlOpts(s) {
         var base = {
-          width: this.iframeWidth(),
-          height: this.iframeHeight(),
+          width: this.webviewWidth(),
+          height: this.webviewHeight(),
           preview: 1,
           screenshot: this.screenshot
         };
@@ -106,10 +115,10 @@
         this.handleRedraw();
       },
       handleResize() {
-        var iframe = this.$el.querySelector("iframe");
+        var webview = this.$el.querySelector("webview");
 
-        iframe.style.width = this.iframeWidth() + "px";
-        iframe.style.height = this.iframeHeight() + "px";
+        webview.style.width = this.webviewWidth() + "px";
+        webview.style.height = this.webviewHeight() + "px";
 
         this.handleRedraw();
       },
@@ -118,8 +127,8 @@
           return;
         }
           
-        var iframe = this.$el.querySelector("iframe");
-        iframe.src = this._previewUrl;
+        var webview = this.$el.querySelector("webview");
+        webview.src = this._previewUrl;
       }
     },
   };

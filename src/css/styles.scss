@@ -88,7 +88,7 @@ button.add-option, button.reset-to-defaults {
   margin-top: 12px;
 }
 
-.watcher iframe {
+.watcher iframe, .watcher webview {
   width: calc(100vw - 15px);
   height: calc(100vh - 90px);
   margin-left: auto;
@@ -106,12 +106,12 @@ button.add-option, button.reset-to-defaults {
   padding-right: 0 !important;
 }
 
-iframe {
+iframe, webview {
   overflow: hidden;
   border: none;
 }
 
-iframe.preview {
+iframe.preview, webview.preview {
     width: 100%;
     overflow:hidden;
 }

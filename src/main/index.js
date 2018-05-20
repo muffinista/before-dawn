@@ -133,7 +133,7 @@ var openTestShim = function() {
     width: 200,
     height: 200,
     webPreferences: {
-      nodeIntegration: testMode
+      nodeIntegration: true
     }
   });
 
@@ -323,7 +323,7 @@ var getWindowOpts = function(s) {
     y: s.bounds.y,
     show: false,
     webPreferences: {
-      nodeIntegration: testMode
+      nodeIntegration: false
     }
   };
 
