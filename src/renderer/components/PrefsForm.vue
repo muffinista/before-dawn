@@ -71,8 +71,8 @@
         
 
         <div class="form-check">
-          <label for="lock" class="form-check-label">
-            <input type="checkbox" id="lock" class="form-check-input"
+          <label for="primary-display" class="form-check-label">
+            <input type="checkbox" id="primary-display" class="form-check-input"
                    v-model="prefs.run_on_single_display" />
             Only run on the primary display?
           </label>
