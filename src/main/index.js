@@ -66,8 +66,8 @@ var icons = {
     paused: __dirname + "/assets/icon-paused.ico"
   },
   "default": {
-    active: __dirname + "/assets/icon.png",
-    paused: __dirname + "/assets/icon-paused.png"
+    active: __dirname + "/assets/iconTemplate.png",
+    paused: __dirname + "/assets/icon-pausedTemplate.png"
   }
 };
 
@@ -185,7 +185,7 @@ var openPrefsWindow = function() {
           webSecurity: !global.IS_DEV,
           nodeIntegration: true
         },
-        icon: path.join(__dirname, "assets", "icon.png")
+        icon: path.join(__dirname, "assets", "iconTemplate.png")
       });
 
       prefsWindowHandle.savers = global.savers;
@@ -234,7 +234,7 @@ var addNewSaver = function(screenshot) {
       webSecurity: !global.IS_DEV,
       nodeIntegration: true
     },
-    icon: path.join(__dirname, "assets", "icon.png")
+    icon: path.join(__dirname, "assets", "iconTemplate.png")
   });
 
   w.savers = global.savers;
@@ -256,7 +256,7 @@ var openAboutWindow = function() {
     width:500,
     height:400,
     resizable:false,
-    icon: path.join(__dirname, "assets", "icon.png"),
+    icon: path.join(__dirname, "assets", "iconTemplate.png"),
     webPreferences: {
       nodeIntegration: true,
       webSecurity: !global.IS_DEV
