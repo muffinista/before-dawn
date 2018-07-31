@@ -49,7 +49,9 @@ function startRenderer () {
     compiler.plugin('compilation', compilation => {
       compilation.plugin('html-webpack-plugin-after-emit', (data, cb) => {
         hotMiddleware.publish({ action: 'reload' })
-        cb()
+        if ( typeof(cb) !== 'undefined' ) {
+          cb();
+        }
       })
     })
 

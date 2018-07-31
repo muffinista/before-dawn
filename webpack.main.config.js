@@ -16,6 +16,7 @@ const deps = [].concat(Object.keys(dependencies),Object.keys(optionalDependencie
 
 let mainConfig = {
   devtool: '#source-map',
+  mode: (process.env.NODE_ENV === 'production' ? 'production' : 'development'),
   entry: {
     main: path.join(__dirname, 'src/main/index.js')
   },

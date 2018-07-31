@@ -1,6 +1,7 @@
 'use strict';
 
 const path = require('path');
+const glob = require('glob-all')
 const packageJSON = require('./package.json');
 
 const productName = packageJSON.productName;
@@ -15,6 +16,9 @@ const BabiliWebpackPlugin = require('babili-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const PurgecssPlugin = require('purgecss-webpack-plugin');
+const VueLoaderPlugin = require('vue-loader/lib/plugin');
+
 
 var htmlPageOptions = function(id, title) {
   return {
@@ -66,13 +70,22 @@ let rendererConfig = {
           }
         }
       },
+      // this will apply to both plain `.css` files
+      // AND `<style>` blocks in `.vue` files
       {
+        test: /\.css$/,
+        use: [
+          'vue-style-loader',
+          'css-loader'
+        ]
+      },
+      /*      {
         test: /\.css$/,
         use: ExtractTextPlugin.extract({
           fallback: 'style-loader',
           use: 'css-loader'
         })
-      },
+      },*/
       {
         test: /\.(scss)$/,
         use: [{
@@ -118,11 +131,20 @@ let rendererConfig = {
     __filename: false
   },
   plugins: [
+    new VueLoaderPlugin(),
     new ExtractTextPlugin('styles.css'),
     new HtmlWebpackPlugin(htmlPageOptions("prefs", "Preferences")),
     new HtmlWebpackPlugin(htmlPageOptions("editor", "Editor")),    
     new HtmlWebpackPlugin(htmlPageOptions("new", "Create Screensaver!")),
     new HtmlWebpackPlugin(htmlPageOptions("about", "About!")),
+    new PurgecssPlugin({
+      paths: glob.sync([
+        path.join(__dirname, './src/index.ejs'),
+        path.join(__dirname, './src/**/*.vue'),
+        path.join(__dirname, './src/**/*.js')
+      ]),
+      whitelistPatterns: [/nav/, /nav-tabs/, /nav-link/, /nav-item/, /tablist/, /tabindex/, /tooltip/, /button-group/, /btn/, /noty/]
+    }),
     new CopyWebpackPlugin(
       [
         {
@@ -141,6 +163,7 @@ let rendererConfig = {
     path: outputDir,
     sourceMapFilename: "[name].js.map"
   },
+  mode: (process.env.NODE_ENV === 'production' ? 'production' : 'development'),
   resolve: {
     alias: {
       '@': path.join(__dirname, 'src/renderer'),

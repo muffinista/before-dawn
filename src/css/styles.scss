@@ -6,6 +6,8 @@ $footer_height: 40px;
 $tab_padding:12px;
 $grid_gap:10px;
 
+/* purgecss start ignore */
+
 html {
     height: 100%;
 }
@@ -32,9 +34,6 @@ body > div > footer {
     grid-row-end: 3;
     padding-left: 5px;
     padding-right: 5px;
-
-  // this should solve some input/footer overlap issues on prefs form 
-  //z-index: 1000;
 }
 
 ul {
@@ -64,13 +63,6 @@ ul[role=tablist] {
   justify-content: center;
   height: 80vh;
 }
-
-// .navbar-header {
-//   height: $nav_height;
-// }
-// .navbar-header.sticky-top {
-//   background-color: white;
-// }
 
 button {
   cursor: pointer;
@@ -242,7 +234,6 @@ form.submit-attempt {
     margin-bottom: 30px;
 }
 
-
 form.entry {
     margin-bottom: 10px;
 }
@@ -254,3 +245,5 @@ label.for-option {
 .saver-detail > * {
     margin-bottom: 10px;
 }
+
+/* purgecss end ignore */
