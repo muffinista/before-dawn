@@ -2,7 +2,7 @@
 
 const path = require('path');
 const glob = require('glob-all')
-const packageJSON = require('./package.json');
+const packageJSON = require(`${'./package.json'}`);
 
 const productName = packageJSON.productName;
 const dependencies = packageJSON.dependencies;
@@ -44,14 +44,17 @@ var htmlPageOptions = function(id, title) {
  */
 let whiteListedModules = ['vue'];
 
+let externals = [
+  ...Object.keys(dependencies || {}).filter(d => !whiteListedModules.includes(d))
+];
+
+
 let rendererConfig = {
   devtool: 'inline-source-map',
   entry: {
     renderer: path.join(__dirname, 'src/renderer/main.js')
   },
-  externals: [
-    ...Object.keys(dependencies || {}).filter(d => !whiteListedModules.includes(d))
-  ],
+  externals: externals,
   module: {
     rules: [
       {
