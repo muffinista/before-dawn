@@ -12,7 +12,24 @@ const outputDir = path.join(__dirname, "output");
 const BabiliWebpackPlugin = require('babili-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
-const deps = [].concat(Object.keys(dependencies),Object.keys(optionalDependencies));
+//
+// get a list of node dependencies, and then
+// convert it to an array of package names
+// this prevents some warnings like:
+//
+//   Critical dependency: the request of a dependency is an expression
+//
+// and
+//
+//   ERROR in ./src/main/fullscreen.js
+//   Module not found: Error: Can't resolve 'winctl'
+//
+// Basically, webpack falls down when you're including node modules
+const deps = [].concat(
+  Object.keys(dependencies),
+  Object.keys(optionalDependencies)
+);
+
 
 let mainConfig = {
   devtool: '#source-map',
@@ -20,9 +37,7 @@ let mainConfig = {
   entry: {
     main: path.join(__dirname, 'src/main/index.js')
   },
-  externals: [
-    deps
-  ],
+  externals: deps,
   module: {
     rules: [
       {
