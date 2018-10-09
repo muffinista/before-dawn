@@ -31,7 +31,7 @@ var releaseChecker;
 const power = require("./power.js");
 let stateManager = require("./state_manager.js");
 
-const robot = require("robotjs");
+//const robot = require("robotjs");
 
 var Raven;
 
@@ -520,11 +520,13 @@ var runScreenSaver = function() {
   }
 
   saver = global.savers.applyPreload(saver);
-  
-  oldMousePosition = robot.getMousePos();
 
-  // move cursor so far off screen, it isn't even funny
-  robot.moveMouse(30000, 30000);
+  if ( typeof(robot) !== "undefined" ) {
+    oldMousePosition = robot.getMousePos();
+
+    // move cursor so far off screen, it isn't even funny
+    robot.moveMouse(30000, 30000);
+  }
   
   // limit to a single screen when debugging
   if ( debugMode === true ) {
@@ -589,8 +591,7 @@ var handleDisplayChange = function() {
 var closeRunningScreensavers = function() {
   log.info("closeRunningScreensavers");
   if ( debugMode !== true ) {
-    if ( oldMousePosition.x !== 0 && oldMousePosition.y !== 0 ) {
-      //log.info("restore mouse to", oldMousePosition.x, oldMousePosition.y); 
+    if ( typeof(robot) !== "undefined" && oldMousePosition.x !== 0 && oldMousePosition.y !== 0 ) {
       robot.moveMouse(oldMousePosition.x, oldMousePosition.y);
     }
 

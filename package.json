@@ -43,7 +43,6 @@
     "request": "^2.88.0",
     "request-promise-native": "^1.0.5",
     "rimraf": "^2.6.2",
-    "robotjs": "^0.5.1",
     "temp": "^0.8.3",
     "yauzl": "^2.10.0"
   },
