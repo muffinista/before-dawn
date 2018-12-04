@@ -5,34 +5,36 @@
         <b-tab title="Screensavers" active>
           <div class="container-fluid">
             <div class="row">
-              <!-- left pane -->
-              <div class="col-sm-6 col-md-6">
-                <saver-list
-                  v-if="isLoaded"
-                  v-bind:savers="savers"
-                  v-bind:current="saver"
-                  v-on:editSaver="editSaver"
-                  v-on:deleteSaver="deleteSaver"
-                  @change="onSaverPicked"></saver-list>
-              </div>
+              <div class="grid">
+                <!-- left pane -->
+                <div>
+                  <saver-list
+                    v-if="isLoaded"
+                    v-bind:savers="savers"
+                    v-bind:current="saver"
+                    v-on:editSaver="editSaver"
+                    v-on:deleteSaver="deleteSaver"
+                    @change="onSaverPicked"></saver-list>
+                </div>
               
-              <!-- right pane -->
-              <div class="col-sm-6 col-md-6 saver-detail">
-                <template v-if="isLoaded">
-                  <saver-summary :saver="saverObj"></saver-summary>
-                  <saver-preview
-                    :bus="bus"
-                    :saver="savers[saverIndex]"
-                    :screenshot="screenshot"
-                    :options="options[saver]"
-                    v-if="savers[saverIndex] !== undefined"></saver-preview>
-                  <saver-options
-                    :saver="saver"
-                    :options="saverOptions"
-                    :values="options[saver]"
-                    @change="onOptionsChange"
-                    v-on:saverOption="updateSaverOption"></saver-options>
-                </template>
+                <!-- right pane -->
+                <div class="saver-detail">
+                  <template v-if="isLoaded">
+                    <saver-summary :saver="saverObj"></saver-summary>
+                    <saver-preview
+                      :bus="bus"
+                      :saver="savers[saverIndex]"
+                      :screenshot="screenshot"
+                      :options="options[saver]"
+                      v-if="savers[saverIndex] !== undefined"></saver-preview>
+                    <saver-options
+                      :saver="saver"
+                      :options="saverOptions"
+                      :values="options[saver]"
+                      @change="onOptionsChange"
+                      v-on:saverOption="updateSaverOption"></saver-options>
+                  </template>
+                </div>
               </div>
             </div>
           </div>

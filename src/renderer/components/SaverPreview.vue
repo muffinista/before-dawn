@@ -65,11 +65,10 @@
         }
 
         // webview will have scrollbars by default and you can't
-        // easily hide them like with an webview
+        // easily hide them
         webview = this.$el.querySelector("webview");
         webview.addEventListener('dom-ready', () => {
           webview.insertCSS('html,body{ overflow: hidden !important; }');
-
         });
 
         this.handleSaverChange(this.saver);
@@ -79,7 +78,6 @@
         if ( this.$el === undefined ) {
           return 0;
         }
-
         return this.$el.clientWidth - 4;
       },
       webviewHeight() {
@@ -127,7 +125,8 @@
           return;
         }
           
-        var webview = this.$el.querySelector("webview");
+        console.log("set preview to", this._previewUrl);
+        let webview = this.$el.querySelector("webview");
         webview.src = this._previewUrl;
       }
     },

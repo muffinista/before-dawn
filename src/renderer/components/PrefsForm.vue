@@ -1,10 +1,11 @@
 <template>
   <div id="prefs-form">
-    <form v-on="$listeners">
-      <fieldset>
+    <h1>Preferences</h1>
+    <form v-on="$listeners" class="grid">
+      <div class="times">
         <div class="form-group">
-          <label for="delay">Activate after</label>
-          <select v-model="prefs.delay" class="form-control">
+          <label for="delay">Activate after:</label>
+          <select v-model="prefs.delay">
             <option value="0">never</option>
             <option value="1">1 minute</option>
             <option value="5">5 minutes</option>
@@ -17,10 +18,10 @@
             The screensaver will activate once your computer has been idle for this amount of time.
           </small>
         </div>
-
+        
         <div class="form-group">
-          <label for="sleep">Disable displays after</label>
-          <select v-model="prefs.sleep" class="form-control">
+          <label for="sleep">Disable displays after:</label>
+          <select v-model="prefs.sleep">
             <option value="0">never</option>
             <option value="1">1 minute</option>
             <option value="5">5 minutes</option>
@@ -35,7 +36,9 @@
             of time.
           </small>
         </div>
+      </div>
 
+      <div class="options">
         <div class="form-check">
           <label for="lock" class="form-check-label">
             <input type="checkbox" id="lock" class="form-check-input" v-model="prefs.lock" />
@@ -80,42 +83,41 @@
             If you have multiple displays, only run on the primary one.
           </small>
         </div>
-
-      </fieldset>
+      </div>
     </form>
 
-    <h1>Advanced Options <small>Be careful with these!</small></h1>
-
+    <h1>Advanced Options <small class="text-muted">Be careful with these!</small></h1>
     <form>
-      <fieldset>
-        <div class="form-group">
-          <label for="repo">Github Repo URL:</label>
-          <div class="input-group">
-            <div class="input-group-addon">github.com/</div>
-            <input type="text" v-model="prefs.sourceRepo"
-                   class="form-control"
-                   placeholder="muffinista/before-dawn-screensavers" />
+      <div class="form-group">
+        <label for="repo">Github Repo URL:</label>
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text">github.com/</span>
           </div>
-          <small class="form-text text-muted">
-            We will download releases from this repository instead of the default repo if specified.
-          </small>
+          <input type="text" v-model="prefs.sourceRepo"
+                 class="form-control"
+                 placeholder="muffinista/before-dawn-screensavers" />
+        </div>
+        <small class="form-text text-muted">
+          We will download releases from this repository instead of
+          the default repo if specified. This defaults to
+          'muffinista/before-dawn-screensavers'
+        </small>
+      </div>
+
+      <div class="form-group">
+        <label for="localSource">Local Source:</label>
+        <div class="input-group">
+          <input type="text" v-model="prefs.localSource" name="localSource" class="form-control" />
+          <span class="input-group-btn">
+            <button type="button" class="btn btn-secondary pick" @click.stop="showPathChooser">...</button>
+          </span>
         </div>
 
-        <div class="form-group">
-          <label for="localSource">Local Source:</label>
-          <div class="input-group">
-            <input type="text" v-model="prefs.localSource" name="localSource" class="form-control" />
-            <span class="input-group-btn">
-              <button type="button" class="btn btn-secondary pick" @click.stop="showPathChooser">...</button>
-            </span>
-          </div>
-
-          <small class="form-text text-muted">
-            We will load screensavers from any directories listed here. Use this to add your own screensavers!
-          </small>
-        </div>
-        
-      </fieldset>
+        <small class="form-text text-muted">
+          We will load screensavers from any directories listed here. Use this to add your own screensavers!
+        </small>
+      </div>
     </form>
   </div>
 </template>

@@ -1,7 +1,7 @@
 @import "../../node_modules/noty/lib/noty.css";
 @import "loader";
 
-$nav_height: 42px;
+$nav_height: 34px;
 $footer_height: 40px;
 $tab_padding:12px;
 $grid_gap:10px;
@@ -15,7 +15,29 @@ body {
     min-height: 100%;
     display: grid;
     grid-template-rows: auto 1fr;
+}
+
+body, input {
+    font: menu;
+}
+
+small {
+    font-size: 90%;
+}
+
+.grid {
+    width: 100%;
+    display: grid;
+    grid-gap: 1rem;
+    grid-template-columns: 48% 48%;
+}
+
+select, label {
     font-size: 0.9rem;
+}
+
+.form-check {
+    margin-bottom: 0.3rem;
 }
 
 .form-control {
@@ -240,7 +262,10 @@ form.entry {
 
 label.for-option {
     font-weight: bold;
-    width: 250px;
+    //width: 250px;
+}
+input[type="range"] {
+    max-width: 250px;
 }
 .saver-detail > * {
     margin-bottom: 10px;
