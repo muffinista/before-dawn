@@ -138,7 +138,7 @@ var openTestShim = function() {
   });
 
   // just open an empty window
-  global.savers.reload().then(() => {
+  savers.reload().then(() => {
     testWindow.loadURL("file:///");
   });
 };
@@ -173,7 +173,7 @@ var openPrefsWindow = function() {
   grabScreen(primary, function(message) {
     // call savers.reload to make sure our data is properly refreshed
     // and check for any system updates
-    global.savers.reload().then(() => {
+    savers.reload().then(() => {
       var prefsUrl = urlPrefix + "/prefs.html";
 
       log.info("loading " + prefsUrl);
@@ -188,7 +188,7 @@ var openPrefsWindow = function() {
         icon: path.join(__dirname, "assets", "iconTemplate.png")
       });
 
-      prefsWindowHandle.savers = global.savers;
+      prefsWindowHandle.savers = savers;
       
       prefsUrl = prefsUrl + "?screenshot=" + encodeURIComponent("file://" + message.url);
       
@@ -237,7 +237,7 @@ var addNewSaver = function(screenshot) {
     icon: path.join(__dirname, "assets", "iconTemplate.png")
   });
 
-  w.savers = global.savers;
+  w.savers = savers;
   w.loadURL(newUrl);
 
   showDock();
@@ -473,7 +473,7 @@ var blankScreen = function(s) {
  */
 var getDisplays = function() {
   var displays = [];
-  if ( debugMode === true  || global.savers.getRunOnSingleDisplay() === true ) {
+  if ( debugMode === true  || savers.getRunOnSingleDisplay() === true ) {
     displays = [
       electronScreen.getPrimaryDisplay()
     ];
@@ -511,7 +511,7 @@ var setStateToRunning = function() {
 var runScreenSaver = function() {
   var displays = getDisplays();
 
-  var saver = global.savers.getCurrentData();
+  var saver = savers.getCurrentData();
 
   // make sure we have something to display
   if ( typeof(saver) === "undefined" ) {
@@ -519,7 +519,7 @@ var runScreenSaver = function() {
     return;
   }
 
-  saver = global.savers.applyPreload(saver);
+  saver = savers.applyPreload(saver);
 
   if ( typeof(robot) !== "undefined" ) {
     oldMousePosition = robot.getMousePos();
@@ -544,7 +544,7 @@ var runScreenSaver = function() {
     } // for
 
     // if we're only running on primary display, blank out the other ones
-    if ( debugMode !== true && global.savers.getRunOnSingleDisplay() === true ) {
+    if ( debugMode !== true && savers.getRunOnSingleDisplay() === true ) {
       var otherDisplays = getNonPrimaryDisplays();
       for ( var i in otherDisplays ) {
         blankScreen(otherDisplays[i]);
@@ -631,7 +631,7 @@ var forcefullyCloseScreensavers = function() {
  * should we lock the user's screen when returning from running the saver?
  */
 var shouldLockScreen = function() {
-  return ( global.savers.getLock() === true );
+  return ( savers.getLock() === true );
 };
 
 /**
@@ -662,7 +662,7 @@ var openPrefsOnFirstLoad = function() {
   if ( appReady === false || configLoaded === false ) {
     return;
   }
-  if ( global.savers.firstLoad() === true ) {
+  if ( savers.firstLoad() === true ) {
     setTimeout(openPrefsWindow, 1000);
   }
 };
@@ -744,8 +744,8 @@ var bootApp = function() {
   };
   
   log.info("Load config with", saverOpts);
-  global.savers.init(saverOpts).then((r) => {
-    global.savers.handlePackageChecks(r);
+  savers.init(saverOpts).then((r) => {
+    savers.handlePackageChecks(r);
   }).then(() => {
     configLoaded = true;
     updateStateManager();
@@ -787,6 +787,8 @@ var bootApp = function() {
       log.info("Setup release check");
       checkForNewRelease();
       setInterval(checkForNewRelease, 1000 * 60 * 60 * 12);
+
+      savers.listAll(console.log);
     }
     
   });
@@ -830,7 +832,7 @@ var runScreenSaverIfPowered = function() {
   }
   
   // check if we are on battery, and if we should be running in that case
-  if ( checkPowerState && global.savers.getDisableOnBattery() ) {
+  if ( checkPowerState && savers.getDisableOnBattery() ) {
     power.charging().then((is_powered) => {
       if ( is_powered ) {       
         runScreenSaverIfNotFullscreen();
@@ -865,13 +867,13 @@ var blankScreenIfNeeded = function() {
  */
 var updateStateManager = function() {
   log.info("updateStateManager",
-           "idleTime: " + global.savers.getDelay(),
-           "blankTime: " + (global.savers.getDelay() + global.savers.getSleep())
+           "idleTime: " + savers.getDelay(),
+           "blankTime: " + (savers.getDelay() + savers.getSleep())
   );
 
   stateManager.setup({
-    idleTime: global.savers.getDelay() * 60000,
-    blankTime: (global.savers.getDelay() + global.savers.getSleep()) * 60000,
+    idleTime: savers.getDelay() * 60000,
+    blankTime: (savers.getDelay() + savers.getSleep()) * 60000,
     onIdleTime: runScreenSaverIfPowered,
     onBlankTime: blankScreenIfNeeded,
     onReset: closeRunningScreensavers
@@ -1125,7 +1127,8 @@ if ( process.env.BEFORE_DAWN_DIR !== undefined ) {
 else {
   global.basePath = path.join(app.getPath("appData"), global.APP_DIR);
 }
-global.savers = require("../lib/savers.js");
+
+let savers = require("../lib/savers.js");
 
 /**
  * make sure we're only running a single instance
@@ -1222,9 +1225,9 @@ trayMenu = Menu.buildFromTemplate([
 // the prefs window know that it needs to reload
 //
 ipcMain.on("savers-updated", (event, arg) => {
-  global.savers.reset();  
+  savers.reset();  
   if ( prefsWindowHandle !== null ) {
-    global.savers.reload().then(() => {
+    savers.reload().then(() => {
       prefsWindowHandle.send("savers-updated", arg);
     });
   }
@@ -1235,8 +1238,8 @@ ipcMain.on("savers-updated", (event, arg) => {
 //
 ipcMain.on("prefs-updated", (event, arg) => {
   log.info("prefs-updated");
-  global.savers.reset();
-  global.savers.reload().then(() => {
+  savers.reset();
+  savers.reload().then(() => {
     updateStateManager();
   });
 });
@@ -1268,7 +1271,7 @@ ipcMain.on("open-editor", (event, args) => {
       webSecurity: !global.IS_DEV
     },
   });
-  w.savers = global.savers;
+  w.savers = savers;
   
   // pass the key of the screensaver we want to load
   // as well as the URL to our screenshot image
@@ -1332,11 +1335,11 @@ ipcMain.on("set-autostart", (event, value) => {
 //
 ipcMain.on("generate-screensaver", (event, args) => {
   var src = path.join(getSystemDir(), "__template");
-  var data = global.savers.generateScreensaver(src, args);
+  var data = savers.generateScreensaver(src, args);
   event.sender.send("generate-screensaver", data);
 
-  global.savers.reset();
-  global.savers.reload().then(() => {
+  savers.reset();
+  savers.reload().then(() => {
     if ( prefsWindowHandle !== null ) {
       prefsWindowHandle.send("savers-updated");
     }
@@ -1378,3 +1381,4 @@ app.once("ready", bootApp);
 
 
 
+exports.savers = savers;

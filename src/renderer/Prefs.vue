@@ -44,8 +44,6 @@
             <prefs-form
               :prefs="prefs"
               v-on:localSourceChange="localSourceChange"></prefs-form>
-          </div>
-          <div class="container-fluid">
             <button class="btn btn-large btn-positive reset-to-defaults"
                     v-on:click="resetToDefaults">Reset to Defaults</button>
           </div>
@@ -73,6 +71,8 @@ import SaverSummary from '@/components/SaverSummary';
 import PrefsForm from '@/components/PrefsForm';
 import Noty from "noty";
   
+const mainProcess = remote.require('../main/index.js');
+
 const {dialog} = require("electron").remote;
   
 export default {
@@ -81,12 +81,8 @@ export default {
     SaverList, SaverOptions, SaverPreview, SaverSummary, PrefsForm
   },
   mounted() {
-    this.ipcRenderer.on("savers-updated", (event, arg) => {
-      this.getData();
-    });
-    this.ipcRenderer.on("request-open-add-screensaver", (event, arg) => {
-      this.createNewScreensaver();
-    });
+    this.ipcRenderer.on("savers-updated", this.getData);
+    this.ipcRenderer.on("request-open-add-screensaver", this.createNewScreensaver);
 
     if ( this.manager === undefined ) {
       return;
@@ -101,6 +97,10 @@ export default {
       });
     }
     
+  },
+  beforeDestroy() {
+    this.ipcRenderer.removeListener('savers-updated', this.getData);
+    this.ipcRenderer.removeListener('request-open-add-screensaver', this.createNewScreensaver);
   },
   data() {
     return {
@@ -119,7 +119,7 @@ export default {
       return this.$electron.remote.getCurrentWindow();
     },
     manager: function() {
-      return this.currentWindow.savers;
+      return mainProcess.savers;
     },
     ipcRenderer: function() {
       return this.$electron.ipcRenderer;
@@ -203,13 +203,17 @@ export default {
       );
     },  
     getData() {
+      var t0 = performance.now();
       this.manager.listAll((entries) => {
+        var t1 = performance.now();
+        console.log("listAll took " + (t1 - t0) + " milliseconds.");
 
         this.savers = entries;
         var tmp = this.manager.getConfigSync();
         if ( tmp.options === undefined ) {
           tmp.options = {};
         }
+        console.log("opts took " + (t1 - t0) + " milliseconds.");
         
         // ensure default settings in the config for all savers
         for(var i = 0; i < this.savers.length; i++ ) {
@@ -221,6 +225,7 @@ export default {
 
           tmp.options[s.key] = s.settings;
         }
+        console.log("for took " + (t1 - t0) + " milliseconds.");
 
         this.options = Object.assign({}, this.options, tmp.options);
         // https://vuejs.org/v2/guide/reactivity.html
@@ -229,6 +234,9 @@ export default {
         // with properties from both the original object and the mixin object:
         this.prefs = Object.assign({}, this.prefs, tmp);
         this.bus.$emit('saver-changed', this.saverObj);
+
+        var t1 = performance.now();
+        console.log("Call to doSomething took " + (t1 - t0) + " milliseconds.");
       });
     },
     getCurrentSaver() {
