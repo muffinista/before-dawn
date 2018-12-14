@@ -74,12 +74,34 @@ var icons = {
 // set the prefix we'll use for loading UI windows
 var urlPrefix;
 
+let grabberWindow = null;
+
+var openGrabberWindow = () => {
+  var grabberUrl = "file://" + __dirname + "/assets/grabber.html";
+  grabberWindow = new BrowserWindow({
+    show: debugMode === true,
+    width:100,
+    height:100,
+    x: 4000,
+    y: 2000,
+    webPreferences: {
+      nodeIntegration: true,
+      webSecurity: !global.IS_DEV
+    }
+  });
+  grabberWindow.noTray = true;
+  
+  grabberWindow.on("closed", function() {
+    //grabber = null;
+  });
+
+  grabberWindow.loadURL(grabberUrl);
+};
 
 /**
  * open our screen grabber tool and issue a screengrab request
  */
 var grabScreen = function(s, cb) {
-
   // bypass screen capture in test mode
   // this is a hack and if i can find a better
   // way to do it (listening for the prefs window, etc),
@@ -90,35 +112,19 @@ var grabScreen = function(s, cb) {
     });
     return;
   }
-
-  var grabberUrl = "file://" + __dirname + "/assets/grabber.html?id=" + s.id +
-                   "&width=" + s.bounds.width +
-                   "&height=" + s.bounds.height;
-
-  var grabber = new BrowserWindow({
-    show: debugMode === true,
-    width:200,
-    height:200,
-    x: 2000,
-    y: 2000,
-    webPreferences: {
-      nodeIntegration: true,
-      webSecurity: !global.IS_DEV
-    }
-  });
-  
-  grabber.on("closed", function() {
-    grabber = null;
-  });
   
   var ipc_channel = "screenshot-" + s.id;
   ipcMain.once("screenshot-" + s.id, function(e, message) {
     log.info("got screenshot!", message);
     cb(message);
-    grabber.close();
+    //    grabber.close();
   });
-  
-  grabber.loadURL(grabberUrl);
+
+  grabberWindow.webContents.send("request-screenshot", { 
+    id: s.id, 
+    width: s.bounds.width, 
+    height: s.bounds.height});
+
 };
 
 
@@ -148,7 +154,10 @@ var openTestShim = function() {
  * dock icon
  */
 var hideDockIfInactive = function() {
-  if (  typeof(app.dock) !== "undefined" && BrowserWindow.getAllWindows().length === 0 ) {
+  let openWindowCount = BrowserWindow.getAllWindows().
+                                      filter(win => win.noTray !== true ).length;
+
+  if ( typeof(app.dock) !== "undefined" && openWindowCount === 0 ) {
     app.dock.hide();
   }
 };
@@ -767,6 +776,7 @@ var bootApp = function() {
     }
     else {
       openPrefsOnFirstLoad();
+      openGrabberWindow();
     }
 
     if ( global.CHECK_FOR_RELEASE === true ) {
