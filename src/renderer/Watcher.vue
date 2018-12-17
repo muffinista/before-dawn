@@ -147,6 +147,7 @@ export default {
       return new Vue();
     },
     currentWindow: function() {
+      console.log("hello");
       return this.$electron.remote.getCurrentWindow();
     },
     manager: function() {

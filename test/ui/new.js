@@ -22,7 +22,7 @@ describe('Add New', function() {
                    helpers.removeLocalSource(workingDir);
                  }).
                  then(() => app.client.waitUntilWindowLoaded() ).
-			           then(() => app.electron.ipcRenderer.
+			           then(() => app.client.electron.ipcRenderer.
                                 send('open-add-screensaver',
                                      'file://' + path.join(__dirname, '../fixtures/screenshot.png'))
                  ).
@@ -37,6 +37,7 @@ describe('Add New', function() {
       app.client.waitUntilWindowLoaded().
           getText('body').
           then((res) => {
+            console.log(res);
             assert(res.lastIndexOf('before you can create a new screensaver') !== -1);
             done();
           });
@@ -56,17 +57,31 @@ describe('Add New', function() {
 		  return app.start().
                  then(() => app.client.waitUntilWindowLoaded() ).
                  then(() => {
-                   helpers.addLocalSource(workingDir, saversDir);
+                  helpers.addLocalSource(workingDir, saversDir);
                    
                    // tell app to reload config
-                   app.electron.ipcRenderer.send("prefs-updated");
+                   app.client.electron.ipcRenderer.send("prefs-updated");
                  }).
 			           then(() => {
-                   app.electron.ipcRenderer.
+                   app.client.electron.ipcRenderer.
                        send('open-add-screensaver',
                             'file://' + path.join(__dirname, '../fixtures/screenshot.png'));
                  }).
-			           then(() => app.client.windowByIndex(1));
+        //  then(() => app.client.getMainProcessLogs()).
+        //    then(function (logs) {
+        //     logs.forEach(function (log) {
+        //       console.log(log);
+        //     });
+        //     console.log("!!!!!!!!!!!!!!!!!!!!");
+        //    }).
+        //    then(() => app.client.getRenderProcessLogs()).
+        //    then(function (logs) {
+        //       logs.forEach(function (log) {
+        //       console.log("XXX", log.message);
+        //     })
+        //    }).
+
+                 then(() => app.client.windowByIndex(1));
 	  });
 
 	  afterEach(() => {

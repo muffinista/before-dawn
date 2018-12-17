@@ -31,7 +31,10 @@
 
 <script>
 import SaverForm from '@/components/SaverForm';
-const mainProcess = remote.require('../main/index.js');
+const remote = require('electron').remote;
+var is_dev = remote.getGlobal('IS_DEV');
+
+const mainProcess = remote.require( is_dev ? '../main/index.js' : './main.js');
 
 export default {
   name: 'new-screensaver',
@@ -93,9 +96,9 @@ export default {
           src: data.dest,
           screenshot: this.screenshot
         });
+        this.currentWindow.close();
       });
 
-      this.currentWindow.close();
     }
   },
 };

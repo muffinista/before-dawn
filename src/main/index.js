@@ -68,7 +68,6 @@ var icons = {
 };
 
 // set the prefix we'll use for loading UI windows
-var urlPrefix;
 
 let grabberWindow = null;
 
@@ -139,9 +138,11 @@ var openTestShim = function() {
     }
   });
 
+  var shimUrl = "file://" + __dirname + "/assets/shim.html";
+
   // just open an empty window
   savers.reload().then(() => {
-    testWindow.loadURL("file:///");
+    testWindow.loadURL(shimUrl);
   });
 };
 
@@ -176,7 +177,7 @@ var openPrefsWindow = function() {
 
   // take a screenshot of the main screen for use in previews
   grabScreen(primary, function(message) {
-    var prefsUrl = urlPrefix + "/prefs.html";
+    var prefsUrl = getUrlPrefix() + "/prefs.html";
 
     log.info("loading " + prefsUrl);
     prefsWindowHandle = new BrowserWindow({
@@ -229,7 +230,7 @@ var addNewSaver = function(screenshot) {
     screenshot = screenshot.screenshot;
   }
 
-  var newUrl = urlPrefix + "/new.html";
+  var newUrl = getUrlPrefix() + "/new.html";
 
   newUrl = newUrl + "?screenshot=" + encodeURIComponent(screenshot);
 
@@ -258,7 +259,7 @@ var addNewSaver = function(screenshot) {
  * Open the About window for the app
  */
 var openAboutWindow = function() {
-  var aboutUrl = urlPrefix + "/about.html";
+  var aboutUrl = getUrlPrefix() + "/about.html";
   var w = new BrowserWindow({
     width:500,
     height:400,
@@ -1138,9 +1139,6 @@ if ( testMode !== true ) {
 }
 
 
-urlPrefix = getUrlPrefix();
-
-
 // load some global CSS we'll inject into running screensavers
 globalCSSCode = fs.readFileSync( path.join(__dirname, "assets", "global.css"), "ascii");  
 
@@ -1246,13 +1244,25 @@ ipcMain.on("prefs-updated", (event, arg) => {
   });
 });
 
-// //
-// // handle request to open the prefs window
-// //
-// ipcMain.on("open-prefs", (event) => {
-//   log.info("open-prefs");
-//   openPrefsWindow();
-// });
+//
+// handle request to open the prefs window
+//
+ipcMain.on("open-prefs", (event) => {
+  log.info("open-prefs");
+  openPrefsWindow();
+});
+
+//
+// handle request to open 'add new saver' window
+//
+ipcMain.on("open-add-screensaver", (event, screenshot) => {
+  log.info("open-add-screensaver");
+  addNewSaver(screenshot);
+});
+
+ipcMain.on("open-editor", (event, args) => {
+  openEditor(args);
+});
 
 
 var openEditor = (args) => {
@@ -1271,7 +1281,7 @@ var openEditor = (args) => {
   // pass the key of the screensaver we want to load
   // as well as the URL to our screenshot image
 
-  var editorUrl = urlPrefix + "/editor.html";
+  var editorUrl = getUrlPrefix() + "/editor.html";
  
   var target = editorUrl + "?" +
                "src=" + encodeURIComponent(key) +
@@ -1285,17 +1295,6 @@ var openEditor = (args) => {
   
   showDock();
 }
-//
-// handle request to open 'add new saver' window
-//
-// ipcMain.on("open-add-screensaver", (event, screenshot) => {
-//   log.info("open-add-screensaver");
-//   addNewSaver(screenshot);
-// });
-
-ipcMain.on("open-editor", (event, args) => {
-  openEditor(args);
-});
 
 
 ipcMain.on("set-autostart", (event, value) => {

@@ -29,7 +29,7 @@ describe('Editor', function() {
     // @todo update
 		return app.start().
                then(() => app.client.waitUntilWindowLoaded() ).
-			         then(() => app.electron.ipcRenderer.send('open-editor', {
+			         then(() => app.client.electron.ipcRenderer.send('open-editor', {
                  screenshot: 'file://' + path.join(__dirname, '../fixtures/screenshot.png'),
                  src: saverJSON
                })).

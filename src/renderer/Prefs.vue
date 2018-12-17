@@ -71,7 +71,10 @@ import SaverSummary from '@/components/SaverSummary';
 import PrefsForm from '@/components/PrefsForm';
 import Noty from "noty";
 
-const mainProcess = remote.require('../main/index.js');
+const remote = require('electron').remote;
+var is_dev = remote.getGlobal('IS_DEV');
+
+const mainProcess = remote.require( is_dev ? '../main/index.js' : './main.js');
 
 const {dialog} = require("electron").remote;
   
@@ -220,7 +223,6 @@ export default {
         }
 
         this.options = Object.assign({}, this.options, tmp.options);
-        t1 = performance.now();
 
         // https://vuejs.org/v2/guide/reactivity.html
         // However, new properties added to the object will not
