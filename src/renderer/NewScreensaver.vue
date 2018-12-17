@@ -31,20 +31,12 @@
 
 <script>
 import SaverForm from '@/components/SaverForm';
+const mainProcess = remote.require('../main/index.js');
 
 export default {
   name: 'new-screensaver',
   components: {
     SaverForm
-  },
-  mounted() {
-    this.ipcRenderer.on("generate-screensaver", (event, data) => {
-      this.ipcRenderer.send("open-editor", {
-        src: data.dest,
-        screenshot: this.screenshot
-      });
-      this.currentWindow.close();
-    });
   },
   data() {
     return {
@@ -89,7 +81,21 @@ export default {
       }
 
       this.disabled = true;
-      this.ipcRenderer.send("generate-screensaver", this.saver);
+
+      const path = require('path');
+      var src = path.join(mainProcess.getSystemDir(), "__template");
+      var data = this.manager.generateScreensaver(src, this.saver);
+
+      this.manager.reset();
+      this.manager.reload().then(() => {
+        mainProcess.toggleSaversUpdated();
+        mainProcess.openEditor({
+          src: data.dest,
+          screenshot: this.screenshot
+        });
+      });
+
+      this.currentWindow.close();
     }
   },
 };

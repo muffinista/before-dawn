@@ -17,21 +17,18 @@
 const electron = require("electron");
 const log = require("electron-log");
 
-const app = electron.app;  // Module to control application life.
-const BrowserWindow = electron.BrowserWindow;  // Module to create native browser window.
-const Menu = electron.Menu;
-const Tray = electron.Tray;
-const {ipcMain, crashReporter} = require("electron");
+const {app, BrowserWindow, ipcMain, crashReporter, Menu, Tray} = require("electron");
 
 const fs = require("fs");
 const path = require("path");
 
 const screen = require("./screen.js");
-var releaseChecker;
 const power = require("./power.js");
+
 let stateManager = require("./state_manager.js");
 
-//const robot = require("robotjs");
+var releaseChecker;
+
 
 var Raven;
 
@@ -43,7 +40,6 @@ let debugMode = ( process.env.DEBUG_MODE !== undefined );
 let testMode = ( process.env.TEST_MODE !== undefined );
 
 let saverWindows = [];
-let oldMousePosition = {x:0, y:0};
 
 var appReady = false;
 var configLoaded = false;
@@ -180,46 +176,48 @@ var openPrefsWindow = function() {
 
   // take a screenshot of the main screen for use in previews
   grabScreen(primary, function(message) {
-    // call savers.reload to make sure our data is properly refreshed
-    // and check for any system updates
-    savers.reload().then(() => {
-      var prefsUrl = urlPrefix + "/prefs.html";
+    var prefsUrl = urlPrefix + "/prefs.html";
 
-      log.info("loading " + prefsUrl);
-      prefsWindowHandle = new BrowserWindow({
-        width:800,
-        height:700,
-        resizable:true,
-        webPreferences: {
-          webSecurity: !global.IS_DEV,
-          nodeIntegration: true
-        },
-        icon: path.join(__dirname, "assets", "iconTemplate.png")
-      });
-
-      prefsWindowHandle.savers = savers;
-      
-      prefsUrl = prefsUrl + "?screenshot=" + encodeURIComponent("file://" + message.url);
-      
-      prefsWindowHandle.loadURL(prefsUrl);
-
-      showDock();
-
-      prefsWindowHandle.on("closed", function() {
-        prefsWindowHandle = null;
-        hideDockIfInactive();
-      });
-
-      // we could do something nice with either of these events
-      prefsWindowHandle.webContents.on("crashed", function (e) {
-        log.info(e);
-      });
-      prefsWindowHandle.webContents.on("unresponsive", function (e) {
-        log.info(e);
-      });
+    log.info("loading " + prefsUrl);
+    prefsWindowHandle = new BrowserWindow({
+      width:800,
+      height:700,
+      resizable:true,
+      // show: false,
+      webPreferences: {
+        webSecurity: !global.IS_DEV,
+        nodeIntegration: true
+      },
+      icon: path.join(__dirname, "assets", "iconTemplate.png")
     });
+
+    prefsWindowHandle.savers = savers;
+    prefsWindowHandle.screenshot = message.url;
+
+    prefsUrl = prefsUrl + "?screenshot=" + encodeURIComponent("file://" + message.url);
+    
+    prefsWindowHandle.loadURL(prefsUrl);
+
+    showDock();
+
+    prefsWindowHandle.on("closed", function() {
+      prefsWindowHandle = null;
+      hideDockIfInactive();
+    });
+
+    // we could do something nice with either of these events
+    prefsWindowHandle.webContents.on("crashed", outputError);
+    prefsWindowHandle.webContents.on("unresponsive", outputError);
+
+    // prefsWindowHandle.once("ready-to-show", () => {
+    //   prefsWindowHandle.show();
+    // });
   });
 };
+
+var outputError = (e) => {
+  log.info(e);
+}
 
 /**
  * handle new screensaver event. open the window to create a screensaver
@@ -529,13 +527,6 @@ var runScreenSaver = function() {
   }
 
   saver = savers.applyPreload(saver);
-
-  if ( typeof(robot) !== "undefined" ) {
-    oldMousePosition = robot.getMousePos();
-
-    // move cursor so far off screen, it isn't even funny
-    robot.moveMouse(30000, 30000);
-  }
   
   // limit to a single screen when debugging
   if ( debugMode === true ) {
@@ -600,10 +591,6 @@ var handleDisplayChange = function() {
 var closeRunningScreensavers = function() {
   log.info("closeRunningScreensavers");
   if ( debugMode !== true ) {
-    if ( typeof(robot) !== "undefined" && oldMousePosition.x !== 0 && oldMousePosition.y !== 0 ) {
-      robot.moveMouse(oldMousePosition.x, oldMousePosition.y);
-    }
-
     attemptToStopScreensavers();
     setTimeout(forcefullyCloseScreensavers, 2500);
   }
@@ -926,10 +913,6 @@ var updateTrayIcon = function() {
 
 var buildMenuTemplate = function(a) {
   var app = a;
-  var openAddNewWindow = function(w) {
-    w.webContents.send("request-open-add-screensaver");
-  };
-
   var base = [
     {
       label: "File",
@@ -938,7 +921,7 @@ var buildMenuTemplate = function(a) {
           label: "Add New Screensaver",
           accelerator: "CmdOrCtrl+N",
           click: function(item, focusedWindow) {
-            openAddNewWindow(focusedWindow);
+            addNewSaver(focusedWindow.screenshot);
           }
         },
       ]
@@ -1115,7 +1098,6 @@ if ( typeof(global.RAVEN_PRIVATE_URL) !== "undefined" ) {
   Raven.config(global.RAVEN_PRIVATE_URL, global.RAVEN_OPTIONS).install();
 }
 
-
 if ( typeof(global.CRASH_REPORTER) !== "undefined" ) {
   crashReporter.start(global.CRASH_REPORTER);
 }
@@ -1243,6 +1225,16 @@ ipcMain.on("savers-updated", (event, arg) => {
   }
 });
 
+let toggleSaversUpdated = (arg) => {
+  savers.reset();  
+  if ( prefsWindowHandle !== null ) {
+    savers.reload().then(() => {
+      prefsWindowHandle.send("savers-updated", arg);
+    });
+  }
+};
+
+
 //
 // user has updated their preferences, let's reload
 //
@@ -1254,24 +1246,16 @@ ipcMain.on("prefs-updated", (event, arg) => {
   });
 });
 
-//
-// handle request to open the prefs window
-//
-ipcMain.on("open-prefs", (event) => {
-  log.info("open-prefs");
-  openPrefsWindow();
-});
+// //
+// // handle request to open the prefs window
+// //
+// ipcMain.on("open-prefs", (event) => {
+//   log.info("open-prefs");
+//   openPrefsWindow();
+// });
 
 
-//
-// handle request to open 'add new saver' window
-//
-ipcMain.on("open-add-screensaver", (event, screenshot) => {
-  log.info("open-add-screensaver");
-  addNewSaver(screenshot);
-});
-
-ipcMain.on("open-editor", (event, args) => {
+var openEditor = (args) => {
   var key = args.src;
   var screenshot = args.screenshot;
 
@@ -1282,7 +1266,8 @@ ipcMain.on("open-editor", (event, args) => {
     },
   });
   w.savers = savers;
-  
+  w.screenshot = screenshot;
+
   // pass the key of the screensaver we want to load
   // as well as the URL to our screenshot image
 
@@ -1299,6 +1284,17 @@ ipcMain.on("open-editor", (event, args) => {
   });
   
   showDock();
+}
+//
+// handle request to open 'add new saver' window
+//
+// ipcMain.on("open-add-screensaver", (event, screenshot) => {
+//   log.info("open-add-screensaver");
+//   addNewSaver(screenshot);
+// });
+
+ipcMain.on("open-editor", (event, args) => {
+  openEditor(args);
 });
 
 
@@ -1343,18 +1339,17 @@ ipcMain.on("set-autostart", (event, value) => {
 //
 // generate screensaver template with specified attributes
 //
-ipcMain.on("generate-screensaver", (event, args) => {
-  var src = path.join(getSystemDir(), "__template");
-  var data = savers.generateScreensaver(src, args);
-  event.sender.send("generate-screensaver", data);
+// var generateScreensaver = (args) => {
+//   var src = path.join(getSystemDir(), "__template");
+//   var data = savers.generateScreensaver(src, args);
 
-  savers.reset();
-  savers.reload().then(() => {
-    if ( prefsWindowHandle !== null ) {
-      prefsWindowHandle.send("savers-updated");
-    }
-  });
-});
+//   savers.reset();
+//   savers.reload().then(() => {
+//     if ( prefsWindowHandle !== null ) {
+//       prefsWindowHandle.send("savers-updated");
+//     }
+//   });
+// };
 
 // seems like we need to catch this event to keep OSX from exiting app after screensaver runs?
 app.on("window-all-closed", function() {
@@ -1392,3 +1387,7 @@ app.once("ready", bootApp);
 
 
 exports.savers = savers;
+exports.addNewSaver = addNewSaver;
+exports.openEditor = openEditor;
+exports.getSystemDir = getSystemDir;
+exports.toggleSaversUpdated = toggleSaversUpdated;

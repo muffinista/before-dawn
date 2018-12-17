@@ -70,7 +70,7 @@ import SaverOptions from '@/components/SaverOptions';
 import SaverSummary from '@/components/SaverSummary';
 import PrefsForm from '@/components/PrefsForm';
 import Noty from "noty";
-  
+
 const mainProcess = remote.require('../main/index.js');
 
 const {dialog} = require("electron").remote;
@@ -82,7 +82,6 @@ export default {
   },
   mounted() {
     this.ipcRenderer.on("savers-updated", this.getData);
-    this.ipcRenderer.on("request-open-add-screensaver", this.createNewScreensaver);
 
     if ( this.manager === undefined ) {
       return;
@@ -100,7 +99,6 @@ export default {
   },
   beforeDestroy() {
     this.ipcRenderer.removeListener('savers-updated', this.getData);
-    this.ipcRenderer.removeListener('request-open-add-screensaver', this.createNewScreensaver);
   },
   data() {
     return {
@@ -203,20 +201,15 @@ export default {
       );
     },  
     getData() {
-      var t0 = performance.now();
       this.manager.listAll((entries) => {
-        var t1 = performance.now();
-        console.log("listAll took " + (t1 - t0) + " milliseconds.");
-
         this.savers = entries;
         var tmp = this.manager.getConfigSync();
         if ( tmp.options === undefined ) {
           tmp.options = {};
         }
-        console.log("opts took " + (t1 - t0) + " milliseconds.");
         
         // ensure default settings in the config for all savers
-        for(var i = 0; i < this.savers.length; i++ ) {
+        for(var i = 0, l = this.savers.length; i < l; i++ ) {
           var s = this.savers[i];
 
           if ( tmp.options[s.key] === undefined ) {
@@ -225,18 +218,17 @@ export default {
 
           tmp.options[s.key] = s.settings;
         }
-        console.log("for took " + (t1 - t0) + " milliseconds.");
 
         this.options = Object.assign({}, this.options, tmp.options);
+        t1 = performance.now();
+
         // https://vuejs.org/v2/guide/reactivity.html
         // However, new properties added to the object will not
         // trigger changes. In such cases, create a fresh object
         // with properties from both the original object and the mixin object:
         this.prefs = Object.assign({}, this.prefs, tmp);
-        this.bus.$emit('saver-changed', this.saverObj);
 
-        var t1 = performance.now();
-        console.log("Call to doSomething took " + (t1 - t0) + " milliseconds.");
+        this.bus.$emit('saver-changed', this.saverObj);
       });
     },
     getCurrentSaver() {
@@ -244,14 +236,14 @@ export default {
     },
     createNewScreensaver() {
       this.saveData(false);
-      this.ipcRenderer.send("open-add-screensaver", this.screenshot);
+      mainProcess.addNewSaver(this.screenshot);
     },
     editSaver(s) {
       var opts = {
         src: s.src,
         screenshot: this.screenshot
       };
-      this.ipcRenderer.send("open-editor", opts);
+      mainProcess.openEditor(opts);
     },
     deleteSaver(s) {
       var index = this.savers.indexOf(s);
@@ -266,12 +258,9 @@ export default {
       var tmp = this.options;
       var update = {};
       
-      //update[saver] = {};
       update[saver] = Object.assign({}, tmp[saver]);    
       update[saver][name] = value;
     
-
-      //this.prefs.options = Object.assign({}, tmp, update);
       this.options = Object.assign({}, this.options, update);
     },
     closeWindow() {

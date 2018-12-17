@@ -1,6 +1,6 @@
 <template>
   <div class="saver-description">
-    <h1>{{name}} <a :href="aboutUrl" v-on:click="open" v-if="hasUrl">learn more</a></h1>
+    <h1>{{name}} <small><a :href="aboutUrl" v-on:click="open" v-if="hasUrl">learn more</a></small></h1>
     <p>{{description}}</p>
     <span v-if="hasAuthor">
       {{author}}

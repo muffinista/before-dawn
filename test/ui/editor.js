@@ -26,6 +26,7 @@ describe('Editor', function() {
     fs.copySync(path.join(__dirname, '../fixtures/saver.json'), saverJSON);
     fs.copySync(path.join(__dirname, '../fixtures/index.html'), saverHTML);    
 
+    // @todo update
 		return app.start().
                then(() => app.client.waitUntilWindowLoaded() ).
 			         then(() => app.electron.ipcRenderer.send('open-editor', {

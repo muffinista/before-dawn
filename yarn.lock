@@ -3986,9 +3986,9 @@ electron-to-chromium@^1.3.47:
   integrity sha1-0tnxJwuko7lnuDHEDvcftNmrXOA=
 
 "electron@~> 2.0.7":
-  version "2.0.10"
-  resolved "https://registry.yarnpkg.com/electron/-/electron-2.0.10.tgz#9d7cccd33698e12ecda4d3f585b3bd678a4d4546"
-  integrity sha512-J6A0AbOwDNl9f1K+P42uF8SKZ9MKzOSm21T9evkkwrMdGQsIm7vzmFZEYb5eFNdwv5x52tx8Q+IUeyg/LgYYxg==
+  version "2.0.15"
+  resolved "https://registry.yarnpkg.com/electron/-/electron-2.0.15.tgz#cbba54e0eacb752826dd2364b53e6aa8e7b1e390"
+  integrity sha512-M8/SCXayCIkSdhwfguI0gyH7Ybq+Aj6GElZrFGanC49Q+gTf8DYZJaAeL7GRu6x60Wao5cq3JkwbmH6MNQkRmw==
   dependencies:
     "@types/node" "^8.0.24"
     electron-download "^3.0.1"
@@ -5269,10 +5269,15 @@ got@^6.7.1:
     unzip-response "^2.0.1"
     url-parse-lax "^1.0.0"
 
-graceful-fs@^4.1.0, graceful-fs@^4.1.11, graceful-fs@^4.1.2, graceful-fs@^4.1.6, graceful-fs@^4.1.9, graceful-fs@~4.1.11:
+graceful-fs@^4.1.0, graceful-fs@^4.1.11, graceful-fs@^4.1.2, graceful-fs@^4.1.6, graceful-fs@~4.1.11:
   version "4.1.11"
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.1.11.tgz#0e8bdfe4d1ddb8854d64e04ea7c00e2a026e5658"
   integrity sha1-Dovf5NHduIVNZOBOp8AOKgJuVlg=
+
+graceful-fs@^4.1.9:
+  version "4.1.15"
+  resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.1.15.tgz#ffb703e1066e8a0eeaa4c8b80ba9253eeefbfb00"
+  integrity sha512-6uHUhOPEBgQ24HM+r6b/QwWfZq+yiFcipKFrOFiBEnWdy5sdzYoi+pJeQaPI5qOLRFqWmAXUPQNsielzdLoecA==
 
 "graceful-readlink@>= 1.0.0":
   version "1.0.1"

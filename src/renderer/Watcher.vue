@@ -116,10 +116,6 @@ export default {
     if ( this.src === null ) {
       return;
     }
-
-    this.ipcRenderer.on("request-open-add-screensaver", (event, arg) => {
-      this.ipcRenderer.send("open-add-screensaver", this.screenshot);
-    });
     
     this.manager.loadFromFile(this.src).then((result) => {
       this.saver = result;

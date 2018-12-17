@@ -32,6 +32,12 @@ small {
     grid-template-columns: 48% 48%;
 }
 
+@media (max-width: 600px) {
+  .grid {
+    grid-template-columns: 99%;
+  }
+}
+
 select, label {
     font-size: 0.9rem;
 }
@@ -46,9 +52,14 @@ select, label {
 
 body > div > .content {
   height: calc(100vh - #{$footer_height});
-  overflow-y: scroll;
+  //overflow-y: scroll;
 }
 
+@media (max-height: 600px) {
+  body > div > .content {
+    overflow-y: scroll;
+  }  
+}
 body > div > footer {
     height: $footer_height;
     background-color: #f5f5f5;
@@ -110,7 +121,7 @@ button.add-option, button.reset-to-defaults {
 }
 
 .saver-list {
-  height: calc(100vh - #{$nav_height+$tab_padding+$footer_height});
+  height: calc(95vh - #{$nav_height+$tab_padding+$footer_height});
   margin-bottom: 0px;
   overflow-y: scroll;
 }
@@ -155,13 +166,6 @@ fieldset {
   padding: 5px;
 }
 
-
-form.input {
-    margin-bottom: 10px;
-}
-form.input input[type=text], input[type=range] {
-    width: 100%;
-}
 
 .padded-top {
     margin-top: 20px;
@@ -258,6 +262,15 @@ form.submit-attempt {
 
 form.entry {
     margin-bottom: 10px;
+}
+
+form.input {
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+}
+form.input input[type=text], input[type=range] {
+    width: 100%;
 }
 
 label.for-option {
