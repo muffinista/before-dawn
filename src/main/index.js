@@ -192,7 +192,12 @@ var openPrefsWindow = function() {
       icon: path.join(__dirname, "assets", "iconTemplate.png")
     });
 
-    prefsWindowHandle.savers = savers;
+    prefsWindowHandle.saverOpts = {
+      base: global.basePath,
+      systemDir: getSystemDir()
+    };
+  
+//    prefsWindowHandle.savers = savers;
     prefsWindowHandle.screenshot = message.url;
 
     prefsUrl = prefsUrl + "?screenshot=" + encodeURIComponent("file://" + message.url);
@@ -796,7 +801,7 @@ var bootApp = function() {
 /**
  * try and guess if we are in fullscreen mode or not
  */
-var inFullscreen = require("./fullscreen.js").inFullscreen;
+var inFullscreen = require("detect-fullscreen").isFullscreen;
 
 /**
  * run the screensaver, but only if there isn't an app in fullscreen mode right now
@@ -1275,7 +1280,12 @@ var openEditor = (args) => {
       webSecurity: !global.IS_DEV
     },
   });
-  w.savers = savers;
+  w.saverOpts = {
+    base: global.basePath,
+    systemDir: getSystemDir()
+  };
+
+  //w.savers = savers;
   w.screenshot = screenshot;
 
   // pass the key of the screensaver we want to load
@@ -1385,7 +1395,7 @@ app.once("ready", bootApp);
 
 
 
-exports.savers = savers;
+//exports.savers = savers;
 exports.addNewSaver = addNewSaver;
 exports.openEditor = openEditor;
 exports.getSystemDir = getSystemDir;
