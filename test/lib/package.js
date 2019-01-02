@@ -21,7 +21,7 @@ var sandbox;
 
 describe('Package', function() {
   beforeEach(() => {
-    sandbox = sinon.sandbox.create();
+    sandbox = sinon.createSandbox();
 
     workingDir = helpers.getTempDir();
     dataPath = path.join(__dirname, "..", "fixtures", "release.json");

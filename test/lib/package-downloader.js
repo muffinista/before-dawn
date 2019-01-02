@@ -8,7 +8,6 @@ const Package = require('../../src/lib/package.js');
 
 const tmp = require('tmp');
 const fs = require('fs-extra');
-const path = require('path');
 const rimraf = require('rimraf');
 
 const sinon = require('sinon');
@@ -25,7 +24,6 @@ describe('PackageDownloader', () => {
   var workingDir;
   var prefs;
 
-  var zipPath = path.join(__dirname, "..", "fixtures", "test-savers.zip");
   var attrs = {
     repo: "muffinista/before-dawn-screensavers",
     dest: workingDir

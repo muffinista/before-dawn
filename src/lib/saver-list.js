@@ -21,13 +21,13 @@ var skipFolder = function(p) {
 
 
 module.exports = class SaverListManager {
-  constructor(opts) {
+  constructor(opts, logger) {
     this.prefs = opts.prefs;
     this.loadedScreensavers = [];
     this._firstLoad = false;
 
-    if ( this.prefs.logger !== undefined ) {
-      this.logger = this.prefs.logger;
+    if ( logger !== undefined ) {
+      this.logger = logger;
     }
     else {
       this.logger = function() {};

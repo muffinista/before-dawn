@@ -7,9 +7,14 @@ const PACKAGE_WAIT_TIME = 60 * 60 * 1000;
 
 
 module.exports = class PackageDownloader {
-  constructor(prefs) {
+  constructor(prefs, logger) {
     this.prefs = prefs;
-    this.logger = console.log;
+    if ( logger !== undefined ) {
+      this.logger = logger;
+    }
+    else {
+      this.logger = function() {}
+    }
   }
 
   getPackage() {
