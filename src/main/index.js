@@ -522,7 +522,7 @@ var setStateToRunning = function() {
 var runScreenSaver = function() {
   var displays = getDisplays();
 
-  const SaverListManager = require('../lib/saver-list.js');
+  const SaverListManager = require("../lib/saver-list.js");
   var savers = new SaverListManager({
     prefs: prefs
   });

@@ -20,7 +20,7 @@ Vue.config.productionTip = false;
 Vue.use(VueElectron);
 Vue.use(BootstrapVue);
 
-if ( document.getElementById('prefs') ) {
+if ( document.getElementById("prefs") ) {
   // eslint-disable no-new 
   new Vue({
     components: { Prefs },
@@ -28,7 +28,7 @@ if ( document.getElementById('prefs') ) {
   }).$mount("#prefs");
 }
 
-if ( document.getElementById('editor') ) {
+if ( document.getElementById("editor") ) {
   // eslint-disable no-new 
   new Vue({
     components: { Watcher },
@@ -36,7 +36,7 @@ if ( document.getElementById('editor') ) {
   }).$mount("#editor");
 }
 
-if ( document.getElementById('new') ) {
+if ( document.getElementById("new") ) {
   // eslint-disable no-new 
   new Vue({
     components: { NewScreensaver },
@@ -44,7 +44,7 @@ if ( document.getElementById('new') ) {
   }).$mount("#new");
 }
 
-if ( document.getElementById('about') ) {
+if ( document.getElementById("about") ) {
   // eslint-disable no-new 
   new Vue({
     components: { About },
