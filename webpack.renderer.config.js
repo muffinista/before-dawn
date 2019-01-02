@@ -188,7 +188,7 @@ let rendererConfig = {
  * Adjust rendererConfig for production settings
  */
 if (process.env.NODE_ENV === 'production') {
-  //rendererConfig.devtool = ''
+  rendererConfig.devtool = ''
 
   rendererConfig.plugins.push(
     new BabiliWebpackPlugin(),
