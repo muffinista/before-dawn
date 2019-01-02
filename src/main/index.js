@@ -41,9 +41,6 @@ let testMode = ( process.env.TEST_MODE !== undefined );
 
 let saverWindows = [];
 
-var appReady = false;
-var configLoaded = false;
-
 var shouldQuit = false;
 var exitOnQuit = false;
 
@@ -141,9 +138,7 @@ var openTestShim = function() {
   var shimUrl = "file://" + __dirname + "/assets/shim.html";
 
   // just open an empty window
-  savers.reload().then(() => {
-    testWindow.loadURL(shimUrl);
-  });
+  testWindow.loadURL(shimUrl);
 };
 
 /**
@@ -174,7 +169,6 @@ var showDock = function() {
 var openPrefsWindow = function() {
   var primary = electronScreen.getPrimaryDisplay();
 
-
   // take a screenshot of the main screen for use in previews
   grabScreen(primary, function(message) {
     var prefsUrl = getUrlPrefix() + "/prefs.html";
@@ -197,7 +191,6 @@ var openPrefsWindow = function() {
       systemDir: getSystemDir()
     };
   
-//    prefsWindowHandle.savers = savers;
     prefsWindowHandle.screenshot = message.url;
 
     prefsUrl = prefsUrl + "?screenshot=" + encodeURIComponent("file://" + message.url);
@@ -250,7 +243,12 @@ var addNewSaver = function(screenshot) {
     icon: path.join(__dirname, "assets", "iconTemplate.png")
   });
 
-  w.savers = savers;
+  w.saverOpts = {
+    base: global.basePath,
+    systemDir: getSystemDir()
+  };
+
+  //w.savers = savers;
   w.loadURL(newUrl);
 
   showDock();
@@ -486,7 +484,7 @@ var blankScreen = function(s) {
  */
 var getDisplays = function() {
   var displays = [];
-  if ( debugMode === true  || savers.getRunOnSingleDisplay() === true ) {
+  if ( debugMode === true || prefs.runOnSingleDisplay === true ) {
     displays = [
       electronScreen.getPrimaryDisplay()
     ];
@@ -524,48 +522,56 @@ var setStateToRunning = function() {
 var runScreenSaver = function() {
   var displays = getDisplays();
 
-  var saver = savers.getCurrentData();
+  const SaverListManager = require('../lib/saver-list.js');
+  var savers = new SaverListManager({
+    prefs: prefs
+  });
+  var settings = prefs.getOptions();
 
-  // make sure we have something to display
-  if ( typeof(saver) === "undefined" ) {
-    log.info("No screensaver defined!");
-    return;
-  }
-
-  saver = savers.applyPreload(saver);
-  
-  // limit to a single screen when debugging
-  if ( debugMode === true ) {
-    if ( typeof(app.dock) !== "undefined" ) {
-      app.dock.show();
+  console.log("hey!", prefs.current);
+  savers.loadFromFile(prefs.current, settings).then((saver) => {
+    // make sure we have something to display
+    if ( typeof(saver) === "undefined" ) {
+      log.info("No screensaver defined!");
+      return;
     }
-  }
-  
-  try {
-    // turn off idle checks for a couple seconds while loading savers
-    stateManager.ignoreReset(true);
 
-    for ( var i in displays ) {
-      runScreenSaverOnDisplay(saver, displays[i]);
-    } // for
-
-    // if we're only running on primary display, blank out the other ones
-    if ( debugMode !== true && savers.getRunOnSingleDisplay() === true ) {
-      var otherDisplays = getNonPrimaryDisplays();
-      for ( var i in otherDisplays ) {
-        blankScreen(otherDisplays[i]);
+//    saver = savers.applyPreload(saver);
+    
+    // limit to a single screen when debugging
+    if ( debugMode === true ) {
+      if ( typeof(app.dock) !== "undefined" ) {
+        app.dock.show();
       }
     }
-  }
-  catch (e) {
-    stateManager.ignoreReset(false);
-    log.info(e);
-  }
-  finally {
-    setTimeout(function() {
+    
+    try {
+      // turn off idle checks for a couple seconds while loading savers
+      stateManager.ignoreReset(true);
+
+      for ( var i in displays ) {
+        runScreenSaverOnDisplay(saver, displays[i]);
+      } // for
+
+      // if we're only running on primary display, blank out the other ones
+      if ( debugMode !== true && prefs.runOnSingleDisplay === true ) {
+        var otherDisplays = getNonPrimaryDisplays();
+        for ( var i in otherDisplays ) {
+          blankScreen(otherDisplays[i]);
+        }
+      }
+    }
+    catch (e) {
       stateManager.ignoreReset(false);
-    }, 2500);
-  }
+      log.info(e);
+    }
+    finally {
+      setTimeout(function() {
+        stateManager.ignoreReset(false);
+      }, 2500);
+    }
+
+  });
 };
 
 /**
@@ -633,7 +639,7 @@ var forcefullyCloseScreensavers = function() {
  * should we lock the user's screen when returning from running the saver?
  */
 var shouldLockScreen = function() {
-  return ( savers.getLock() === true );
+  return ( prefs.lock === true );
 };
 
 /**
@@ -653,20 +659,6 @@ var stopScreenSaver = function(fromBlank) {
   }
 
   closeRunningScreensavers();
-};
-
-
-/**
- * once the app is ready and our config is loaded, check to see if the app
- * has been loaded before. if not, let's go ahead and open the prefs window now.
- */
-var openPrefsOnFirstLoad = function() {
-  if ( appReady === false || configLoaded === false ) {
-    return;
-  }
-  if ( savers.firstLoad() === true ) {
-    setTimeout(openPrefsWindow, 1000);
-  }
 };
 
 
@@ -705,6 +697,8 @@ var getUrlPrefix = function() {
   return "file://" + __dirname;
 };
 
+const SaverPrefs = require("../lib/prefs.js");
+let prefs = undefined;
 
 
 /**
@@ -744,57 +738,51 @@ var bootApp = function() {
     systemDir: getSystemDir(),
     logger: log.info
   };
-  
+
   log.info("Load config with", saverOpts);
-  savers.init(saverOpts).then((r) => {
-    savers.handlePackageChecks(r);
-  }).then(() => {
-    configLoaded = true;
-    updateStateManager();
-    
-    appIcon = new Tray(icons.active);
-    appIcon.setToolTip(global.APP_NAME);
-    appIcon.setContextMenu(trayMenu); 
-    
-    // show tray menu on right click
-    // @todo should this be osx only?
-    appIcon.on("right-click", () => {
-      appIcon.popUpContextMenu();
-    });
-    
-    appReady = true;
-    
-    if ( testMode === true ) {
-      openTestShim();
-    }
-    else {
-      openPrefsOnFirstLoad();
-      openGrabberWindow();
-    }
 
-    if ( global.CHECK_FOR_RELEASE === true ) {
-      releaseChecker = require("./release_check.js");
-      
-      releaseChecker.setFeed(global.RELEASE_CHECK_URL);
-      releaseChecker.setLogger(log.info);
-      releaseChecker.onUpdate((x) => {
-        global.NEW_RELEASE_AVAILABLE = true;
-        trayMenu.items[3].visible = global.NEW_RELEASE_AVAILABLE;
-      });
-      releaseChecker.onNoUpdate(() => {
-        global.NEW_RELEASE_AVAILABLE = false;
-        trayMenu.items[3].visible = global.NEW_RELEASE_AVAILABLE;
-      });
-
-      // check for a new release every 12 hours
-      log.info("Setup release check");
-      checkForNewRelease();
-      setInterval(checkForNewRelease, 1000 * 60 * 60 * 12);
-
-      savers.listAll(console.log);
-    }
-    
+  updateStateManager();
+  
+  appIcon = new Tray(icons.active);
+  appIcon.setToolTip(global.APP_NAME);
+  appIcon.setContextMenu(trayMenu); 
+  
+  // show tray menu on right click
+  // @todo should this be osx only?
+  appIcon.on("right-click", () => {
+    appIcon.popUpContextMenu();
   });
+  
+  
+  if ( testMode === true ) {
+    openTestShim();
+  }
+  else {
+    openGrabberWindow();
+    if ( prefs.needSetup() === true ) {
+      setTimeout(openPrefsWindow, 1000);
+    }
+  }
+
+  if ( global.CHECK_FOR_RELEASE === true ) {
+    releaseChecker = require("./release_check.js");
+    
+    releaseChecker.setFeed(global.RELEASE_CHECK_URL);
+    releaseChecker.setLogger(log.info);
+    releaseChecker.onUpdate((x) => {
+      global.NEW_RELEASE_AVAILABLE = true;
+      trayMenu.items[3].visible = global.NEW_RELEASE_AVAILABLE;
+    });
+    releaseChecker.onNoUpdate(() => {
+      global.NEW_RELEASE_AVAILABLE = false;
+      trayMenu.items[3].visible = global.NEW_RELEASE_AVAILABLE;
+    });
+
+    // check for a new release every 12 hours
+    log.info("Setup release check");
+    checkForNewRelease();
+    setInterval(checkForNewRelease, 1000 * 60 * 60 * 12);
+  }
 };
 
 
@@ -835,7 +823,7 @@ var runScreenSaverIfPowered = function() {
   }
   
   // check if we are on battery, and if we should be running in that case
-  if ( checkPowerState && savers.getDisableOnBattery() ) {
+  if ( checkPowerState && prefs.disableOnBattery ) {
     power.charging().then((is_powered) => {
       if ( is_powered ) {       
         runScreenSaverIfNotFullscreen();
@@ -870,13 +858,13 @@ var blankScreenIfNeeded = function() {
  */
 var updateStateManager = function() {
   log.info("updateStateManager",
-           "idleTime: " + savers.getDelay(),
-           "blankTime: " + (savers.getDelay() + savers.getSleep())
+           "idleTime: " + prefs.delay,
+           "blankTime: " + (prefs.delay + prefs.sleep)
   );
 
   stateManager.setup({
-    idleTime: savers.getDelay() * 60000,
-    blankTime: (savers.getDelay() + savers.getSleep()) * 60000,
+    idleTime: prefs.delay * 60000,
+    blankTime: (prefs.delay + prefs.sleep) * 60000,
     onIdleTime: runScreenSaverIfPowered,
     onBlankTime: blankScreenIfNeeded,
     onReset: closeRunningScreensavers
@@ -1126,7 +1114,7 @@ else {
   global.basePath = path.join(app.getPath("appData"), global.APP_DIR);
 }
 
-let savers = require("../lib/savers.js");
+prefs = new SaverPrefs(global.basePath);
 
 /**
  * make sure we're only running a single instance
@@ -1220,20 +1208,13 @@ trayMenu = Menu.buildFromTemplate([
 // the prefs window know that it needs to reload
 //
 ipcMain.on("savers-updated", (event, arg) => {
-  savers.reset();  
-  if ( prefsWindowHandle !== null ) {
-    savers.reload().then(() => {
-      prefsWindowHandle.send("savers-updated", arg);
-    });
-  }
+  toggleSaversUpdated();
 });
 
 let toggleSaversUpdated = (arg) => {
-  savers.reset();  
+  prefs.reload();  
   if ( prefsWindowHandle !== null ) {
-    savers.reload().then(() => {
-      prefsWindowHandle.send("savers-updated", arg);
-    });
+    prefsWindowHandle.send("savers-updated", arg);
   }
 };
 
@@ -1242,11 +1223,10 @@ let toggleSaversUpdated = (arg) => {
 // user has updated their preferences, let's reload
 //
 ipcMain.on("prefs-updated", (event, arg) => {
-  log.info("prefs-updated");
-  savers.reset();
-  savers.reload().then(() => {
-    updateStateManager();
-  });
+  log.info("prefs-updated", Object.keys(arg));
+  prefs.reload();
+  log.info(prefs.toHash());
+  updateStateManager();
 });
 
 //
@@ -1285,7 +1265,6 @@ var openEditor = (args) => {
     systemDir: getSystemDir()
   };
 
-  //w.savers = savers;
   w.screenshot = screenshot;
 
   // pass the key of the screensaver we want to load
@@ -1341,24 +1320,7 @@ ipcMain.on("set-autostart", (event, value) => {
                   });
     });
   }
-
-
 });
-
-//
-// generate screensaver template with specified attributes
-//
-// var generateScreensaver = (args) => {
-//   var src = path.join(getSystemDir(), "__template");
-//   var data = savers.generateScreensaver(src, args);
-
-//   savers.reset();
-//   savers.reload().then(() => {
-//     if ( prefsWindowHandle !== null ) {
-//       prefsWindowHandle.send("savers-updated");
-//     }
-//   });
-// };
 
 // seems like we need to catch this event to keep OSX from exiting app after screensaver runs?
 app.on("window-all-closed", function() {
@@ -1393,9 +1355,6 @@ process.on("uncaughtException", function (ex) {
 app.once("ready", bootApp);
 
 
-
-
-//exports.savers = savers;
 exports.addNewSaver = addNewSaver;
 exports.openEditor = openEditor;
 exports.getSystemDir = getSystemDir;

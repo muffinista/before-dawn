@@ -95,29 +95,42 @@
 </template>
 
 <script>
-  const fs = require("fs");
-  const path = require("path");
-  const url = require("url");
-  const exec = require("child_process").exec;
-  
-  import Vue from 'vue';
-  import SaverPreview from '@/components/SaverPreview';
-  import SaverForm from '@/components/SaverForm';  
-  import SaverOptionInput from '@/components/SaverOptionInput';
-  import SaverOptions from '@/components/SaverOptions';
-  import Noty from "noty";
-  
+const fs = require("fs");
+const path = require("path");
+const url = require("url");
+const exec = require("child_process").exec;
+
+import Vue from 'vue';
+import SaverPreview from '@/components/SaverPreview';
+import SaverForm from '@/components/SaverForm';  
+import SaverOptionInput from '@/components/SaverOptionInput';
+import SaverOptions from '@/components/SaverOptions';
+import Noty from "noty";
+
+const remote = require('electron').remote;
+
+import SaverPrefs from '@/../lib/prefs';
+import SaverListManager from '@/../lib/saver-list';
+
 export default {
   name: 'editor',
   components: {
     SaverForm, SaverPreview, SaverOptionInput, SaverOptions
   },
-  mounted() {
+  async mounted() {
     if ( this.src === null ) {
       return;
     }
-    
-    this.manager.loadFromFile(this.src).then((result) => {
+
+    let dataPath = remote.getCurrentWindow().saverOpts.base;
+
+    this._prefs = new SaverPrefs(dataPath);
+    this._savers = new SaverListManager({
+      prefs: this._prefs
+    });
+
+
+    this._savers.loadFromFile(this.src).then((result) => {
       this.saver = result;
       this.options = result.options;
       this.lastIndex = result.options.length;
@@ -129,8 +142,7 @@ export default {
             this.reloadPreview();
           }
         });
-      }
-      
+      }      
     });
   },
   data() {
@@ -147,11 +159,10 @@ export default {
       return new Vue();
     },
     currentWindow: function() {
-      console.log("hello");
       return this.$electron.remote.getCurrentWindow();
     },
     manager: function() {
-      return this.currentWindow.savers;
+      return savers;
     },
     ipcRenderer: function() {
       return this.$electron.ipcRenderer;

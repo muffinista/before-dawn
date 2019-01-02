@@ -30,16 +30,27 @@
 </template>
 
 <script>
+const path = require('path');
+
 import SaverForm from '@/components/SaverForm';
 const remote = require('electron').remote;
-var is_dev = remote.getGlobal('IS_DEV');
+const is_dev = remote.getGlobal('IS_DEV');
 
-const mainProcess = remote.require( is_dev ? '../main/index.js' : './main.js');
+import SaverPrefs from '@/../lib/prefs';
+import SaverListManager from '@/../lib/saver-list';
 
 export default {
   name: 'new-screensaver',
   components: {
     SaverForm
+  },
+  mounted() {
+    let dataPath = remote.getCurrentWindow().saverOpts.base;
+
+    this._prefs = new SaverPrefs(dataPath);
+    this._savers = new SaverListManager({
+      prefs: this._prefs
+    });
   },
   data() {
     return {
@@ -52,7 +63,7 @@ export default {
       return this.$electron.remote.getCurrentWindow();
     },
     manager: function() {
-      return this.currentWindow.savers;
+      return this._savers;
     },
     ipcRenderer: function() {
       return this.$electron.ipcRenderer;
@@ -66,9 +77,9 @@ export default {
       return decodeURIComponent(this.params.get("screenshot"));
     },
     canAdd: function() {
-      return this.manager !== undefined &&
-        this.manager.getLocalSource() !== undefined &&
-        this.manager.getLocalSource() !== "";
+      return this._prefs !== undefined &&
+        this._prefs.localSource !== undefined &&
+        this._prefs.localSource !== "";
     }
   },
   methods: {
@@ -85,12 +96,14 @@ export default {
 
       this.disabled = true;
 
-      const path = require('path');
       var src = path.join(mainProcess.getSystemDir(), "__template");
       var data = this.manager.generateScreensaver(src, this.saver);
 
       this.manager.reset();
       this.manager.reload().then(() => {
+        let loadPath = remote.getCurrentWindow().saverOpts.systemDir;
+        const mainProcess = remote.require( path.join(loadPath, 'index.js'));
+
         mainProcess.toggleSaversUpdated();
         mainProcess.openEditor({
           src: data.dest,

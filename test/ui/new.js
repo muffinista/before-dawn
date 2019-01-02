@@ -17,8 +17,10 @@ describe('Add New', function() {
 
   describe('when not setup', function() {
 	  beforeEach(() => {
+      console.log(app);
 		  return app.start().
                  then(() => {
+                   console.log("A");
                    helpers.removeLocalSource(workingDir);
                  }).
                  then(() => app.client.waitUntilWindowLoaded() ).

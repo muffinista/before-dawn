@@ -9,7 +9,6 @@
                 <!-- left pane -->
                 <div>
                   <saver-list
-                    v-if="isLoaded"
                     v-bind:savers="savers"
                     v-bind:current="saver"
                     v-on:editSaver="editSaver"
@@ -19,7 +18,7 @@
               
                 <!-- right pane -->
                 <div class="saver-detail">
-                  <template v-if="isLoaded">
+                  <template v-if="saverIsPicked">
                     <saver-summary :saver="saverObj"></saver-summary>
                     <saver-preview
                       :bus="bus"
@@ -71,34 +70,45 @@ import SaverSummary from '@/components/SaverSummary';
 import PrefsForm from '@/components/PrefsForm';
 import Noty from "noty";
 
+const path = require('path');
 const remote = require('electron').remote;
-var is_dev = remote.getGlobal('IS_DEV');
-
-const mainProcess = remote.require( is_dev ? '../main/index.js' : './main.js');
-
 const {dialog} = require("electron").remote;
-  
+const is_dev = remote.getGlobal('IS_DEV');
+
+
+import SaverPrefs from '@/../lib/prefs';
+import SaverListManager from '@/../lib/saver-list';
+import PackageDownloader from '@/../lib/package-downloader';
+
 export default {
   name: 'prefs',
   components: {
     SaverList, SaverOptions, SaverPreview, SaverSummary, PrefsForm
   },
-  mounted() {
+  async mounted() {
+    let dataPath = remote.getCurrentWindow().saverOpts.base;
+
     this.ipcRenderer.on("savers-updated", this.getData);
-
-    if ( this.manager === undefined ) {
-      return;
-    }
-
-    this.getData();
-    this.getCurrentSaver();
-
-    if ( this.$electron.remote.getGlobal("NEW_RELEASE_AVAILABLE") ) {
-      this.$nextTick(() => {
-        this.renderUpdateNotice();
-      });
-    }
-    
+    this._prefs = new SaverPrefs(dataPath);
+    this._savers = new SaverListManager({
+      prefs: this._prefs
+    });
+    this._savers.setup().then(() => {
+      this.getData();
+      this.getCurrentSaver();
+      if ( this._prefs.needSetup() ) {
+        this._prefs.setDefaultRepo(this.$electron.remote.getGlobal("SAVER_REPO"));
+        var pd = new PackageDownloader(this._prefs);
+        pd.updatePackage().then((r) => {
+          this.getData();
+        });
+      }
+      else if ( this.$electron.remote.getGlobal("NEW_RELEASE_AVAILABLE") ) {
+        this.$nextTick(() => {
+          this.renderUpdateNotice();
+        });
+      }
+    });
   },
   beforeDestroy() {
     this.ipcRenderer.removeListener('savers-updated', this.getData);
@@ -116,19 +126,25 @@ export default {
     bus: function() {
       return new Vue();
     },
+    mainProcess() {
+      let loadPath = remote.getCurrentWindow().saverOpts.systemDir;
+      return remote.require( path.join(loadPath, 'index.js'));
+    },
     currentWindow: function() {
       return this.$electron.remote.getCurrentWindow();
     },
     manager: function() {
-      return mainProcess.savers;
+      return this._savers;
     },
     ipcRenderer: function() {
       return this.$electron.ipcRenderer;
     },
     isLoaded: function() {
-      return ( this.saver !== undefined &&
-               typeof(this.savers) !== "undefined" &&
+      return ( typeof(this.savers) !== "undefined" &&
                this.savers.length > 0);
+    },
+    saverIsPicked() {
+      return this.saverIndex >= 0;
     },
     saverIndex: function() {
       return this.savers.findIndex((s) => s.key === this.saver);
@@ -137,6 +153,9 @@ export default {
       var self = this;
       if ( ! this.isLoaded ) {
         return undefined;
+      }
+      if ( this.saverIndex < 0 ) {
+        return {};
       }
 
       return this.savers[this.saverIndex].options;
@@ -204,9 +223,9 @@ export default {
       );
     },  
     getData() {
-      this.manager.listAll((entries) => {
+      this.manager.list((entries) => {
         this.savers = entries;
-        var tmp = this.manager.getConfigSync();
+        var tmp = this._prefs.toHash();
         if ( tmp.options === undefined ) {
           tmp.options = {};
         }
@@ -230,22 +249,29 @@ export default {
         // with properties from both the original object and the mixin object:
         this.prefs = Object.assign({}, this.prefs, tmp);
 
+
+        // pick the first screensaver if nothing picked yet
+        if ( this.current === undefined ) {
+          this._prefs.current = this.savers[0].key;
+          this.getCurrentSaver();
+        }
+
         this.bus.$emit('saver-changed', this.saverObj);
       });
     },
     getCurrentSaver() {
-      this.saver = this.manager.getCurrent();
+      this.saver = this._prefs.current;
     },
     createNewScreensaver() {
       this.saveData(false);
-      mainProcess.addNewSaver(this.screenshot);
+      this.mainProcess.addNewSaver(this.screenshot);
     },
     editSaver(s) {
       var opts = {
         src: s.src,
         screenshot: this.screenshot
       };
-      mainProcess.openEditor(opts);
+      this.mainProcess.openEditor(opts);
     },
     deleteSaver(s) {
       var index = this.savers.indexOf(s);
@@ -276,12 +302,12 @@ export default {
       this.disabled = true;
 
       // @todo should this use Object.assign?
-      this.prefs.saver = this.saver;
+      this.prefs.current = this.saver;
       this.prefs.options = this.options;
       
-      this.manager.updatePrefs(this.prefs, () => {
+      this._prefs.updatePrefs(this.prefs, (changes) => {
         this.disabled = false;
-        this.ipcRenderer.send("prefs-updated", this.prefs);
+        this.ipcRenderer.send("prefs-updated", changes);
         this.ipcRenderer.send("set-autostart", this.prefs.auto_start);
         if ( doClose ) {
           this.closeWindow();

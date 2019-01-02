@@ -23,6 +23,8 @@ var serialize = function(obj) {
   return str.join("&");
 };
 
+const _path = require("path");
+
 module.exports = function Saver(_attrs) {
   this.UNWRITABLE_KEYS = ["key", "path", "url", "settings", "editable"];
 
@@ -37,19 +39,19 @@ module.exports = function Saver(_attrs) {
   this.preload = _attrs.preload;
   this.requirements = _attrs.requirements || DEFAULT_REQUIREMENTS;
 
-
   // allow for a specified URL -- this way you could create a screensaver
   // that pointed to a remote URL
   this.url = _attrs.url;
-  if ( typeof(this.url) === "undefined" ) {
-    this.url = "file://" + this.key;
+  if ( typeof(this.url) === "undefined" && 
+    _attrs.path !== undefined  && 
+    _attrs.source !== undefined) {
+    this.url = "file://" + _path.join(_attrs.path, _attrs.source);
   }
 
   // keep track of our main saver.json file
   this.src = _attrs.src;
   if ( typeof(this.src) === "undefined" && typeof(this.key) !== "undefined" ) {
-    var p = require("path");
-    this.src = p.join(p.dirname(this.key), "saver.json");
+    this.src = _path.join(_path.dirname(this.key), "saver.json");
   }
   
   this.published = _attrs.published;

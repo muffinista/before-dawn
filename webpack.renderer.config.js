@@ -6,7 +6,7 @@ const packageJSON = require(`${'./package.json'}`);
 
 const productName = packageJSON.productName;
 const dependencies = packageJSON.dependencies;
-const optionalDependencies = packageJSON.optionalDependencies;
+//const optionalDependencies = packageJSON.optionalDependencies || {};
 
 const webpack = require('webpack');
 
@@ -155,6 +155,12 @@ let rendererConfig = {
           to: path.join(outputDir, 'assets'),
           ignore: ['.*']
         }
+        // ,
+        // {
+        //   from: path.join(__dirname, 'src', 'lib'),
+        //   to: path.join(outputDir, 'lib'),
+        //   ignore: ['.*']
+        // }
       ]
     ),
     new webpack.HotModuleReplacementPlugin(),

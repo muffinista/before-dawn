@@ -2,9 +2,12 @@
   "source": {
     "repo": ""
   },
-  "saver": "before-dawn-screensavers/emoji/saver.json",
+  "saver": "/Users/colin/Projects/before-dawn-screensavers/emoji/saver.json",
   "options": {
-    "/Users/colin/Projects/before-dawn-screensavers/emoji/saver.json": {}
+    "/Users/colin/Projects/before-dawn-screensavers/emoji/saver.json": {
+      "foo": "bar",
+      "level": 100
+    }
   },
   "delay": 10,
   "lock": false,

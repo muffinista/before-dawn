@@ -20,26 +20,34 @@ Vue.config.productionTip = false;
 Vue.use(VueElectron);
 Vue.use(BootstrapVue);
 
-// eslint-disable no-new 
-new Vue({
-  components: { Prefs },
-  template: "<Prefs/>"
-}).$mount("#prefs");
+if ( document.getElementById('prefs') ) {
+  // eslint-disable no-new 
+  new Vue({
+    components: { Prefs },
+    template: "<Prefs/>"
+  }).$mount("#prefs");
+}
 
-// eslint-disable no-new 
-new Vue({
-  components: { Watcher },
-  template: "<Watcher/>"
-}).$mount("#editor");
+if ( document.getElementById('editor') ) {
+  // eslint-disable no-new 
+  new Vue({
+    components: { Watcher },
+    template: "<Watcher/>"
+  }).$mount("#editor");
+}
 
-// eslint-disable no-new 
-new Vue({
-  components: { NewScreensaver },
-  template: "<NewScreensaver/>"
-}).$mount("#new");
+if ( document.getElementById('new') ) {
+  // eslint-disable no-new 
+  new Vue({
+    components: { NewScreensaver },
+    template: "<NewScreensaver/>"
+  }).$mount("#new");
+}
 
-// eslint-disable no-new 
-new Vue({
-  components: { About },
-  template: "<About/>"
-}).$mount("#about");
+if ( document.getElementById('about') ) {
+  // eslint-disable no-new 
+  new Vue({
+    components: { About },
+    template: "<About/>"
+  }).$mount("#about");
+}
