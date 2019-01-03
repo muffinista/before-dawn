@@ -52,8 +52,12 @@ select, label {
 
 body > div > .content {
   height: calc(100vh - #{$footer_height});
-  //overflow-y: scroll;
 }
+
+body > #editor > .content {
+  overflow-y: scroll;
+}
+
 
 @media (max-height: 600px) {
   body > div > .content {
