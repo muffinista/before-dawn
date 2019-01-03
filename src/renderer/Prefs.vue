@@ -88,7 +88,7 @@ export default {
   async mounted() {
     let dataPath = remote.getCurrentWindow().saverOpts.base;
 
-    this.ipcRenderer.on("savers-updated", this.getData);
+    this.ipcRenderer.on("savers-updated", this.onSaversUpdated);
     this._prefs = new SaverPrefs(dataPath);
     this._savers = new SaverListManager({
       prefs: this._prefs
@@ -115,7 +115,7 @@ export default {
     });
   },
   beforeDestroy() {
-    this.ipcRenderer.removeListener('savers-updated', this.getData);
+    this.ipcRenderer.removeListener('savers-updated', this.onSaversUpdated);
   },
   data() {
     return {
@@ -269,6 +269,10 @@ export default {
 
         this.bus.$emit('saver-changed', this.saverObj);
       });
+    },
+    onSaversUpdated() {
+      this.manager.reset();
+      this.getData();
     },
     getCurrentSaver() {
       this.saver = this._prefs.current;

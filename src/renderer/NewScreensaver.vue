@@ -53,19 +53,23 @@ export default {
   },
   mounted() {
     let dataPath = remote.getCurrentWindow().saverOpts.base;
+    this.prefs = new SaverPrefs(dataPath);
 
-    this._prefs = new SaverPrefs(dataPath);
     this._savers = new SaverListManager({
-      prefs: this._prefs
+      prefs: this.prefs
     });
   },
   data() {
     return {
       saver: {},
-      disabled: false
+      disabled: false,
+      prefs: undefined
     }
   },
   computed: {
+    isLoaded: function() {
+      return typeof(this.prefs) !== "undefined";
+    },
     currentWindow: function() {
       return this.$electron.remote.getCurrentWindow();
     },
@@ -84,9 +88,10 @@ export default {
       return decodeURIComponent(this.params.get("screenshot"));
     },
     canAdd: function() {
-      return this._prefs !== undefined &&
-        this._prefs.localSource !== undefined &&
-        this._prefs.localSource !== "";
+      return this.isLoaded &&
+        this.prefs !== undefined &&
+        this.prefs.localSource !== undefined &&
+        this.prefs.localSource !== "";
     }
   },
   methods: {
@@ -103,22 +108,16 @@ export default {
 
       this.disabled = true;
 
-      var src = path.join(mainProcess.getSystemDir(), "__template");
-      var data = this.manager.generateScreensaver(src, this.saver);
+      let systemPath = remote.getCurrentWindow().saverOpts.systemDir;
 
-      this.manager.reset();
-      this.manager.reload().then(() => {
-        let loadPath = remote.getCurrentWindow().saverOpts.systemDir;
-        const mainProcess = remote.require( path.join(loadPath, 'index.js'));
-
-        mainProcess.toggleSaversUpdated();
-        mainProcess.openEditor({
-          src: data.dest,
-          screenshot: this.screenshot
-        });
-        this.currentWindow.close();
+      var src = path.join(systemPath, "__template");
+      var data = this.manager.create(src, this.saver);
+      this.ipcRenderer.send("savers-updated");
+      this.ipcRenderer.send("open-editor", {
+        src: data.dest,
+        screenshot: this.screenshot
       });
-
+      this.currentWindow.close();
     }
   },
 };
