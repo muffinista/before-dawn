@@ -3,15 +3,22 @@
   <div class="content">
     <div class="container-fluid">
       <template v-if="!canAdd">
-        <div class="container-fluid">
+        <div class="need-setup-message">
           <p>
-            Hey, before you can create a new screensaver, you'll need to
-            set a local directory in the preferences window!
+            Screensavers in Before Dawn are web pages, so if you can use HTML, 
+            CSS, and/or Javascript, you can make your own screensaver. But before 
+            you can do that, you'll need to set a local directory in the preferences 
+            window!
           </p>
         </div>
       </template>  
 
       <template v-if="canAdd">
+        <p>
+          Screensavers in Before Dawn are web pages, so if you can use HTML, 
+          CSS, and/or Javascript, you can make your own screensaver.
+        </p>
+
         <p>Use this form to create a new screensaver. A template will be
           added to the system that you can fill in with your code.</p>
         <saver-form
@@ -118,5 +125,10 @@ export default {
 </script>
 
 <style>
-  /* CSS */
+.need-setup-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 80vh;
+}
 </style>
