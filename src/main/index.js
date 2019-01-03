@@ -26,6 +26,7 @@ const screen = require("./screen.js");
 const power = require("./power.js");
 
 let stateManager = require("./state_manager.js");
+const SaverPrefs = require("../lib/prefs.js");
 
 var releaseChecker;
 
@@ -64,9 +65,17 @@ var icons = {
   }
 };
 
-// set the prefix we'll use for loading UI windows
-
 let grabberWindow = null;
+
+let prefs = undefined;
+let saverOpts = {};
+
+// usually we want to check power state before running, but
+// we'll skip that check depending on the value of this toggle
+// so that manually running screensaver works just fine
+var checkPowerState = true;
+
+
 
 var openGrabberWindow = () => {
   var grabberUrl = "file://" + __dirname + "/assets/grabber.html";
@@ -186,10 +195,7 @@ var openPrefsWindow = function() {
       icon: path.join(__dirname, "assets", "iconTemplate.png")
     });
 
-    prefsWindowHandle.saverOpts = {
-      base: global.basePath,
-      systemDir: getSystemDir()
-    };
+    prefsWindowHandle.saverOpts = saverOpts;
   
     prefsWindowHandle.screenshot = message.url;
 
@@ -243,10 +249,7 @@ var addNewSaver = function(screenshot) {
     icon: path.join(__dirname, "assets", "iconTemplate.png")
   });
 
-  w.saverOpts = {
-    base: global.basePath,
-    systemDir: getSystemDir()
-  };
+  w.saverOpts = saverOpts;
 
   //w.savers = savers;
   w.loadURL(newUrl);
@@ -697,8 +700,6 @@ var getUrlPrefix = function() {
   return "file://" + __dirname;
 };
 
-const SaverPrefs = require("../lib/prefs.js");
-let prefs = undefined;
 
 
 /**
@@ -709,6 +710,12 @@ var bootApp = function() {
   var menu = Menu.buildFromTemplate(buildMenuTemplate(app));
 
   Menu.setApplicationMenu(menu);
+
+  log.info("Loading prefs");
+  prefs = new SaverPrefs(global.basePath);
+  
+  log.info(prefs);
+  
 
   global.NEW_RELEASE_AVAILABLE = false;
   trayMenu.items[3].visible = global.NEW_RELEASE_AVAILABLE;
@@ -733,13 +740,13 @@ var bootApp = function() {
   });
 
 
-  let saverOpts = {
+  // these are some variables we'll pass to windows so they
+  // can bootstrap access to data/etc
+  saverOpts = {
     base: global.basePath,
     systemDir: getSystemDir(),
     logger: log.info
   };
-
-  log.info("Load config with", saverOpts);
 
   updateStateManager();
   
@@ -804,11 +811,6 @@ var runScreenSaverIfNotFullscreen = function() {
     log.info("looks like we are in fullscreen mode");
   }
 };
-
-// usually we want to check power state before running, but
-// we'll skip that check depending on the value of this toggle
-// so that manually running screensaver works just fine
-var checkPowerState = true;
 
 /**
  * activate the screensaver, but only if we're plugged in, or if the user
@@ -1096,7 +1098,6 @@ if ( typeof(global.CRASH_REPORTER) !== "undefined" ) {
   crashReporter.start(global.CRASH_REPORTER);
 }
 
-
 log.info("Hello from version: " + global.APP_VERSION_BASE);
 
 if (global.IS_DEV) {
@@ -1114,8 +1115,6 @@ else {
   global.basePath = path.join(app.getPath("appData"), global.APP_DIR);
 }
 
-prefs = new SaverPrefs(global.basePath);
-
 /**
  * make sure we're only running a single instance
  */
@@ -1130,7 +1129,6 @@ if ( testMode !== true ) {
     process.exit();
   }
 }
-
 
 // load some global CSS we'll inject into running screensavers
 globalCSSCode = fs.readFileSync( path.join(__dirname, "assets", "global.css"), "ascii");  
@@ -1260,10 +1258,7 @@ var openEditor = (args) => {
       webSecurity: !global.IS_DEV
     },
   });
-  w.saverOpts = {
-    base: global.basePath,
-    systemDir: getSystemDir()
-  };
+  w.saverOpts = saverOpts;
 
   w.screenshot = screenshot;
 
