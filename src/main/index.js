@@ -27,6 +27,7 @@ const power = require("./power.js");
 
 let stateManager = require("./state_manager.js");
 const SaverPrefs = require("../lib/prefs.js");
+const SaverListManager = require("../lib/saver-list.js");
 
 var releaseChecker;
 
@@ -525,55 +526,72 @@ var setStateToRunning = function() {
 var runScreenSaver = function() {
   var displays = getDisplays();
 
-  const SaverListManager = require("../lib/saver-list.js");
   var savers = new SaverListManager({
     prefs: prefs
   });
-  var settings = prefs.getOptions();
 
-  console.log("hey!", prefs.current);
-  savers.loadFromFile(prefs.current, settings).then((saver) => {
-    // make sure we have something to display
-    if ( typeof(saver) === "undefined" ) {
-      log.info("No screensaver defined!");
-      return;
-    }
+  var settings;
+  var saverKey = prefs.current;
+  let setupPromise;
 
-//    saver = savers.applyPreload(saver);
-    
-    // limit to a single screen when debugging
-    if ( debugMode === true ) {
-      if ( typeof(app.dock) !== "undefined" ) {
-        app.dock.show();
+  // check if the user is running the random screensaver. if so, pick one!
+  let randomPath = path.join(global.basePath, "system-savers", "random", "saver.json");
+  if ( saverKey === randomPath ) {
+    setupPromise = new Promise((resolve, reject) => {
+      savers.list((entries) => {
+        let s = savers.random();
+        resolve(s.key);
+      })
+    });
+  }
+  else {
+    setupPromise = Promise.resolve(saverKey);
+  }
+
+  setupPromise.then((k) => {
+    saverKey = k;
+    settings = prefs.getOptions(saverKey);    
+
+    savers.loadFromFile(saverKey, settings).then((saver) => {
+      // make sure we have something to display
+      if ( typeof(saver) === "undefined" ) {
+        log.info("No screensaver defined!");
+        return;
       }
-    }
-    
-    try {
-      // turn off idle checks for a couple seconds while loading savers
-      stateManager.ignoreReset(true);
-
-      for ( var i in displays ) {
-        runScreenSaverOnDisplay(saver, displays[i]);
-      } // for
-
-      // if we're only running on primary display, blank out the other ones
-      if ( debugMode !== true && prefs.runOnSingleDisplay === true ) {
-        var otherDisplays = getNonPrimaryDisplays();
-        for ( var i in otherDisplays ) {
-          blankScreen(otherDisplays[i]);
+      
+      // limit to a single screen when debugging
+      if ( debugMode === true ) {
+        if ( typeof(app.dock) !== "undefined" ) {
+          app.dock.show();
         }
       }
-    }
-    catch (e) {
-      stateManager.ignoreReset(false);
-      log.info(e);
-    }
-    finally {
-      setTimeout(function() {
-        stateManager.ignoreReset(false);
-      }, 2500);
-    }
+      
+      try {
+        // turn off idle checks for a couple seconds while loading savers
+        stateManager.ignoreReset(true);
 
+        for ( var i in displays ) {
+          runScreenSaverOnDisplay(saver, displays[i]);
+        } // for
+
+        // if we're only running on primary display, blank out the other ones
+        if ( debugMode !== true && prefs.runOnSingleDisplay === true ) {
+          var otherDisplays = getNonPrimaryDisplays();
+          for ( var i in otherDisplays ) {
+            blankScreen(otherDisplays[i]);
+          }
+        }
+      }
+      catch (e) {
+        stateManager.ignoreReset(false);
+        log.info(e);
+      }
+      finally {
+        setTimeout(function() {
+          stateManager.ignoreReset(false);
+        }, 2500);
+      }
+    });
   });
 };
 
@@ -1111,9 +1129,13 @@ else {
 if ( process.env.BEFORE_DAWN_DIR !== undefined ) {
   global.basePath = process.env.BEFORE_DAWN_DIR;
 }
+else if ( global.IS_DEV ) {
+  global.basePath = path.join(__dirname, "..");
+}
 else {
   global.basePath = path.join(app.getPath("appData"), global.APP_DIR);
 }
+log.info("use base path", global.basePath);
 
 /**
  * make sure we're only running a single instance

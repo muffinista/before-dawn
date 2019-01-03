@@ -156,7 +156,20 @@ module.exports = class SaverListManager {
     });
   };
 
-  
+
+  /**
+   * pick a random screensaver
+   */
+  random() {
+    var tmp = this.loadedScreensavers.filter((s) => {
+      return ( typeof(s.preload) === "undefined" );
+    });
+    var idx = Math.floor(Math.random() * tmp.length);
+
+    return tmp[idx];
+  };
+
+
   /**
    * look up a screensaver by key, and return it
    */

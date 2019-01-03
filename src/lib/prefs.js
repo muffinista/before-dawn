@@ -2,10 +2,7 @@
 
 const fs = require("fs-extra");
 const path = require("path");
-
 const config_file = "config.json";
-
-// @todo need a way to specify default repo on initial load
 
 const PROPERTIES = [
   ["current", "saver", "string", undefined],
