@@ -35,7 +35,6 @@
     "linux-battery": "^3.0.1",
     "lodash.debounce": "^4.0.8",
     "mkdirp": "^0.5.1",
-    "nconf": "^0.10.0",
     "node-system-idle-time": "muffinista/node-system-idle-time.git#master",
     "osx-battery": "gillstrom/osx-battery.git",
     "raven": "^2.6.3",

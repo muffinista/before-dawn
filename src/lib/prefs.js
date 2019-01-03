@@ -26,26 +26,26 @@ class SaverPrefs {
   constructor(baseDir, _defaults) {
     this.baseDir = baseDir;
     this.configFile = path.join(baseDir, config_file);
-    this.nconf = require("nconf");
     this.defaults = _defaults;
 
     this.reload();
   }
 
+  loadData() {
+    this._data = JSON.parse(fs.readFileSync(this.configFile));
+  }
+
   reload() {
     this.firstLoad = false;
-    this.nconf.reset();
+    this._data = {};
+
     try {
-      this.nconf.remove("file").file({
-        file: this.configFile
-      });
+      this.loadData();
     }
     catch(e) {
-      fs.unlinkSync(this.configFile);
-      this.nconf.remove("file").file({
-        file: this.configFile
-      });
+      this.ensureDefaults();
       this.writeSync();
+      this.loadData();
       this.firstLoad = true;
     } 
   }
@@ -84,21 +84,12 @@ class SaverPrefs {
   ensureDefaults() {
     if ( typeof(this.defaults) !== undefined ) {
       for ( var k in this.defaults ) {
-        if ( this.nconf.get(k) === undefined ) {
+        if ( this._data[k] === undefined ) {
           this.setConfig(k, this.defaults[k]);
         }
       }
     }
   };
-
-
-  // /**
-  //  * return the object/data of the current screensaver
-  //  */
-  // get currentData() {
-  //   var key = this.nconf.get("saver");
-  //   return getByKey(key);
-  // };
 
 
   /**
@@ -139,40 +130,16 @@ class SaverPrefs {
    * set config var k to value v
    */
   setConfig(k, v) {
-    this.nconf.set(k, v);
+    this._data[k] = v;
   };
 
-  // /**
-  //  * set current screensaver key
-  //  */
-  // setCurrent(x, opts) {
-  //   this.current = x;
-
-  //   if ( typeof(opts) !== "undefined" ) {
-  //     setOptions(opts, x);
-  //   }
-  // };
-
-  // /**
-  //  * set options for the specified screensaver
-  //  */
-  // setOptions(opts, s) {
-  //   var key;
-  //   if ( typeof(s) === "undefined" ) {
-  //     s = this.current;
-  //   }
-  //   key = "options:" + s;
-  //   this.setConfig(key, opts);
-  // };
 
   getOptions(name) {
     if ( typeof(name) === "undefined" ) {
       name = this.current;
     }
-    var key = "options:" + name;
-    var result = this.nconf.get(key) || {};
 
-    return result;
+    return this._data.options[name] || {};
   };
 
   updatePrefs(data, cb) {
@@ -190,38 +157,14 @@ class SaverPrefs {
   };
 
   write(cb) {
-    this.nconf.save(cb);
+    let output = JSON.stringify(this._data);
+    fs.writeFile(this.configFile, output, cb);
   };
   
   writeSync() {
-    this.nconf.save();
+    let output = JSON.stringify(this._data);
+    fs.writeFileSync(this.configFile, output);
   };
-  
-  // getConfig(cb) {
-  //   fs.readFile(this.configFile, function(err, data) {
-  //     cb(JSON.parse(data.toString()));
-  //   });
-  // }
-  
-  // getConfigSync() {
-  //   var data = {};
-
-  //   if ( fs.existsSync(this.configFile) ) {
-  //     data = fs.readFileSync(this.configFile);
-  //     data = JSON.parse(data.toString());  
-  //   }
-  //   else {
-  //     data = this.defaults;
-  //   }
-  
-  //   // add anything that might not exist, because
-  //   // vue.js won't treat missing data properly
-  //   if ( data.auto_start === undefined ) {
-  //     data.auto_start = false;
-  //   }
-  
-  //   return data;
-  // }
 
   setDefaultRepo(r) {
     this.sourceRepo = r;
@@ -236,7 +179,7 @@ for ( var i = 0; i < PROPERTIES.length; i++ ) {
 
   Object.defineProperty(SaverPrefs.prototype, name, {
     get() {
-      let v = this.nconf.get(key) || value;
+      let v = this._data[key] || value;
       if ( type == "integer" ) {
         return parseInt(v, 10);
       }
@@ -250,7 +193,7 @@ for ( var i = 0; i < PROPERTIES.length; i++ ) {
         this.changes = {};
       }
 
-      if ( this.changes[key] === undefined && this.nconf.get(key) !== newval ) {
+      if ( this.changes[key] === undefined && this._data[key] !== newval ) {
         this.changes[key] = newval;
       }
 
