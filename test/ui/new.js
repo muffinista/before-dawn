@@ -17,18 +17,16 @@ describe('Add New', function() {
 
   describe('when not setup', function() {
 	  beforeEach(() => {
-      console.log(app);
 		  return app.start().
-                 then(() => {
-                   console.log("A");
-                   helpers.removeLocalSource(workingDir);
-                 }).
-                 then(() => app.client.waitUntilWindowLoaded() ).
-			           then(() => app.client.electron.ipcRenderer.
-                                send('open-add-screensaver',
-                                     'file://' + path.join(__dirname, '../fixtures/screenshot.png'))
-                 ).
-			           then(() => app.client.windowByIndex(1));
+        then(() => {
+          helpers.removeLocalSource(workingDir);
+        }).
+        then(() => app.client.waitUntilWindowLoaded() ).
+        then(() => app.client.electron.ipcRenderer.
+                      send('open-add-screensaver',
+                            'file://' + path.join(__dirname, '../fixtures/screenshot.png'))
+        ).
+        then(() => app.client.windowByIndex(1));
 	  });
 
 	  afterEach(() => {
@@ -57,33 +55,32 @@ describe('Add New', function() {
   describe('when setup', function() {
 	  beforeEach(() => {
 		  return app.start().
-                 then(() => app.client.waitUntilWindowLoaded() ).
-                 then(() => {
-                  helpers.addLocalSource(workingDir, saversDir);
-                   
-                   // tell app to reload config
-                   app.client.electron.ipcRenderer.send("prefs-updated");
-                 }).
-			           then(() => {
-                   app.client.electron.ipcRenderer.
-                       send('open-add-screensaver',
-                            'file://' + path.join(__dirname, '../fixtures/screenshot.png'));
-                 }).
-        //  then(() => app.client.getMainProcessLogs()).
-        //    then(function (logs) {
+        then(() => app.client.waitUntilWindowLoaded() ).
+        then(() => {
+        helpers.addLocalSource(workingDir, saversDir);
+          
+          // tell app to reload config
+          app.client.electron.ipcRenderer.send("prefs-updated");
+        }).
+        then(() => {
+          app.client.electron.ipcRenderer.
+              send('open-add-screensaver',
+                  'file://' + path.join(__dirname, '../fixtures/screenshot.png'));
+        }).
+        // then(() => app.client.getMainProcessLogs()).
+        // then(function (logs) {
+        //   logs.forEach(function (log) {
+        //     console.log(log);
+        //   });
+        //   console.log("!!!!!!!!!!!!!!!!!!!!");
+        // }).
+        // then(() => app.client.getRenderProcessLogs()).
+        // then(function (logs) {
         //     logs.forEach(function (log) {
-        //       console.log(log);
-        //     });
-        //     console.log("!!!!!!!!!!!!!!!!!!!!");
-        //    }).
-        //    then(() => app.client.getRenderProcessLogs()).
-        //    then(function (logs) {
-        //       logs.forEach(function (log) {
-        //       console.log("XXX", log.message);
-        //     })
-        //    }).
-
-                 then(() => app.client.windowByIndex(1));
+        //     console.log("XXX", log.message);
+        //   })
+        // }).
+        then(() => app.client.windowByIndex(1));
 	  });
 
 	  afterEach(() => {
@@ -93,27 +90,27 @@ describe('Add New', function() {
     it('works', function(done) {
       var src = path.join(saversDir, "a-new-name", "saver.json");
       app.client.waitUntilWindowLoaded().
-			    then(() => app.client.windowByIndex(1)).
-          waitUntil(() => {
-            return app.client.getText('body').then((res) => {
-              return res.indexOf('Use this form') !== -1
-            });
-          }).
-          then(() => app.client.setValue("[name='name']", 'A New Name')).
-          then(() => app.client.setValue("[name='description']", 'A Thing I Made?')).
-          then(() => app.client.click(".save")).
-          then(() => app.client.waitUntilWindowLoaded()).
-          then(() => app.client.windowByIndex(1)).
-          getTitle().
-          then((res) => {
-            assert.equal('Before Dawn: Editor', res);
-          }).
-          then(() => {
-            assert(fs.existsSync(src));
-          }).
-          then(() => {
-            done();
+        then(() => app.client.windowByIndex(1)).
+        waitUntil(() => {
+          return app.client.getText('body').then((res) => {
+            return res.indexOf('Use this form') !== -1
           });
+        }).
+        then(() => app.client.setValue("[name='name']", 'A New Name')).
+        then(() => app.client.setValue("[name='description']", 'A Thing I Made?')).
+        then(() => app.client.click(".save")).
+        //          then(() => app.client.waitUntilWindowLoaded()).
+        then(() => app.client.windowByIndex(1)).
+        getTitle().
+        then((res) => {
+          assert.equal('Before Dawn: Editor', res);
+        }).
+        then(() => {
+          assert(fs.existsSync(src));
+        }).
+        then(() => {
+          done();
+        });
       
     });
   });

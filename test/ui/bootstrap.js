@@ -2,7 +2,7 @@
 
 const assert = require('assert');
 const fs = require('fs');
-const tmp = require('tmp');
+const path = require('path');
 
 const helpers = require('./setup.js');
 var workingDir = helpers.getTempDir();
@@ -13,7 +13,7 @@ describe('bootstrap', function() {
 
 	before(() => {
 		return app.start().
-               then(() => app.client.waitUntilWindowLoaded() );
+      then(() => app.client.waitUntilWindowLoaded() );
 	});
 
 	after(() => {
@@ -21,29 +21,8 @@ describe('bootstrap', function() {
 	});
 
   it('creates config file', function(done) {
-    assert.equal("muffinista/before-dawn-screensavers", helpers.savedConfig(workingDir).sourceRepo);
+    let configDest = path.join(workingDir, "config.json");
+    assert(fs.existsSync(configDest));
     done();
-  });
-
-  it('populates screensavers', function(done) {
-    var source = helpers.savedConfig(workingDir).saver;
-    assert(fs.existsSync(source));
-    done();
-/*
-    app.client.getMainProcessLogs().
-        then(function (logs) {
-          logs.forEach(function (log) {
-            console.log(log);
-          })
-        }).
-        then(() => app.client.getRenderProcessLogs()).
-        then(function (logs) {
-          logs.forEach(function (log) {
-            console.log(log.message)
-          })
-        }).then(() => {
-        });*/
   });
 });
-
-
