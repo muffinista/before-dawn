@@ -92,18 +92,22 @@ export default {
     this._prefs = new SaverPrefs(dataPath);
     this._savers = new SaverListManager({
       prefs: this._prefs
-    });
+    }, this.logger);
     this._savers.setup().then(() => {
       this.getData();
       this.getCurrentSaver();
+      var pd = new PackageDownloader(this._prefs);
       if ( this._prefs.needSetup() ) {
         this._prefs.setDefaultRepo(this.$electron.remote.getGlobal("SAVER_REPO"));
-        var pd = new PackageDownloader(this._prefs);
-        pd.updatePackage().then((r) => {
-          this.getData();
-        });
       }
-      else if ( this.$electron.remote.getGlobal("NEW_RELEASE_AVAILABLE") ) {
+      pd.updatePackage().then((r) => {
+        if ( r.downloaded === true ) {
+          this.getData();
+          this.getCurrentSaver();
+        }
+      });
+
+      if ( this.$electron.remote.getGlobal("NEW_RELEASE_AVAILABLE") ) {
         this.$nextTick(() => {
           this.renderUpdateNotice();
         });
@@ -125,6 +129,13 @@ export default {
   computed: {
     bus: function() {
       return new Vue();
+    },
+    logger() {
+      let l = remote.getCurrentWindow().saverOpts.logger;
+      if ( l === undefined ) {
+        l = console.log;
+      }
+      return l;
     },
     mainProcess() {
       let loadPath = remote.getCurrentWindow().saverOpts.systemDir;
@@ -251,7 +262,7 @@ export default {
 
 
         // pick the first screensaver if nothing picked yet
-        if ( this.current === undefined ) {
+        if ( this._prefs.current === undefined ) {
           this._prefs.current = this.savers[0].key;
           this.getCurrentSaver();
         }

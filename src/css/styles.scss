@@ -121,7 +121,7 @@ button.add-option, button.reset-to-defaults {
 }
 
 .saver-list {
-  height: calc(95vh - #{$nav_height+$tab_padding+$footer_height});
+  height: calc(99vh - #{$nav_height+$tab_padding+$footer_height});
   margin-bottom: 0px;
   overflow-y: scroll;
 }
