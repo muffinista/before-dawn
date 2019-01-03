@@ -249,7 +249,7 @@ export default {
       new Noty({
         type: "success",
         layout: "topRight",
-        timeout: 1000,
+        timeout: 2000,
         text: "Changes saved!",
         animation: {
           open: null
@@ -308,6 +308,7 @@ export default {
 } 
 </script>
 
-<style>
-  /* CSS */
+<style lang="scss">
+@import "~noty/lib/noty.css";
+@import "~noty/lib/themes/mint.css";
 </style>

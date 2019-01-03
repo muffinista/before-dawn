@@ -1,6 +1,3 @@
-@import "../../node_modules/noty/lib/noty.css";
-@import "loader";
-
 $nav_height: 34px;
 $footer_height: 40px;
 $tab_padding:12px;
@@ -9,45 +6,45 @@ $grid_gap:10px;
 /* purgecss start ignore */
 
 html {
-    height: 100%;
+  height: 100%;
 }
 body {
-    min-height: 100%;
-    display: grid;
-    grid-template-rows: auto 1fr;
+  min-height: 100%;
+  display: grid;
+  grid-template-rows: auto 1fr;
 }
 
 body, input {
-    font: menu;
+  font: menu;
 }
 
 small {
-    font-size: 90%;
+  font-size: 90%;
 }
 
 .grid {
-    width: 100%;
-    display: grid;
-    grid-gap: 1rem;
-    grid-template-columns: 48% 48%;
+  width: 100%;
+  display: grid;
+  grid-gap: 1rem;
+  grid-template-columns: 48% 48%;
 }
 
 @media (max-width: 600px) {
   .grid {
-    grid-template-columns: 99%;
+  grid-template-columns: 99%;
   }
 }
 
 select, label {
-    font-size: 0.9rem;
+  font-size: 0.9rem;
 }
 
 .form-check {
-    margin-bottom: 0.3rem;
+  margin-bottom: 0.3rem;
 }
 
 .form-control {
-    font-size: 0.9rem;
+  font-size: 0.9rem;
 }
 
 body > div > .content {
@@ -61,33 +58,33 @@ body > #editor > .content {
 
 @media (max-height: 600px) {
   body > div > .content {
-    overflow-y: scroll;
+  overflow-y: scroll;
   }  
 }
 body > div > footer {
-    height: $footer_height;
-    background-color: #f5f5f5;
-    grid-row-start: 2;
-    grid-row-end: 3;
-    padding-left: 5px;
-    padding-right: 5px;
+  height: $footer_height;
+  background-color: #f5f5f5;
+  grid-row-start: 2;
+  grid-row-end: 3;
+  padding-left: 5px;
+  padding-right: 5px;
 }
 
 ul {
-    padding-left: 0px;
-    list-style-type: none;
+  padding-left: 0px;
+  list-style-type: none;
 }
 
 ul[role=tablist] {
-    width: 100%;
-    position: fixed;
-    height: $nav_height;
-    margin-bottom: 42px;
-    background: white;
-    z-index: 99999;
+  width: 100%;
+  position: fixed;
+  height: $nav_height;
+  margin-bottom: 42px;
+  background: white;
+  z-index: 99999;
 }
 .tab-content {
-    padding-top: $nav_height+$tab_padding;
+  padding-top: $nav_height+$tab_padding;
 }
 
 .hide {
@@ -141,8 +138,8 @@ iframe, webview {
 }
 
 iframe.preview, webview.preview {
-    width: 100%;
-    overflow:hidden;
+  width: 100%;
+  overflow:hidden;
 }
 
 .form-control[name=repo] {
@@ -172,11 +169,11 @@ fieldset {
 
 
 .padded-top {
-    margin-top: 20px;
+  margin-top: 20px;
 }
 
 .padded-bottom {
-    margin-bottom: 60px;
+  margin-bottom: 60px;
 }
 
 #about {
@@ -243,7 +240,7 @@ p.description {
 }
 
 #prefs-form h1 {
-    font-size: 2.0rem;
+  font-size: 2.0rem;
 }
 
 .prefs-wrapper {
@@ -252,7 +249,7 @@ p.description {
 
 form.submit-attempt {
   input:invalid {
-    border: 2px dashed red;
+  border: 2px dashed red;
   }
 }
 
@@ -261,31 +258,31 @@ form.submit-attempt {
 }
 
 #prefs .tab-content > .tab-pane:last-child {
-    margin-bottom: 30px;
+  margin-bottom: 30px;
 }
 
 form.entry {
-    margin-bottom: 10px;
+  margin-bottom: 10px;
 }
 
 form.input {
-    margin-bottom: 10px;
-    display: flex;
-    flex-direction: column;
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
 }
 form.input input[type=text], input[type=range] {
-    width: 100%;
+  width: 100%;
 }
 
 label.for-option {
-    font-weight: bold;
-    //width: 250px;
+  font-weight: bold;
+  //width: 250px;
 }
 input[type="range"] {
-    max-width: 250px;
+  max-width: 250px;
 }
 .saver-detail > * {
-    margin-bottom: 10px;
+  margin-bottom: 10px;
 }
 
 /* purgecss end ignore */
