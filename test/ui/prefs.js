@@ -23,7 +23,7 @@ describe('Prefs', function() {
 		return app.start().
                then(() => app.client.waitUntilWindowLoaded() ).
 			         then(() => app.electron.ipcRenderer.send('open-prefs')).
-			         then(() => app.client.windowByIndex(1));
+			         then(() => app.client.windowByIndex(2));
 	});
 
 	afterEach(() => {
@@ -34,22 +34,20 @@ describe('Prefs', function() {
     assert(app.browserWindow.isVisible());
   });
 
-  it('sets title', function(done) {
-    app.client.waitUntilWindowLoaded().getTitle().then((res) => {
+  it('sets title', function() {
+    return app.client.waitUntilWindowLoaded().getTitle().then((res) => {
       assert.equal('Before Dawn: Preferences', res);
-      done();
     });
   });
 
-  it('lists screensavers', function(done) {
-    app.client.waitUntilTextExists('body', 'Screensaver One').getText('body').then((text) => {
+  it('lists screensavers', function() {
+    return app.client.waitUntilTextExists('body', 'Screensaver One').getText('body').then((text) => {
       assert(text.lastIndexOf('Screensaver One') !== -1);
-      done();
     });
   });
 
-  it('allows picking a screensaver', function(done) {
-    app.client.waitUntilTextExists('body', 'Screensaver One', 10000)
+  it('allows picking a screensaver', function() {
+    return app.client.waitUntilTextExists('body', 'Screensaver One', 10000)
        .getAttribute("[type=radio]","data-name")
        .then(() => {
          app.client.click("[type=radio][data-name='Screensaver One']").
@@ -64,13 +62,12 @@ describe('Prefs', function() {
         }).
         then(() => {
           assert(helpers.savedConfig(workingDir).saver.lastIndexOf("/saver-one/") !== -1);
-          done();
         });
     
   });
 
-  it('sets options for screensaver', function(done) {
-    app.client.waitUntilTextExists('body', 'Screensaver One', 10000).
+  it('sets options for screensaver', function() {
+    return app.client.waitUntilTextExists('body', 'Screensaver One', 10000).
        getAttribute("[type=radio]","data-name").
         then(() => app.client.click("[type=radio][data-name='Screensaver One']")).
         then(() => app.client.getText('body')).
@@ -91,38 +88,33 @@ describe('Prefs', function() {
 
           assert(options[k].load_url == 'barfoo');
           assert(options[k].sound == false);
-          done();
         });
    
   });
   
-  it('allows setting path', function(done) {
-    app.client.waitUntilWindowLoaded().click("=Preferences").
-        then(() => app.client.scroll("[name='localSource']")).
-        then(() => app.client.setValue("[name='localSource']", '/tmp')).
-        then(() => app.client.click("button.save")).
-        then(() => {
-          app.client.getWindowCount().should.eventually.equal(1)
-        }).
-        then(() => {
-          assert.equal("/tmp", helpers.savedConfig(workingDir).localSource);
-        }).
-        then(() => done());
+  it('allows setting path', function() {
+    return app.client.waitUntilWindowLoaded().click("=Preferences").
+      then(() => app.client.scroll("[name='localSource']")).
+      then(() => app.client.setValue("[name='localSource']", '/tmp')).
+      then(() => app.client.click("button.save")).
+      then(() => {
+        app.client.getWindowCount().should.eventually.equal(1)
+      }).
+      then(() => {
+        assert.equal("/tmp", helpers.savedConfig(workingDir).localSource);
+      });
   });
 
-  it('allows setting path via dialog', function(done) {
+  it('allows setting path via dialog', function() {
     app.fakeDialog.mock([ { method: 'showOpenDialog', value: ['/not/a/real/path'] } ]);
-    app.client.waitUntilWindowLoaded().click("=Preferences").
-        then(() => app.client.click("button.pick")).
-        then(() => app.client.click("button.save")).
-        then(() => {
-          app.client.getWindowCount().should.eventually.equal(1)
-        }).
-        then(() => {
-          assert.equal("/not/a/real/path", helpers.savedConfig(workingDir).localSource);
-        }).
-        then(() => done());
+    return app.client.waitUntilWindowLoaded().click("=Preferences").
+      then(() => app.client.click("button.pick")).
+      then(() => app.client.click("button.save")).
+      then(() => {
+        app.client.getWindowCount().should.eventually.equal(1)
+      }).
+      then(() => {
+        assert.equal("/not/a/real/path", helpers.savedConfig(workingDir).localSource);
+      });
   });
-
-
 });

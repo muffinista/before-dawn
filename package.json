@@ -97,7 +97,7 @@
     "purgecss-webpack-plugin": "^1.4.0",
     "sass-loader": "^7.1.0",
     "sinon": "^7.2.2",
-    "spectron": "^4.0.0",
+    "spectron": "electron/spectron",
     "spectron-fake-dialog": "^0.0.1",
     "style-loader": "^0.23.1",
     "url-loader": "^1.1.1",
