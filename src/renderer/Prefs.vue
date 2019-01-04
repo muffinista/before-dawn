@@ -137,10 +137,6 @@ export default {
       }
       return l;
     },
-    mainProcess() {
-      let loadPath = remote.getCurrentWindow().saverOpts.systemDir;
-      return remote.require( path.join(loadPath, 'index.js'));
-    },
     currentWindow: function() {
       return this.$electron.remote.getCurrentWindow();
     },
@@ -279,14 +275,16 @@ export default {
     },
     createNewScreensaver() {
       this.saveData(false);
-      this.mainProcess.addNewSaver(this.screenshot);
+      this.ipcRenderer.send("open-add-screensaver", {
+        screenshot: this.screenshot
+      });
     },
     editSaver(s) {
       var opts = {
         src: s.src,
         screenshot: this.screenshot
       };
-      this.mainProcess.openEditor(opts);
+      this.ipcRenderer.send("open-editor", opts);
     },
     deleteSaver(s) {
       var index = this.savers.indexOf(s);
