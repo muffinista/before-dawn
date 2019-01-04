@@ -77,6 +77,13 @@ let saverOpts = {};
 var checkPowerState = true;
 
 
+const singleLock = app.requestSingleInstanceLock();
+if (! singleLock ) {
+  console.log("looks like another copy of app is running, exiting!");
+  app.quit();
+  process.exit();
+}
+
 
 var openGrabberWindow = () => {
   var grabberUrl = "file://" + __dirname + "/assets/grabber.html";
@@ -115,7 +122,6 @@ var grabScreen = function(s, cb) {
     return;
   }
   
-  var ipc_channel = "screenshot-" + s.id;
   ipcMain.once("screenshot-" + s.id, function(e, message) {
     log.info("got screenshot!", message);
     cb(message);
@@ -1140,16 +1146,30 @@ log.info("use base path", global.basePath);
 /**
  * make sure we're only running a single instance
  */
+
 if ( testMode !== true ) {
-  shouldQuit = app.makeSingleInstance(function(commandLine, workingDirectory) {
-    return true;
+  app.on('second-instance', (commandLine, workingDirectory) => {
+    if ( prefsWindowHandle !== null ) {
+      openPrefsWindow();
+    }
+    else {
+      if ( openPrefsWindow.isMinimized() ) {
+        openPrefsWindow.restore();
+      }
+      openPrefsWindow.focus();
+      
+    }
   });
 
-  if (shouldQuit) {
-    log.info("looks like another copy of app is running, exiting!");
-    app.quit();
-    process.exit();
-  }
+  // shouldQuit = app.makeSingleInstance(function(commandLine, workingDirectory) {
+  //   return true;
+  // });
+
+  // if (shouldQuit) {
+  //   log.info("looks like another copy of app is running, exiting!");
+  //   app.quit();
+  //   process.exit();
+  // }
 }
 
 // load some global CSS we'll inject into running screensavers

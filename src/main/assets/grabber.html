@@ -54,8 +54,6 @@
        }
      };
 
-     //log.info(screen_opts);
-
      desktopCapturer.getSources({types: ['screen']}, function(error, sources) {     
        if ( sources.length > 1 ) {
          screen_id = id;
@@ -72,9 +70,13 @@
        
        navigator.webkitGetUserMedia(screen_opts, function(s) {
          video = findOrCreate('video', id);
+         // adding muted helps with some security errors
+         // @see https://stackoverflow.com/questions/49930680/how-to-handle-uncaught-in-promise-domexception-play-failed-because-the-use
+         video.muted = "muted";
+
          canvas = findOrCreate('canvas', id);
          photo = findOrCreate('photo', id);
-         
+
          video.src = URL.createObjectURL(s);
          video.play();
 
@@ -100,7 +102,8 @@
 
            var tempName = temp.path({dir: os.tmpdir(), suffix:'.png'});
            var fs = require('fs');
-           var buffer = new Buffer(data.split(",")[1], 'base64');
+
+           var buffer = Buffer.from(data.split(",")[1], 'base64');
            fs.writeFileSync(tempName, buffer);
 
            //
@@ -121,7 +124,6 @@
            video.remove();
            canvas.remove();
            photo.remove();
-
          
            ipcRenderer.send('screenshot-' + id, {url:tempName});
          });
