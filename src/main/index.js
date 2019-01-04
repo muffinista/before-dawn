@@ -95,7 +95,7 @@ var openGrabberWindow = () => {
     webPreferences: {
       nodeIntegration: true,
       webSecurity: !global.IS_DEV,
-      preload: global.TRACK_ERRORS ? path.join(__dirname, 'assets', 'sentry.js') : undefined
+      preload: global.TRACK_ERRORS ? path.join(__dirname, "assets", "sentry.js") : undefined
     }
   });
   grabberWindow.noTray = true;
@@ -199,7 +199,7 @@ var openPrefsWindow = function() {
       webPreferences: {
         webSecurity: !global.IS_DEV,
         nodeIntegration: true,
-        preload: global.TRACK_ERRORS ? path.join(__dirname, 'assets', 'sentry.js') : undefined
+        preload: global.TRACK_ERRORS ? path.join(__dirname, "assets", "sentry.js") : undefined
       },
       icon: path.join(__dirname, "assets", "iconTemplate.png")
     });
@@ -254,7 +254,7 @@ var addNewSaver = function(screenshot) {
     webPreferences: {
       webSecurity: !global.IS_DEV,
       nodeIntegration: true,
-      preload: global.TRACK_ERRORS ? path.join(__dirname, 'assets', 'sentry.js') : undefined
+      preload: global.TRACK_ERRORS ? path.join(__dirname, "assets", "sentry.js") : undefined
     },
     icon: path.join(__dirname, "assets", "iconTemplate.png")
   });
@@ -284,7 +284,7 @@ var openAboutWindow = function() {
     webPreferences: {
       nodeIntegration: true,
       webSecurity: !global.IS_DEV,
-      preload: global.TRACK_ERRORS ? path.join(__dirname, 'assets', 'sentry.js') : undefined
+      preload: global.TRACK_ERRORS ? path.join(__dirname, "assets", "sentry.js") : undefined
     }
   });
 
@@ -1153,7 +1153,7 @@ log.info("use base path", global.basePath);
  */
 
 if ( testMode !== true ) {
-  app.on('second-instance', (commandLine, workingDirectory) => {
+  app.on("second-instance", (commandLine, workingDirectory) => {
     if ( prefsWindowHandle !== null ) {
       openPrefsWindow();
     }
@@ -1303,7 +1303,7 @@ var openEditor = (args) => {
     webPreferences: {
       nodeIntegration: true,
       webSecurity: !global.IS_DEV,
-      preload: global.TRACK_ERRORS ? path.join(__dirname, 'assets', 'sentry.js') : undefined
+      preload: global.TRACK_ERRORS ? path.join(__dirname, "assets", "sentry.js") : undefined
     },
   });
   w.saverOpts = saverOpts;

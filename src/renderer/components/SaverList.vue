@@ -10,12 +10,12 @@
 </template>
 
 <script>
-  import SaverListItem from './SaverListItem';
+  import SaverListItem from "./SaverListItem";
 
   export default {
-    name: 'saver-list',
+    name: "saver-list",
     components: {saverListItem: SaverListItem},
-    props: ['savers', 'current'],
+    props: ["savers", "current"],
   }
 </script>
 

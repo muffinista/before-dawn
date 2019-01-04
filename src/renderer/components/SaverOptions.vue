@@ -1,7 +1,7 @@
 <template>
   <div id="wrapper">
     <ul>
-      <li v-for="option in options">
+      <li v-for="(option, index) in options" :key="index">
         <template v-if="option.type === 'boolean'">
           <boolean-input
             v-on="$listeners"
@@ -25,11 +25,11 @@
 </template>
 
 <script>
-import OptionInput from '@/components/OptionInput';
-import BooleanInput from '@/components/BooleanInput';
+import OptionInput from "@/components/OptionInput";
+import BooleanInput from "@/components/BooleanInput";
 export default {
-  name: 'saver-options',
-  props: ['saver', 'options', 'values'],
+  name: "saver-options",
+  props: ["saver", "options", "values"],
   components: {
     optionInput: OptionInput,
     booleanInput: BooleanInput

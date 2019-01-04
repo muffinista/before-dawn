@@ -18,8 +18,8 @@
 
 <script>
   export default {
-    name: 'option-input',
-    props: ['saver', 'option', 'value'],
+    name: "option-input",
+    props: ["saver", "option", "value"],
     components: { },
     computed: {
       renderType: function() {

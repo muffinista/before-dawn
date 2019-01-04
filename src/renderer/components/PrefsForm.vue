@@ -125,9 +125,9 @@
 <script>
 const {dialog} = require("electron").remote;
 export default {
-  name: 'prefs-form',
+  name: "prefs-form",
   components: {},
-  props: ['prefs'],
+  props: ["prefs"],
   methods: {
     showPathChooser() {
       dialog.showOpenDialog(

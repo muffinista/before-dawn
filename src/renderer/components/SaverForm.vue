@@ -40,9 +40,9 @@
 
 <script>
   export default {
-    name: 'saver-form',
+    name: "saver-form",
     components: { },
-    props: ['saver'],
+    props: ["saver"],
     methods: {
     }
   };

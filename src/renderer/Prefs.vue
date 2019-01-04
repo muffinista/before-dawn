@@ -62,26 +62,26 @@
 </template>
 
 <script>
-import Vue from 'vue';
-import SaverList from '@/components/SaverList';
-import SaverPreview from '@/components/SaverPreview';
-import SaverOptions from '@/components/SaverOptions';
-import SaverSummary from '@/components/SaverSummary';
-import PrefsForm from '@/components/PrefsForm';
+import Vue from "vue";
+import SaverList from "@/components/SaverList";
+import SaverPreview from "@/components/SaverPreview";
+import SaverOptions from "@/components/SaverOptions";
+import SaverSummary from "@/components/SaverSummary";
+import PrefsForm from "@/components/PrefsForm";
 import Noty from "noty";
 
-const path = require('path');
-const remote = require('electron').remote;
+const path = require("path");
+const remote = require("electron").remote;
 const {dialog} = require("electron").remote;
-const is_dev = remote.getGlobal('IS_DEV');
+const is_dev = remote.getGlobal("IS_DEV");
 
 
-import SaverPrefs from '@/../lib/prefs';
-import SaverListManager from '@/../lib/saver-list';
-import PackageDownloader from '@/../lib/package-downloader';
+import SaverPrefs from "@/../lib/prefs";
+import SaverListManager from "@/../lib/saver-list";
+import PackageDownloader from "@/../lib/package-downloader";
 
 export default {
-  name: 'prefs',
+  name: "prefs",
   components: {
     SaverList, SaverOptions, SaverPreview, SaverSummary, PrefsForm
   },
@@ -115,7 +115,7 @@ export default {
     });
   },
   beforeDestroy() {
-    this.ipcRenderer.removeListener('savers-updated', this.onSaversUpdated);
+    this.ipcRenderer.removeListener("savers-updated", this.onSaversUpdated);
   },
   data() {
     return {
@@ -190,11 +190,11 @@ export default {
   },
   methods: {
     onOptionsChange(e) {
-      this.bus.$emit('options-changed', this.options[this.saver]);
+      this.bus.$emit("options-changed", this.options[this.saver]);
     },
     onSaverPicked(e) {
       this.saver = e.target.value;
-      this.bus.$emit('saver-changed', this.saverObj);
+      this.bus.$emit("saver-changed", this.saverObj);
     },
     resetToDefaults(e) {
       dialog.showMessageBox(
@@ -263,7 +263,7 @@ export default {
           this.getCurrentSaver();
         }
 
-        this.bus.$emit('saver-changed', this.saverObj);
+        this.bus.$emit("saver-changed", this.saverObj);
       });
     },
     onSaversUpdated() {

@@ -37,17 +37,17 @@
 </template>
 
 <script>
-const path = require('path');
+const path = require("path");
 
-import SaverForm from '@/components/SaverForm';
-const remote = require('electron').remote;
-const is_dev = remote.getGlobal('IS_DEV');
+import SaverForm from "@/components/SaverForm";
+const remote = require("electron").remote;
+const is_dev = remote.getGlobal("IS_DEV");
 
-import SaverPrefs from '@/../lib/prefs';
-import SaverListManager from '@/../lib/saver-list';
+import SaverPrefs from "@/../lib/prefs";
+import SaverListManager from "@/../lib/saver-list";
 
 export default {
-  name: 'new-screensaver',
+  name: "new-screensaver",
   components: {
     SaverForm
   },

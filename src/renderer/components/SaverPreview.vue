@@ -5,28 +5,28 @@
 </template>
 
 <script>
-  const debounce = require('lodash.debounce');
+  const debounce = require("lodash.debounce");
   export default {
-    name: 'saver-preview',
-    props: ['screenshot', 'bus', 'saver'],
+    name: "saver-preview",
+    props: ["screenshot", "bus", "saver"],
     data() {
       return {
         options: {},
-        _previewUrl: ""
+        myUrl: ""
       }
     },
     mounted: function () {
       if ( this.bus !== undefined ) {
-        this.bus.$on('options-changed', this.debounceHandleOptionsChange);
-        this.bus.$on('saver-changed', this.handleSaverChange);
+        this.bus.$on("options-changed", this.debounceHandleOptionsChange);
+        this.bus.$on("saver-changed", this.handleSaverChange);
       }
 
-      window.addEventListener('resize', this.debounceHandleResize);
+      window.addEventListener("resize", this.debounceHandleResize);
 
       this.$nextTick(this.waitForWebview);
     },
     beforeDestroy: function () {
-      window.removeEventListener('resize', this.debounceHandleResize);
+      window.removeEventListener("resize", this.debounceHandleResize);
     },
     computed: {
       aspectRatio() {
@@ -46,13 +46,13 @@
       },
       previewUrl: {
         get: function() {
-          if ( this._previewUrl === undefined ) {
+          if ( this.myUrl === undefined ) {
             this.$forceUpdate();
           }
-          return this._previewUrl;
+          return this.myUrl;
         },
         set: function(val) {
-          this._previewUrl = val;
+          this.myUrl = val;
         }       
       }
      
@@ -67,8 +67,8 @@
         // webview will have scrollbars by default and you can't
         // easily hide them
         webview = this.$el.querySelector("webview");
-        webview.addEventListener('dom-ready', () => {
-          webview.insertCSS('html,body{ overflow: hidden !important; }');
+        webview.addEventListener("dom-ready", () => {
+          webview.insertCSS("html,body{ overflow: hidden !important; }");
         });
 
         this.handleSaverChange(this.saver);
@@ -126,7 +126,7 @@
         }
 
         let webview = this.$el.querySelector("webview");
-        webview.src = this._previewUrl;
+        webview.src = this.myUrl;
       }
     },
   };

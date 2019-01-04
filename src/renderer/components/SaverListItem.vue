@@ -22,8 +22,8 @@
 <script>
 const {dialog} = require("electron").remote;
 export default {
-  name: 'saver-list-item',
-  props: ['saver', 'checked'],
+  name: "saver-list-item",
+  props: ["saver", "checked"],
   methods: {
     onEditClick(s) {
       this.$emit("editSaver", s);

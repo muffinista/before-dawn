@@ -95,8 +95,8 @@
 
 <script>
   export default {
-    name: 'saver-option-input',
-    props: ['option', 'index'],
+    name: "saver-option-input",
+    props: ["option", "index"],
     components: { },
     computed: {
       formType: function() {

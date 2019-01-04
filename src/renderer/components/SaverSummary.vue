@@ -10,8 +10,8 @@
 
 <script>
   export default {
-    name: 'saver-summary',
-    props: ['saver'],
+    name: "saver-summary",
+    props: ["saver"],
     components: { },
     computed: {
       name() {

@@ -46,13 +46,14 @@
                 note: is track-by ok here?
                 https://v1.vuejs.org/guide/list.html#track-by-index 
               -->
-            <saver-option-input
-              v-for="option, index in options"
-              v-bind:option="option"
-              :index="index"
-              v-bind:key="option.index"
-              v-on:deleteOption="deleteOption(option)"
-              v-if="isLoaded"></saver-option-input>      
+            <div v-if="isLoaded">
+              <saver-option-input
+                v-for="(option, index) in options"
+                v-bind:option="option"
+                :index="index"
+                v-bind:key="option.index"
+                v-on:deleteOption="deleteOption(option)"></saver-option-input>      
+            </div>
             
             <div class="padded-top padded-bottom">
               <button
@@ -100,20 +101,20 @@ const path = require("path");
 const url = require("url");
 const exec = require("child_process").exec;
 
-import Vue from 'vue';
-import SaverPreview from '@/components/SaverPreview';
-import SaverForm from '@/components/SaverForm';  
-import SaverOptionInput from '@/components/SaverOptionInput';
-import SaverOptions from '@/components/SaverOptions';
+import Vue from "vue";
+import SaverPreview from "@/components/SaverPreview";
+import SaverForm from "@/components/SaverForm";  
+import SaverOptionInput from "@/components/SaverOptionInput";
+import SaverOptions from "@/components/SaverOptions";
 import Noty from "noty";
 
-const remote = require('electron').remote;
+const remote = require("electron").remote;
 
-import SaverPrefs from '@/../lib/prefs';
-import SaverListManager from '@/../lib/saver-list';
+import SaverPrefs from "@/../lib/prefs";
+import SaverListManager from "@/../lib/saver-list";
 
 export default {
-  name: 'editor',
+  name: "editor",
   components: {
     SaverForm, SaverPreview, SaverOptionInput, SaverOptions
   },
@@ -217,7 +218,7 @@ export default {
       result[name] = value;
 
       this.optionValues = Object.assign({}, result);
-      this.bus.$emit('options-changed', this.optionValues);
+      this.bus.$emit("options-changed", this.optionValues);
     },
     deleteOption(opt) {
       let index = this.options.indexOf(opt);
@@ -299,7 +300,7 @@ export default {
       });
     },
     reloadPreview() {
-      this.bus.$emit('options-changed', this.optionValues);
+      this.bus.$emit("options-changed", this.optionValues);
     },
     openConsole() {
       this.currentWindow.toggleDevTools();

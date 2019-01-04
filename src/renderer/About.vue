@@ -25,11 +25,11 @@
 
 <script>
 export default {
-  name: 'about',
+  name: "about",
   components: {},
   computed: {
     version: function() {
-      return this.$electron.remote.getGlobal('APP_VERSION');
+      return this.$electron.remote.getGlobal("APP_VERSION");
     }
   },
   mounted() {

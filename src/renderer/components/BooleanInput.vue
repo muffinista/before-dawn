@@ -25,8 +25,8 @@
 
 <script>
   export default {
-    name: 'boolean-input',
-    props: ['saver', 'option', 'name', 'value'],
+    name: "boolean-input",
+    props: ["saver", "option", "name", "value"],
   
     components: { },
     computed: {
