@@ -24,6 +24,7 @@
     "url": "git://github.com/muffinista/before-dawn.git"
   },
   "dependencies": {
+    "@sentry/electron": "^0.14.0",
     "auto-launch": "^5.0.5",
     "cross-env": "^5.2.0",
     "detect-fullscreen": "^0.0.1",
@@ -37,8 +38,6 @@
     "mkdirp": "^0.5.1",
     "node-system-idle-time": "muffinista/node-system-idle-time.git#master",
     "osx-battery": "gillstrom/osx-battery.git",
-    "raven": "^2.6.3",
-    "raven-js": "^3.27.0",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.5",
     "rimraf": "^2.6.2",
@@ -47,6 +46,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.2.2",
+    "@sentry/cli": "^1.37.2",
     "babel-eslint": "^10.0.1",
     "babel-loader": "^8",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",

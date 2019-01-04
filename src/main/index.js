@@ -32,8 +32,6 @@ const SaverListManager = require("../lib/saver-list.js");
 var releaseChecker;
 
 
-var Raven;
-
 // NOTE -- this needs to be global, otherwise the app icon gets
 // garbage collected and won't show up in the system tray
 let appIcon = null;
@@ -95,7 +93,8 @@ var openGrabberWindow = () => {
     y: 2000,
     webPreferences: {
       nodeIntegration: true,
-      webSecurity: !global.IS_DEV
+      webSecurity: !global.IS_DEV,
+      preload: global.TRACK_ERRORS ? path.join(__dirname, 'assets', 'sentry.js') : undefined
     }
   });
   grabberWindow.noTray = true;
@@ -198,7 +197,8 @@ var openPrefsWindow = function() {
       // show: false,
       webPreferences: {
         webSecurity: !global.IS_DEV,
-        nodeIntegration: true
+        nodeIntegration: true,
+        preload: global.TRACK_ERRORS ? path.join(__dirname, 'assets', 'sentry.js') : undefined
       },
       icon: path.join(__dirname, "assets", "iconTemplate.png")
     });
@@ -252,7 +252,8 @@ var addNewSaver = function(screenshot) {
     resizable:true,
     webPreferences: {
       webSecurity: !global.IS_DEV,
-      nodeIntegration: true
+      nodeIntegration: true,
+      preload: global.TRACK_ERRORS ? path.join(__dirname, 'assets', 'sentry.js') : undefined
     },
     icon: path.join(__dirname, "assets", "iconTemplate.png")
   });
@@ -281,7 +282,8 @@ var openAboutWindow = function() {
     icon: path.join(__dirname, "assets", "iconTemplate.png"),
     webPreferences: {
       nodeIntegration: true,
-      webSecurity: !global.IS_DEV
+      webSecurity: !global.IS_DEV,
+      preload: global.TRACK_ERRORS ? path.join(__dirname, 'assets', 'sentry.js') : undefined
     }
   });
 
@@ -1114,12 +1116,6 @@ require("./bootstrap.js");
 log.transports.file.level = "debug";
 log.transports.file.maxSize = 1 * 1024 * 1024;
 
-if ( typeof(global.RAVEN_PRIVATE_URL) !== "undefined" ) {
-  Raven = require("raven");
-  log.info("Setup sentry logging with " + global.RAVEN_PRIVATE_URL);
-  Raven.config(global.RAVEN_PRIVATE_URL, global.RAVEN_OPTIONS).install();
-}
-
 if ( typeof(global.CRASH_REPORTER) !== "undefined" ) {
   crashReporter.start(global.CRASH_REPORTER);
 }
@@ -1299,7 +1295,8 @@ var openEditor = (args) => {
   var w = new BrowserWindow({
     webPreferences: {
       nodeIntegration: true,
-      webSecurity: !global.IS_DEV
+      webSecurity: !global.IS_DEV,
+      preload: global.TRACK_ERRORS ? path.join(__dirname, 'assets', 'sentry.js') : undefined
     },
   });
   w.saverOpts = saverOpts;
