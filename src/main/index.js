@@ -434,6 +434,7 @@ var runScreenSaverOnDisplay = function(saver, s) {
         }
 
         w.show();
+        w.moveTop();
 
         diff = process.hrtime(tickCount);
         log.info(`rendered in ${diff[0] * 1e9 + diff[1]} nanoseconds`);
