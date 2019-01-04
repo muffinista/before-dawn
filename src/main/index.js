@@ -28,6 +28,7 @@ const power = require("./power.js");
 let stateManager = require("./state_manager.js");
 const SaverPrefs = require("../lib/prefs.js");
 const SaverListManager = require("../lib/saver-list.js");
+const PackageDownloader = require("../lib/package-downloader.js");
 
 var releaseChecker;
 
@@ -794,8 +795,14 @@ var bootApp = function() {
   }
   else {
     openGrabberWindow();
-    if ( prefs.needSetup() === true ) {
-      setTimeout(openPrefsWindow, 1000);
+
+    // check if we should download savers, set something up, etc
+    if ( prefs.needSetup() ) {
+      var pd = new PackageDownloader(prefs);
+      prefs.setDefaultRepo(global.SAVER_REPO);
+      pd.updatePackage().then((r) => {
+        setTimeout(openPrefsWindow, 250);
+      });
     }
   }
 
