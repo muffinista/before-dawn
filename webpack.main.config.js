@@ -4,7 +4,7 @@ const path = require('path');
 const packageJSON = require('./package.json');
 
 const dependencies = packageJSON.dependencies;
-const optionalDependencies = packageJSON.optionalDependencies;
+const optionalDependencies = packageJSON.optionalDependencies || {};
 const webpack = require('webpack');
 
 const outputDir = path.join(__dirname, "output");
@@ -98,7 +98,7 @@ let mainConfig = {
     ]),
     new CopyWebpackPlugin([
       {
-        from: path.join(__dirname, 'src', 'system-savers'),
+        from: path.join(__dirname, 'system-savers'),
         to: path.join(outputDir, 'system-savers'),
         ignore: ['.*']
       }

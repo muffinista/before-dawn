@@ -130,14 +130,17 @@
      });
    };
 
+    ipcRenderer.on("request-screenshot", (event, opts) => {
+    // var tmpParams = new URLSearchParams(document.location.search);
+    // //log.info(document.location.search, tmpParams);
+    // var screen_id = tmpParams.get('id');
+    // var width = tmpParams.get('width');
+    // var height = tmpParams.get('height');
 
-   var tmpParams = new URLSearchParams(document.location.search);
-   log.info(document.location.search, tmpParams);
-   var screen_id = tmpParams.get('id');
-   var width = tmpParams.get('width');
-   var height = tmpParams.get('height');
+    //log.info("screengrab " + screen_id);
+    log.info(opts);
+    captureScreen(opts.id, opts.width, opts.height);
 
-   log.info("screengrab " + screen_id);
-   captureScreen(screen_id, width, height);
+  });
   </script>
 </html>

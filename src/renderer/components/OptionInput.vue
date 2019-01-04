@@ -1,7 +1,7 @@
 <template>
   <div class="wrapper">
     <form class="input" v-on="$listeners">
-      <label class="for-option">{{option.name}}: {{option.description}}</label>
+      <label class="for-option">{{option.name}}:</label>
       <input
         :type="renderType"
         :name="option.name"
@@ -9,7 +9,9 @@
         :max="option.max"
         :value="value"
         :saver="saver"
+        :class="inputClass"
         v-on:change="emitChange(saver, option.name, $event.target.value)" />
+      <small class="form-text text-muted">{{option.description}}</small>
     </form>
   </div>
 </template>
@@ -25,6 +27,12 @@
           return "range";
         }
         return "text";
+      },
+      inputClass: function() {
+        if ( this.option.type === "slider" ) {
+          return "form-control-range";
+        }
+        return "form-control";
       }
     },
     methods: {

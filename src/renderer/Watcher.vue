@@ -95,33 +95,42 @@
 </template>
 
 <script>
-  const fs = require("fs");
-  const path = require("path");
-  const url = require("url");
-  const exec = require("child_process").exec;
-  
-  import Vue from 'vue';
-  import SaverPreview from '@/components/SaverPreview';
-  import SaverForm from '@/components/SaverForm';  
-  import SaverOptionInput from '@/components/SaverOptionInput';
-  import SaverOptions from '@/components/SaverOptions';
-  import Noty from "noty";
-  
+const fs = require("fs");
+const path = require("path");
+const url = require("url");
+const exec = require("child_process").exec;
+
+import Vue from 'vue';
+import SaverPreview from '@/components/SaverPreview';
+import SaverForm from '@/components/SaverForm';  
+import SaverOptionInput from '@/components/SaverOptionInput';
+import SaverOptions from '@/components/SaverOptions';
+import Noty from "noty";
+
+const remote = require('electron').remote;
+
+import SaverPrefs from '@/../lib/prefs';
+import SaverListManager from '@/../lib/saver-list';
+
 export default {
   name: 'editor',
   components: {
     SaverForm, SaverPreview, SaverOptionInput, SaverOptions
   },
-  mounted() {
+  async mounted() {
     if ( this.src === null ) {
       return;
     }
 
-    this.ipcRenderer.on("request-open-add-screensaver", (event, arg) => {
-      this.ipcRenderer.send("open-add-screensaver", this.screenshot);
+    let dataPath = remote.getCurrentWindow().saverOpts.base;
+
+    this._prefs = new SaverPrefs(dataPath);
+    this._savers = new SaverListManager({
+      prefs: this._prefs
     });
-    
-    this.manager.loadFromFile(this.src).then((result) => {
+
+
+    this._savers.loadFromFile(this.src).then((result) => {
       this.saver = result;
       this.options = result.options;
       this.lastIndex = result.options.length;
@@ -133,8 +142,7 @@ export default {
             this.reloadPreview();
           }
         });
-      }
-      
+      }      
     });
   },
   data() {
@@ -154,7 +162,7 @@ export default {
       return this.$electron.remote.getCurrentWindow();
     },
     manager: function() {
-      return this.currentWindow.savers;
+      return savers;
     },
     ipcRenderer: function() {
       return this.$electron.ipcRenderer;
@@ -241,7 +249,7 @@ export default {
       new Noty({
         type: "success",
         layout: "topRight",
-        timeout: 1000,
+        timeout: 2000,
         text: "Changes saved!",
         animation: {
           open: null
@@ -300,6 +308,7 @@ export default {
 } 
 </script>
 
-<style>
-  /* CSS */
+<style lang="scss">
+@import "~noty/lib/noty.css";
+@import "~noty/lib/themes/mint.css";
 </style>

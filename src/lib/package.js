@@ -30,7 +30,7 @@ module.exports = function Package(_attrs) {
   }
 
   if ( typeof(_attrs.log) === "undefined" ) {
-    _attrs.log = console.log;
+    _attrs.log = function() {};
   }
 
   this.logger = _attrs.log;

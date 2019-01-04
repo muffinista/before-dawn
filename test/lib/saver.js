@@ -16,6 +16,7 @@ describe('Saver', function() {
     "description": testDescription,
     "aboutUrl": "",
     "author": "Colin Mitchell",
+    "path": "/tmp",
     "source": "index.html",
     "requirements": [],
     "options": [

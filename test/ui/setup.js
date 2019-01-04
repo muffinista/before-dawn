@@ -48,7 +48,6 @@ exports.application = function(workingDir) {
   });
 
   fakeDialog.apply(a);
-
   a.fakeDialog = fakeDialog;
   
   chaiAsPromised.transferPromiseness = a.transferPromiseness;

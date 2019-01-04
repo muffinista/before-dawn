@@ -3,15 +3,22 @@
   <div class="content">
     <div class="container-fluid">
       <template v-if="!canAdd">
-        <div class="container-fluid">
+        <div class="need-setup-message">
           <p>
-            Hey, before you can create a new screensaver, you'll need to
-            set a local directory in the preferences window!
+            Screensavers in Before Dawn are web pages, so if you can use HTML, 
+            CSS, and/or Javascript, you can make your own screensaver. But before 
+            you can do that, you'll need to set a local directory in the preferences 
+            window!
           </p>
         </div>
       </template>  
 
       <template v-if="canAdd">
+        <p>
+          Screensavers in Before Dawn are web pages, so if you can use HTML, 
+          CSS, and/or Javascript, you can make your own screensaver.
+        </p>
+
         <p>Use this form to create a new screensaver. A template will be
           added to the system that you can fill in with your code.</p>
         <saver-form
@@ -30,7 +37,14 @@
 </template>
 
 <script>
+const path = require('path');
+
 import SaverForm from '@/components/SaverForm';
+const remote = require('electron').remote;
+const is_dev = remote.getGlobal('IS_DEV');
+
+import SaverPrefs from '@/../lib/prefs';
+import SaverListManager from '@/../lib/saver-list';
 
 export default {
   name: 'new-screensaver',
@@ -38,26 +52,29 @@ export default {
     SaverForm
   },
   mounted() {
-    this.ipcRenderer.on("generate-screensaver", (event, data) => {
-      this.ipcRenderer.send("open-editor", {
-        src: data.dest,
-        screenshot: this.screenshot
-      });
-      this.currentWindow.close();
+    let dataPath = remote.getCurrentWindow().saverOpts.base;
+    this.prefs = new SaverPrefs(dataPath);
+
+    this._savers = new SaverListManager({
+      prefs: this.prefs
     });
   },
   data() {
     return {
       saver: {},
-      disabled: false
+      disabled: false,
+      prefs: undefined
     }
   },
   computed: {
+    isLoaded: function() {
+      return typeof(this.prefs) !== "undefined";
+    },
     currentWindow: function() {
       return this.$electron.remote.getCurrentWindow();
     },
     manager: function() {
-      return this.currentWindow.savers;
+      return this._savers;
     },
     ipcRenderer: function() {
       return this.$electron.ipcRenderer;
@@ -71,9 +88,10 @@ export default {
       return decodeURIComponent(this.params.get("screenshot"));
     },
     canAdd: function() {
-      return this.manager !== undefined &&
-        this.manager.getLocalSource() !== undefined &&
-        this.manager.getLocalSource() !== "";
+      return this.isLoaded &&
+        this.prefs !== undefined &&
+        this.prefs.localSource !== undefined &&
+        this.prefs.localSource !== "";
     }
   },
   methods: {
@@ -89,12 +107,27 @@ export default {
       }
 
       this.disabled = true;
-      this.ipcRenderer.send("generate-screensaver", this.saver);
+
+      let systemPath = remote.getCurrentWindow().saverOpts.systemDir;
+
+      var src = path.join(systemPath, "__template");
+      var data = this.manager.create(src, this.saver);
+      this.ipcRenderer.send("savers-updated");
+      this.ipcRenderer.send("open-editor", {
+        src: data.dest,
+        screenshot: this.screenshot
+      });
+      this.currentWindow.close();
     }
   },
 };
 </script>
 
 <style>
-  /* CSS */
+.need-setup-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 80vh;
+}
 </style>

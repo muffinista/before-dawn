@@ -124,8 +124,7 @@
         if ( this.$el === undefined || this.saver === undefined ) {
           return;
         }
-          
-        console.log("set preview to", this._previewUrl);
+
         let webview = this.$el.querySelector("webview");
         webview.src = this._previewUrl;
       }
