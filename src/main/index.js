@@ -99,6 +99,7 @@ var openGrabberWindow = () => {
     }
   });
   grabberWindow.noTray = true;
+  //grabberWindow.webContents.openDevTools();
   
   grabberWindow.on("closed", function() {
     //grabber = null;
@@ -1136,9 +1137,9 @@ else {
 if ( process.env.BEFORE_DAWN_DIR !== undefined ) {
   global.basePath = process.env.BEFORE_DAWN_DIR;
 }
-else if ( global.IS_DEV ) {
-  global.basePath = path.join(__dirname, "..", "..");
-}
+// else if ( global.IS_DEV ) {
+//   global.basePath = path.join(__dirname, "..", "..");
+// }
 else {
   global.basePath = path.join(app.getPath("appData"), global.APP_DIR);
 }
