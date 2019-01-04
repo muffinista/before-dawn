@@ -84,7 +84,7 @@ if (! singleLock ) {
 }
 
 
-var openGrabberWindow = () => {
+var openGrabberWindow = (cb) => {
   var grabberUrl = "file://" + __dirname + "/assets/grabber.html";
   grabberWindow = new BrowserWindow({
     show: debugMode === true,
@@ -104,6 +104,9 @@ var openGrabberWindow = () => {
   grabberWindow.on("closed", function() {
     //grabber = null;
   });
+
+  grabberWindow.once("ready-to-show", cb);
+
 
   grabberWindow.loadURL(grabberUrl);
 };
@@ -794,16 +797,14 @@ var bootApp = function() {
     openTestShim();
   }
   else {
-    openGrabberWindow();
-
-    // check if we should download savers, set something up, etc
-    if ( prefs.needSetup() ) {
-      var pd = new PackageDownloader(prefs);
-      prefs.setDefaultRepo(global.SAVER_REPO);
-      pd.updatePackage().then((r) => {
-        setTimeout(openPrefsWindow, 250);
-      });
-    }
+    openGrabberWindow(() => {
+      // check if we should download savers, set something up, etc
+      if ( prefs.needSetup() ) {
+        var pd = new PackageDownloader(prefs);
+        prefs.setDefaultRepo(global.SAVER_REPO);
+        pd.updatePackage().then(openPrefsWindow);
+      }
+    });
   }
 
   if ( global.CHECK_FOR_RELEASE === true ) {
