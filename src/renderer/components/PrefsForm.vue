@@ -95,8 +95,7 @@
             <span class="input-group-text">github.com/</span>
           </div>
           <input type="text" v-model="prefs.sourceRepo"
-                 class="form-control"
-                 placeholder="muffinista/before-dawn-screensavers" />
+                 class="form-control" />
         </div>
         <small class="form-text text-muted">
           We will download releases from this repository instead of

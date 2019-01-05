@@ -1,5 +1,6 @@
 $nav_height: 34px;
-$footer_height: 40px;
+$footer_height: 50px;
+$footer_inner_height: 40px;
 $tab_padding:12px;
 $grid_gap:10px;
 
@@ -70,6 +71,12 @@ body > div > footer {
   padding-right: 5px;
 }
 
+body > div > footer > div {
+  height: $footer_inner_height;
+  margin-top: #{($footer_height/2 - $footer_inner_height/2) + 1};
+}
+
+
 ul {
   padding-left: 0px;
   list-style-type: none;
@@ -91,27 +98,16 @@ ul[role=tablist] {
   display: none;
 }
 
-.loader-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 80vh;
-}
-
 button {
   cursor: pointer;
-}
-button.btn-positive:hover {
-  background-color: green;
-  color: white;
-}
-button.btn-default:hover {
-  background-color: rgb(160, 160, 160);
-  color: white;
 }
 
 button.add-option, button.reset-to-defaults {
   margin-top: 12px;
+}
+
+.space-at-bottom {
+  margin-bottom: 20px;
 }
 
 .watcher iframe, .watcher webview {
@@ -122,7 +118,7 @@ button.add-option, button.reset-to-defaults {
 }
 
 .saver-list {
-  height: calc(99vh - #{$nav_height+$tab_padding+$footer_height});
+  height: calc(98vh - #{$nav_height+$tab_padding+$footer_height});
   margin-bottom: 0px;
   overflow-y: scroll;
 }

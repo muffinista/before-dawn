@@ -28,8 +28,8 @@
   </div>
   <footer class="footer d-flex justify-content-between">
     <div>
-      <button class="btn btn-large btn-default cancel" v-on:click="closeWindow">Cancel</button>
-      <button class="btn btn-large btn-positive save"
+      <button class="btn btn-large btn-secondary cancel" v-on:click="closeWindow">Cancel</button>
+      <button class="btn btn-large btn-primary save"
               v-on:click="saveData" :disabled="disabled || !canAdd">Save</button>
     </div>
   </footer>

@@ -3,7 +3,7 @@
     <div class="content">
       <b-tabs>
         <b-tab title="Preview" active>
-          <div class="container-fluid">
+          <div class="container-fluid space-at-bottom">
             <template v-if="options.length > 0">
               <h4>Options</h4>
               <small>Tweak the values here and they will be sent along
@@ -58,7 +58,7 @@
             <div class="padded-top padded-bottom">
               <button
                 type="button"
-                class="btn btn-positive add-option"
+                class="btn btn-primary add-option"
                 v-on:click="addSaverOption">Add Option</button>
             </div>
           </div>
@@ -87,9 +87,9 @@
     </div>
     <footer class="footer d-flex justify-content-between">
       <div>
-        <button class="btn btn-large btn-default cancel" v-on:click="closeWindow">Cancel</button>
-        <button class="btn btn-large btn-positive save" v-on:click="saveData" :disabled="disabled">Save</button>
-        <button class="btn btn-large btn-positive save" v-on:click="saveDataAndClose" :disabled="disabled">Save and Close</button>        
+        <button class="btn btn-large btn-secondary cancel" v-on:click="closeWindow">Cancel</button>
+        <button class="btn btn-large btn-primary save" v-on:click="saveData" :disabled="disabled">Save</button>
+        <button class="btn btn-large btn-primary save" v-on:click="saveDataAndClose" :disabled="disabled">Save and Close</button>        
       </div>
     </footer>
   </div> <!-- #editor -->

@@ -43,19 +43,19 @@
             <prefs-form
               :prefs="prefs"
               v-on:localSourceChange="localSourceChange"></prefs-form>
-            <button class="btn btn-large btn-positive reset-to-defaults"
+            <button class="btn btn-large btn-primary reset-to-defaults"
                     v-on:click="resetToDefaults">Reset to Defaults</button>
           </div>
         </b-tab>
       </b-tabs>
     </div> <!-- content -->
     <footer class="footer d-flex justify-content-between">
-      <div>
-        <button class="btn btn-large btn-positive create" v-on:click="createNewScreensaver">Create Screensaver</button>
+      <div class="">
+        <button class="align-middle btn btn-large btn-primary create" v-on:click="createNewScreensaver">Create Screensaver</button>
       </div>
       <div>
-        <button class="btn btn-large btn-default cancel" v-on:click="closeWindow">Cancel</button>
-        <button class="btn btn-large btn-positive save"  v-on:click="saveData" :disabled="disabled">Save</button>
+        <button class="btn btn-large btn-secondary cancel" v-on:click="closeWindow">Cancel</button>
+        <button class="btn btn-large btn-primary save"  v-on:click="saveData" :disabled="disabled">Save</button>
       </div>
     </footer>
   </div> <!-- #prefs -->
