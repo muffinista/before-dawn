@@ -37,7 +37,6 @@ describe('Add New', function() {
       return app.client.waitUntilWindowLoaded().
           getText('body').
           then((res) => {
-            console.log(res);
             assert(res.lastIndexOf('set a local directory in the preferences window') !== -1);
             // done();
           });
