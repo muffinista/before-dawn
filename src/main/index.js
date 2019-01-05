@@ -1153,27 +1153,16 @@ log.info("use base path", global.basePath);
 
 if ( testMode !== true ) {
   app.on("second-instance", (commandLine, workingDirectory) => {
-    if ( prefsWindowHandle !== null ) {
+    if ( prefsWindowHandle === null ) {
       openPrefsWindow();
     }
     else {
-      if ( openPrefsWindow.isMinimized() ) {
-        openPrefsWindow.restore();
+      if ( prefsWindowHandle.isMinimized() ) {
+        prefsWindowHandle.restore();
       }
-      openPrefsWindow.focus();
-      
+      prefsWindowHandle.focus();
     }
   });
-
-  // shouldQuit = app.makeSingleInstance(function(commandLine, workingDirectory) {
-  //   return true;
-  // });
-
-  // if (shouldQuit) {
-  //   log.info("looks like another copy of app is running, exiting!");
-  //   app.quit();
-  //   process.exit();
-  // }
 }
 
 // load some global CSS we'll inject into running screensavers
