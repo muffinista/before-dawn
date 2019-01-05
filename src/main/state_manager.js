@@ -136,15 +136,6 @@ var onEnterState = function(s) {
 };
 
 
-/**
- * check to see if we should switch from running -> blanked
- */
-var checkBlank = function() {
-  if ( currentState === STATES.STATE_RUNNING ) {
-    switchState(STATES.STATE_BLANKED);
-  }
-};
-
 var getCurrentState = function() {
   return currentState;
 };
@@ -171,7 +162,7 @@ var ignoreReset = function(val) {
 /**
  * check idle time and determine if we should switch states
  */
-var tick = function() {
+var tick = function(runAgain) {
   var i, nextTime, hadActivity;
 
   if ( currentState !== STATES.STATE_NONE && currentState !== STATES.STATE_PAUSED ) {
@@ -201,14 +192,25 @@ var tick = function() {
     lastTime = i;
   }
 
-  scheduleTick();
+  if ( runAgain !== false ) {
+    scheduleTick();
+  }
 };
 
+var keepTicking = true;
 var scheduleTick = function() {
-  setTimeout(tick, IDLE_CHECK_RATE);
+  if ( keepTicking ) {
+    setTimeout(tick, IDLE_CHECK_RATE);
+  }
 };
 
-scheduleTick();
+var startTicking = function() {
+  scheduleTick();
+}
+var stopTicking = function() {
+  keepTicking = false;
+}
+
 
 
 exports.states = STATES;
@@ -218,3 +220,10 @@ exports.pause = pause;
 exports.run = run;
 exports.currentState = getCurrentState;
 exports.ignoreReset = ignoreReset;
+
+exports.idler = idler;
+exports.scheduleTick = scheduleTick;
+exports.tick = tick;
+
+exports.startTicking = startTicking;
+exports.stopTicking = stopTicking;

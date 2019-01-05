@@ -778,6 +778,7 @@ var bootApp = function() {
   };
 
   updateStateManager();
+  stateManager.startTicking();
   
   appIcon = new Tray(icons.active);
   appIcon.setToolTip(global.APP_NAME);
