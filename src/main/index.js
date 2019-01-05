@@ -745,9 +745,6 @@ var bootApp = function() {
 
   log.info("Loading prefs");
   prefs = new SaverPrefs(global.basePath);
-  
-  log.info(prefs);
-  
 
   global.NEW_RELEASE_AVAILABLE = false;
   trayMenu.items[3].visible = global.NEW_RELEASE_AVAILABLE;
@@ -1271,7 +1268,6 @@ let toggleSaversUpdated = (arg) => {
 ipcMain.on("prefs-updated", (event, arg) => {
   log.info("prefs-updated", Object.keys(arg));
   prefs.reload();
-  log.info(prefs.toHash());
   updateStateManager();
 });
 
