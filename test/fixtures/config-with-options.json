@@ -7,6 +7,10 @@
     "/Users/colin/Projects/before-dawn-screensavers/emoji/saver.json": {
       "foo": "bar",
       "level": 100
+    },
+    "/Users/colin/Projects/before-dawn-screensavers/key/saver.json": {
+      "baz": "boo",
+      "level": 10
     }
   },
   "delay": 10,

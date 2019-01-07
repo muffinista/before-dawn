@@ -2,6 +2,8 @@
 
 const fs = require("fs-extra");
 const path = require("path");
+const lockfile = require('proper-lockfile');
+
 const config_file = "config.json";
 
 const PROPERTIES = [
@@ -14,7 +16,7 @@ const PROPERTIES = [
   ["auto_start", "auto_start", "boolean", false],
   ["runOnSingleDisplay", "run_on_single_display", "boolean", false],
   ["localSource", "localSource", "string", ""],
-  ["sourceUpdatedAt", "sourceUpdatedAt", "string", undefined],
+  ["sourceUpdatedAt", "sourceUpdatedAt", "date", undefined],
   ["options", "options", "hash", {}],
   ["updateCheckTimestamp", "sourceCheckTimestamp", "integer", 0]
 ];
@@ -155,12 +157,20 @@ class SaverPrefs {
 
   write(cb) {
     let output = JSON.stringify(this._data);
-    fs.writeFile(this.configFile, output, cb);
+    lockfile.lock(this.configFile, { realpath: false }).then((release) => {
+      return fs.writeFile(this.configFile, output, () => {
+        cb();
+        return release();
+      });
+    });
   };
   
   writeSync() {
     let output = JSON.stringify(this._data);
+    let release = lockfile.lockSync(this.configFile, { realpath: false });
+
     fs.writeFileSync(this.configFile, output);
+    release();
   };
 
   setDefaultRepo(r) {
@@ -182,6 +192,15 @@ for ( var i = 0; i < PROPERTIES.length; i++ ) {
       }
       if ( type == "boolean" ) {
         return (/true/i).test(v);
+      }
+      if ( type === "date" ) {
+        let tmp = new Date(v);
+        if ( isNaN(tmp.getTime()) ) {
+          v = undefined;
+        }
+        else {
+          v = tmp;
+        }
       }
       return v;
     },

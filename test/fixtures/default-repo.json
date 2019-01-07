@@ -1,0 +1,13 @@
+{
+  "sourceRepo": "mocha/screensavers",
+  "sourceUpdatedAt": "2018-01-07T15:59:04.499Z",
+  "saver": "before-dawn-screensavers/emoji/saver.json",
+  "options": {
+    "/Users/colin/Projects/before-dawn-screensavers/emoji/saver.json": {}
+  },
+  "delay": 10,
+  "lock": false,
+  "localSource": "/Users/colin/Dropbox/Projects/before-dawn-screensavers",
+  "disable_on_battery": true,
+  "sleep": 10
+}

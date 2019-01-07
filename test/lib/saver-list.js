@@ -69,6 +69,24 @@ describe('SaverListManager', function() {
     sandbox.restore();
   });
 
+  describe('setup', () => {
+    it('works', (done) => {
+      savers.setup().then((results) => {
+        assert(results.first);
+        assert(results.setup);
+
+        done();
+      })
+    });
+  });
+
+  describe('reload', () => {
+    it('works', (done) => {
+      savers.reload(true).then((results) => {
+        done();
+      })
+    });
+  });
   
   describe('loadFromFile', function() {
     it('loads data', function(done) {
@@ -99,43 +117,56 @@ describe('SaverListManager', function() {
     });
   });
   
-  describe('listAll', function() {
+  describe('list', function() {
     it('loads data', function(done) {
       savers.list(function(data) {
         assert.equal(3, data.length);
         done();
       });
     });
+
+    it('uses cache', (done) => {
+      let cache = [0, 1, 2, 3, 4, 5];
+      savers.loadedScreensavers = cache;
+      savers.list((data) => {
+        assert.deepEqual(cache, data);
+        done();
+      })
+    });
+
+    it('forces reset', (done) => {
+      let cache = [0, 1, 2, 3, 4, 5];
+      savers.loadedScreensavers = cache;
+      savers.list((data) => {
+        assert.notDeepEqual(cache, data);
+        assert.equal(3, data.length);
+        done();
+      }, true)
+    });
   });
 
-  // describe('applyPreload/getRandomScreensaver', function() {
-  //   it('works for random', function(done) {
-  //     savers.init(workingDir).then(() => {
-  //       savers.listAll(function(data) {
-  //         var s = {
-  //           preload:"random"
-  //         };
-  //         var s2 = savers.applyPreload(s);
-  //         assert.notDeepEqual(s, s2);
-  //         done();
-  //       });
-  //     });
-  //   });
+  describe('reset', function() {
+    it('resets cache', function(done) {
+      savers.list(function(data) {
+        assert.equal(3, savers.loadedScreensavers.length);
+        savers.reset();
+        assert.equal(0, savers.loadedScreensavers.length);
 
-  //   it('works for non-random', function(done) {
-  //     savers.init(workingDir).then(() => {
-  //       savers.listAll(function(data) {
-  //         var s = {
-  //           name:"hello"
-  //         };
-  //         var s2 = savers.applyPreload(s);
-  //         assert.deepEqual(s, s2);
-  //         done();
-  //       });
-  //     });
-  //   });
-  // });
+        done();
+      });
+    });
+  });
 
+  describe('random', function() {
+    it('returns something', function(done) {
+      savers.list(function(data) {
+        assert.equal(3, data.length);
+        let foo = savers.random();
+        assert(foo.key !== undefined)
+        done();
+      });
+    });
+  });
 
   describe('create', function() {
     it('works', function(done) {
@@ -174,5 +205,27 @@ describe('SaverListManager', function() {
         done();
       });
     });
-  });  
+  });
+
+  describe('delete', () => {
+    it("can delete if editable", function(done) {
+      savers.list(function(data) {
+        let s = data.find(s => s.editable);
+        savers.delete(s, (result) => {
+          assert(result);
+          done();
+        });
+      });
+    });
+
+    it("doesn't delete if not editable", function(done) {
+      savers.list(function(data) {
+        let s = data.find(s => !s.editable);
+        savers.delete(s, (result) => {
+          assert(!result);
+          done();
+        });
+      });
+    });
+  });
 });

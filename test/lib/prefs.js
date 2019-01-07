@@ -17,6 +17,20 @@ describe('SaverPrefs', () => {
     );
   };
 
+  let prefsToJSON = () => {
+    let testFile = path.join(tmpdir, "config.json")
+    let data = {};
+
+    try {
+      data = JSON.parse(fs.readFileSync(testFile));
+    }
+    catch(e) {
+      data = {};
+    }
+
+    return data;
+  }
+
   beforeEach(() => {
     tmpdir = tmp.dirSync().name;
   });
@@ -165,23 +179,6 @@ describe('SaverPrefs', () => {
     })
   });
 
-  // currentData
-  // describe('currentData', () => {
-  //   beforeEach(() => {
-  //     specifyConfig('config');
-  //     prefs = new SaverPrefs(tmpdir);
-  //   });
-
-  //   it('works', () => {
-  //     let result = prefs.currentData;
-
-  //     console.log(result);
-
-  //     assert.equal("bar", result.foo);
-  //     assert.equal(100, result.level);
-  //   })
-  // });
-
   // sources
   describe('sources', () => {
     beforeEach(() => {
@@ -229,14 +226,98 @@ describe('SaverPrefs', () => {
   });
 
   // getOptions
+  describe('getOptions', () => {
+    beforeEach(() => {
+      specifyConfig('config-with-options');
+      prefs = new SaverPrefs(tmpdir);
+    });
+
+    it('works without key', () => {
+      let opts = prefs.getOptions();
+      assert.deepEqual({ foo: 'bar', level: 100 }, opts);
+    });
+
+    it('works with key', () => {
+      let opts = prefs.getOptions("/Users/colin/Projects/before-dawn-screensavers/key/saver.json");
+      assert.deepEqual({ baz: "boo", level: 10 }, opts);
+    });
+  });
 
   // write
+  describe('write', () => {
+    beforeEach(() => {
+      prefs = new SaverPrefs(tmpdir);
+    });
+
+    it('works', (done) => {
+      let data = prefsToJSON();
+      assert.notEqual(data.delay, 123);
+
+      prefs.delay = 123;
+      prefs.write(() => {
+        data = prefsToJSON();
+        assert.equal(data.delay, 123);
+
+        done();
+      })
+    });
+  });
 
   // writeSync
+  describe('writeSync', () => {
+    beforeEach(() => {
+      prefs = new SaverPrefs(tmpdir);
+    });
+
+    it('works', () => {
+      let data = prefsToJSON();
+      assert.notEqual(data.delay, 123);
+
+      prefs.delay = 123;
+      prefs.writeSync();
+      
+      data = prefsToJSON();
+      assert.equal(data.delay, 123);
+    });
+  });
 
   // updatePrefs
+  describe('updatePrefs', () => {
+    beforeEach(() => {
+      prefs = new SaverPrefs(tmpdir);
+    });
+
+    it('works', (done) => {
+      let data = prefsToJSON();
+      assert.notEqual(data.delay, 123);
+
+      prefs.updatePrefs({
+        delay: 123
+      }, () => {
+        data = prefsToJSON();
+        assert.equal(data.delay, 123);
+
+        done();
+      });
+    });
+  });
 
   // setDefaultRepo
+  describe('setDefaultRepo', () => {
+    beforeEach(() => {
+      specifyConfig('default-repo');
+      prefs = new SaverPrefs(tmpdir);
+    });
+
+    it('works', () => {
+      assert(prefs.sourceUpdatedAt !== undefined);
+      prefs.setDefaultRepo("foo/bar");
+
+
+      assert(prefs.sourceUpdatedAt === undefined);
+      assert.equal(prefs.sourceRepo, "foo/bar");
+    });
+  });
 
   // getters/setters
 

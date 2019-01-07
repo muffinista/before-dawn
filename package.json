@@ -38,6 +38,7 @@
     "mkdirp": "^0.5.1",
     "node-system-idle-time": "muffinista/node-system-idle-time.git#master",
     "osx-battery": "gillstrom/osx-battery.git",
+    "proper-lockfile": "^3.2.0",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.5",
     "rimraf": "^2.6.2",

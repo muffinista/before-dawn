@@ -92,7 +92,7 @@ module.exports = class SaverListManager {
    */
   reload(load_savers) {
     this.logger("savers.reload");
-    return setup(load_savers).then(handlePackageChecks);  
+    return this.setup(load_savers).then(this.handlePackageChecks);  
   };
 
   reset() {
@@ -299,18 +299,19 @@ module.exports = class SaverListManager {
   delete(s, cb) {
     var k = s.key;
     var p = path.dirname(k);
+    let _self = this;
 
-    var cbWrapped = function() {
-      reload(cb);
+    var cbWrapped = function(result) {
+      _self.reload().then(() => cb(result));
     };
     
     // make sure we're deleting a screensaver that exists and is
     // actually editable
     if ( typeof(s) !== "undefined" && s.editable === true ) {
-      rimraf(p, cbWrapped);
+      rimraf(p, () => { cbWrapped(true) });
     }
     else {
-      cbWrapped();
+      cb(false);
     }
   };
 }

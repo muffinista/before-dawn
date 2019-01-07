@@ -45,12 +45,31 @@ describe('PackageDownloader', () => {
     sandbox.restore();
   });
 
+  describe('getPackage', function() {
+    it('gets package details from prefs', () => {
+      let tmp = new Date(0);
+      prefs.sourceRepo = "foo/bar";
+      prefs.sourceUpdatedAt = tmp;
+
+      let result = pd.getPackage();
+      assert.equal("foo/bar", result.repo);
+      assert.deepEqual(tmp, result.updated_at);
+    })
+  });
 
   describe('updatePackage', function() {
+    it('handles undefined package', (done) => {
+      prefs.sourceRepo = "";
+      pd.updatePackage(undefined).then((result) => {
+        assert(!result.downloaded);
+        done();
+      })
+    });
+
     it('gets package if stale', (done) => {
       var oldCheckTime = prefs.updateCheckTimestamp;
-      var df = sandbox.stub(fakePackage, 'downloadFile').resolves();
-      var zts = sandbox.stub(fakePackage, 'zipToSavers').resolves({});
+      sandbox.stub(fakePackage, 'downloadFile').resolves();
+      sandbox.stub(fakePackage, 'zipToSavers').resolves({});
 
       pd.updatePackage(fakePackage).then((result) => {
         assert(result.downloaded);
