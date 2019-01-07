@@ -24,7 +24,6 @@ module.exports = class SaverListManager {
   constructor(opts, logger) {
     this.prefs = opts.prefs;
     this.loadedScreensavers = [];
-    this._firstLoad = false;
 
     if ( logger !== undefined ) {
       this.logger = logger;
@@ -41,10 +40,6 @@ module.exports = class SaverListManager {
   
     this.baseDir = this.prefs.baseDir;
   }
-
-  get firstLoad() {
-    return this._firstLoad;
-  };
   
   get defaultSaversDir() {
     return path.join(this.baseDir, "savers");
@@ -76,7 +71,6 @@ module.exports = class SaverListManager {
         // if there's no config yet,
         // or if the savers folder was empty
         if ( made === true || ! fs.existsSync(configPath) || fs.readdirSync(saversDir).length === 0 ) {
-          //_firstLoad = true;
           results.first = true;
         }
   
