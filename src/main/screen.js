@@ -43,6 +43,7 @@ var doSleep = function() {
   else if ( process.platform === "win32" ) {
     // this uses a 3rd party library -- nircmd -- to turn off the monitor
     // http://www.nirsoft.net/utils/nircmd.html
+    // NOTE: this doesn't work in development mode right now because the path is wrong
     cmd = path.join(__dirname, "bin", "nircmd.exe") + " monitor off";
   }
   else {

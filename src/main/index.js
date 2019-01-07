@@ -25,7 +25,9 @@ const path = require("path");
 const screen = require("./screen.js");
 const power = require("./power.js");
 
-let stateManager = require("./state_manager.js");
+const idler = require("node-system-idle-time");
+
+const StateManager = require("./state_manager.js");
 const SaverPrefs = require("../lib/prefs.js");
 const SaverListManager = require("../lib/saver-list.js");
 const PackageDownloader = require("../lib/package-downloader.js");
@@ -68,6 +70,7 @@ var icons = {
 let grabberWindow = null;
 
 let prefs = undefined;
+let stateManager = undefined;
 let saverOpts = {};
 
 // usually we want to check power state before running, but
@@ -196,9 +199,8 @@ var openPrefsWindow = function() {
     log.info("loading " + prefsUrl);
     prefsWindowHandle = new BrowserWindow({
       width:800,
-      height:700,
+      height:800,
       resizable:true,
-      // show: false,
       webPreferences: {
         webSecurity: !global.IS_DEV,
         nodeIntegration: true,
@@ -776,6 +778,9 @@ var bootApp = function() {
     systemDir: getSystemDir(),
     logger: log.info
   };
+
+  stateManager = new StateManager();
+  stateManager.idleFn = idler.getIdleTime;
 
   updateStateManager();
   stateManager.startTicking();

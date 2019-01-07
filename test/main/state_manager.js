@@ -1,82 +1,99 @@
-// 'use strict';
+'use strict';
 
-// const assert = require('assert');
-// const sinon = require('sinon');
+const assert = require('assert');
+const sinon = require('sinon');
 
+const StateManager = require('../../src/main/state_manager.js');
+const fakeIdler = {
+  getIdleTime: () => { return 0 }
+}
 
-// describe('StateManager', () => {
-//   let hitIdle, hitBlank, hitReset;
-//   let sandbox;
-//   let stateManager;
+describe('StateManager', () => {
+  let hitIdle, hitBlank, hitReset;
+  let sandbox;
+  let stateManager;
 
-//   beforeEach(() => {
-//     global.SKIP_NATIVE = true;
-//     stateManager = require("../../src/main/state_manager.js");
+  beforeEach(() => {
+    stateManager = new StateManager();
 
-//     hitIdle = false;
-//     hitBlank = false;
-//     hitReset = false;
+    hitIdle = false;
+    hitBlank = false;
+    hitReset = false;
   
-//     sandbox = sinon.createSandbox();
+    sandbox = sinon.createSandbox();
 
-//     stateManager.reset();
-//     stateManager.setup({
-//       idleTime: 100,
-//       blankTime: 200,
-//       onIdleTime: () => {
-//         hitIdle = true;
-//       },
-//       onBlankTime: () => {
-//         hitBlank = true;
-//       },
-//       onReset: () => {
-//         hitReset = true;
-//       }
-//     });
-//   });
+    stateManager.reset();
+    stateManager.setup({
+      idleTime: 100,
+      blankTime: 200,
+      onIdleTime: () => {
+        hitIdle = true;
+      },
+      onBlankTime: () => {
+        hitBlank = true;
+      },
+      onReset: () => {
+        hitReset = true;
+      }
+    });
+  });
 
-//   afterEach(() => {
-//     global.SKIP_NATIVE = false;
-//     stateManager.stopTicking();
-//     sandbox.restore();
-//   });
+  afterEach(() => {
+    stateManager.stopTicking();
+    sandbox.restore();
+  });
 
-//   it('does nothing', () => {
-//     sandbox.stub(stateManager.idler, 'getIdleTime').returns(10);
+  it('does nothing', (done) => {
+    sandbox.stub(fakeIdler, 'getIdleTime').returns(10);
+    stateManager.idleFn = fakeIdler.getIdleTime;
 
-//     stateManager.tick(false);
-//     setTimeout(() => {
-//       assert(!hitIdle);
-//       assert(!hitBlank);
-//       assert(!hitReset);
-//     }, 50);
-//   });
+    stateManager.tick(false);
+    setTimeout(() => {
+      assert(!hitIdle);
+      assert(!hitBlank);
+      //assert(!hitReset);
 
-//   it('idles and blanks', () => {
-//     sandbox.stub(stateManager.idler, 'getIdleTime').returns(2500);
+      done();
+    }, 50);
+  });
 
-//     stateManager.tick(false);
-//     setTimeout(() => {
-//       assert(hitIdle);
-//       assert(hitBlank);
-//       assert(!hitReset);
-//     }, 50);
-//   });
+  it('idles', (done) => {
+    sandbox.stub(fakeIdler, 'getIdleTime').returns(2500);
+    stateManager.idleFn = fakeIdler.getIdleTime;
 
-//   it('resets', () => {
-//     var idleCount = sandbox.stub(stateManager.idler, 'getIdleTime');
-//     idleCount.onCall(0).returns(2500);
-//     idleCount.onCall(1).returns(3);
+    stateManager.tick(false);
+    setTimeout(() => {
+      assert(hitIdle);
+      assert(!hitBlank);
 
-//     setTimeout(() => {
-//       stateManager.tick(false);
-//       assert(!hitReset);
-//     }, 50);
+      done();
+    }, 50);
+  });
 
-//     setTimeout(() => {
-//       stateManager.tick(false);
-//       assert(hitReset);
-//     }, 100);
+  it('blanks', (done) => {
+    sandbox.stub(fakeIdler, 'getIdleTime').returns(2500);
+    stateManager.idleFn = fakeIdler.getIdleTime;
+    stateManager.switchState(stateManager.STATES.STATE_RUNNING);
 
-//   });
-// });
+    stateManager.tick(false);
+    setTimeout(() => {
+      assert(hitBlank);
+      done();
+    }, 50);
+  });
+
+  it('resets', (done) => {
+    var idleCount = sandbox.stub(fakeIdler, 'getIdleTime');
+    idleCount.onCall(0).returns(3);
+
+    stateManager.idleFn = fakeIdler.getIdleTime;
+    stateManager.switchState(stateManager.STATES.STATE_RUNNING);
+
+    setTimeout(() => {
+      stateManager.tick(false);
+      assert(hitReset);
+      done();
+    }, 50);
+
+  });
+});
