@@ -168,6 +168,24 @@ describe('SaverListManager', function() {
     });
   });
 
+  describe('confirmExists', function() {
+    it('returns true if present', function(done) {
+      let key = path.join(saversDir, 'saver2', 'saver.json');    
+      savers.confirmExists(key).then((result) => {
+        assert(result);
+        done();
+      });
+    });
+
+    it('returns false if not present', function(done) {
+      let key = "junk";
+      savers.confirmExists(key).then((result) => {
+        assert(!result);
+        done();
+      });
+    });
+  });
+
   describe('create', function() {
     it('works', function(done) {
 

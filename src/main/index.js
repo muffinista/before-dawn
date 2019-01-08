@@ -807,6 +807,17 @@ var bootApp = function() {
         prefs.setDefaultRepo(global.SAVER_REPO);
         pd.updatePackage().then(openPrefsWindow);
       }
+      else {
+        var savers = new SaverListManager({
+          prefs: prefs
+        });
+        log.info("checking if " + prefs.current + " is valid");
+        savers.confirmExists(prefs.current).then((result) => {
+          if ( ! result ) {
+            openPrefsWindow();
+          }
+        })
+      }
     });
   }
 

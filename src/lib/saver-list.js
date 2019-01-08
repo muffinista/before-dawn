@@ -45,7 +45,7 @@ module.exports = class SaverListManager {
     return path.join(this.baseDir, "savers");
   };
   
-  setup(load_savers) {
+  setup() {
     let _self = this;
     return new Promise(function (resolve, reject) {
       var configPath = path.join(_self.baseDir, config_file);
@@ -163,6 +163,13 @@ module.exports = class SaverListManager {
     return tmp[idx];
   };
 
+  confirmExists(key) {
+    return new Promise((resolve, reject) => {
+      this.list(() => {
+        resolve(this.getByKey(key) !== undefined);
+      })
+    });
+  };
 
   /**
    * look up a screensaver by key, and return it
