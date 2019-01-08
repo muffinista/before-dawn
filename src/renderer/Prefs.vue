@@ -19,7 +19,6 @@
                 <!-- right pane -->
                 <div class="saver-detail">
                   <template v-if="saverIsPicked">
-                    <saver-summary :saver="saverObj"></saver-summary>
                     <saver-preview
                       :bus="bus"
                       :saver="savers[saverIndex]"
@@ -32,6 +31,7 @@
                       :values="options[saver]"
                       @change="onOptionsChange"
                       v-on:saverOption="updateSaverOption"></saver-options>
+                    <saver-summary :saver="saverObj"></saver-summary>
                   </template>
                 </div>
               </div>
@@ -71,10 +71,7 @@ import PrefsForm from "@/components/PrefsForm";
 import Noty from "noty";
 
 const path = require("path");
-const remote = require("electron").remote;
 const {dialog} = require("electron").remote;
-const is_dev = remote.getGlobal("IS_DEV");
-
 
 import SaverPrefs from "@/../lib/prefs";
 import SaverListManager from "@/../lib/saver-list";
@@ -86,7 +83,7 @@ export default {
     SaverList, SaverOptions, SaverPreview, SaverSummary, PrefsForm
   },
   async mounted() {
-    let dataPath = remote.getCurrentWindow().saverOpts.base;
+    let dataPath = this.$electron.remote.getCurrentWindow().saverOpts.base;
 
     this.ipcRenderer.on("savers-updated", this.onSaversUpdated);
     this._prefs = new SaverPrefs(dataPath);
@@ -131,7 +128,7 @@ export default {
       return new Vue();
     },
     logger() {
-      let l = remote.getCurrentWindow().saverOpts.logger;
+      let l = this.$electron.remote.getCurrentWindow().saverOpts.logger;
       if ( l === undefined ) {
         l = console.log;
       }
