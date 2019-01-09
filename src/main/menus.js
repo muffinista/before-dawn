@@ -249,23 +249,33 @@ var trayMenuTemplate = function() {
     },
     {
       label: "Preferences",
-      click: main.openPrefsWindow
+      click: () => {
+        main.openPrefsWindow();
+      }
     },
     {
       label: "About " + global.APP_NAME,
-      click: main.openAboutWindow
+      click: () => {
+        main.openAboutWindow();
+      }
     },
     {
       label: "Help",
-      click: openHelpUrl
+      click: () => {
+        openHelpUrl();
+      }
     },
     {
       label: "Report a Bug",
-      click: openIssuesUrl
+      click: () => {
+        openIssuesUrl()
+      }
     },
     {
       label: "Quit",
-      click: main.quitApp
+      click: () => {
+        main.quitApp()
+      }
     }
   ];
 }
