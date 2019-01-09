@@ -810,6 +810,7 @@ var bootApp = function() {
           if ( ! result ) {
             openPrefsWindow();
           }
+          log.info("I think we're done!");
         })
       }
     });

@@ -111,6 +111,9 @@
           <span class="input-group-btn">
             <button type="button" class="btn btn-secondary pick" @click.stop="showPathChooser">...</button>
           </span>
+          <span class="input-group-btn spaced" v-if="prefs.localSource != ''">
+            <button type="button" class="btn btn-secondary clear" @click.stop="clearLocalSource">X</button>
+          </span>
         </div>
 
         <small class="form-text text-muted">
@@ -135,6 +138,11 @@ export default {
         },
         this.handlePathChoice );
     },
+    clearLocalSource() {
+      this.$emit("localSourceChange", "");
+      this.prefs.localSource = "";
+      document.querySelector("[name=localSource]").value = this.prefs.localSource;
+    },
     handlePathChoice(result) {
       this.$emit("localSourceChange", result[0]);
 
@@ -147,4 +155,7 @@ export default {
 </script>
 
 <style>
+.input-group-btn.spaced {
+  margin-left: 3px;
+}
 </style>

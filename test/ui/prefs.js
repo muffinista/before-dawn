@@ -92,18 +92,6 @@ describe('Prefs', function() {
    
   });
   
-  it('allows setting path', function() {
-    return app.client.waitUntilWindowLoaded().click("=Preferences").
-      then(() => app.client.scroll("[name='localSource']")).
-      then(() => app.client.setValue("[name='localSource']", '/tmp')).
-      then(() => app.client.click("button.save")).
-      then(() => {
-        app.client.getWindowCount().should.eventually.equal(1)
-      }).
-      then(() => {
-        assert.equal("/tmp", helpers.savedConfig(workingDir).localSource);
-      });
-  });
 
   it('allows setting path via dialog', function() {
     app.fakeDialog.mock([ { method: 'showOpenDialog', value: ['/not/a/real/path'] } ]);
@@ -115,6 +103,21 @@ describe('Prefs', function() {
       }).
       then(() => {
         assert.equal("/not/a/real/path", helpers.savedConfig(workingDir).localSource);
+      });
+  });
+
+  it('clears localSource', function() {
+    return app.client.waitUntilWindowLoaded().click("=Preferences").
+    then(() => {
+      assert.equal(saversDir, helpers.savedConfig(workingDir).localSource);
+    }).
+    then(() => app.client.click("button.clear")).
+      then(() => app.client.click("button.save")).
+      then(() => {
+        app.client.getWindowCount().should.eventually.equal(1)
+      }).
+      then(() => {
+        assert.equal("", helpers.savedConfig(workingDir).localSource);
       });
   });
 });
