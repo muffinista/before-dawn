@@ -34,6 +34,7 @@ const PackageDownloader = require("../lib/package-downloader.js");
 
 var releaseChecker;
 
+const menusAndTrays = require("./menus.js");
 
 // NOTE -- this needs to be global, otherwise the app icon gets
 // garbage collected and won't show up in the system tray
@@ -44,7 +45,6 @@ let testMode = ( process.env.TEST_MODE !== undefined );
 
 let saverWindows = [];
 
-var shouldQuit = false;
 var exitOnQuit = false;
 
 var globalCSSCode;
@@ -55,17 +55,6 @@ var trayMenu;
 var electronScreen;
 
 var testWindow;
-
-var icons = {
-  "win32" : {
-    active: __dirname + "/assets/icon.ico",
-    paused: __dirname + "/assets/icon-paused.ico"
-  },
-  "default": {
-    active: __dirname + "/assets/iconTemplate.png",
-    paused: __dirname + "/assets/icon-pausedTemplate.png"
-  }
-};
 
 let grabberWindow = null;
 
@@ -87,6 +76,11 @@ if (! singleLock ) {
 }
 
 
+/**
+ * Open the screengrab window
+ * 
+ * @param {function} cb - callback triggered when window is ready
+ */
 var openGrabberWindow = (cb) => {
   var grabberUrl = "file://" + __dirname + "/assets/grabber.html";
   grabberWindow = new BrowserWindow({
@@ -102,20 +96,17 @@ var openGrabberWindow = (cb) => {
     }
   });
   grabberWindow.noTray = true;
-  //grabberWindow.webContents.openDevTools();
   
-  grabberWindow.on("closed", function() {
-    //grabber = null;
-  });
+  grabberWindow.on("closed", () => {});
 
   grabberWindow.once("ready-to-show", cb);
-
-
   grabberWindow.loadURL(grabberUrl);
 };
 
 /**
  * open our screen grabber tool and issue a screengrab request
+ * @param {Screen} s the screen to grab
+ * @param {Function} cb callback triggered when work is done
  */
 var grabScreen = function(s, cb) {
   // bypass screen capture in test mode
@@ -132,7 +123,6 @@ var grabScreen = function(s, cb) {
   ipcMain.once("screenshot-" + s.id, function(e, message) {
     log.info("got screenshot!", message);
     cb(message);
-    //    grabber.close();
   });
 
   grabberWindow.webContents.send("request-screenshot", { 
@@ -226,10 +216,6 @@ var openPrefsWindow = function() {
     // we could do something nice with either of these events
     prefsWindowHandle.webContents.on("crashed", outputError);
     prefsWindowHandle.webContents.on("unresponsive", outputError);
-
-    // prefsWindowHandle.once("ready-to-show", () => {
-    //   prefsWindowHandle.show();
-    // });
   });
 };
 
@@ -263,7 +249,6 @@ var addNewSaver = function() {
     w.saverOpts = saverOpts;
     w.screenshot = message.url;
 
-    //w.savers = savers;
     w.loadURL(newUrl);
 
     showDock();
@@ -301,31 +286,42 @@ var openAboutWindow = function() {
   });
 };
 
-/**
- * open the help section in a browser
- */
-var openHelpUrl = function() {
-  try {
-    require("electron").shell.openExternal(global.HELP_URL);
-  }
-  catch(e) {
-    log.info(e);
-  }
-};
-
 
 /**
- * open the github issues url in a browser
+ * open the editor tool for a screensaver
+ * @param {Object} args object with arguments
+ * @param {string} args.src path to the JSON file for the screensaver
+ * @param {string} args.screenshot path to the screenshot to use when editing
  */
-var openIssuesUrl = function() {
-  try {
-    require("electron").shell.openExternal(global.ISSUES_URL);
-  }
-  catch(e) {
-    log.info(e);
-  }
-};
+var openEditor = (args) => {
+  var key = args.src;
+  var screenshot = args.screenshot;
 
+  var w = new BrowserWindow({
+    webPreferences: {
+      nodeIntegration: true,
+      webSecurity: !global.IS_DEV,
+      preload: global.TRACK_ERRORS ? path.join(__dirname, "assets", "sentry.js") : undefined
+    },
+  });
+
+  var editorUrl = getUrlPrefix() + "/editor.html";
+ 
+  var target = editorUrl + "?" +
+               "src=" + encodeURIComponent(key) +
+               "&screenshot=" + encodeURIComponent(screenshot);
+
+  w.saverOpts = saverOpts;
+  w.screenshot = screenshot;
+  w.loadURL(target);
+
+  w.on("closed", () => {
+    w = null;
+    hideDockIfInactive();
+  });
+  
+  showDock();
+};
 
 /**
  * forcefully close a screensaver window
@@ -738,8 +734,8 @@ var getUrlPrefix = function() {
  * handle initial startup of app
  */
 var bootApp = function() {
-  var icons = getIcons();
-  var menu = Menu.buildFromTemplate(buildMenuTemplate(app));
+  var icons = menusAndTrays.getIcons();
+  var menu = Menu.buildFromTemplate(menusAndTrays.buildMenuTemplate(app));
 
   Menu.setApplicationMenu(menu);
 
@@ -840,6 +836,10 @@ var bootApp = function() {
   }
 };
 
+var quitApp = () => {
+  exitOnQuit = false;
+  app.quit(); 
+}
 
 /**
  * try and guess if we are in fullscreen mode or not
@@ -931,204 +931,6 @@ var checkForNewRelease = function() {
   releaseChecker.checkLatestRelease();
 };
 
-/**
- * get icons for the current platform
- */
-var getIcons = function() {
-  if ( icons[process.platform] ) {
-    return icons[process.platform];
-  }
-
-  return icons.default;
-};
-
-/**
- * update tray icon to match our current state
- */
-var updateTrayIcon = function() {
-  var icons = getIcons();
-  if ( stateManager.currentState() === stateManager.states.STATE_PAUSED ) {
-    appIcon.setImage(icons.paused);
-  }
-  else {
-    appIcon.setImage(icons.active);
-  }
-};
-
-var buildMenuTemplate = function(a) {
-  var app = a;
-  var base = [
-    {
-      label: "File",
-      submenu: [
-        {
-          label: "Add New Screensaver",
-          accelerator: "CmdOrCtrl+N",
-          click: function(item, focusedWindow) {
-            addNewSaver();
-          }
-        },
-      ]
-    },
-
-    {
-      label: "Edit",
-      submenu: [
-        {
-          label: "Undo",
-          accelerator: "CmdOrCtrl+Z",
-          role: "undo"
-        },
-        {
-          label: "Redo",
-          accelerator: "Shift+CmdOrCtrl+Z",
-          role: "redo"
-        },
-        {
-          type: "separator"
-        },
-        {
-          label: "Cut",
-          accelerator: "CmdOrCtrl+X",
-          role: "cut"
-        },
-        {
-          label: "Copy",
-          accelerator: "CmdOrCtrl+C",
-          role: "copy"
-        },
-        {
-          label: "Paste",
-          accelerator: "CmdOrCtrl+V",
-          role: "paste"
-        },
-        {
-          label: "Select All",
-          accelerator: "CmdOrCtrl+A",
-          role: "selectall"
-        }
-      ]
-    },
-    {
-      label: "View",
-      submenu: [
-        {
-          label: "Reload",
-          accelerator: "CmdOrCtrl+R",
-          click: function(item, focusedWindow) {
-            if (focusedWindow) {
-              focusedWindow.reload();
-            }
-          }
-        },
-        {
-          label: "Toggle Developer Tools",
-          accelerator: (function() {
-            if (process.platform == "darwin") {
-              return "Alt+Command+I";
-            }
-            else {
-              return "Ctrl+Shift+I";
-            }
-          })(),
-          click: function(item, focusedWindow) {
-            if (focusedWindow) {
-              focusedWindow.toggleDevTools();
-            }
-          }
-        }
-      ]
-    },
-    {
-      label: "Window",
-      role: "window",
-      submenu: [
-        {
-          label: "Minimize",
-          accelerator: "CmdOrCtrl+M",
-          role: "minimize"
-        },
-        {
-          label: "Close",
-          accelerator: "CmdOrCtrl+W",
-          role: "close"
-        }
-      ]
-    },
-    {
-      label: "Help",
-      role: "help",
-      submenu: [
-        {
-          label: "Learn More",
-          click: function() {
-            require("electron").shell.openExternal("https://github.com/muffinista/before-dawn");
-          }
-        },
-        {
-          label: "Help",
-          click: function() {
-            require("electron").shell.openExternal(global.HELP_URL);
-          }
-        }
-      ]
-    }
-  ];
-
-
-  if (process.platform == "darwin") {
-    var name = app.getName();
-    base.unshift({
-      label: name,
-      submenu: [
-        {
-          label: "About " + name,
-          role: "about"
-        },
-        {
-          type: "separator"
-        },
-        {
-          label: "Services",
-          role: "services",
-          submenu: []
-        },
-        {
-          type: "separator"
-        },
-        {
-          label: "Hide " + name,
-          accelerator: "Command+H",
-          role: "hide"
-        },
-        {
-          label: "Hide Others",
-          accelerator: "Command+Alt+H",
-          role: "hideothers"
-        },
-        {
-          label: "Show All",
-          role: "unhide"
-        },
-        {
-          type: "separator"
-        },
-        {
-          label: "Quit",
-          accelerator: "Command+Q",
-          click: function() {
-            exitOnQuit = false;
-            app.quit();
-          }
-        }
-      ]
-    });
-  }
-
-
-  return base;
-};
-
 
 // load a few global variables
 require("./bootstrap.js");
@@ -1153,9 +955,6 @@ else {
 if ( process.env.BEFORE_DAWN_DIR !== undefined ) {
   global.basePath = process.env.BEFORE_DAWN_DIR;
 }
-// else if ( global.IS_DEV ) {
-//   global.basePath = path.join(__dirname, "..", "..");
-// }
 else {
   global.basePath = path.join(app.getPath("appData"), global.APP_DIR);
 }
@@ -1191,63 +990,7 @@ if ( typeof(app.dock) !== "undefined" ) {
 //
 // build the tray menu
 //
-trayMenu = Menu.buildFromTemplate([
-  {
-    label: "Run Now",
-    click: function() {
-      setTimeout(setStateToRunning, 50);
-    }
-  },
-  {
-    label: "Disable",
-    click: function() {
-      stateManager.pause();
-      updateTrayIcon();
-      trayMenu.items[1].visible = false;
-      trayMenu.items[2].visible = true;
-    }
-  },
-  {
-    label: "Enable",
-    click: function() { 
-      stateManager.reset();
-      updateTrayIcon();
-      trayMenu.items[1].visible = true;
-      trayMenu.items[2].visible = false;
-    },
-    visible: false
-  },
-  {
-    label: "Update Available!",
-    click: function() { 
-      require("electron").shell.openExternal("https://github.com/" + global.APP_REPO + "/releases/latest");
-    },
-    visible: (global.NEW_RELEASE_AVAILABLE === true)
-  },
-  {
-    label: "Preferences",
-    click: function() { openPrefsWindow(); }
-  },
-  {
-    label: "About " + global.APP_NAME,
-    click: function() { openAboutWindow(); }
-  },
-  {
-    label: "Help",
-    click: function() { openHelpUrl(); }
-  },
-  {
-    label: "Report a Bug",
-    click: function() { openIssuesUrl(); }
-  },
-  {
-    label: "Quit",
-    click: function() {
-      exitOnQuit = true;
-      app.quit();
-    }
-  }
-]);
+trayMenu = Menu.buildFromTemplate(menusAndTrays.trayMenuTemplate());
 
 
 //
@@ -1264,6 +1007,7 @@ let toggleSaversUpdated = (arg) => {
     prefsWindowHandle.send("savers-updated", arg);
   }
 };
+
 
 
 //
@@ -1294,41 +1038,6 @@ ipcMain.on("open-add-screensaver", (event, screenshot) => {
 ipcMain.on("open-editor", (event, args) => {
   openEditor(args);
 });
-
-
-var openEditor = (args) => {
-  var key = args.src;
-  var screenshot = args.screenshot;
-
-  var w = new BrowserWindow({
-    webPreferences: {
-      nodeIntegration: true,
-      webSecurity: !global.IS_DEV,
-      preload: global.TRACK_ERRORS ? path.join(__dirname, "assets", "sentry.js") : undefined
-    },
-  });
-  w.saverOpts = saverOpts;
-
-  w.screenshot = screenshot;
-
-  // pass the key of the screensaver we want to load
-  // as well as the URL to our screenshot image
-
-  var editorUrl = getUrlPrefix() + "/editor.html";
- 
-  var target = editorUrl + "?" +
-               "src=" + encodeURIComponent(key) +
-               "&screenshot=" + encodeURIComponent(screenshot);
-  w.loadURL(target);
-
-  w.on("closed", () => {
-    w = null;
-    hideDockIfInactive();
-  });
-  
-  showDock();
-}
-
 
 ipcMain.on("set-autostart", (event, value) => {
   var AutoLaunch = require("auto-launch");
@@ -1395,6 +1104,13 @@ process.on("uncaughtException", function (ex) {
 app.once("ready", bootApp);
 
 
+exports.setStateToRunning = setStateToRunning;
+exports.stateManager = stateManager;
+exports.trayMenu = trayMenu;
+exports.openPrefsWindow = openPrefsWindow;
+exports.openAboutWindow = openAboutWindow;
+exports.addNewSaver = addNewSaver;
 exports.openEditor = openEditor;
 exports.getSystemDir = getSystemDir;
 exports.toggleSaversUpdated = toggleSaversUpdated;
+exports.quitApp = quitApp;
