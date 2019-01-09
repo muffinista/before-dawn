@@ -22,7 +22,7 @@ const {app, BrowserWindow, ipcMain, crashReporter, Menu, Tray} = require("electr
 const fs = require("fs");
 const path = require("path");
 
-const screen = require("./screen.js");
+const screenLock = require("./screen.js");
 const power = require("./power.js");
 
 const idler = require("node-system-idle-time");
@@ -210,7 +210,6 @@ var openPrefsWindow = function() {
     });
 
     prefsWindowHandle.saverOpts = saverOpts;
-  
     prefsWindowHandle.screenshot = message.url;
 
     prefsUrl = prefsUrl + "?screenshot=" + encodeURIComponent("file://" + message.url);
@@ -241,38 +240,37 @@ var outputError = (e) => {
 /**
  * handle new screensaver event. open the window to create a screensaver
  */
-var addNewSaver = function(screenshot) {
-  var newUrl;
-
-  if ( screenshot.screenshot ) {
-    screenshot = screenshot.screenshot;
-  }
-
+var addNewSaver = function() {
   var newUrl = getUrlPrefix() + "/new.html";
+  var primary = electronScreen.getPrimaryDisplay();
 
-  newUrl = newUrl + "?screenshot=" + encodeURIComponent(screenshot);
+  // take a screenshot of the main screen for use in previews
+  grabScreen(primary, function(message) {
+    newUrl = newUrl + "?screenshot=" + encodeURIComponent("file://" + message.url);
 
-  var w = new BrowserWindow({
-    width:450,
-    height:620,
-    resizable:true,
-    webPreferences: {
-      webSecurity: !global.IS_DEV,
-      nodeIntegration: true,
-      preload: global.TRACK_ERRORS ? path.join(__dirname, "assets", "sentry.js") : undefined
-    },
-    icon: path.join(__dirname, "assets", "iconTemplate.png")
-  });
+    var w = new BrowserWindow({
+      width:450,
+      height:620,
+      resizable:true,
+      webPreferences: {
+        webSecurity: !global.IS_DEV,
+        nodeIntegration: true,
+        preload: global.TRACK_ERRORS ? path.join(__dirname, "assets", "sentry.js") : undefined
+      },
+      icon: path.join(__dirname, "assets", "iconTemplate.png")
+    });
 
-  w.saverOpts = saverOpts;
+    w.saverOpts = saverOpts;
+    w.screenshot = message.url;
 
-  //w.savers = savers;
-  w.loadURL(newUrl);
+    //w.savers = savers;
+    w.loadURL(newUrl);
 
-  showDock();
-  w.on("closed", () => {
-    w = null;
-    hideDockIfInactive();
+    showDock();
+    w.on("closed", () => {
+      w = null;
+      hideDockIfInactive();
+    });
   });
 };
 
@@ -692,7 +690,7 @@ var stopScreenSaver = function(fromBlank) {
   
   // trigger lock screen before actually closing anything
   else if ( shouldLockScreen() ) {
-    screen.doLockScreen();
+    screenLock.doLockScreen();
   }
 
   closeRunningScreensavers();
@@ -900,7 +898,7 @@ var blankScreenIfNeeded = function() {
   if ( screenSaverIsRunning() ) {
     log.info("running, close windows");
     stopScreenSaver(true);
-    screen.doSleep();
+    screenLock.doSleep();
   }
 };
 
@@ -967,7 +965,7 @@ var buildMenuTemplate = function(a) {
           label: "Add New Screensaver",
           accelerator: "CmdOrCtrl+N",
           click: function(item, focusedWindow) {
-            addNewSaver(focusedWindow.screenshot);
+            addNewSaver();
           }
         },
       ]
@@ -1390,10 +1388,6 @@ app.on("quit", function() {
 process.on("uncaughtException", function (ex) {
   log.info(ex);
   log.info(ex.stack);
-
-  if ( typeof(Raven) !== "undefined" ) {
-    Raven.captureException(ex);
-  }
 });
 
 // This method will be called when Electron has finished
@@ -1401,7 +1395,6 @@ process.on("uncaughtException", function (ex) {
 app.once("ready", bootApp);
 
 
-exports.addNewSaver = addNewSaver;
 exports.openEditor = openEditor;
 exports.getSystemDir = getSystemDir;
 exports.toggleSaversUpdated = toggleSaversUpdated;
