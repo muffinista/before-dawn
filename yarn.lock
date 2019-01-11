@@ -3549,10 +3549,10 @@ detect-file@^1.0.0:
   resolved "https://registry.yarnpkg.com/detect-file/-/detect-file-1.0.0.tgz#f0d66d03672a825cb1b73bdb3fe62310c8e552b7"
   integrity sha1-8NZtA2cqglyxtzvbP+YjEMjlUrc=
 
-detect-fullscreen@^0.0.1:
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/detect-fullscreen/-/detect-fullscreen-0.0.1.tgz#cddfe9acda8df389b3b2933b8b05954b92fe8633"
-  integrity sha512-yKJjhUMhxjvhRlSzIWx4DP+wXXZmzVarJiuwPl63Yv95+d9GFC5lU12cP5l2yJnEX8s2+Yre8PmZ3WplxeGl4Q==
+detect-fullscreen@^0.0.2:
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/detect-fullscreen/-/detect-fullscreen-0.0.2.tgz#9e2c0dd50e259f122f74998d69208f5c38c561c0"
+  integrity sha512-WeK0JozGvt9olGgkefS9xTpl41ZhcMimu4PZouA7TQr0DJSQ17bGAV5igwR0FzyPpU4hxtM9QUW9Kux3l8BmxQ==
   dependencies:
     bindings "^1.3.0"
     nan "^2.12.0"

@@ -28,7 +28,7 @@
     "@sentry/electron": "^0.14.0",
     "auto-launch": "^5.0.5",
     "cross-env": "^5.2.0",
-    "detect-fullscreen": "^0.0.1",
+    "detect-fullscreen": "^0.0.2",
     "electron-is-dev": "^1.0.1",
     "electron-log": "^2.2.16",
     "fs-extra": "^7.0.0",
