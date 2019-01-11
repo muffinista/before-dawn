@@ -43,6 +43,7 @@
     "request-promise-native": "^1.0.5",
     "rimraf": "^2.6.2",
     "temp": "^0.9.0",
+    "vue-observe-visibility": "^0.4.3",
     "yauzl": "^2.10.0"
   },
   "devDependencies": {

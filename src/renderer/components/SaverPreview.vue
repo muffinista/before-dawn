@@ -1,6 +1,7 @@
 <template>
   <div>
-    <webview class="preview" :src="previewUrl" />
+    <webview class="preview" v-observe-visibility="{
+      callback: visibilityChanged, once: true, }" />
   </div>
 </template>
 
@@ -15,15 +16,17 @@
         myUrl: ""
       }
     },
-    mounted: function () {
+    created() {
+      this.debounceHandleResize = debounce(this.handleResize, 200);
+      this.debounceHandleOptionsChange = debounce(this.handleOptionsChange, 200);
+    },
+    async mounted() {
       if ( this.bus !== undefined ) {
         this.bus.$on("options-changed", this.debounceHandleOptionsChange);
         this.bus.$on("saver-changed", this.handleSaverChange);
       }
 
       window.addEventListener("resize", this.debounceHandleResize);
-
-      this.$nextTick(this.waitForWebview);
     },
     beforeDestroy: function () {
       window.removeEventListener("resize", this.debounceHandleResize);
@@ -37,45 +40,40 @@
       },
       isLoaded() {
         return this.saver !== undefined;
-      },
-      debounceHandleResize() {
-        return debounce(this.handleResize, 200);
-      },
-      debounceHandleOptionsChange() {
-        return debounce(this.handleOptionsChange, 200);
-      },
-      previewUrl: {
-        get: function() {
-          if ( this.myUrl === undefined ) {
-            this.$forceUpdate();
-          }
-          return this.myUrl;
-        },
-        set: function(val) {
-          this.myUrl = val;
-        }       
       }
+      //,
+      // previewUrl: {
+      //   get: function() {
+      //     if ( this.myUrl === undefined ) {
+      //       this.$forceUpdate();
+      //     }
+      //     return this.myUrl;
+      //   },
+      //   set: function(val) {
+      //     console.log("set to " + val);
+      //     this.myUrl = val;
+      //   }       
+      //}
      
     },
     methods: {
-      waitForWebview() {
-        var webview;
-        if ( this.webviewWidth() === 0 ) {
-          this.$nextTick(this.waitForWebview);
+      visibilityChanged(isVisible, entry) {
+        if ( isVisible ) {
+          console.log("hey", this.webviewWidth(), this.webviewHeight());
+
+          // webview will have scrollbars by default and you can't
+          // easily hide them
+          var webview = this.$el.querySelector("webview");
+          webview.addEventListener("dom-ready", () => {
+            webview.insertCSS("html,body{ overflow: hidden !important; }");
+          });
+
+          this.handleSaverChange(this.saver);
+          this.$nextTick(this.handleResize);
         }
-
-        // webview will have scrollbars by default and you can't
-        // easily hide them
-        webview = this.$el.querySelector("webview");
-        webview.addEventListener("dom-ready", () => {
-          webview.insertCSS("html,body{ overflow: hidden !important; }");
-        });
-
-        this.handleSaverChange(this.saver);
-        this.$nextTick(this.handleResize);
       },
       webviewWidth() {
-        if ( this.$el === undefined ) {
+        if ( this.$el === undefined || this.$el.clientWidth <= 0 ) {
           return 0;
         }
         return this.$el.clientWidth - 4;
@@ -88,7 +86,8 @@
           width: this.webviewWidth(),
           height: this.webviewHeight(),
           preview: 1,
-          screenshot: this.screenshot
+          screenshot: this.screenshot,
+          _: Math.random()
         };
 
         if ( typeof(s) === "undefined" ) {
@@ -101,32 +100,29 @@
           this.options);
 
         return mergedOpts;
-
       },
       handleOptionsChange(data) {
         this.options = data;
-        this.previewUrl = this.saver.getUrl(this.urlOpts(this.saver));
         this.handleRedraw();
       },
       handleSaverChange(s) {
-        this.previewUrl = s.getUrl(this.urlOpts(s));
         this.handleRedraw();
       },
       handleResize() {
         var webview = this.$el.querySelector("webview");
-
-        webview.style.width = this.webviewWidth() + "px";
-        webview.style.height = this.webviewHeight() + "px";
-
-        this.handleRedraw();
+        if ( this.webviewWidth() > 0 ) {
+          console.log("resize to", this.webviewWidth(), this.webviewHeight());
+          // only set the height manually! use css to set one dimension
+          webview.style.height = this.webviewHeight() + "px";
+          this.handleRedraw();
+        }
       },
       handleRedraw() {
         if ( this.$el === undefined || this.saver === undefined ) {
           return;
         }
-
         let webview = this.$el.querySelector("webview");
-        webview.src = this.myUrl;
+        webview.src = this.saver.getUrl(this.urlOpts(this.saver))
       }
     },
   };

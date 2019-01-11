@@ -1,8 +1,39 @@
 <template>
   <div id="editor">
+    <ul role="tablist" class="nav nav-tabs">
+      <li role="presentation" class="active nav-item" id="preview-tab">
+        <a aria-expanded="true" aria-controls="preview"
+          role="tab" data-toggle="tab"
+          class="nav-link active" href="#preview" v-on:click="showPreview">Preview</a>
+      </li>
+      <li role="presentation" class="nav-item" id="settings-tab">
+        <a aria-expanded="false" aria-controls="settings"
+          role="tab" data-toggle="tab"
+          class="nav-link" href="#settings" v-on:click="showSettings">Settings</a>
+      </li>
+      <b-button-group>
+        <b-button variant="default" @click="openFolder"
+                  v-b-tooltip.hover title="Open screensaver folder">
+          <span class="icon"><img src="assets/img/folder.svg" width="14" height="14" /></span>
+        </b-button>
+        <b-button variant="default" @click="saveData"
+                  v-b-tooltip.hover title="Save changes">
+          <span class="icon"><img src="assets/img/save.svg" width="14" height="14" /></span>
+        </b-button>
+        <b-button variant="default" @click="reloadPreview"
+                  v-b-tooltip.hover title="Reload preview">
+          <span class="icon"><img src="assets/img/cycle.svg" width="14" height="14" /></span>
+        </b-button>
+        <b-button variant="default" @click="openConsole"
+                  v-b-tooltip.hover title="View Developer Console">
+          <span class="icon"><img src="assets/img/bug.svg" width="14" height="14" /></span>
+        </b-button>
+      </b-button-group>
+    </ul>
+
     <div class="content">
-      <b-tabs>
-        <b-tab title="Preview" active>
+      <div class="tab-content">
+        <div class="tab-pane active" aria-labelledby="preview-tab" id="preview" role="tabpanel">
           <div class="container-fluid space-at-bottom">
             <template v-if="options.length > 0">
               <h4>Options</h4>
@@ -22,8 +53,8 @@
               v-bind:screenshot="screenshot"
               v-if="isLoaded"></saver-preview>
           </div>
-        </b-tab>
-        <b-tab title="Settings">
+        </div>
+        <div class="tab-pane" aria-labelledby="settings-tab" id="settings" role="tabpanel">
           <div class="container-fluid">
             <h4>Basic Information</h4>
             <small>You can enter the basics about this screensaver
@@ -62,28 +93,8 @@
                 v-on:click="addSaverOption">Add Option</button>
             </div>
           </div>
-        </b-tab>
-        <template slot="tabs">
-          <b-button-group>
-            <b-button variant="default" @click="openFolder"
-                      v-b-tooltip.hover title="Open screensaver folder">
-              <span class="icon"><img src="assets/img/folder.svg" width="14" height="14" /></span>
-            </b-button>
-            <b-button variant="default" @click="saveData"
-                      v-b-tooltip.hover title="Save changes">
-              <span class="icon"><img src="assets/img/save.svg" width="14" height="14" /></span>
-            </b-button>
-            <b-button variant="default" @click="reloadPreview"
-                      v-b-tooltip.hover title="Reload preview">
-              <span class="icon"><img src="assets/img/cycle.svg" width="14" height="14" /></span>
-            </b-button>
-            <b-button variant="default" @click="openConsole"
-                      v-b-tooltip.hover title="View Developer Console">
-              <span class="icon"><img src="assets/img/bug.svg" width="14" height="14" /></span>
-            </b-button>
-          </b-button-group>
-        </template>
-      </b-tabs>
+        </div>
+      </div>
     </div>
     <footer class="footer d-flex justify-content-between">
       <div>
@@ -130,7 +141,6 @@ export default {
       prefs: this._prefs
     });
 
-
     this._savers.loadFromFile(this.src).then((result) => {
       this.saver = result;
       this.options = result.options;
@@ -141,6 +151,7 @@ export default {
         fs.watch(this.folderPath, (eventType, filename) => {
           if (filename) {
             this.reloadPreview();
+            this.showPreview();
           }
         });
       }      
@@ -195,6 +206,14 @@ export default {
     },
   },
   methods: {
+    showPreview(e) {
+      document.querySelector("#preview").classList.add("active");
+      document.querySelector("#settings").classList.remove("active");
+    },
+    showSettings(e) {
+      document.querySelector("#preview").classList.remove("active");
+      document.querySelector("#settings").classList.add("active");
+    },
     onOptionsChange(e) {
       var name = e.target.name;
       var value = e.target.value;

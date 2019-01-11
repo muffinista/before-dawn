@@ -1,5 +1,6 @@
 import Vue from "vue";
 import VueElectron from "vue-electron";
+import VueObserveVisibility from "vue-observe-visibility";
 import BootstrapVue from "bootstrap-vue"
 
 import Prefs from "./Prefs";
@@ -12,6 +13,8 @@ import "bootstrap-vue/dist/bootstrap-vue.css"
 import "../css/styles.scss";
 
 
+
+
 if (!process.env.IS_WEB) {
   Vue.use(require("vue-electron"));
 }
@@ -19,6 +22,7 @@ Vue.config.productionTip = false;
 
 Vue.use(VueElectron);
 Vue.use(BootstrapVue);
+Vue.use(VueObserveVisibility);
 
 if ( document.getElementById("prefs") ) {
   // eslint-disable no-new 

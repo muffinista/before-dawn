@@ -110,13 +110,6 @@ button.add-option, button.reset-to-defaults {
   margin-bottom: 20px;
 }
 
-.watcher iframe, .watcher webview {
-  width: calc(100vw - 15px);
-  height: calc(100vh - 90px);
-  margin-left: auto;
-  margin-right: auto;
-}
-
 .saver-list {
   height: calc(98vh - #{$nav_height+$tab_padding+$footer_height});
   margin-bottom: 0px;

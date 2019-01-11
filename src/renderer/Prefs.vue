@@ -1,8 +1,20 @@
 <template>
   <div id="prefs">
+    <ul role="tablist" class="nav nav-tabs">
+      <li role="presentation" class="active nav-item" id="screensavers-tab">
+        <a aria-expanded="true" aria-controls="screensavers"
+          role="tab" data-toggle="tab"
+          class="nav-link active" href="#screensavers" v-on:click="showScreensavers">Screensavers</a>
+      </li>
+      <li role="presentation" class="nav-item" id="preferences-tab">
+        <a aria-expanded="false" aria-controls="preferences"
+          role="tab" data-toggle="tab"
+          class="nav-link" href="#preferences" v-on:click="showPreferences">Preferences</a>
+      </li>
+    </ul>
     <div class="content">
-      <b-tabs>
-        <b-tab title="Screensavers" active>
+      <div class="tab-content">
+        <div class="tab-pane" aria-labelledby="screensavers-tab" id="screensavers" role="tabpanel">
           <div class="container-fluid">
             <div class="row">
               <div class="grid">
@@ -37,8 +49,8 @@
               </div>
             </div>
           </div>
-        </b-tab>
-        <b-tab title="Preferences">
+        </div>
+        <div class="tab-pane" aria-labelledby="preferences-tab" id="preferences" role="tabpanel">
           <div class="container-fluid">
             <prefs-form
               :prefs="prefs"
@@ -46,8 +58,8 @@
             <button class="btn btn-large btn-primary reset-to-defaults"
                     v-on:click="resetToDefaults">Reset to Defaults</button>
           </div>
-        </b-tab>
-      </b-tabs>
+        </div>
+      </div>
     </div> <!-- content -->
     <footer class="footer d-flex justify-content-between">
       <div class="">
@@ -102,6 +114,7 @@ export default {
           this.getData();
           this.getCurrentSaver();
         }
+        this.showScreensavers();
       });
 
       if ( this.$electron.remote.getGlobal("NEW_RELEASE_AVAILABLE") ) {
@@ -110,6 +123,8 @@ export default {
         });
       }
     });
+
+//    $().tab();
   },
   beforeDestroy() {
     this.ipcRenderer.removeListener("savers-updated", this.onSaversUpdated);
@@ -186,6 +201,14 @@ export default {
     }
   },
   methods: {
+    showPreferences(e) {
+      document.querySelector("#preferences").classList.add("active");
+      document.querySelector("#screensavers").classList.remove("active");
+    },
+    showScreensavers(e) {
+      document.querySelector("#screensavers").classList.add("active");
+      document.querySelector("#preferences").classList.remove("active");
+    },
     onOptionsChange(e) {
       this.bus.$emit("options-changed", this.options[this.saver]);
     },
