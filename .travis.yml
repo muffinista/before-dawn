@@ -27,3 +27,6 @@ notifications:
   email:
     on_success: never
     on_failure: change
+
+env:
+  - YARN_GPG=no
