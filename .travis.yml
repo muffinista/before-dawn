@@ -15,6 +15,7 @@ osx_image: xcode9.1
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get -qq update ; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -y libx11-dev libxss-dev icnsutils graphicsmagick libappindicator1 libxtst-dev ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then cinst -y python2; fi
 
 branches:
   only:
