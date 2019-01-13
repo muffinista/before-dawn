@@ -11,10 +11,15 @@
           role="tab" data-toggle="tab"
           class="nav-link" href="#preferences" v-on:click="showPreferences">Preferences</a>
       </li>
+      <li role="presentation" class="nav-item" id="advanced-tab">
+        <a aria-expanded="false" aria-controls="advanced"
+          role="tab" data-toggle="tab"
+          class="nav-link" href="#advanced" v-on:click="showAdvanced">Advanced</a>
+      </li>
     </ul>
     <div class="content">
       <div class="tab-content">
-        <div class="tab-pane" aria-labelledby="screensavers-tab" id="screensavers" role="tabpanel">
+        <div class="active tab-pane" aria-labelledby="screensavers-tab" id="screensavers" role="tabpanel">
           <div class="container-fluid">
             <div class="row">
               <div class="grid">
@@ -53,8 +58,14 @@
         <div class="tab-pane" aria-labelledby="preferences-tab" id="preferences" role="tabpanel">
           <div class="container-fluid">
             <prefs-form
+              :prefs="prefs"></prefs-form>
+          </div>
+        </div>
+        <div class="tab-pane" aria-labelledby="advanced-tab" id="advanced" role="tabpanel">
+          <div class="container-fluid">
+            <advanced-prefs-form
               :prefs="prefs"
-              v-on:localSourceChange="localSourceChange"></prefs-form>
+              v-on:localSourceChange="localSourceChange"></advanced-prefs-form>
             <button class="btn btn-large btn-primary reset-to-defaults"
                     v-on:click="resetToDefaults">Reset to Defaults</button>
           </div>
@@ -79,6 +90,7 @@ import SaverList from "@/components/SaverList";
 import SaverPreview from "@/components/SaverPreview";
 import SaverOptions from "@/components/SaverOptions";
 import SaverSummary from "@/components/SaverSummary";
+import AdvancedPrefsForm from "@/components/AdvancedPrefsForm";
 import PrefsForm from "@/components/PrefsForm";
 import Noty from "noty";
 
@@ -92,7 +104,7 @@ import PackageDownloader from "@/../lib/package-downloader";
 export default {
   name: "prefs",
   components: {
-    SaverList, SaverOptions, SaverPreview, SaverSummary, PrefsForm
+    SaverList, SaverOptions, SaverPreview, SaverSummary, AdvancedPrefsForm, PrefsForm
   },
   async mounted() {
     let dataPath = this.$electron.remote.getCurrentWindow().saverOpts.base;
@@ -201,13 +213,25 @@ export default {
     }
   },
   methods: {
+    clearTabs() {
+      var els = document.querySelectorAll(".nav-tabs > li > a.nav-link, .tab-content > .tab-pane");
+      for ( var i = 0; i < els.length; i++ ) {
+        els[i].classList.remove("active");
+      }
+    },
+    setActiveTab(n) {
+      this.clearTabs();
+      document.querySelector("#" + n).classList.add("active");
+      document.querySelector("[href='#" + n + "']").classList.add("active");
+    },
     showPreferences(e) {
-      document.querySelector("#preferences").classList.add("active");
-      document.querySelector("#screensavers").classList.remove("active");
+      this.setActiveTab("preferences");
     },
     showScreensavers(e) {
-      document.querySelector("#screensavers").classList.add("active");
-      document.querySelector("#preferences").classList.remove("active");
+      this.setActiveTab("screensavers");
+    },
+    showAdvanced(e) {
+      this.setActiveTab("advanced");
     },
     onOptionsChange(e) {
       this.bus.$emit("options-changed", this.options[this.saver]);
