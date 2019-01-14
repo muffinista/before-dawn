@@ -1,13 +1,14 @@
 $nav_height: 34px;
 $footer_height: 50px;
 $footer_inner_height: 40px;
-$tab_padding:12px;
+$tab_padding:6px;
 $grid_gap:10px;
 
 /* purgecss start ignore */
 
 html {
   height: 100%;
+  font-family: system-ui;
 }
 body {
   min-height: 100%;
@@ -15,8 +16,9 @@ body {
   grid-template-rows: auto 1fr;
 }
 
-body, input {
-  font: menu;
+body, input, button {
+  // font: menu;
+  font: caption;
 }
 
 small {
@@ -32,20 +34,16 @@ small {
 
 @media (max-width: 600px) {
   .grid {
-  grid-template-columns: 99%;
+    grid-template-columns: 99%;
   }
 }
 
-select, label {
+select, label, .form-control {
   font-size: 0.9rem;
 }
 
 .form-check {
   margin-bottom: 0.3rem;
-}
-
-.form-control {
-  font-size: 0.9rem;
 }
 
 body > div > .content {
@@ -59,7 +57,7 @@ body > #editor > .content {
 
 @media (max-height: 600px) {
   body > div > .content {
-  overflow-y: scroll;
+    overflow-y: scroll;
   }  
 }
 body > div > footer {
@@ -102,7 +100,7 @@ button {
   cursor: pointer;
 }
 
-button.add-option, button.reset-to-defaults {
+button.add-option {
   margin-top: 12px;
 }
 
@@ -114,11 +112,11 @@ button.add-option, button.reset-to-defaults {
   height: calc(98vh - #{$nav_height+$tab_padding+$footer_height});
   margin-bottom: 0px;
   overflow-y: scroll;
-}
+  font: small-caption;
 
-.no-padding > [class*="col-"] {
-  padding-left: 0 !important;
-  padding-right: 0 !important;
+  li.list-group-item {
+    border: none;
+  }
 }
 
 iframe, webview {
@@ -131,13 +129,9 @@ iframe.preview, webview.preview {
   overflow:hidden;
 }
 
-.form-control[name=repo] {
-  width: 80%;
-}
-
-input[type=radio], div.body > a {
-  margin: 4px;
-}
+// input[type=radio], div.body > a {
+//   margin: 4px;
+// }
 
 .hint {
   color: #888888;
@@ -148,23 +142,20 @@ h1 .hint {
   font-size: 60%;
 }
 
-fieldset {
-  border: none;
-}
-
 .window > footer {
   padding: 5px;
 }
 
-
 .padded-top {
   margin-top: 20px;
 }
-
 .padded-bottom {
   margin-bottom: 60px;
 }
 
+//
+// about page
+//
 #about {
   overflow-x: hidden;
 }
@@ -182,24 +173,6 @@ fieldset {
 }
 #about p {
   font-size: 120%;
-}
-
-#attributes .list-group * {
-  white-space: normal;
-}
-
-#details {
-  min-height: 120px;
-}
-
-#details h1, #options h1, .saver-description h1 {
-  font-size: 125%;
-  margin-top: 5px;
-}
-
-p.description {
-  white-space: initial;
-  margin-bottom: 0px;
 }
 
 #options {
@@ -220,25 +193,17 @@ p.description {
   margin: 0px;
 }
 
-.buttons > a {
-  margin: 2px;
-}
-
-#savers li.list-group-item.active a.btn {
-  background: white;
-}
+// #savers li.list-group-item.active a.btn {
+//   background: white;
+// }
 
 #prefs-form h1 {
   font-size: 2.0rem;
 }
 
-.prefs-wrapper {
-  padding-left: 5px;
-}
-
 form.submit-attempt {
   input:invalid {
-  border: 2px dashed red;
+    border: 2px dashed red;
   }
 }
 
@@ -265,7 +230,6 @@ form.input input[type=text], input[type=range] {
 
 label.for-option {
   font-weight: bold;
-  //width: 250px;
 }
 input[type="range"] {
   max-width: 250px;

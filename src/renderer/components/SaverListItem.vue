@@ -3,15 +3,24 @@
     <div class="d-flex w-100 justify-content-between">
       <label>
         <div class="body">
-          <input type="radio" v-bind:value="saver.key" :data-name="saver.name" name="screensaver" v-on="$listeners" :checked="checked"/>
-          <b>{{saver.name}}</b>
+          <input type="radio" 
+            name="screensaver" 
+            v-bind:value="saver.key" 
+            :data-name="saver.name" 
+            v-on="$listeners" 
+            :checked="checked"/>
+          {{saver.name}}
         </div>
       </label>
 
       <template v-if="saver.editable">
         <div>
-          <a class="btn btn-outline-secondary btn-sm" href="#" role="button" v-on:click="onEditClick(saver)">edit</a>
-          <a class="btn btn-outline-secondary btn-sm" href="#" role="button" v-on:click="onDeleteClick(saver)">delete</a>
+          <a class="btn btn-outline-secondary btn-sm" 
+            href="#" role="button" 
+            v-on:click="onEditClick(saver)">edit</a>
+          <a class="btn btn-outline-secondary btn-sm" 
+            href="#" role="button" 
+            v-on:click="onDeleteClick(saver)">delete</a>
         </div>
       </template>
     </div>
