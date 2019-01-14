@@ -5,7 +5,7 @@
       <div class="times">
         <div class="form-group">
           <label for="delay">Activate after:</label>
-          <select v-model="prefs.delay">
+          <select name="delay" v-model="prefs.delay">
             <option value="0">never</option>
             <option value="1">1 minute</option>
             <option value="5">5 minutes</option>
@@ -21,7 +21,7 @@
         
         <div class="form-group">
           <label for="sleep">Disable displays after:</label>
-          <select v-model="prefs.sleep">
+          <select name="sleep" v-model="prefs.sleep">
             <option value="0">never</option>
             <option value="1">1 minute</option>
             <option value="5">5 minutes</option>

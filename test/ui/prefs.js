@@ -1,14 +1,10 @@
 'use strict';
 
 const assert = require('assert');
-const fs = require('fs');
-const path = require('path');
-const tmp = require('tmp');
 
 const helpers = require('./setup.js');
 var workingDir = helpers.getTempDir();
 var saversDir = helpers.getTempDir();
-
 
 const app = helpers.application(workingDir);
 
@@ -20,7 +16,9 @@ describe('Prefs', function() {
   helpers.setupTimeout(this);
   
 	beforeEach(() => {
-		return app.start().
+    return app.start().
+              then(() =>
+              app.fakeDialog.mock([ { method: 'showOpenDialog', value: ['/not/a/real/path'] } ])).
                then(() => app.client.waitUntilWindowLoaded() ).
 			         then(() => app.electron.ipcRenderer.send('open-prefs')).
 			         then(() => app.client.windowByIndex(2));
@@ -63,7 +61,26 @@ describe('Prefs', function() {
         then(() => {
           assert(helpers.savedConfig(workingDir).saver.lastIndexOf("/saver-one/") !== -1);
         });
-    
+  });
+
+  it('set general preferences', () => {
+    return app.client.waitUntilWindowLoaded().
+      click("=Preferences").
+      waitUntilTextExists('body', 'Activate after').
+      then(() => 
+        app.client.selectByVisibleText("[name=delay]", "30 minutes")
+      ).
+      then(() => 
+        app.client.selectByVisibleText('[name="sleep"]', "15 minutes")
+      ).
+      then(() => app.client.click("button.save")).
+      then(() => {
+        app.client.getWindowCount().should.eventually.equal(1)
+      }).
+      then(() => {
+        assert.equal(30, helpers.savedConfig(workingDir).delay);
+        assert.equal(15, helpers.savedConfig(workingDir).sleep);  
+      });
   });
 
   it('sets options for screensaver', function() {
@@ -89,13 +106,11 @@ describe('Prefs', function() {
           assert(options[k].load_url == 'barfoo');
           assert(options[k].sound == false);
         });
-   
   });
   
 
   it('allows setting path via dialog', function() {
-    app.fakeDialog.mock([ { method: 'showOpenDialog', value: ['/not/a/real/path'] } ]);
-    return app.client.waitUntilWindowLoaded().click("=Preferences").
+    return app.client.waitUntilWindowLoaded().click("=Advanced").
       then(() => app.client.click("button.pick")).
       then(() => app.client.click("button.save")).
       then(() => {
@@ -107,7 +122,7 @@ describe('Prefs', function() {
   });
 
   it('clears localSource', function() {
-    return app.client.waitUntilWindowLoaded().click("=Preferences").
+    return app.client.waitUntilWindowLoaded().click("=Advanced").
     then(() => {
       assert.equal(saversDir, helpers.savedConfig(workingDir).localSource);
     }).
