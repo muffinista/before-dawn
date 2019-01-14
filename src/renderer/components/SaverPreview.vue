@@ -1,7 +1,7 @@
 <template>
   <div>
-    <webview class="preview" v-observe-visibility="{
-      callback: visibilityChanged, once: true, }" />
+    <webview class="preview"
+      v-observe-visibility="{ callback: visibilityChanged, once: true, }" />
   </div>
 </template>
 
@@ -12,8 +12,7 @@
     props: ["screenshot", "bus", "saver"],
     data() {
       return {
-        options: {},
-        myUrl: ""
+        options: {}
       }
     },
     created() {
@@ -41,26 +40,10 @@
       isLoaded() {
         return this.saver !== undefined;
       }
-      //,
-      // previewUrl: {
-      //   get: function() {
-      //     if ( this.myUrl === undefined ) {
-      //       this.$forceUpdate();
-      //     }
-      //     return this.myUrl;
-      //   },
-      //   set: function(val) {
-      //     console.log("set to " + val);
-      //     this.myUrl = val;
-      //   }       
-      //}
-     
     },
     methods: {
       visibilityChanged(isVisible, entry) {
         if ( isVisible ) {
-          console.log("hey", this.webviewWidth(), this.webviewHeight());
-
           // webview will have scrollbars by default and you can't
           // easily hide them
           var webview = this.$el.querySelector("webview");

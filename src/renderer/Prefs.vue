@@ -38,17 +38,18 @@
                   <template v-if="saverIsPicked">
                     <saver-preview
                       :bus="bus"
-                      :saver="savers[saverIndex]"
+                      :saver="saverObj"
                       :screenshot="screenshot"
                       :options="options[saver]"
+                      :key="renderIndex"
                       v-if="savers[saverIndex] !== undefined"></saver-preview>
+                    <saver-summary :saver="saverObj"></saver-summary>
                     <saver-options
                       :saver="saver"
                       :options="saverOptions"
                       :values="options[saver]"
                       @change="onOptionsChange"
                       v-on:saverOption="updateSaverOption"></saver-options>
-                    <saver-summary :saver="saverObj"></saver-summary>
                   </template>
                 </div>
               </div>
@@ -135,8 +136,6 @@ export default {
         });
       }
     });
-
-//    $().tab();
   },
   beforeDestroy() {
     this.ipcRenderer.removeListener("savers-updated", this.onSaversUpdated);
@@ -147,7 +146,8 @@ export default {
       prefs: {},
       options: {},
       saver: undefined,
-      disabled: false
+      disabled: false,
+      renderIndex: 0
     }
   },
   computed: {
@@ -239,6 +239,7 @@ export default {
     onSaverPicked(e) {
       this.saver = e.target.value;
       this.bus.$emit("saver-changed", this.saverObj);
+      this.renderIndex += 1;
     },
     resetToDefaults(e) {
       dialog.showMessageBox(
