@@ -83,6 +83,28 @@ describe('Prefs', function() {
       });
   });
 
+  it('toggles checkboxes', () => {
+    let oldConfig = helpers.savedConfig(workingDir);
+
+    return app.client.waitUntilTextExists('body', 'Screensaver One', 10000).
+      click("=Preferences").
+      waitUntilTextExists('body', 'Activate after').
+      then(() => app.client.click("label*=Lock screen after running")).
+      then(() => app.client.click("label*=Disable when on battery?")).
+      then(() => app.client.click("label*=Auto start on login?")).
+      then(() => app.client.click("label*=Only run on the primary display?")).
+      then(() => app.client.click("button.save")).
+      then(() => {
+        app.client.getWindowCount().should.eventually.equal(1)
+      }).
+      then(() => {
+        assert.equal(!oldConfig.lock, helpers.savedConfig(workingDir).lock);
+        assert.equal(!oldConfig.disable_on_battery, helpers.savedConfig(workingDir).disable_on_battery);
+        assert.equal(!oldConfig.auto_start, helpers.savedConfig(workingDir).auto_start);
+        assert.equal(!oldConfig.run_on_single_display, helpers.savedConfig(workingDir).run_on_single_display);
+      });
+  });
+
   it('sets options for screensaver', function() {
     return app.client.waitUntilTextExists('body', 'Screensaver One', 10000).
        getAttribute("[type=radio]","data-name").

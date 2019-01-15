@@ -58,17 +58,20 @@
         </div>
         <div class="tab-pane" aria-labelledby="preferences-tab" id="preferences" role="tabpanel">
           <div class="container-fluid">
-            <prefs-form
-              :prefs="prefs"></prefs-form>
+            <template v-if="prefs !== undefined">
+              <prefs-form :prefs="prefs"></prefs-form>
+            </template>
           </div>
         </div>
         <div class="tab-pane" aria-labelledby="advanced-tab" id="advanced" role="tabpanel">
           <div class="container-fluid">
-            <advanced-prefs-form
-              :prefs="prefs"
-              v-on:localSourceChange="localSourceChange"></advanced-prefs-form>
-            <button class="btn btn-large btn-primary reset-to-defaults"
-                    v-on:click="resetToDefaults">Reset to Defaults</button>
+            <template v-if="prefs !== undefined">
+              <advanced-prefs-form
+                :prefs="prefs"
+                v-on:localSourceChange="localSourceChange"></advanced-prefs-form>
+              <button class="btn btn-large btn-primary reset-to-defaults"
+                      v-on:click="resetToDefaults">Reset to Defaults</button>
+            </template>
           </div>
         </div>
       </div>
@@ -111,16 +114,16 @@ export default {
     let dataPath = this.$electron.remote.getCurrentWindow().saverOpts.base;
 
     this.ipcRenderer.on("savers-updated", this.onSaversUpdated);
-    this._prefs = new SaverPrefs(dataPath);
+    this.prefs = new SaverPrefs(dataPath);
     this._savers = new SaverListManager({
-      prefs: this._prefs
+      prefs: this.prefs
     }, this.logger);
     this._savers.setup().then(() => {
       this.getData();
       this.getCurrentSaver();
-      var pd = new PackageDownloader(this._prefs);
-      if ( this._prefs.needSetup() ) {
-        this._prefs.setDefaultRepo(this.$electron.remote.getGlobal("SAVER_REPO"));
+      var pd = new PackageDownloader(this.prefs);
+      if ( this.prefs.needSetup() ) {
+        this.prefs.setDefaultRepo(this.$electron.remote.getGlobal("SAVER_REPO"));
       }
       pd.updatePackage().then((r) => {
         if ( r.downloaded === true ) {
@@ -277,7 +280,7 @@ export default {
     getData() {
       this.manager.list((entries) => {
         this.savers = entries;
-        var tmp = this._prefs.toHash();
+        var tmp = this.prefs.toHash();
         if ( tmp.options === undefined ) {
           tmp.options = {};
         }
@@ -299,12 +302,13 @@ export default {
         // However, new properties added to the object will not
         // trigger changes. In such cases, create a fresh object
         // with properties from both the original object and the mixin object:
-        this.prefs = Object.assign({}, this.prefs, tmp);
+//        this.prefs = Object.assign({}, this.prefs, tmp);
+        this.prefs = Object.assign(this.prefs, tmp);
 
 
         // pick the first screensaver if nothing picked yet
-        if ( this._prefs.current === undefined ) {
-          this._prefs.current = this.savers[0].key;
+        if ( this.prefs.current === undefined ) {
+          this.prefs.current = this.savers[0].key;
           this.getCurrentSaver();
         }
 
@@ -316,7 +320,7 @@ export default {
       this.getData();
     },
     getCurrentSaver() {
-      this.saver = this._prefs.current;
+      this.saver = this.prefs.current;
     },
     createNewScreensaver() {
       this.saveData(false);
@@ -362,8 +366,8 @@ export default {
       // @todo should this use Object.assign?
       this.prefs.current = this.saver;
       this.prefs.options = this.options;
-      
-      this._prefs.updatePrefs(this.prefs, (changes) => {
+
+      this.prefs.updatePrefs(this.prefs, (changes) => {
         this.disabled = false;
         this.ipcRenderer.send("prefs-updated", changes);
         this.ipcRenderer.send("set-autostart", this.prefs.auto_start);

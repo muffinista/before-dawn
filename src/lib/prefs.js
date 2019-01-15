@@ -148,10 +148,10 @@ class SaverPrefs {
     }
 
     let result = this.changes;
-    this.changes = {}
+    this.changes = {};
 
     this.write(() => {
-      cb(result)
+      cb(result);
     });
   };
 
@@ -186,7 +186,13 @@ for ( var i = 0; i < PROPERTIES.length; i++ ) {
 
   Object.defineProperty(SaverPrefs.prototype, name, {
     get() {
-      let v = this._data[key] || value;
+      let v = this._data[key];
+      // don't assign default value unless it's explicitly missing
+      // ie, don't overwrite "false"!
+      if ( v === undefined || v === null ) {
+        v = value;
+      }
+
       if ( type == "integer" ) {
         return parseInt(v, 10);
       }

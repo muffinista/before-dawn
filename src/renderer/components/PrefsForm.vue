@@ -40,7 +40,7 @@
 
       <div class="options">
         <div class="form-check">
-          <label for="lock" class="form-check-label">
+          <label class="form-check-label">
             <input type="checkbox" id="lock" class="form-check-input" v-model="prefs.lock" />
             Lock screen after running?
           </label>
@@ -50,8 +50,8 @@
         </div>
 
         <div class="form-check">
-          <label for="disable_on_battery" class="form-check-label">
-            <input type="checkbox" id="disable_on_battery" class="form-check-input" v-model="prefs.disable_on_battery" />
+          <label class="form-check-label">
+            <input type="checkbox" id="disable_on_battery" class="form-check-input" v-model="prefs.disableOnBattery" />
             Disable when on battery?
           </label>
           <small class="form-text text-muted">
@@ -63,7 +63,7 @@
         </div>
         <!-- ' -->
         <div class="form-check">
-          <label for="auto_start" class="form-check-label">
+          <label class="form-check-label">
             <input type="checkbox" class="form-check-input" v-model="prefs.auto_start" />
             Auto start on login?
           </label>
@@ -73,9 +73,9 @@
         </div>
 
         <div class="form-check">
-          <label for="primary-display" class="form-check-label">
+          <label class="form-check-label">
             <input type="checkbox" id="primary-display" class="form-check-input"
-                   v-model="prefs.run_on_single_display" />
+                   v-model="prefs.runOnSingleDisplay" />
             Only run on the primary display?
           </label>
           <small class="form-text text-muted">
