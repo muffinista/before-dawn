@@ -52,9 +52,8 @@ export default {
             this.$emit("deleteSaver", s);
           }
         }
-      );
-      
-    }      
+      ); 
+    }
   }
 };
 </script>

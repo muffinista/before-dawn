@@ -124,15 +124,16 @@ describe('Prefs', function() {
   it('clears localSource', function() {
     return app.client.waitUntilWindowLoaded().click("=Advanced").
     then(() => {
-      assert.equal(saversDir, helpers.savedConfig(workingDir).localSource);
+      let ls = helpers.savedConfig(workingDir).localSource;
+      assert( ls != "" && ls !== undefined);
     }).
     then(() => app.client.click("button.clear")).
-      then(() => app.client.click("button.save")).
-      then(() => {
-        app.client.getWindowCount().should.eventually.equal(1)
-      }).
-      then(() => {
-        assert.equal("", helpers.savedConfig(workingDir).localSource);
-      });
+    then(() => app.client.click("button.save")).
+    then(() => {
+      app.client.getWindowCount().should.eventually.equal(1)
+    }).
+    then(() => {
+      assert.equal("", helpers.savedConfig(workingDir).localSource);
+    });
   });
 });
