@@ -111,27 +111,25 @@
         if ( this.$el === undefined || this.saver === undefined ) {
           return;
         }
+
+        let self = this;
         let webview = this.webview; //this.$el.querySelector("webview");
+        // webview.loadURL(this.saver.getUrl(this.urlOpts(this.saver)));
         webview.src = this.saver.getUrl(this.urlOpts(this.saver));
-        this.setZoom();
+
+        webview.addEventListener("dom-ready", () => {
+          self.webview.insertCSS("html,body{ overflow: hidden !important; }");
+          self.setZoom();
+        }, { once: true });
       },
       setZoom() {
         let webview = this.webview; //this.$el.querySelector("webview");
         if ( webview.zoomable ) {
-          //console.log(webview);
           webview.setZoomFactor(this.webviewZoomLevel());
         }
       },
       visibilityChanged(isVisible, entry) {
         if ( isVisible ) {
-          // webview will have scrollbars by default and you can't
-          // easily hide them
-          // var webview = this.webview; //this.$el.querySelector("webview");
-          // let self = this;
-          // webview.addEventListener("dom-ready", () => {
-          //   webview.insertCSS("html,body{ overflow: hidden !important; }");
-          // });
-
           this.handleSaverChange(this.saver);
           this.$nextTick(this.handleResize);
         }

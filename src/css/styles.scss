@@ -25,15 +25,15 @@ small {
   font-size: 90%;
 }
 
-.grid {
+.savers-grid {
   width: 100%;
   display: grid;
-  grid-gap: 1rem;
-  grid-template-columns: 48% 48%;
+  //grid-gap: 1rem;
+  grid-template-columns: 400px 1fr;
 }
 
 @media (max-width: 600px) {
-  .grid {
+  .savers-grid {
     grid-template-columns: 99%;
   }
 }
@@ -118,6 +118,12 @@ button.add-option {
     border: none;
   }
 }
+.saver-detail {
+  height: calc(98vh - #{$nav_height+$tab_padding+$footer_height});
+  overflow-y: scroll;
+  padding-left: 5px;
+  padding-right: 5px;
+}
 
 iframe, webview {
   overflow: hidden;
@@ -193,13 +199,6 @@ h1 .hint {
   margin: 0px;
 }
 
-// #savers li.list-group-item.active a.btn {
-//   background: white;
-// }
-
-#prefs-form h1 {
-  font-size: 2.0rem;
-}
 
 form.submit-attempt {
   input:invalid {

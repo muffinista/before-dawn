@@ -190,6 +190,10 @@ var openPrefsWindow = function() {
     prefsWindowHandle = new BrowserWindow({
       width:800,
       height:800,
+      minWidth: 800,
+      minHeight: 500,
+      maxWidth: 1200,
+      maxHeight: 1000,
       resizable:true,
       webPreferences: {
         webSecurity: !global.IS_DEV,

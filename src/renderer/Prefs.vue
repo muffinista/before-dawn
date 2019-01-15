@@ -22,7 +22,7 @@
         <div class="active tab-pane" aria-labelledby="screensavers-tab" id="screensavers" role="tabpanel">
           <div class="container-fluid">
             <div class="row">
-              <div class="grid">
+              <div class="savers-grid">
                 <!-- left pane -->
                 <div>
                   <saver-list
