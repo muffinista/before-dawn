@@ -186,7 +186,6 @@ var openPrefsWindow = function() {
   grabScreen(primary, function(message) {
     var prefsUrl = getUrlPrefix() + "/prefs.html";
 
-    log.info("loading " + prefsUrl);
     prefsWindowHandle = new BrowserWindow({
       width:800,
       height:800,
@@ -208,6 +207,7 @@ var openPrefsWindow = function() {
 
     prefsUrl = prefsUrl + "?screenshot=" + encodeURIComponent("file://" + message.url);
     
+    log.info("loading " + prefsUrl);
     prefsWindowHandle.loadURL(prefsUrl);
 
     showDock();
