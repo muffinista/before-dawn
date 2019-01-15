@@ -2,9 +2,9 @@
 
 const fs = require("fs-extra");
 const path = require("path");
-const lockfile = require('proper-lockfile');
+const lockfile = require("proper-lockfile");
 
-const config_file = "config.json";
+const CONFIG_FILE_NAME = "config.json";
 
 const PROPERTIES = [
   ["current", "saver", "string", undefined],
@@ -24,7 +24,7 @@ const PROPERTIES = [
 class SaverPrefs {
   constructor(baseDir, _defaults) {
     this.baseDir = baseDir;
-    this.configFile = path.join(baseDir, config_file);
+    this.configFile = path.join(baseDir, CONFIG_FILE_NAME);
     this.defaults = _defaults;
 
     this.reload();

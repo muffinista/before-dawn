@@ -8,7 +8,7 @@ var yauzl = require("yauzl");
 var mkdirp = require("mkdirp");
 const util = require("util");
 const rimraf = require("rimraf");
-const lockfile = require('proper-lockfile');
+const lockfile = require("proper-lockfile");
 
 /**
  * need source repo url
@@ -67,10 +67,6 @@ module.exports = function Package(_attrs) {
     });
 
     return this.data;
-  };
-
-  this.setReleaseInfo = function(d) {
-    this.data = d;
   };
   
   this.checkLatestRelease = async function(force) {

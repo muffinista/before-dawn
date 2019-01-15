@@ -7,7 +7,7 @@ const rimraf = require("rimraf");
 
 const Saver = require("./saver.js");
 
-const config_file = "config.json";
+const CONFIG_FILE_NAME = "config.json";
 
 
 /**
@@ -48,7 +48,7 @@ module.exports = class SaverListManager {
   setup() {
     let _self = this;
     return new Promise(function (resolve, reject) {
-      var configPath = path.join(_self.baseDir, config_file);
+      var configPath = path.join(_self.baseDir, CONFIG_FILE_NAME);
       var saversDir = _self.defaultSaversDir;
       var results = {
         first: false,
