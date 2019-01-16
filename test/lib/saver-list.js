@@ -21,10 +21,13 @@ describe("SaverListManager", function() {
     return tmp.dirSync().name;
   };
 
-  var addSaver = function(dest, name) {
+  var addSaver = function(dest, name, source) {
     // make a subdir in the savers directory and drop screensaver
     // config there
-    var src = path.join(__dirname, "../fixtures/saver.json");
+    if ( source === undefined ) {
+      source = "saver.json"
+    }
+    var src = path.join(__dirname, "../fixtures/" + source);
     var testSaverDir = path.join(dest, name);
     fs.mkdirSync(testSaverDir);
 
@@ -115,6 +118,17 @@ describe("SaverListManager", function() {
              }).
              catch(done);
     });
+
+    it("rejects invalid savers", (done) => {
+      var f = path.join(__dirname, "../fixtures/invalid.json");
+      savers.loadFromFile(f, false, {}).
+        then(() => {
+          done(new Error("Expected method to reject."));               
+        }).
+        catch(() => {
+          done();
+        });
+    });
   });
   
   describe("list", function() {
@@ -124,6 +138,14 @@ describe("SaverListManager", function() {
         done();
       });
     });
+
+    it("handles bad data", (done) => {
+      addSaver(saversDir, "invalid", "invalid.json");
+      savers.list(function(data) {
+        assert.equal(3, data.length);
+        done();
+      });
+    })
 
     it("uses cache", (done) => {
       let cache = [0, 1, 2, 3, 4, 5];
