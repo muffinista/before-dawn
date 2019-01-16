@@ -1,14 +1,10 @@
 'use strict';
 
 const assert = require('assert');
-const fs = require('fs');
-const path = require('path');
-const tmp = require('tmp');
 
 const helpers = require('./setup.js');
 var workingDir = helpers.getTempDir();
 var saversDir = helpers.getTempDir();
-
 
 const app = helpers.application(workingDir);
 
@@ -20,7 +16,9 @@ describe('Prefs', function() {
   helpers.setupTimeout(this);
   
 	beforeEach(() => {
-		return app.start().
+    return app.start().
+              then(() =>
+              app.fakeDialog.mock([ { method: 'showOpenDialog', value: ['/not/a/real/path'] } ])).
                then(() => app.client.waitUntilWindowLoaded() ).
 			         then(() => app.electron.ipcRenderer.send('open-prefs')).
 			         then(() => app.client.windowByIndex(2));
@@ -63,7 +61,66 @@ describe('Prefs', function() {
         then(() => {
           assert(helpers.savedConfig(workingDir).saver.lastIndexOf("/saver-one/") !== -1);
         });
-    
+  });
+
+  it('set general preferences', () => {
+    return app.client.waitUntilWindowLoaded().
+      click("=Preferences").
+      waitUntilTextExists('body', 'Activate after').
+      then(() => 
+        app.client.selectByVisibleText("[name=delay]", "30 minutes")
+      ).
+      then(() => 
+        app.client.selectByVisibleText('[name="sleep"]', "15 minutes")
+      ).
+      then(() => app.client.click("button.save")).
+      then(() => {
+        app.client.getWindowCount().should.eventually.equal(1)
+      }).
+      then(() => {
+        assert.equal(30, helpers.savedConfig(workingDir).delay);
+        assert.equal(15, helpers.savedConfig(workingDir).sleep);  
+      });
+  });
+
+  it('toggles checkboxes', () => {
+    let oldConfig = helpers.savedConfig(workingDir);
+
+    return app.client.waitUntilTextExists('body', 'Screensaver One', 10000).
+      click("=Preferences").
+      waitUntilTextExists('body', 'Activate after').
+      then(() => app.client.click("label*=Lock screen after running")).
+      then(() => app.client.click("label*=Disable when on battery?")).
+      then(() => app.client.click("label*=Auto start on login?")).
+      then(() => app.client.click("label*=Only run on the primary display?")).
+      then(() => app.client.click("button.save")).
+      then(() => {
+        app.client.getWindowCount().should.eventually.equal(1)
+      }).
+      then(() => {
+        assert.equal(!oldConfig.lock, helpers.savedConfig(workingDir).lock);
+        assert.equal(!oldConfig.disable_on_battery, helpers.savedConfig(workingDir).disable_on_battery);
+        assert.equal(!oldConfig.auto_start, helpers.savedConfig(workingDir).auto_start);
+        assert.equal(!oldConfig.run_on_single_display, helpers.savedConfig(workingDir).run_on_single_display);
+      });
+  });
+
+  it('leaves checkboxes', () => {
+    let oldConfig = helpers.savedConfig(workingDir);
+
+    return app.client.waitUntilTextExists('body', 'Screensaver One', 10000).
+      click("=Preferences").
+      waitUntilTextExists('body', 'Activate after').
+      then(() => app.client.click("button.save")).
+      then(() => {
+        app.client.getWindowCount().should.eventually.equal(1)
+      }).
+      then(() => {
+        assert.equal(oldConfig.lock, helpers.savedConfig(workingDir).lock);
+        assert.equal(oldConfig.disable_on_battery, helpers.savedConfig(workingDir).disable_on_battery);
+        assert.equal(oldConfig.auto_start, helpers.savedConfig(workingDir).auto_start);
+        assert.equal(oldConfig.run_on_single_display, helpers.savedConfig(workingDir).run_on_single_display);
+      });
   });
 
   it('sets options for screensaver', function() {
@@ -89,13 +146,11 @@ describe('Prefs', function() {
           assert(options[k].load_url == 'barfoo');
           assert(options[k].sound == false);
         });
-   
   });
   
 
   it('allows setting path via dialog', function() {
-    app.fakeDialog.mock([ { method: 'showOpenDialog', value: ['/not/a/real/path'] } ]);
-    return app.client.waitUntilWindowLoaded().click("=Preferences").
+    return app.client.waitUntilWindowLoaded().click("=Advanced").
       then(() => app.client.click("button.pick")).
       then(() => app.client.click("button.save")).
       then(() => {
@@ -107,17 +162,18 @@ describe('Prefs', function() {
   });
 
   it('clears localSource', function() {
-    return app.client.waitUntilWindowLoaded().click("=Preferences").
+    return app.client.waitUntilWindowLoaded().click("=Advanced").
     then(() => {
-      assert.equal(saversDir, helpers.savedConfig(workingDir).localSource);
+      let ls = helpers.savedConfig(workingDir).localSource;
+      assert( ls != "" && ls !== undefined);
     }).
     then(() => app.client.click("button.clear")).
-      then(() => app.client.click("button.save")).
-      then(() => {
-        app.client.getWindowCount().should.eventually.equal(1)
-      }).
-      then(() => {
-        assert.equal("", helpers.savedConfig(workingDir).localSource);
-      });
+    then(() => app.client.click("button.save")).
+    then(() => {
+      app.client.getWindowCount().should.eventually.equal(1)
+    }).
+    then(() => {
+      assert.equal("", helpers.savedConfig(workingDir).localSource);
+    });
   });
 });

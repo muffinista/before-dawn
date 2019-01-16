@@ -10,5 +10,7 @@
   "lock": false,
   "localSource": "/Users/colin/Dropbox/Projects/before-dawn-screensavers",
   "disable_on_battery": true,
+  "run_on_single_display": true,
+  "auto_start": true,
   "sleep": 10
 }

@@ -1,7 +1,7 @@
 <template>
   <div>
-    <webview class="preview" v-observe-visibility="{
-      callback: visibilityChanged, once: true, }" />
+    <webview class="preview"
+      v-observe-visibility="{ callback: visibilityChanged, once: true, }" />
   </div>
 </template>
 
@@ -13,7 +13,7 @@
     data() {
       return {
         options: {},
-        myUrl: ""
+        webview: undefined
       }
     },
     created() {
@@ -21,6 +21,13 @@
       this.debounceHandleOptionsChange = debounce(this.handleOptionsChange, 200);
     },
     async mounted() {
+      this.webview = this.$el.querySelector("webview");
+      this.webview.addEventListener('dom-ready', () => {
+        this.webview.insertCSS("html,body{ overflow: hidden !important; }");
+        this.webview.zoomable = true;
+        this.setZoom();
+      }, {once: true});
+
       if ( this.bus !== undefined ) {
         this.bus.$on("options-changed", this.debounceHandleOptionsChange);
         this.bus.$on("saver-changed", this.handleSaverChange);
@@ -29,7 +36,12 @@
       window.addEventListener("resize", this.debounceHandleResize);
     },
     beforeDestroy: function () {
+      //console.log("soon i will be dead");
+      this.webview.zoomable = false;
       window.removeEventListener("resize", this.debounceHandleResize);
+    },
+    destroyed() {
+      //console.log("i am dead!");
     },
     computed: {
       aspectRatio() {
@@ -38,53 +50,32 @@
         var ratio = size.height / size.width;
         return ratio;
       },
+      screenWidth() {
+        var screen = this.$electron.screen;
+        var size = screen.getPrimaryDisplay().bounds;
+        return size.width;
+      },
       isLoaded() {
         return this.saver !== undefined;
       }
-      //,
-      // previewUrl: {
-      //   get: function() {
-      //     if ( this.myUrl === undefined ) {
-      //       this.$forceUpdate();
-      //     }
-      //     return this.myUrl;
-      //   },
-      //   set: function(val) {
-      //     console.log("set to " + val);
-      //     this.myUrl = val;
-      //   }       
-      //}
-     
     },
     methods: {
-      visibilityChanged(isVisible, entry) {
-        if ( isVisible ) {
-          console.log("hey", this.webviewWidth(), this.webviewHeight());
-
-          // webview will have scrollbars by default and you can't
-          // easily hide them
-          var webview = this.$el.querySelector("webview");
-          webview.addEventListener("dom-ready", () => {
-            webview.insertCSS("html,body{ overflow: hidden !important; }");
-          });
-
-          this.handleSaverChange(this.saver);
-          this.$nextTick(this.handleResize);
-        }
-      },
       webviewWidth() {
         if ( this.$el === undefined || this.$el.clientWidth <= 0 ) {
           return 0;
         }
-        return this.$el.clientWidth - 4;
+        return this.$el.clientWidth;
       },
       webviewHeight() {
         return this.webviewWidth() * this.aspectRatio;
       },
+      webviewZoomLevel() {
+        return this.webviewWidth() / this.screenWidth;
+      },
       urlOpts(s) {
         var base = {
-          width: this.webviewWidth(),
-          height: this.webviewHeight(),
+          width: this.screenWidth,
+          height: this.screenWidth * this.aspectRatio,
           preview: 1,
           screenshot: this.screenshot,
           _: Math.random()
@@ -109,9 +100,8 @@
         this.handleRedraw();
       },
       handleResize() {
-        var webview = this.$el.querySelector("webview");
+        var webview = this.webview; //this.$el.querySelector("webview");
         if ( this.webviewWidth() > 0 ) {
-          console.log("resize to", this.webviewWidth(), this.webviewHeight());
           // only set the height manually! use css to set one dimension
           webview.style.height = this.webviewHeight() + "px";
           this.handleRedraw();
@@ -121,8 +111,28 @@
         if ( this.$el === undefined || this.saver === undefined ) {
           return;
         }
-        let webview = this.$el.querySelector("webview");
-        webview.src = this.saver.getUrl(this.urlOpts(this.saver))
+
+        let self = this;
+        let webview = this.webview; //this.$el.querySelector("webview");
+        // webview.loadURL(this.saver.getUrl(this.urlOpts(this.saver)));
+        webview.src = this.saver.getUrl(this.urlOpts(this.saver));
+
+        webview.addEventListener("dom-ready", () => {
+          self.webview.insertCSS("html,body{ overflow: hidden !important; }");
+          self.setZoom();
+        }, { once: true });
+      },
+      setZoom() {
+        let webview = this.webview; //this.$el.querySelector("webview");
+        if ( webview.zoomable ) {
+          webview.setZoomFactor(this.webviewZoomLevel());
+        }
+      },
+      visibilityChanged(isVisible, entry) {
+        if ( isVisible ) {
+          this.handleSaverChange(this.saver);
+          this.$nextTick(this.handleResize);
+        }
       }
     },
   };

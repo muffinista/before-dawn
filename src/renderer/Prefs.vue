@@ -11,13 +11,18 @@
           role="tab" data-toggle="tab"
           class="nav-link" href="#preferences" v-on:click="showPreferences">Preferences</a>
       </li>
+      <li role="presentation" class="nav-item" id="advanced-tab">
+        <a aria-expanded="false" aria-controls="advanced"
+          role="tab" data-toggle="tab"
+          class="nav-link" href="#advanced" v-on:click="showAdvanced">Advanced</a>
+      </li>
     </ul>
     <div class="content">
       <div class="tab-content">
-        <div class="tab-pane" aria-labelledby="screensavers-tab" id="screensavers" role="tabpanel">
+        <div class="active tab-pane" aria-labelledby="screensavers-tab" id="screensavers" role="tabpanel">
           <div class="container-fluid">
             <div class="row">
-              <div class="grid">
+              <div class="savers-grid">
                 <!-- left pane -->
                 <div>
                   <saver-list
@@ -33,17 +38,18 @@
                   <template v-if="saverIsPicked">
                     <saver-preview
                       :bus="bus"
-                      :saver="savers[saverIndex]"
+                      :saver="saverObj"
                       :screenshot="screenshot"
                       :options="options[saver]"
+                      :key="renderIndex"
                       v-if="savers[saverIndex] !== undefined"></saver-preview>
+                    <saver-summary :saver="saverObj"></saver-summary>
                     <saver-options
                       :saver="saver"
                       :options="saverOptions"
                       :values="options[saver]"
                       @change="onOptionsChange"
                       v-on:saverOption="updateSaverOption"></saver-options>
-                    <saver-summary :saver="saverObj"></saver-summary>
                   </template>
                 </div>
               </div>
@@ -52,11 +58,20 @@
         </div>
         <div class="tab-pane" aria-labelledby="preferences-tab" id="preferences" role="tabpanel">
           <div class="container-fluid">
-            <prefs-form
-              :prefs="prefs"
-              v-on:localSourceChange="localSourceChange"></prefs-form>
-            <button class="btn btn-large btn-primary reset-to-defaults"
-                    v-on:click="resetToDefaults">Reset to Defaults</button>
+            <template v-if="prefs !== undefined">
+              <prefs-form :prefs="prefs"></prefs-form>
+            </template>
+          </div>
+        </div>
+        <div class="tab-pane" aria-labelledby="advanced-tab" id="advanced" role="tabpanel">
+          <div class="container-fluid">
+            <template v-if="prefs !== undefined">
+              <advanced-prefs-form
+                :prefs="prefs"
+                v-on:localSourceChange="localSourceChange"></advanced-prefs-form>
+              <button class="btn btn-large btn-primary reset-to-defaults"
+                      v-on:click="resetToDefaults">Reset to Defaults</button>
+            </template>
           </div>
         </div>
       </div>
@@ -79,6 +94,7 @@ import SaverList from "@/components/SaverList";
 import SaverPreview from "@/components/SaverPreview";
 import SaverOptions from "@/components/SaverOptions";
 import SaverSummary from "@/components/SaverSummary";
+import AdvancedPrefsForm from "@/components/AdvancedPrefsForm";
 import PrefsForm from "@/components/PrefsForm";
 import Noty from "noty";
 
@@ -92,22 +108,22 @@ import PackageDownloader from "@/../lib/package-downloader";
 export default {
   name: "prefs",
   components: {
-    SaverList, SaverOptions, SaverPreview, SaverSummary, PrefsForm
+    SaverList, SaverOptions, SaverPreview, SaverSummary, AdvancedPrefsForm, PrefsForm
   },
   async mounted() {
     let dataPath = this.$electron.remote.getCurrentWindow().saverOpts.base;
 
     this.ipcRenderer.on("savers-updated", this.onSaversUpdated);
-    this._prefs = new SaverPrefs(dataPath);
+    this.prefs = new SaverPrefs(dataPath);
     this._savers = new SaverListManager({
-      prefs: this._prefs
+      prefs: this.prefs
     }, this.logger);
     this._savers.setup().then(() => {
       this.getData();
       this.getCurrentSaver();
-      var pd = new PackageDownloader(this._prefs);
-      if ( this._prefs.needSetup() ) {
-        this._prefs.setDefaultRepo(this.$electron.remote.getGlobal("SAVER_REPO"));
+      var pd = new PackageDownloader(this.prefs);
+      if ( this.prefs.needSetup() ) {
+        this.prefs.setDefaultRepo(this.$electron.remote.getGlobal("SAVER_REPO"));
       }
       pd.updatePackage().then((r) => {
         if ( r.downloaded === true ) {
@@ -123,8 +139,6 @@ export default {
         });
       }
     });
-
-//    $().tab();
   },
   beforeDestroy() {
     this.ipcRenderer.removeListener("savers-updated", this.onSaversUpdated);
@@ -135,7 +149,8 @@ export default {
       prefs: {},
       options: {},
       saver: undefined,
-      disabled: false
+      disabled: false,
+      renderIndex: 0
     }
   },
   computed: {
@@ -201,13 +216,25 @@ export default {
     }
   },
   methods: {
+    clearTabs() {
+      var els = document.querySelectorAll(".nav-tabs > li > a.nav-link, .tab-content > .tab-pane");
+      for ( var i = 0; i < els.length; i++ ) {
+        els[i].classList.remove("active");
+      }
+    },
+    setActiveTab(n) {
+      this.clearTabs();
+      document.querySelector("#" + n).classList.add("active");
+      document.querySelector("[href='#" + n + "']").classList.add("active");
+    },
     showPreferences(e) {
-      document.querySelector("#preferences").classList.add("active");
-      document.querySelector("#screensavers").classList.remove("active");
+      this.setActiveTab("preferences");
     },
     showScreensavers(e) {
-      document.querySelector("#screensavers").classList.add("active");
-      document.querySelector("#preferences").classList.remove("active");
+      this.setActiveTab("screensavers");
+    },
+    showAdvanced(e) {
+      this.setActiveTab("advanced");
     },
     onOptionsChange(e) {
       this.bus.$emit("options-changed", this.options[this.saver]);
@@ -215,6 +242,7 @@ export default {
     onSaverPicked(e) {
       this.saver = e.target.value;
       this.bus.$emit("saver-changed", this.saverObj);
+      this.renderIndex += 1;
     },
     resetToDefaults(e) {
       dialog.showMessageBox(
@@ -252,7 +280,7 @@ export default {
     getData() {
       this.manager.list((entries) => {
         this.savers = entries;
-        var tmp = this._prefs.toHash();
+        var tmp = this.prefs.toHash();
         if ( tmp.options === undefined ) {
           tmp.options = {};
         }
@@ -274,12 +302,13 @@ export default {
         // However, new properties added to the object will not
         // trigger changes. In such cases, create a fresh object
         // with properties from both the original object and the mixin object:
-        this.prefs = Object.assign({}, this.prefs, tmp);
+//        this.prefs = Object.assign({}, this.prefs, tmp);
+        this.prefs = Object.assign(this.prefs, tmp);
 
 
         // pick the first screensaver if nothing picked yet
-        if ( this._prefs.current === undefined ) {
-          this._prefs.current = this.savers[0].key;
+        if ( this.prefs.current === undefined ) {
+          this.prefs.current = this.savers[0].key;
           this.getCurrentSaver();
         }
 
@@ -291,7 +320,7 @@ export default {
       this.getData();
     },
     getCurrentSaver() {
-      this.saver = this._prefs.current;
+      this.saver = this.prefs.current;
     },
     createNewScreensaver() {
       this.saveData(false);
@@ -337,8 +366,8 @@ export default {
       // @todo should this use Object.assign?
       this.prefs.current = this.saver;
       this.prefs.options = this.options;
-      
-      this._prefs.updatePrefs(this.prefs, (changes) => {
+
+      this.prefs.updatePrefs(this.prefs, (changes) => {
         this.disabled = false;
         this.ipcRenderer.send("prefs-updated", changes);
         this.ipcRenderer.send("set-autostart", this.prefs.auto_start);

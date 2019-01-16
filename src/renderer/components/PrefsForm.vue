@@ -5,7 +5,7 @@
       <div class="times">
         <div class="form-group">
           <label for="delay">Activate after:</label>
-          <select v-model="prefs.delay">
+          <select name="delay" v-model="prefs.delay">
             <option value="0">never</option>
             <option value="1">1 minute</option>
             <option value="5">5 minutes</option>
@@ -21,7 +21,7 @@
         
         <div class="form-group">
           <label for="sleep">Disable displays after:</label>
-          <select v-model="prefs.sleep">
+          <select name="sleep" v-model="prefs.sleep">
             <option value="0">never</option>
             <option value="1">1 minute</option>
             <option value="5">5 minutes</option>
@@ -40,7 +40,7 @@
 
       <div class="options">
         <div class="form-check">
-          <label for="lock" class="form-check-label">
+          <label class="form-check-label">
             <input type="checkbox" id="lock" class="form-check-input" v-model="prefs.lock" />
             Lock screen after running?
           </label>
@@ -50,8 +50,8 @@
         </div>
 
         <div class="form-check">
-          <label for="disable_on_battery" class="form-check-label">
-            <input type="checkbox" id="disable_on_battery" class="form-check-input" v-model="prefs.disable_on_battery" />
+          <label class="form-check-label">
+            <input type="checkbox" id="disable_on_battery" class="form-check-input" v-model="prefs.disableOnBattery" />
             Disable when on battery?
           </label>
           <small class="form-text text-muted">
@@ -63,7 +63,7 @@
         </div>
         <!-- ' -->
         <div class="form-check">
-          <label for="auto_start" class="form-check-label">
+          <label class="form-check-label">
             <input type="checkbox" class="form-check-input" v-model="prefs.auto_start" />
             Auto start on login?
           </label>
@@ -71,12 +71,11 @@
             If checked, Before Dawn will start when your computer starts.
           </small>
         </div>
-        
 
         <div class="form-check">
-          <label for="primary-display" class="form-check-label">
+          <label class="form-check-label">
             <input type="checkbox" id="primary-display" class="form-check-input"
-                   v-model="prefs.run_on_single_display" />
+                   v-model="prefs.runOnSingleDisplay" />
             Only run on the primary display?
           </label>
           <small class="form-text text-muted">
@@ -85,71 +84,15 @@
         </div>
       </div>
     </form>
-
-    <h1>Advanced Options <small class="text-muted">Be careful with these!</small></h1>
-    <form>
-      <div class="form-group">
-        <label for="repo">Github Repo URL:</label>
-        <div class="input-group">
-          <div class="input-group-prepend">
-            <span class="input-group-text">github.com/</span>
-          </div>
-          <input type="text" v-model="prefs.sourceRepo"
-                 class="form-control" />
-        </div>
-        <small class="form-text text-muted">
-          We will download releases from this repository instead of
-          the default repo if specified. This defaults to
-          'muffinista/before-dawn-screensavers'
-        </small>
-      </div>
-
-      <div class="form-group">
-        <label for="localSource">Local Source:</label>
-        <div class="input-group">
-          <input type="text" v-model="prefs.localSource" readonly="readonly" name="localSource" class="form-control" />
-          <span class="input-group-btn">
-            <button type="button" class="btn btn-secondary pick" @click.stop="showPathChooser">...</button>
-          </span>
-          <span class="input-group-btn spaced" v-if="prefs.localSource != ''">
-            <button type="button" class="btn btn-secondary clear" @click.stop="clearLocalSource">X</button>
-          </span>
-        </div>
-
-        <small class="form-text text-muted">
-          We will load screensavers from any directories listed here. Use this to add your own screensavers!
-        </small>
-      </div>
-    </form>
   </div>
 </template>
 
 <script>
-const {dialog} = require("electron").remote;
 export default {
   name: "prefs-form",
   components: {},
   props: ["prefs"],
   methods: {
-    showPathChooser() {
-      dialog.showOpenDialog(
-        {
-          properties: [ "openDirectory", "createDirectory" ]
-        },
-        this.handlePathChoice );
-    },
-    clearLocalSource() {
-      this.$emit("localSourceChange", "");
-      this.prefs.localSource = "";
-      document.querySelector("[name=localSource]").value = this.prefs.localSource;
-    },
-    handlePathChoice(result) {
-      this.$emit("localSourceChange", result[0]);
-
-      // blah this is weird
-      this.prefs.localSource = result[0];
-      document.querySelector("[name=localSource]").value = this.prefs.localSource;
-    }
   }
 };
 </script>

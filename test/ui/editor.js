@@ -3,7 +3,6 @@
 const assert = require('assert');
 const fs = require('fs-extra');
 const path = require('path');
-const tmp = require('tmp');
 const helpers = require('./setup.js');
 
 var workingDir = helpers.getTempDir();
