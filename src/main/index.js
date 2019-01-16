@@ -31,6 +31,7 @@ const StateManager = require("./state_manager.js");
 const SaverPrefs = require("../lib/prefs.js");
 const SaverListManager = require("../lib/saver-list.js");
 const PackageDownloader = require("../lib/package-downloader.js");
+const ReleaseCheck = require("./release_check.js");
 
 var releaseChecker;
 
@@ -821,8 +822,8 @@ var bootApp = function() {
   }
 
   if ( global.CHECK_FOR_RELEASE === true ) {
-    releaseChecker = require("./release_check.js");
-    
+    releaseChecker = new ReleaseCheck();
+
     releaseChecker.setFeed(global.RELEASE_CHECK_URL);
     releaseChecker.setLogger(log.info);
     releaseChecker.onUpdate((x) => {
