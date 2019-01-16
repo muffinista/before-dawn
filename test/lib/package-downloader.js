@@ -1,20 +1,20 @@
-'use strict';
+"use strict";
 
-const assert = require('assert');
+const assert = require("assert");
 
-const SaverPrefs = require('../../src/lib/prefs.js');
-const PackageDownloader = require('../../src/lib/package-downloader.js');
-const Package = require('../../src/lib/package.js');
+const SaverPrefs = require("../../src/lib/prefs.js");
+const PackageDownloader = require("../../src/lib/package-downloader.js");
+const Package = require("../../src/lib/package.js");
 
-const tmp = require('tmp');
-const fs = require('fs-extra');
-const rimraf = require('rimraf');
+const tmp = require("tmp");
+const fs = require("fs-extra");
+const rimraf = require("rimraf");
 
-const sinon = require('sinon');
+const sinon = require("sinon");
 
 var sandbox;
 
-describe('PackageDownloader', () => {
+describe("PackageDownloader", () => {
   var getTempDir = function() {
     return tmp.dirSync().name;
   };
@@ -45,8 +45,8 @@ describe('PackageDownloader', () => {
     sandbox.restore();
   });
 
-  describe('getPackage', function() {
-    it('gets package details from prefs', () => {
+  describe("getPackage", function() {
+    it("gets package details from prefs", () => {
       let tmp = new Date(0);
       prefs.sourceRepo = "foo/bar";
       prefs.sourceUpdatedAt = tmp;
@@ -57,8 +57,8 @@ describe('PackageDownloader', () => {
     })
   });
 
-  describe('updatePackage', function() {
-    it('handles undefined package', (done) => {
+  describe("updatePackage", function() {
+    it("handles undefined package", (done) => {
       prefs.sourceRepo = "";
       pd.updatePackage(undefined).then((result) => {
         assert(!result.downloaded);
@@ -66,10 +66,10 @@ describe('PackageDownloader', () => {
       })
     });
 
-    it('gets package if stale', (done) => {
+    it("gets package if stale", (done) => {
       var oldCheckTime = prefs.updateCheckTimestamp;
-      sandbox.stub(fakePackage, 'downloadFile').resolves();
-      sandbox.stub(fakePackage, 'zipToSavers').resolves({});
+      sandbox.stub(fakePackage, "downloadFile").resolves();
+      sandbox.stub(fakePackage, "zipToSavers").resolves({});
 
       pd.updatePackage(fakePackage).then((result) => {
         assert(result.downloaded);
@@ -80,7 +80,7 @@ describe('PackageDownloader', () => {
       });
     });
 
-    it('skips download if fresh', (done) => {
+    it("skips download if fresh", (done) => {
       var now = new Date().getTime();
       prefs.updateCheckTimestamp = now;
       pd.updatePackage(fakePackage).then((result) => {
@@ -89,8 +89,8 @@ describe('PackageDownloader', () => {
       });
     });
 
-    it('handles package failure', (done) => {
-      var df = sandbox.stub(fakePackage, 'downloadFile').rejects();
+    it("handles package failure", (done) => {
+      var df = sandbox.stub(fakePackage, "downloadFile").rejects();
       pd.updatePackage(fakePackage).catch((err) => {
         done();
       });

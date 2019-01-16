@@ -1,23 +1,23 @@
-const tmp = require('tmp');
-const path = require('path');
-const fs = require('fs-extra');
-const Application = require('spectron').Application;
-const fakeDialog = require('spectron-fake-dialog');
+const tmp = require("tmp");
+const path = require("path");
+const fs = require("fs-extra");
+const Application = require("spectron").Application;
+const fakeDialog = require("spectron-fake-dialog");
 
-const chai = require('chai');
-const chaiAsPromised = require('chai-as-promised');
+const chai = require("chai");
+const chaiAsPromised = require("chai-as-promised");
 
-var appPath = path.join(__dirname, '..', '..', 'app', 'node_modules', '.bin', 'electron');
-if (process.platform === 'win32') {
-  appPath += '.cmd';
+var appPath = path.join(__dirname, "..", "..", "app", "node_modules", ".bin", "electron");
+if (process.platform === "win32") {
+  appPath += ".cmd";
 }
 
 // if app/node_modules doesn't exist, try ../node_modules instead
 // this is a hack, if it works i'll clean it up
 if ( ! fs.existsSync(appPath) ) {
-  appPath = path.join(__dirname, '..', '..', 'node_modules', '.bin', 'electron');
-  if (process.platform === 'win32') {
-    appPath += '.cmd';
+  appPath = path.join(__dirname, "..", "..", "node_modules", ".bin", "electron");
+  if (process.platform === "win32") {
+    appPath += ".cmd";
   }
 }
 
@@ -40,7 +40,7 @@ exports.savedConfig = function(p) {
 exports.application = function(workingDir) {
   var a = new Application({
     path: appPath,
-    args: ['output/main.js'],
+    args: ["output/main.js"],
     env: {
       BEFORE_DAWN_DIR: workingDir,
       TEST_MODE: true
@@ -64,7 +64,7 @@ exports.stopApp = function(app) {
 
 
 exports.setupConfig = function(workingDir) {
-  var src = path.join(__dirname, '../fixtures/config.json');
+  var src = path.join(__dirname, "../fixtures/config.json");
   var dest = path.join(workingDir, "config.json");
   fs.copySync(src, dest);
 };
@@ -84,7 +84,7 @@ exports.removeLocalSource = function(workingDir) {
 };
 
 exports.addSaver = function(dir, key, fname) {
-  var src = path.join(__dirname, '../fixtures/' + fname);
+  var src = path.join(__dirname, "../fixtures/" + fname);
   var dest = path.join(dir, key);
 
   fs.mkdirSync(dest);

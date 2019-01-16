@@ -1,19 +1,19 @@
-'use strict';
+"use strict";
 
-const assert = require('assert');
-const sinon = require('sinon');
+const assert = require("assert");
+const sinon = require("sinon");
 
-const SaverPrefs = require('../../src/lib/prefs.js');
-const SaverListManager = require('../../src/lib/saver-list.js');
+const SaverPrefs = require("../../src/lib/prefs.js");
+const SaverListManager = require("../../src/lib/saver-list.js");
 
-const tmp = require('tmp');
-const rimraf = require('rimraf');
-const fs = require('fs-extra');
-const path = require('path');
+const tmp = require("tmp");
+const rimraf = require("rimraf");
+const fs = require("fs-extra");
+const path = require("path");
 
 var sandbox;
 
-describe('SaverListManager', function() { 
+describe("SaverListManager", function() { 
   var savers;
   var prefs;
 
@@ -24,11 +24,11 @@ describe('SaverListManager', function() {
   var addSaver = function(dest, name) {
     // make a subdir in the savers directory and drop screensaver
     // config there
-    var src = path.join(__dirname, '../fixtures/saver.json');
+    var src = path.join(__dirname, "../fixtures/saver.json");
     var testSaverDir = path.join(dest, name);
     fs.mkdirSync(testSaverDir);
 
-    saverJSONFile = path.join(testSaverDir, 'saver.json');
+    saverJSONFile = path.join(testSaverDir, "saver.json");
     fs.copySync(src, saverJSONFile);
   };
   
@@ -46,14 +46,14 @@ describe('SaverListManager', function() {
     // this will be the separate directory to hold screensavers
     saversDir = getTempDir();
 
-    addSaver(saversDir, 'saver');
-    addSaver(saversDir, 'saver2');    
+    addSaver(saversDir, "saver");
+    addSaver(saversDir, "saver2");    
 
-    systemDir = path.join(workingDir, 'system-savers');
+    systemDir = path.join(workingDir, "system-savers");
     fs.mkdirSync(systemDir);
 
-    addSaver(systemDir, 'random-saver');
-    addSaver(systemDir, '__template');    
+    addSaver(systemDir, "random-saver");
+    addSaver(systemDir, "__template");    
 
     prefs = new SaverPrefs(workingDir);
     prefs.localSource = saversDir;
@@ -69,8 +69,8 @@ describe('SaverListManager', function() {
     sandbox.restore();
   });
 
-  describe('setup', () => {
-    it('works', (done) => {
+  describe("setup", () => {
+    it("works", (done) => {
       savers.setup().then((results) => {
         assert(results.first);
         assert(results.setup);
@@ -80,34 +80,34 @@ describe('SaverListManager', function() {
     });
   });
 
-  describe('reload', () => {
-    it('works', (done) => {
+  describe("reload", () => {
+    it("works", (done) => {
       savers.reload(true).then((results) => {
         done();
       })
     });
   });
   
-  describe('loadFromFile', function() {
-    it('loads data', function(done) {
+  describe("loadFromFile", function() {
+    it("loads data", function(done) {
       savers.loadFromFile(saverJSONFile).then((s) => {
         assert.equal("Screensaver One", s.name);
         done();
       });
     });
     
-    it('applies options', function(done) {
-      savers.loadFromFile(saverJSONFile, { 'New Option I Guess': '25' }).then((s) => {
-        assert.equal(s.settings['New Option I Guess'], '25');
+    it("applies options", function(done) {
+      savers.loadFromFile(saverJSONFile, { "New Option I Guess": "25" }).then((s) => {
+        assert.equal(s.settings["New Option I Guess"], "25");
         done();
       });
     });
 
-    it('rejects bad json', function(done) {
-      var f = path.join(__dirname, '../fixtures/index.html');
-      savers.loadFromFile(f, false, { 'New Option I Guess': '25' }).
+    it("rejects bad json", function(done) {
+      var f = path.join(__dirname, "../fixtures/index.html");
+      savers.loadFromFile(f, false, { "New Option I Guess": "25" }).
              then(() => {
-               done(new Error('Expected method to reject.'));               
+               done(new Error("Expected method to reject."));               
              }).
              catch((err) => {
                assert(typeof(err) !== "undefined");
@@ -117,15 +117,15 @@ describe('SaverListManager', function() {
     });
   });
   
-  describe('list', function() {
-    it('loads data', function(done) {
+  describe("list", function() {
+    it("loads data", function(done) {
       savers.list(function(data) {
         assert.equal(3, data.length);
         done();
       });
     });
 
-    it('uses cache', (done) => {
+    it("uses cache", (done) => {
       let cache = [0, 1, 2, 3, 4, 5];
       savers.loadedScreensavers = cache;
       savers.list((data) => {
@@ -134,7 +134,7 @@ describe('SaverListManager', function() {
       })
     });
 
-    it('forces reset', (done) => {
+    it("forces reset", (done) => {
       let cache = [0, 1, 2, 3, 4, 5];
       savers.loadedScreensavers = cache;
       savers.list((data) => {
@@ -145,8 +145,8 @@ describe('SaverListManager', function() {
     });
   });
 
-  describe('reset', function() {
-    it('resets cache', function(done) {
+  describe("reset", function() {
+    it("resets cache", function(done) {
       savers.list(function(data) {
         assert.equal(3, savers.loadedScreensavers.length);
         savers.reset();
@@ -157,8 +157,8 @@ describe('SaverListManager', function() {
     });
   });
 
-  describe('random', function() {
-    it('returns something', function(done) {
+  describe("random", function() {
+    it("returns something", function(done) {
       savers.list(function(data) {
         assert.equal(3, data.length);
         let foo = savers.random();
@@ -168,16 +168,16 @@ describe('SaverListManager', function() {
     });
   });
 
-  describe('confirmExists', function() {
-    it('returns true if present', function(done) {
-      let key = path.join(saversDir, 'saver2', 'saver.json');    
+  describe("confirmExists", function() {
+    it("returns true if present", function(done) {
+      let key = path.join(saversDir, "saver2", "saver.json");    
       savers.confirmExists(key).then((result) => {
         assert(result);
         done();
       });
     });
 
-    it('returns false if not present', function(done) {
+    it("returns false if not present", function(done) {
       let key = "junk";
       savers.confirmExists(key).then((result) => {
         assert(!result);
@@ -186,8 +186,8 @@ describe('SaverListManager', function() {
     });
   });
 
-  describe('create', function() {
-    it('works', function(done) {
+  describe("create", function() {
+    it("works", function(done) {
 
       // this should be the path to our __template in the main app
       var src = path.join(__dirname, "..", "..", "src", "main", "__template");
@@ -202,7 +202,7 @@ describe('SaverListManager', function() {
       });
     });
 
-    it('throws exception', function(done) {
+    it("throws exception", function(done) {
       assert.throws(
         () => {
           savers.create({
@@ -214,7 +214,7 @@ describe('SaverListManager', function() {
     });
   });
 
-  describe('getByKey', function() {
+  describe("getByKey", function() {
     it("returns saver", function(done) {
       savers.list(function(data) {
         var key = data[2].key;
@@ -225,7 +225,7 @@ describe('SaverListManager', function() {
     });
   });
 
-  describe('delete', () => {
+  describe("delete", () => {
     it("can delete if editable", function(done) {
       savers.list(function(data) {
         let s = data.find(s => s.editable);

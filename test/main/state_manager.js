@@ -1,14 +1,14 @@
-'use strict';
+"use strict";
 
-const assert = require('assert');
-const sinon = require('sinon');
+const assert = require("assert");
+const sinon = require("sinon");
 
-const StateManager = require('../../src/main/state_manager.js');
+const StateManager = require("../../src/main/state_manager.js");
 const fakeIdler = {
   getIdleTime: () => { return 0 }
 }
 
-describe('StateManager', () => {
+describe("StateManager", () => {
   let hitIdle, hitBlank, hitReset;
   let sandbox;
   let stateManager;
@@ -43,8 +43,8 @@ describe('StateManager', () => {
     sandbox.restore();
   });
 
-  it('does nothing', (done) => {
-    sandbox.stub(fakeIdler, 'getIdleTime').returns(10);
+  it("does nothing", (done) => {
+    sandbox.stub(fakeIdler, "getIdleTime").returns(10);
     stateManager.idleFn = fakeIdler.getIdleTime;
 
     stateManager.tick(false);
@@ -57,8 +57,8 @@ describe('StateManager', () => {
     }, 50);
   });
 
-  it('idles', (done) => {
-    sandbox.stub(fakeIdler, 'getIdleTime').returns(2500);
+  it("idles", (done) => {
+    sandbox.stub(fakeIdler, "getIdleTime").returns(2500);
     stateManager.idleFn = fakeIdler.getIdleTime;
 
     stateManager.tick(false);
@@ -70,8 +70,8 @@ describe('StateManager', () => {
     }, 50);
   });
 
-  it('blanks', (done) => {
-    sandbox.stub(fakeIdler, 'getIdleTime').returns(2500);
+  it("blanks", (done) => {
+    sandbox.stub(fakeIdler, "getIdleTime").returns(2500);
     stateManager.idleFn = fakeIdler.getIdleTime;
     stateManager.switchState(stateManager.STATES.STATE_RUNNING);
 
@@ -82,8 +82,8 @@ describe('StateManager', () => {
     }, 50);
   });
 
-  it('resets', (done) => {
-    var idleCount = sandbox.stub(fakeIdler, 'getIdleTime');
+  it("resets", (done) => {
+    var idleCount = sandbox.stub(fakeIdler, "getIdleTime");
     idleCount.onCall(0).returns(3);
 
     stateManager.idleFn = fakeIdler.getIdleTime;

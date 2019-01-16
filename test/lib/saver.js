@@ -1,13 +1,13 @@
-'use strict';
+"use strict";
 
-const assert = require('assert');
-const Saver = require('../../src/lib/saver.js');
-const tmp = require('tmp');
-const path = require('path');
-const fs = require('fs');
+const assert = require("assert");
+const Saver = require("../../src/lib/saver.js");
+const tmp = require("tmp");
+const path = require("path");
+const fs = require("fs");
 
 
-describe('Saver', function() {
+describe("Saver", function() {
   const testName = "Test Screensaver";
   const testDescription = "It's a screensaver, but for testing";
 
@@ -51,101 +51,101 @@ describe('Saver', function() {
     return new Saver(vals);
   };
   
-	describe('initialization', function() {
-    it('loads data', function() {
+	describe("initialization", function() {
+    it("loads data", function() {
       var s = loadSaver();
 			assert.equal(testName, s.name);
 			assert.equal(testDescription, s.description);      
 		});
     
-    it('loads options', function() {
+    it("loads options", function() {
       var s = loadSaver();
 			assert.equal(testName, s.name);
       assert.equal(2, s.options.length);
     });
     
-    it('is published by default', function() {
+    it("is published by default", function() {
       var s = loadSaver();
 			assert.equal(testName, s.name);
       assert(s.published);
     });
     
-    it('is not valid if not published', function() {
+    it("is not valid if not published", function() {
       var s = loadSaver({published: false});
       assert(!s.valid);
     });
 
-    it('has default settings', function() {
+    it("has default settings", function() {
       var s = loadSaver();
-      assert.equal('75', s.settings['New Option']);
-      assert.equal('50', s.settings['New Option I Guess']);      
+      assert.equal("75", s.settings["New Option"]);
+      assert.equal("50", s.settings["New Option I Guess"]);      
     });
 
-    it('merges user settings', function() {
+    it("merges user settings", function() {
       var s = loadSaver({settings: []});
-      assert.equal('75', s.settings['New Option']);
-      assert.equal('50', s.settings['New Option I Guess']);      
+      assert.equal("75", s.settings["New Option"]);
+      assert.equal("50", s.settings["New Option I Guess"]);      
     });
 
-    it('loads local previewUrl', function() {
+    it("loads local previewUrl", function() {
       var s = loadSaver({path: "path", previewUrl:"preview.html"});
-      assert.equal('path/preview.html', s.previewUrl);
+      assert.equal("path/preview.html", s.previewUrl);
     });
   });
 
-  describe('getUrl', function() {
-    it('handles no opts', function() {
-      var s = loadSaver({url:'index.html'});
-      assert.equal('index.html?New%20Option%20I%20Guess=50&New%20Option=75', s.getUrl());
+  describe("getUrl", function() {
+    it("handles no opts", function() {
+      var s = loadSaver({url:"index.html"});
+      assert.equal("index.html?New%20Option%20I%20Guess=50&New%20Option=75", s.getUrl());
     });
 
-    it('handles opts', function() {
-      var s = loadSaver({url:'index.html'});
-      assert.equal('index.html?New%20Option%20I%20Guess=50&New%20Option=75&foo=bar', s.getUrl({foo: 'bar'}));
+    it("handles opts", function() {
+      var s = loadSaver({url:"index.html"});
+      assert.equal("index.html?New%20Option%20I%20Guess=50&New%20Option=75&foo=bar", s.getUrl({foo: "bar"}));
     });
 
-    it('handles urls with queries', function() {
-      var s = loadSaver({url:'index.html?baz=boo'});
-      assert.equal('index.html?baz=boo&New%20Option%20I%20Guess=50&New%20Option=75&foo=bar', s.getUrl({foo: 'bar'}));
+    it("handles urls with queries", function() {
+      var s = loadSaver({url:"index.html?baz=boo"});
+      assert.equal("index.html?baz=boo&New%20Option%20I%20Guess=50&New%20Option=75&foo=bar", s.getUrl({foo: "bar"}));
     });
   });
   
-  describe('getRequirements', function() {
-    it('defaults to empty', function() {
+  describe("getRequirements", function() {
+    it("defaults to empty", function() {
       var s = loadSaver();
       assert.deepEqual([], s.getRequirements());
     });
 
-    it('reads from incoming params', function() {
-      var s = loadSaver({requirements:['stuff']});
-      assert.deepEqual(['stuff'], s.getRequirements());
+    it("reads from incoming params", function() {
+      var s = loadSaver({requirements:["stuff"]});
+      assert.deepEqual(["stuff"], s.getRequirements());
     });
   });
 
-  describe('getPreviewUrl', function() {
-    it('returns a preview url', function() {
-      var s = loadSaver({url:'index.html'});
-      assert.equal('index.html?New%20Option%20I%20Guess=50&New%20Option=75', s.getPreviewUrl());
+  describe("getPreviewUrl", function() {
+    it("returns a preview url", function() {
+      var s = loadSaver({url:"index.html"});
+      assert.equal("index.html?New%20Option%20I%20Guess=50&New%20Option=75", s.getPreviewUrl());
     });
-    it('uses custom url', function() {
-      var s = loadSaver({url:'preview.html'});
-      assert.equal('preview.html?New%20Option%20I%20Guess=50&New%20Option=75', s.getPreviewUrl());
+    it("uses custom url", function() {
+      var s = loadSaver({url:"preview.html"});
+      assert.equal("preview.html?New%20Option%20I%20Guess=50&New%20Option=75", s.getPreviewUrl());
     });
-    it('uses custom url with opts', function() {
-      var s = loadSaver({url:'preview.html?bar=baz'});
-      assert.equal('preview.html?bar=baz&New%20Option%20I%20Guess=50&New%20Option=75', s.getPreviewUrl());
+    it("uses custom url with opts", function() {
+      var s = loadSaver({url:"preview.html?bar=baz"});
+      assert.equal("preview.html?bar=baz&New%20Option%20I%20Guess=50&New%20Option=75", s.getPreviewUrl());
     });
   });
   
-  describe('toHash', function() {
-    it('should return attributes', function() {
+  describe("toHash", function() {
+    it("should return attributes", function() {
       var s = loadSaver();
       assert.deepEqual(attrs, s.toHash());
     });
   });
   
-  describe('write', function() {
-    it('should write some output', function() {
+  describe("write", function() {
+    it("should write some output", function() {
       var dest = tmp.fileSync().name;
       var s = loadSaver();
       s.attrs.name = "New Name To Write";
@@ -157,7 +157,7 @@ describe('Saver', function() {
       assert.equal("New Name To Write", s.name);
     });
 
-    it('should work without a dest', function() {
+    it("should work without a dest", function() {
       var p = tmp.dirSync().name;
       var dest = path.join(p, "saver.json");
 
@@ -173,7 +173,7 @@ describe('Saver', function() {
     });
   });
 
-  describe('published', function() {
+  describe("published", function() {
     it("defaults to true", function() {
       var s = new Saver({
         path:""
@@ -190,7 +190,7 @@ describe('Saver', function() {
     });
   });
 
-  describe('valid', function() {
+  describe("valid", function() {
     it("false without data", function() {
       var s = new Saver({
         path:""
@@ -235,7 +235,7 @@ describe('Saver', function() {
 
   });
 
-  describe('settings', function() {
+  describe("settings", function() {
     it("defaults to empty", function() {
       var s = new Saver({
         name:"name",
@@ -288,7 +288,7 @@ describe('Saver', function() {
     });
   });
 
-  describe('getPreviewUrl', function() {
+  describe("getPreviewUrl", function() {
     it("uses previewUrl if provided", function() {
       var s = new Saver({
         name:"name",
@@ -313,7 +313,7 @@ describe('Saver', function() {
     });
   });
 
-  describe('getUrl', function() {
+  describe("getUrl", function() {
     it("uses url", function() {
       var s = new Saver({
         name:"name",

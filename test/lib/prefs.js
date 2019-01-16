@@ -1,19 +1,19 @@
-'use strict';
+"use strict";
 
-const assert = require('assert');
+const assert = require("assert");
 
-const SaverPrefs = require('../../src/lib/prefs.js');
+const SaverPrefs = require("../../src/lib/prefs.js");
 
-const tmp = require('tmp');
-const fs = require('fs-extra');
-const path = require('path');
+const tmp = require("tmp");
+const fs = require("fs-extra");
+const path = require("path");
 
-describe('SaverPrefs', () => {
+describe("SaverPrefs", () => {
   var tmpdir, prefs;
   let specifyConfig = (name) => {
     fs.copySync(
-      path.join(__dirname, '../fixtures/' + name + '.json'),
-      path.join(tmpdir, 'config.json')
+      path.join(__dirname, "../fixtures/" + name + ".json"),
+      path.join(tmpdir, "config.json")
     );
   };
 
@@ -35,23 +35,23 @@ describe('SaverPrefs', () => {
     tmpdir = tmp.dirSync().name;
   });
 
-  describe('without config', () => {
+  describe("without config", () => {
     beforeEach(() => {
       prefs = new SaverPrefs(tmpdir);
     });
 
-    it('should load', () => {
+    it("should load", () => {
       assert(prefs.needSetup());
     });
 
-    it('should set noSource', () => {
+    it("should set noSource", () => {
       assert(prefs.noSource);
     });
   });
 
-  describe('with config', () => {
-    it('recovers from corrupt config', () => {
-      specifyConfig('bad-config');
+  describe("with config", () => {
+    it("recovers from corrupt config", () => {
+      specifyConfig("bad-config");
       prefs = new SaverPrefs(tmpdir);
 
       assert(prefs.firstLoad);
@@ -59,8 +59,8 @@ describe('SaverPrefs', () => {
       assert(fs.existsSync(configDest));
     });
 
-    it('works with existing config', () => {
-      specifyConfig('config');
+    it("works with existing config", () => {
+      specifyConfig("config");
       prefs = new SaverPrefs(tmpdir);
 
       assert(!prefs.firstLoad);
@@ -70,14 +70,14 @@ describe('SaverPrefs', () => {
   });
 
   // reload
-  describe('reload', () => {
+  describe("reload", () => {
     beforeEach(() => {
-      specifyConfig('config');
+      specifyConfig("config");
       prefs = new SaverPrefs(tmpdir);
     });
   
-    it('works with existing config', () => {
-      specifyConfig('config');
+    it("works with existing config", () => {
+      specifyConfig("config");
       prefs = new SaverPrefs(tmpdir);
 
       assert.equal("before-dawn-screensavers/emoji/saver.json", prefs.current);
@@ -85,7 +85,7 @@ describe('SaverPrefs', () => {
       assert(fs.existsSync(configDest));
 
 
-      specifyConfig('config-2');
+      specifyConfig("config-2");
       prefs.reload()
       assert.equal("before-dawn-screensavers/blur/saver.json", prefs.current);
       assert(fs.existsSync(configDest));
@@ -93,21 +93,21 @@ describe('SaverPrefs', () => {
   });
 
   // no source
-  describe('noSource', () => {
-    describe('without config', () => {
-      it('is true', () => {
+  describe("noSource", () => {
+    describe("without config", () => {
+      it("is true", () => {
         prefs = new SaverPrefs(tmpdir);
         assert(prefs.noSource)
       });
     })
 
-    describe('with config', () => {
+    describe("with config", () => {
       beforeEach(() => {
-        specifyConfig('config');
+        specifyConfig("config");
         prefs = new SaverPrefs(tmpdir);
       });
 
-      it('is true if no source repo and no local source', () => {
+      it("is true if no source repo and no local source", () => {
         prefs.sourceRepo = undefined;
         prefs.localSource = undefined;
         assert(prefs.noSource);
@@ -117,14 +117,14 @@ describe('SaverPrefs', () => {
         assert(prefs.noSource);
       });
 
-      it('is false if source repo', () => {
+      it("is false if source repo", () => {
         prefs.sourceRepo = "foo";
         prefs.localSource = undefined;
 
         assert(!prefs.noSource);
       });
 
-      it('is false if local source', () => {
+      it("is false if local source", () => {
         prefs.sourceRepo = undefined;
         prefs.localSource = "foo";
 
@@ -135,38 +135,38 @@ describe('SaverPrefs', () => {
 
 
   // defaultSaversDir
-  describe('defaultSaversDir', () => {
+  describe("defaultSaversDir", () => {
     beforeEach(() => {
       prefs = new SaverPrefs(tmpdir);
     });
 
-    it('is the working directory', () => {
+    it("is the working directory", () => {
       let dest = path.join(tmpdir, "savers");
       assert.equal(dest, prefs.defaultSaversDir);
     })
   });
 
   // toHash
-  describe('toHash', () => {
+  describe("toHash", () => {
     beforeEach(() => {
-      specifyConfig('config');
+      specifyConfig("config");
       prefs = new SaverPrefs(tmpdir);
     });
 
-    it('works', () => {
+    it("works", () => {
       let data = prefs.toHash();
-      assert.equal('before-dawn-screensavers/emoji/saver.json', data.saver);
+      assert.equal("before-dawn-screensavers/emoji/saver.json", data.saver);
       assert.equal(10, data.delay);
     })
   });
 
   // ensureDefaults
-  describe('ensureDefaults', () => {
+  describe("ensureDefaults", () => {
     beforeEach(() => {
       prefs = new SaverPrefs(tmpdir);
     });
 
-    it('works', () => {
+    it("works", () => {
       prefs.delay = undefined;
       prefs.sleep = undefined;
 
@@ -180,27 +180,27 @@ describe('SaverPrefs', () => {
   });
 
   // sources
-  describe('sources', () => {
+  describe("sources", () => {
     beforeEach(() => {
-      specifyConfig('config');
+      specifyConfig("config");
       prefs = new SaverPrefs(tmpdir);
     });
 
-    it('works', () => {
+    it("works", () => {
       let result = prefs.sources;
 
       assert.deepEqual(
-        [ '/Users/colin/Dropbox/Projects/before-dawn-screensavers' ], result);
+        [ "/Users/colin/Dropbox/Projects/before-dawn-screensavers" ], result);
     });
 
-    it('includes repo', () => {
+    it("includes repo", () => {
       prefs.sourceRepo = "foo";
       let result = prefs.sources;
       let dest = path.join(tmpdir, "savers");
 
       assert.deepEqual(
         [ dest,
-          '/Users/colin/Dropbox/Projects/before-dawn-screensavers' ], result);
+          "/Users/colin/Dropbox/Projects/before-dawn-screensavers" ], result);
     });
 
     // it('includes system', () => {
@@ -214,42 +214,42 @@ describe('SaverPrefs', () => {
   });
 
   // systemSource
-  describe('sources', () => {
+  describe("sources", () => {
     beforeEach(() => {
       prefs = new SaverPrefs(tmpdir);
     });
 
-    it('works', () => {
+    it("works", () => {
       let expected = path.join(tmpdir, "system-savers");
       assert.equal(expected, prefs.systemSource);
     });
   });
 
   // getOptions
-  describe('getOptions', () => {
+  describe("getOptions", () => {
     beforeEach(() => {
-      specifyConfig('config-with-options');
+      specifyConfig("config-with-options");
       prefs = new SaverPrefs(tmpdir);
     });
 
-    it('works without key', () => {
+    it("works without key", () => {
       let opts = prefs.getOptions();
-      assert.deepEqual({ foo: 'bar', level: 100 }, opts);
+      assert.deepEqual({ foo: "bar", level: 100 }, opts);
     });
 
-    it('works with key', () => {
+    it("works with key", () => {
       let opts = prefs.getOptions("/Users/colin/Projects/before-dawn-screensavers/key/saver.json");
       assert.deepEqual({ baz: "boo", level: 10 }, opts);
     });
   });
 
   // write
-  describe('write', () => {
+  describe("write", () => {
     beforeEach(() => {
       prefs = new SaverPrefs(tmpdir);
     });
 
-    it('works', (done) => {
+    it("works", (done) => {
       let data = prefsToJSON();
       assert.notEqual(data.delay, 123);
 
@@ -264,12 +264,12 @@ describe('SaverPrefs', () => {
   });
 
   // writeSync
-  describe('writeSync', () => {
+  describe("writeSync", () => {
     beforeEach(() => {
       prefs = new SaverPrefs(tmpdir);
     });
 
-    it('works', () => {
+    it("works", () => {
       let data = prefsToJSON();
       assert.notEqual(data.delay, 123);
 
@@ -282,12 +282,12 @@ describe('SaverPrefs', () => {
   });
 
   // updatePrefs
-  describe('updatePrefs', () => {
+  describe("updatePrefs", () => {
     beforeEach(() => {
       prefs = new SaverPrefs(tmpdir);
     });
 
-    it('works', (done) => {
+    it("works", (done) => {
       let data = prefsToJSON();
       assert.notEqual(data.delay, 123);
 
@@ -303,13 +303,13 @@ describe('SaverPrefs', () => {
   });
 
   // setDefaultRepo
-  describe('setDefaultRepo', () => {
+  describe("setDefaultRepo", () => {
     beforeEach(() => {
-      specifyConfig('default-repo');
+      specifyConfig("default-repo");
       prefs = new SaverPrefs(tmpdir);
     });
 
-    it('works', () => {
+    it("works", () => {
       assert(prefs.sourceUpdatedAt !== undefined);
       prefs.setDefaultRepo("foo/bar");
 

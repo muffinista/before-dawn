@@ -1,15 +1,15 @@
-'use strict';
+"use strict";
 
-const assert = require('assert');
-const path = require('path');
-const fs = require('fs');
+const assert = require("assert");
+const path = require("path");
+const fs = require("fs");
 const rimraf = require("rimraf");
-const sinon = require('sinon');
-const nock = require('nock');
+const sinon = require("sinon");
+const nock = require("nock");
 
-const Package = require('../../src/lib/package.js');
+const Package = require("../../src/lib/package.js");
 
-const helpers = require('./setup.js');
+const helpers = require("./setup.js");
 
 var attrs;
 
@@ -19,7 +19,7 @@ var zipPath;
 
 var sandbox;
 
-describe('Package', function() {
+describe("Package", function() {
   beforeEach(() => {
     sandbox = sinon.createSandbox();
 
@@ -36,8 +36,8 @@ describe('Package', function() {
     sandbox.restore();
   });
 
-	describe('initialization', function() {
-    it('loads data', function() {
+	describe("initialization", function() {
+    it("loads data", function() {
       var p = new Package(attrs);
 
 			assert.equal(false, p.downloaded);
@@ -48,33 +48,33 @@ describe('Package', function() {
 		});
   });
 
-  describe('getReleaseInfo', () => {
-    describe('withValidResponse', () => {
+  describe("getReleaseInfo", () => {
+    describe("withValidResponse", () => {
       var request = require("request-promise-native");
       beforeEach(() => {
-        sinon.stub(request, 'get').resolves(require('../fixtures/release.json'));
+        sinon.stub(request, "get").resolves(require("../fixtures/release.json"));
       });
       afterEach(() => {
         request.get.restore();
       });
       
-      it('does stuff', async () => {
+      it("does stuff", async () => {
         var p = new Package(attrs);
         let results = await p.getReleaseInfo();
         assert.equal("muffinista", results.author.login);
       });
     });
 
-    describe('withReject', () => {
+    describe("withReject", () => {
       var request = require("request-promise-native");
       beforeEach(() => {
-        sinon.stub(request, 'get').rejects();
+        sinon.stub(request, "get").rejects();
       });
       afterEach(() => {
         request.get.restore();
       });
 
-      it('survives', async () => {
+      it("survives", async () => {
         var p = new Package(attrs);
         let results = await p.getReleaseInfo();
         assert.deepEqual({}, results);
@@ -82,25 +82,25 @@ describe('Package', function() {
     });
   });
 
-  describe('checkLatestRelease', () => {
+  describe("checkLatestRelease", () => {
     var p;
 
     beforeEach(() => {
       p = new Package(attrs);
-      sandbox.stub(p, 'getReleaseInfo').
-              returns(require('../fixtures/release.json'));
+      sandbox.stub(p, "getReleaseInfo").
+              returns(require("../fixtures/release.json"));
     });
      
-    it('calls downloadFile', async () => {
-      var df = sandbox.stub(p, 'downloadFile').resolves(zipPath);
+    it("calls downloadFile", async () => {
+      var df = sandbox.stub(p, "downloadFile").resolves(zipPath);
 
       let results = await p.checkLatestRelease();
       assert(df.calledOnce);
     });
 
-    it('doesnt call if not needed', async () => {
+    it("doesnt call if not needed", async () => {
       var cb = sinon.spy();
-      var df = sandbox.stub(p, 'downloadFile');
+      var df = sandbox.stub(p, "downloadFile");
 
       p.updated_at = "2017-06-06T23:55:44Z";
       
@@ -109,24 +109,24 @@ describe('Package', function() {
     });
   });
    
-  describe('checkLocalRelease', () => {
+  describe("checkLocalRelease", () => {
     var p;
     
     beforeEach(() => {
       p = new Package(attrs);
     });
     
-    it('calls zipToSavers', async () => {
-      var zts = sandbox.stub(p, 'zipToSavers').resolves({});
+    it("calls zipToSavers", async () => {
+      var zts = sandbox.stub(p, "zipToSavers").resolves({});
       
       let results = await p.checkLocalRelease(dataPath, zipPath);
       assert(zts.calledOnce);
 
-      assert.equal(results.updated_at, '2017-06-06T23:55:44Z');
+      assert.equal(results.updated_at, "2017-06-06T23:55:44Z");
     });
     
-    it('doesnt call if not needed', async () => {
-      var zts = sandbox.stub(p, 'zipToSavers');
+    it("doesnt call if not needed", async () => {
+      var zts = sandbox.stub(p, "zipToSavers");
       
       p.updated_at = "2017-06-06T23:55:44Z";
       
@@ -135,10 +135,10 @@ describe('Package', function() {
     });
   });
 
-  describe('downloadFile', () => {
+  describe("downloadFile", () => {
     var testUrl = "http://test.file/savers.zip";
-    var scope = nock('http://test.file').
-      get('/savers.zip').
+    var scope = nock("http://test.file").
+      get("/savers.zip").
       reply(200, (uri, requestBody) => {
         return fs.createReadStream(zipPath);
       });
@@ -147,7 +147,7 @@ describe('Package', function() {
       fs.mkdirSync(workingDir);
     });
 
-    it('works', (done) => {
+    it("works", (done) => {
       let p = new Package(attrs);
       p.downloadFile(testUrl).then((dest) => {
         assert(fs.existsSync(dest))
@@ -156,7 +156,7 @@ describe('Package', function() {
     });
   });
 
-  describe('zipToSavers', () => {
+  describe("zipToSavers", () => {
     var p;
 
     beforeEach(() => {
@@ -165,7 +165,7 @@ describe('Package', function() {
       fs.mkdirSync(workingDir);
     });
 
-    it('unzips files', (done) => {
+    it("unzips files", (done) => {
       p.zipToSavers(zipPath).then((attrs) => {
         var testDest = path.resolve(workingDir, "sparks", "index.html");
         assert(fs.existsSync(testDest));
@@ -173,13 +173,13 @@ describe('Package', function() {
       });
     });
 
-    it('recovers from errors', (done) => {
+    it("recovers from errors", (done) => {
       p.zipToSavers(dataPath).then((attrs) => {}).catch( (err) => {
         done();
       });
     });
 
-    it('keeps files on failure', (done) => {
+    it("keeps files on failure", (done) => {
       helpers.addSaver(workingDir, "saver-one", "saver.json");
       
       var testDest = path.resolve(workingDir, "saver-one", "saver.json");
@@ -192,7 +192,7 @@ describe('Package', function() {
     });
 
 
-    it('removes files that arent needed', (done) => {
+    it("removes files that arent needed", (done) => {
       helpers.addSaver(workingDir, "saver-one", "saver.json");
       
       var testDest = path.resolve(workingDir, "saver-one", "saver.json");
