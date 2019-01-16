@@ -1,28 +1,33 @@
 "use strict";
 
 const ReleaseCheck = require("../../src/main/release_check.js");
-const packageJSON = require("../../package.json");
+const path = require("path");
+const nock = require("nock");
+const assert = require("assert");
 
 describe("ReleaseCheck", () => {
   let releaseChecker;
-  let url;
-  let version;
-  let server = "https://before-dawn.now.sh";
+  let version = "0.1.1";
+  let server = "https://sillynotreal.domain";
+  let uriPath = `/update/win32/${version}`
+  let url = `${server}${uriPath}`;
+  let fixturePath;
 
   beforeEach(() => {
+    fixturePath = path.join(__dirname, "../fixtures/releases/updates.json");
     releaseChecker = new ReleaseCheck();  
   });
 
-  afterEach(() => {
-  });
-
   it("handles updates", (done) => {
-    version = "0.1.1";
-    url = `${server}/update/win32/${version}`;
+    nock(server).
+      get(uriPath).
+      replyWithFile(200, fixturePath, {
+        'Content-Type': 'application/json',
+      })
 
     releaseChecker.setFeed(url);
-
-    releaseChecker.onUpdate((x) => {
+    releaseChecker.onUpdate((result) => {
+      assert.equal("v0.9.26", result.name);
       done();
     });
 
@@ -30,11 +35,13 @@ describe("ReleaseCheck", () => {
   });
 
   it("handles no updates", (done) => {
-    version = packageJSON.version;
-    url = `${server}/update/win32/${version}`;
+    nock(server).
+      get(uriPath).
+      reply(204, () => {
+        return "";
+      });
 
     releaseChecker.setFeed(url);
-
     releaseChecker.onNoUpdate(() => {
       done();
     });

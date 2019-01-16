@@ -137,12 +137,12 @@ describe("Package", function() {
 
   describe("downloadFile", () => {
     var testUrl = "http://test.file/savers.zip";
-    var scope = nock("http://test.file").
-      get("/savers.zip").
-      reply(200, (uri, requestBody) => {
-        return fs.createReadStream(zipPath);
-      });
     beforeEach(() => {
+      nock("http://test.file").
+        get("/savers.zip").
+        reply(200, (uri, requestBody) => {
+          return fs.createReadStream(zipPath);
+        });
       rimraf.sync(workingDir);
       fs.mkdirSync(workingDir);
     });
