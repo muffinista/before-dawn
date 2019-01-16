@@ -1,16 +1,16 @@
-'use strict'
+"use strict"
 
-const path = require('path');
-const packageJSON = require('./package.json');
+const path = require("path");
+const packageJSON = require("./package.json");
 
 const dependencies = packageJSON.dependencies;
 const optionalDependencies = packageJSON.optionalDependencies || {};
-const webpack = require('webpack');
+const webpack = require("webpack");
 
 const outputDir = path.join(__dirname, "output");
 
-const BabiliWebpackPlugin = require('babili-webpack-plugin')
-const CopyWebpackPlugin = require('copy-webpack-plugin');
+const BabiliWebpackPlugin = require("babili-webpack-plugin")
+const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 //
 // get a list of node dependencies, and then
@@ -32,36 +32,36 @@ const deps = [].concat(
 
 
 let mainConfig = {
-  devtool: 'source-map',
-  mode: (process.env.NODE_ENV === 'production' ? 'production' : 'development'),
+  devtool: "source-map",
+  mode: (process.env.NODE_ENV === "production" ? "production" : "development"),
   entry: {
-    main: path.join(__dirname, 'src/main/index.js')
+    main: path.join(__dirname, "src/main/index.js")
   },
   externals: deps,
   module: {
     rules: [
       {
         test: /\.(js)$/,
-        enforce: 'pre',
+        enforce: "pre",
         exclude: [
           /node_modules/,
           /lib/
         ],
         use: {
-          loader: 'eslint-loader',
+          loader: "eslint-loader",
           options: {
-            formatter: require('eslint-friendly-formatter')
+            formatter: require("eslint-friendly-formatter")
           }
         }
       },
       {
         test: /\.js$/,
-        use: 'babel-loader',
+        use: "babel-loader",
         exclude: /node_modules/
       },
       {
         test: /\.node$/,
-        use: 'node-loader'
+        use: "node-loader"
       }
     ]
   },
@@ -70,61 +70,61 @@ let mainConfig = {
     __filename: false
   },
   output: {
-    filename: '[name].js',
-    libraryTarget: 'commonjs2',
+    filename: "[name].js",
+    libraryTarget: "commonjs2",
     path: outputDir,
     sourceMapFilename: "[name].js.map"
   },
   plugins: [
     new CopyWebpackPlugin([
       {
-        from: path.join(__dirname, 'package.json'),
+        from: path.join(__dirname, "package.json"),
         to: path.join(outputDir)
       }
     ]),
     new CopyWebpackPlugin([
       {
-        from: path.join(__dirname, 'src', 'main', 'assets'),
-        to: path.join(outputDir, 'assets'),
-        ignore: ['.*']
+        from: path.join(__dirname, "src", "main", "assets"),
+        to: path.join(outputDir, "assets"),
+        ignore: [".*"]
       }
     ]),
     new CopyWebpackPlugin([
       {
-        from: path.join(__dirname, 'src', 'bin'),
-        to: path.join(outputDir, 'bin'),
-        ignore: ['.*']
+        from: path.join(__dirname, "src", "bin"),
+        to: path.join(outputDir, "bin"),
+        ignore: [".*"]
       }
     ]),
     new CopyWebpackPlugin([
       {
-        from: path.join(__dirname, 'system-savers'),
-        to: path.join(outputDir, 'system-savers'),
-        ignore: ['.*']
+        from: path.join(__dirname, "system-savers"),
+        to: path.join(outputDir, "system-savers"),
+        ignore: [".*"]
       }
     ]),
     new CopyWebpackPlugin([
       {
-        from: path.join(__dirname, 'src', 'main', '__template'),
-        to: path.join(outputDir, '__template'),
-        ignore: ['.*']
+        from: path.join(__dirname, "src", "main", "__template"),
+        to: path.join(outputDir, "__template"),
+        ignore: [".*"]
       }
     ]),
     new webpack.NoEmitOnErrorsPlugin()
   ],
   resolve: {
-    extensions: ['.js', '.json', '.node']
+    extensions: [".js", ".json", ".node"]
   },
-  target: 'electron-main'
+  target: "electron-main"
 }
 
 /**
  * Adjust mainConfig for development settings
  */
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== "production") {
   mainConfig.plugins.push(
     new webpack.DefinePlugin({
-      '__static': `"${path.join(__dirname, '../static').replace(/\\/g, '\\\\')}"`
+      "__static": `"${path.join(__dirname, "../static").replace(/\\/g, "\\\\")}"`
     })
   )
 }
@@ -132,11 +132,11 @@ if (process.env.NODE_ENV !== 'production') {
 /**
  * Adjust mainConfig for production settings
  */
-if (process.env.NODE_ENV === 'production') {
+if (process.env.NODE_ENV === "production") {
   mainConfig.plugins.push(
     new BabiliWebpackPlugin(),
     new webpack.DefinePlugin({
-      'process.env.NODE_ENV': '"production"'
+      "process.env.NODE_ENV": "\"production\""
     })
   )
 }
