@@ -5,7 +5,7 @@ const path = require('path');
 const fs = require('fs');
 const rimraf = require("rimraf");
 const sinon = require('sinon');
-
+const nock = require('nock');
 
 const Package = require('../../src/lib/package.js');
 
@@ -134,7 +134,28 @@ describe('Package', function() {
       assert(!zts.calledOnce);
     });
   });
-   
+
+  describe('downloadFile', () => {
+    var testUrl = "http://test.file/savers.zip";
+    var scope = nock('http://test.file').
+      get('/savers.zip').
+      reply(200, (uri, requestBody) => {
+        return fs.createReadStream(zipPath);
+      });
+    beforeEach(() => {
+      rimraf.sync(workingDir);
+      fs.mkdirSync(workingDir);
+    });
+
+    it('works', (done) => {
+      let p = new Package(attrs);
+      p.downloadFile(testUrl).then((dest) => {
+        assert(fs.existsSync(dest))
+        done();
+      })
+    });
+  });
+
   describe('zipToSavers', () => {
     var p;
 
