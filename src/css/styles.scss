@@ -237,4 +237,8 @@ input[type="range"] {
   margin-bottom: 10px;
 }
 
+.btn:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
 /* purgecss end ignore */
