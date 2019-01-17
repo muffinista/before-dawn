@@ -21,6 +21,7 @@ const {app, BrowserWindow, ipcMain, crashReporter, Menu, Tray} = require("electr
 
 const fs = require("fs");
 const path = require("path");
+const url = require("url");
 
 const screenLock = require("./screen.js");
 const power = require("./power.js");
@@ -185,7 +186,7 @@ var openPrefsWindow = function() {
 
   // take a screenshot of the main screen for use in previews
   grabScreen(primary, function(message) {
-    var prefsUrl = getUrlPrefix() + "/prefs.html";
+    var prefsUrl = getUrl("prefs.html");
 
     prefsWindowHandle = new BrowserWindow({
       width:800,
@@ -232,7 +233,7 @@ var outputError = (e) => {
  * handle new screensaver event. open the window to create a screensaver
  */
 var addNewSaver = function() {
-  var newUrl = getUrlPrefix() + "/new.html";
+  var newUrl = getUrl("new.html");
   var primary = electronScreen.getPrimaryDisplay();
 
   // take a screenshot of the main screen for use in previews
@@ -268,7 +269,7 @@ var addNewSaver = function() {
  * Open the About window for the app
  */
 var openAboutWindow = function() {
-  var aboutUrl = getUrlPrefix() + "/about.html";
+  var aboutUrl = getUrl("about.html");
   var w = new BrowserWindow({
     width:500,
     height:600,
@@ -310,7 +311,7 @@ var openEditor = (args) => {
     },
   });
 
-  var editorUrl = getUrlPrefix() + "/editor.html";
+  var editorUrl = getUrl("editor.html");
  
   var target = editorUrl + "?" +
                "src=" + encodeURIComponent(key) +
@@ -713,24 +714,28 @@ var getSystemDir = function() {
   }
 
   return path.join(app.getAppPath(), "output");
-}
+};
 
 /**
  * return the URL prefix we should use when loading app windows. if
  * running in development mode with hot reload enabled, we'll use an
  * HTTP request, otherwise we'll use a file:// url.
  */
-var getUrlPrefix = function() {
+var getUrl = function(dest) {
+  let baseUrl;
   if ( process.env.NODE_ENV === "development" ) {
     if ( ! process.env.DISABLE_RELOAD ) {
-      return "http://localhost:9080";
+      baseUrl = "http://localhost:9080";
     }
     else {
-      return "file://" + __dirname + "/../../output";
+      baseUrl = "file://" + __dirname + "/../../output";
     }
   }
+  else {
+    baseUrl = "file://" + __dirname + "/";
+  }
 
-  return "file://" + __dirname;
+  return url.resolve(baseUrl, dest);
 };
 
 
