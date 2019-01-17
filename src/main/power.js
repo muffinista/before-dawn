@@ -26,12 +26,13 @@ module.exports.charging = function() {
   else {
     // this code is modified from https://github.com/gillstrom/battery-level/blob/master/win.js
     var p = new Promise(function(resolve, reject) {
-      var cmd = "WMIC Path Win32_Battery Get BatteryStatus";
+      var cmd = "WMIC";
+      let args = ["Path", "Win32_Battery", "Get", "BatteryStatus"];
 
       //Other (1)
       //The battery is discharging.
-      var exec = require("child_process").exec;
-      exec(cmd, function(error, stdout, stderr) {
+      var exec = require("child_process").execFile;
+      exec(cmd, args, function(error, stdout, stderr) {
         // console.log("stdout: " + stdout);
         // console.log("stderr: " + stderr);
         if (error !== null) {

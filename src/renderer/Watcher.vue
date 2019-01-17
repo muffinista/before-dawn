@@ -110,7 +110,7 @@
 const fs = require("fs");
 const path = require("path");
 const url = require("url");
-const exec = require("child_process").exec;
+const exec = require("child_process").execFile;
 
 import Vue from "vue";
 import SaverPreview from "@/components/SaverPreview";
@@ -284,6 +284,7 @@ export default {
     },
     openFolder() {
       var cmd;
+      var args = [];
       
       // figure out the path to the screensaver folder. use
       // decodeURIComponent to convert %20 to spaces
@@ -291,7 +292,8 @@ export default {
 
       switch(process.platform) {
       case "darwin":
-        cmd = `open ${filePath}`;
+        cmd = "open";
+        args = [ filePath ];
         break;
       case "win32":
         if (process.env.SystemRoot) {
@@ -300,17 +302,17 @@ export default {
         else {
           cmd = "explorer.exe";
         }
-        
-        cmd = cmd + ` /select,${filePath}`;
+        args = [`/select,${filePath}`];
         break;
       default:
         // # Strip the filename from the path to make sure we pass a directory
         // # path. If we pass xdg-open a file path, it will open that file in the
         // # most suitable application instead, which is not what we want.
-        cmd = `xdg-open ${filePath}`;
+        cmd = "xdg-open";
+        args = [ filePath ];
       };
       
-      exec(cmd, function(error, stdout, stderr) {
+      exec(cmd, args, function(error, stdout, stderr) {
         console.log("stdout: " + stdout);
         console.log("stderr: " + stderr);
         if (error !== null) {
