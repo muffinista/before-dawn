@@ -271,7 +271,7 @@ var openAboutWindow = function() {
   var aboutUrl = getUrlPrefix() + "/about.html";
   var w = new BrowserWindow({
     width:500,
-    height:400,
+    height:600,
     resizable:false,
     icon: path.join(__dirname, "assets", "iconTemplate.png"),
     webPreferences: {
