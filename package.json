@@ -10,7 +10,7 @@
   "scripts": {
     "dev": "node bin/dev-runner.js",
     "dev-no-reload": "cross-env DISABLE_RELOAD=1 node bin/dev-runner.js",
-    "compile": "cross-env NODE_ENV=production webpack --config webpack.config.js",
+    "compile": "cross-env NODE_ENV=production webpack --mode production --config webpack.config.js",
     "eslint": "eslint -c eslint.json src/**/*.js src/**/*.vue test/**/*.js webpack*.js",
     "postinstall": "electron-builder install-app-deps",
     "pack": "yarn compile && electron-builder --dir",
@@ -48,6 +48,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.2.2",
+    "@babel/preset-env": "^7.2.3",
     "@sentry/cli": "^1.37.2",
     "babel-eslint": "^10.0.1",
     "babel-loader": "^8",
