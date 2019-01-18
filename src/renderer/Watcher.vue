@@ -35,23 +35,25 @@
       <div class="tab-content">
         <div class="tab-pane active" aria-labelledby="preview-tab" id="preview" role="tabpanel">
           <div class="container-fluid space-at-bottom">
-            <template v-if="options.length > 0">
-              <h4>Options</h4>
-              <small>Tweak the values here and they will be sent along
-                to your preview.</small>
-              <saver-options
-                :saver="saver"
-                :options="options"
-                :values="optionDefaults"
-                @change="onOptionsChange"></saver-options>
+            <template v-if="saver !== undefined">
+              <template v-if="options.length > 0">
+                <h4>Options</h4>
+                <small>Tweak the values here and they will be sent along
+                  to your preview.</small>
+                <saver-options
+                  :saver="saver"
+                  :options="options"
+                  :values="optionDefaults"
+                  @change="onOptionsChange"></saver-options>
+              </template>
+              
+              <h4>Preview</h4>
+              <saver-preview
+                :bus="bus"
+                v-bind:saver="saver"
+                v-bind:screenshot="screenshot"
+                v-if="isLoaded"></saver-preview>
             </template>
-            
-            <h4>Preview</h4>
-            <saver-preview
-              :bus="bus"
-              v-bind:saver="saver"
-              v-bind:screenshot="screenshot"
-              v-if="isLoaded"></saver-preview>
           </div>
         </div>
         <div class="tab-pane" aria-labelledby="settings-tab" id="settings" role="tabpanel">
@@ -59,39 +61,41 @@
             <h4>Basic Information</h4>
             <small>You can enter the basics about this screensaver
               here.</small>
-            
-            <!-- NOTE: passing the attrs here because its really all
-                 we need for this form and makes saving the data later a
-                 lot easier -->
-            <saver-form
-              v-bind:saver="saver.attrs"
-              v-if="isLoaded"></saver-form>
-            
-            
-            <h4>Configurable Options</h4>
-            <small>You can offer users configurable options to control
-              your screensaver. Manage those here.</small>
-            
-            
-            <!--
-                note: is track-by ok here?
-                https://v1.vuejs.org/guide/list.html#track-by-index 
-              -->
-            <div v-if="isLoaded">
-              <saver-option-input
-                v-for="(option, index) in options"
-                v-bind:option="option"
-                :index="index"
-                v-bind:key="option.index"
-                v-on:deleteOption="deleteOption(option)"></saver-option-input>      
-            </div>
-            
-            <div class="padded-top padded-bottom">
-              <button
-                type="button"
-                class="btn btn-primary add-option"
-                v-on:click="addSaverOption">Add Option</button>
-            </div>
+            <template v-if="saver !== undefined">
+              
+              <!-- NOTE: passing the attrs here because its really all
+                  we need for this form and makes saving the data later a
+                  lot easier -->
+              <saver-form
+                v-bind:saver="saver.attrs"
+                v-if="isLoaded"></saver-form>
+              
+              
+              <h4>Configurable Options</h4>
+              <small>You can offer users configurable options to control
+                your screensaver. Manage those here.</small>
+              
+              
+              <!--
+                  note: is track-by ok here?
+                  https://v1.vuejs.org/guide/list.html#track-by-index 
+                -->
+              <div v-if="isLoaded">
+                <saver-option-input
+                  v-for="(option, index) in options"
+                  v-bind:option="option"
+                  :index="index"
+                  v-bind:key="option.index"
+                  v-on:deleteOption="deleteOption(option)"></saver-option-input>      
+              </div>
+              
+              <div class="padded-top padded-bottom">
+                <button
+                  type="button"
+                  class="btn btn-primary add-option"
+                  v-on:click="addSaverOption">Add Option</button>
+              </div>
+            </template>
           </div>
         </div>
       </div>
