@@ -848,7 +848,7 @@ var bootApp = function() {
 };
 
 var quitApp = () => {
-  exitOnQuit = false;
+  exitOnQuit = true;
   app.quit(); 
 }
 
@@ -1096,7 +1096,7 @@ app.on("before-quit", function(e) {
 app.on("will-quit", function(e) {
   log.info("will-quit");
   if ( testMode !== true && global.IS_DEV !== true && exitOnQuit !== true ) {
-    console.log("don't quit yet!");
+    log.info(`don't quit yet! testMode: ${testMode} IS_DEV ${global.IS_DEV} exitOnQuit ${exitOnQuit}`);
     e.preventDefault();
   }
 });
