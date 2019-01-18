@@ -18,6 +18,3 @@
     props: ["savers", "current"],
   }
 </script>
-
-<style>
-</style>

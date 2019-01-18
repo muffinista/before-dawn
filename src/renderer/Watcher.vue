@@ -333,8 +333,3 @@ export default {
   }
 } 
 </script>
-
-<style lang="scss">
-@import "~noty/lib/noty.css";
-@import "~noty/lib/themes/mint.css";
-</style>

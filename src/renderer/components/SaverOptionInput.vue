@@ -118,6 +118,3 @@
     },
   };
 </script>
-
-<style>
-</style>

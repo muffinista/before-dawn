@@ -14,11 +14,12 @@ const outputDir = path.join(__dirname, "output");
 
 const BabiliWebpackPlugin = require("babili-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
-const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const PurgecssPlugin = require("purgecss-webpack-plugin");
 const VueLoaderPlugin = require("vue-loader/lib/plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
+const devMode = (process.env.NODE_ENV !== "production");
 
 var htmlPageOptions = function(id, title) {
   return {
@@ -31,7 +32,7 @@ var htmlPageOptions = function(id, title) {
       removeAttributeQuotes: true,
       removeComments: true
     },
-    nodeModules: process.env.NODE_ENV !== "production" ? path.resolve(__dirname, "node_modules") : false
+    nodeModules: devMode ? path.resolve(__dirname, "node_modules") : false
   }
 };
 
@@ -47,7 +48,6 @@ let whiteListedModules = ["vue"];
 let externals = [
   ...Object.keys(dependencies || {}).filter(d => !whiteListedModules.includes(d))
 ];
-
 
 let rendererConfig = {
   devtool: "inline-source-map",
@@ -75,29 +75,45 @@ let rendererConfig = {
       },
       // this will apply to both plain `.css` files
       // AND `<style>` blocks in `.vue` files
+      // {
+      //   test: /\.css$/,
+      //   use: [
+      //     "vue-style-loader",
+      //     "css-loader"
+      //   ]
+      // },
       {
-        test: /\.css$/,
+        //test: /\.(scss)$/,
+        test: /\.(sa|sc|c)ss$/,
         use: [
-          "vue-style-loader",
-          "css-loader"
+          devMode ? 'style-loader' : MiniCssExtractPlugin.loader,
+          //'vue-style-loader',
+          'css-loader',
+//          'postcss-loader',
+          'sass-loader',
         ]
-      },
-      /*      {
-        test: /\.css$/,
-        use: ExtractTextPlugin.extract({
-          fallback: 'style-loader',
-          use: 'css-loader'
-        })
-      },*/
-      {
-        test: /\.(scss)$/,
-        use: [{
-          loader: "style-loader", // inject CSS to page
-        }, {
-          loader: "css-loader", // translates CSS into CommonJS modules
-        }, {
-          loader: "sass-loader" // compiles SASS to CSS
-        }]
+        
+        // [
+        //   {
+        //     loader: MiniCssExtractPlugin.loader,
+        //     options: {
+        //       // you can specify a publicPath here
+        //       // by default it use publicPath in webpackOptions.output
+        //       //publicPath: '../'
+        //     }
+        //   },
+        //   "css-loader"
+        // ]
+        //   {
+        //     loader: "style-loader", // inject CSS to page
+        //   },
+        //   {
+        //     loader: "css-loader", // translates CSS into CommonJS modules
+        //   },
+        //   {
+        //     loader: "sass-loader" // compiles SASS to CSS
+        //   }
+        // ]
       },
       {
         test: /\.js$/,
@@ -140,7 +156,6 @@ let rendererConfig = {
   },
   plugins: [
     new VueLoaderPlugin(),
-    new ExtractTextPlugin("styles.css"),
     new HtmlWebpackPlugin(htmlPageOptions("prefs", "Preferences")),
     new HtmlWebpackPlugin(htmlPageOptions("editor", "Editor")),    
     new HtmlWebpackPlugin(htmlPageOptions("new", "Create Screensaver!")),
@@ -160,17 +175,27 @@ let rendererConfig = {
           to: path.join(outputDir, "assets"),
           ignore: [".*"]
         }
-        // ,
-        // {
-        //   from: path.join(__dirname, 'src', 'lib'),
-        //   to: path.join(outputDir, 'lib'),
-        //   ignore: ['.*']
-        // }
       ]
     ),
     new webpack.HotModuleReplacementPlugin(),
-    new webpack.NoEmitOnErrorsPlugin()
+    new webpack.NoEmitOnErrorsPlugin(),
+    new MiniCssExtractPlugin({
+      filename: "[name].css",
+      chunkFilename: "[id].css"
+    })
   ],
+  // optimization: {
+  //   splitChunks: {
+  //     cacheGroups: {
+  //       styles: {
+  //         name: 'styles',
+  //         test: /\.css$/,
+  //         chunks: 'all',
+  //         enforce: true
+  //       }
+  //     }
+  //   }
+  // },
   output: {
     filename: "[name].js",
     libraryTarget: "commonjs2",

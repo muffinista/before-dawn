@@ -69,9 +69,3 @@ export default {
   },
 };
 </script>
-
-<style>
-svg {
-  width: 50%;
-}
-</style>

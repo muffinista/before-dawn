@@ -5,6 +5,8 @@ $tab_padding:6px;
 $grid_gap:10px;
 
 /* purgecss start ignore */
+@import "~noty/lib/noty.css";
+@import "~noty/lib/themes/mint.css";
 
 html {
   height: 100%;
@@ -180,6 +182,9 @@ h1 .hint {
 #about p {
   font-size: 120%;
 }
+#about svg {
+  width: 50%;
+}
 
 #options {
   margin-bottom: 10px;
@@ -240,5 +245,15 @@ input[type="range"] {
 .btn:focus {
   outline: none !important;
   box-shadow: none !important;
+}
+.input-group-btn.spaced {
+  margin-left: 3px;
+}
+
+.need-setup-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 80vh;
 }
 /* purgecss end ignore */

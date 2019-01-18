@@ -42,6 +42,3 @@
     },
   };
 </script>
-
-<style>
-</style>

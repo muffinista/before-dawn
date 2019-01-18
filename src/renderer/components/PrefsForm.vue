@@ -96,9 +96,3 @@ export default {
   }
 };
 </script>
-
-<style>
-.input-group-btn.spaced {
-  margin-left: 3px;
-}
-</style>

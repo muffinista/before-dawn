@@ -122,12 +122,3 @@ export default {
   },
 };
 </script>
-
-<style>
-.need-setup-message {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 80vh;
-}
-</style>
