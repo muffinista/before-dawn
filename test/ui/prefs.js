@@ -143,8 +143,8 @@ describe("Prefs", function() {
             return i.indexOf("saver-one") !== -1;
           });
 
-          assert(options[k].load_url == "barfoo");
-          assert(options[k].sound == false);
+          assert.equal("barfoo", options[k].load_url);
+          assert(!options[k].sound);
         });
   });
   
