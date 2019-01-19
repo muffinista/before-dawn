@@ -27,7 +27,7 @@ describe("About", function() {
     return helpers.stopApp(app);
 	});
 
-  it("works", function() {
+  it("has some text and current version number", function() {
     return app.client.waitUntilWindowLoaded().
         getText("body").
         then((res) => {
