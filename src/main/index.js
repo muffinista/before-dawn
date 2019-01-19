@@ -1038,6 +1038,11 @@ ipcMain.on("open-prefs", (event) => {
   openPrefsWindow();
 });
 
+ipcMain.on("open-about", (event) => {
+  log.info("open-about");
+  openAboutWindow();
+});
+
 //
 // handle request to open 'add new saver' window
 //
