@@ -7,19 +7,7 @@ const fakeDialog = require("spectron-fake-dialog");
 const chai = require("chai");
 const chaiAsPromised = require("chai-as-promised");
 
-var appPath = path.join(__dirname, "..", "..", "app", "node_modules", ".bin", "electron");
-if (process.platform === "win32") {
-  appPath += ".cmd";
-}
-
-// if app/node_modules doesn't exist, try ../node_modules instead
-// this is a hack, if it works i'll clean it up
-if ( ! fs.existsSync(appPath) ) {
-  appPath = path.join(__dirname, "..", "..", "node_modules", ".bin", "electron");
-  if (process.platform === "win32") {
-    appPath += ".cmd";
-  }
-}
+const appPath = require("electron");
 
 global.before(() => {
   chai.should();
@@ -40,7 +28,7 @@ exports.savedConfig = function(p) {
 exports.application = function(workingDir) {
   var a = new Application({
     path: appPath,
-    args: ["output/main.js"],
+    args: [path.join(__dirname, "..", "..", "output/main.js")],
     env: {
       BEFORE_DAWN_DIR: workingDir,
       TEST_MODE: true

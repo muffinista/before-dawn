@@ -11,12 +11,11 @@ var workingDir;
 let app;
 
 describe("Add New", function() {
+  helpers.setupTimeout(this);
   beforeEach(() => {
     saversDir = helpers.getTempDir();
     workingDir = helpers.getTempDir();
     app = helpers.application(workingDir);
-    
-    helpers.setupTimeout(this);
   });
 
   describe("when not setup", function() {

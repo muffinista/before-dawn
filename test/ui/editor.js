@@ -11,11 +11,11 @@ let app;
 var saverJSON;
 
 describe("Editor", function() {
+  helpers.setupTimeout(this);
  
 	beforeEach(() => {
     workingDir = helpers.getTempDir();
     app = helpers.application(workingDir);
-    helpers.setupTimeout(this);
     
 
     var saversDir = helpers.getTempDir();

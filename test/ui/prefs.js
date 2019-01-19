@@ -9,7 +9,9 @@ var saversDir;
 
 
 describe("Prefs", function() { 
-	beforeEach(() => {
+  helpers.setupTimeout(this);
+
+  beforeEach(() => {
     workingDir = helpers.getTempDir();
     saversDir = helpers.getTempDir();
     
@@ -18,7 +20,6 @@ describe("Prefs", function() {
     helpers.addSaver(saversDir, "saver-one", "saver.json");
 
     app = helpers.application(workingDir);
-    helpers.setupTimeout(this);
     return app.start().
               then(() =>
               app.fakeDialog.mock([ { method: "showOpenDialog", value: ["/not/a/real/path"] } ])).
