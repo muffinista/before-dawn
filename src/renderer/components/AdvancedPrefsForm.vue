@@ -1,6 +1,7 @@
 <template>
   <div id="advanced-prefs-form">
-    <h1>Advanced Options <small class="text-muted">Be careful with these!</small></h1>
+    <h1>Advanced Options</h1>
+    <p class="form-text text-muted">Be careful with these!</p>
     <form>
       <div class="form-group">
         <label for="repo">Github Repo URL:</label>
