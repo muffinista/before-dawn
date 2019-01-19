@@ -28,7 +28,7 @@ var doLockScreen = function() {
     if (error !== null) {
       logger("doLockScreen error: " + error);
       logger("stdout: " + stdout);
-      logger('stderr: ' + stderr);
+      logger("stderr: " + stderr);
     }
   });
 };
@@ -59,8 +59,8 @@ var doSleep = function() {
   exec(cmd, args, function(error, stdout, stderr) {
     if (error !== null) {
       logger("doSleep exec error: " + error);
-      logger('stdout: ' + stdout);
-      logger('stderr: ' + stderr);
+      logger("stdout: " + stdout);
+      logger("stderr: " + stderr);
     }
   });
 };

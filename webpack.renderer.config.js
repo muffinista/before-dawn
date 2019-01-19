@@ -86,11 +86,11 @@ let rendererConfig = {
         //test: /\.(scss)$/,
         test: /\.(sa|sc|c)ss$/,
         use: [
-          devMode ? 'style-loader' : MiniCssExtractPlugin.loader,
+          devMode ? "style-loader" : MiniCssExtractPlugin.loader,
           //'vue-style-loader',
-          'css-loader',
+          "css-loader",
 //          'postcss-loader',
-          'sass-loader',
+          "sass-loader",
         ]
         
         // [
@@ -119,9 +119,9 @@ let rendererConfig = {
         test: /\.js$/,
         exclude: /node_modules/,
         use: {
-          loader: 'babel-loader',
+          loader: "babel-loader",
           options: {
-            presets: ['@babel/preset-env']
+            presets: ["@babel/preset-env"]
           }
         }
       },
