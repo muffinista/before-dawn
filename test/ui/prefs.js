@@ -1,36 +1,38 @@
 "use strict";
 
 const assert = require("assert");
-
 const helpers = require("./setup.js");
-var workingDir = helpers.getTempDir();
-var saversDir = helpers.getTempDir();
 
-const app = helpers.application(workingDir);
+let app;
+var workingDir;
+var saversDir;
 
-helpers.setupConfig(workingDir);
-helpers.addLocalSource(workingDir, saversDir);
-helpers.addSaver(saversDir, "saver-one", "saver.json");
 
-describe("Prefs", function() {
-  helpers.setupTimeout(this);
-  
+describe("Prefs", function() { 
 	beforeEach(() => {
+    workingDir = helpers.getTempDir();
+    saversDir = helpers.getTempDir();
+    
+    helpers.setupConfig(workingDir);
+    helpers.addLocalSource(workingDir, saversDir);
+    helpers.addSaver(saversDir, "saver-one", "saver.json");
+
+    app = helpers.application(workingDir);
+    helpers.setupTimeout(this);
     return app.start().
               then(() =>
               app.fakeDialog.mock([ { method: "showOpenDialog", value: ["/not/a/real/path"] } ])).
                then(() => app.client.waitUntilWindowLoaded() ).
 			         then(() => app.electron.ipcRenderer.send("open-prefs")).
-			         then(() => app.client.windowByIndex(2));
+               then(() => {
+                app.client.getWindowCount().should.eventually.equal(2)
+                }).
+                then(() => app.client.windowByIndex(2));
 	});
 
 	afterEach(() => {
     return helpers.stopApp(app);
 	});
-
-  it("opens window", function() {
-    assert(app.browserWindow.isVisible());
-  });
 
   it("sets title", function() {
     return app.client.waitUntilWindowLoaded().getTitle().then((res) => {
@@ -64,7 +66,7 @@ describe("Prefs", function() {
   });
 
   it("set general preferences", () => {
-    return app.client.waitUntilWindowLoaded().
+    return app.client.waitUntilTextExists("body", "Preferences", 10000).
       click("=Preferences").
       waitUntilTextExists("body", "Activate after").
       then(() => 

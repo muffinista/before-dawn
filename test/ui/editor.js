@@ -5,15 +5,19 @@ const fs = require("fs-extra");
 const path = require("path");
 const helpers = require("./setup.js");
 
-var workingDir = helpers.getTempDir();
-const app = helpers.application(workingDir);
+var workingDir;
+let app;
 
 var saverJSON;
 
 describe("Editor", function() {
-  helpers.setupTimeout(this);
  
 	beforeEach(() => {
+    workingDir = helpers.getTempDir();
+    app = helpers.application(workingDir);
+    helpers.setupTimeout(this);
+    
+
     var saversDir = helpers.getTempDir();
     // make a subdir in the savers directory and drop screensaver
     // config there
@@ -32,6 +36,9 @@ describe("Editor", function() {
         screenshot: "file://" + path.join(__dirname, "../fixtures/screenshot.png"),
         src: saverJSON
       })).
+      then(() => {
+        app.client.getWindowCount().should.eventually.equal(2)
+        }).
       then(() => app.client.windowByIndex(2));
 	});
 

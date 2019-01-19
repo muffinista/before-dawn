@@ -22,7 +22,7 @@ describe("ReleaseCheck", () => {
     nock(server).
       get(uriPath).
       replyWithFile(200, fixturePath, {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       })
 
     releaseChecker.setFeed(url);

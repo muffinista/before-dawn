@@ -6,16 +6,21 @@ const path = require("path");
 
 const helpers = require("./setup.js");
 
-var saversDir = helpers.getTempDir();
-var workingDir = helpers.getTempDir();
-const app = helpers.application(workingDir);
-
+var saversDir;
+var workingDir;
+let app;
 
 describe("Add New", function() {
-  helpers.setupTimeout(this);
+  beforeEach(() => {
+    saversDir = helpers.getTempDir();
+    workingDir = helpers.getTempDir();
+    app = helpers.application(workingDir);
+    
+    helpers.setupTimeout(this);
+  });
 
   describe("when not setup", function() {
-	  beforeEach(() => {
+    beforeEach(() => {
 		  return app.start().
         then(() => {
           helpers.removeLocalSource(workingDir);
@@ -25,6 +30,9 @@ describe("Add New", function() {
                       send("open-add-screensaver",
                             "file://" + path.join(__dirname, "../fixtures/screenshot.png"))
         ).
+        then(() => {
+          app.client.getWindowCount().should.eventually.equal(2)
+        }).
         then(() => app.client.windowByIndex(2));
 	  });
 
@@ -64,19 +72,9 @@ describe("Add New", function() {
               send("open-add-screensaver",
                   "file://" + path.join(__dirname, "../fixtures/screenshot.png"));
         }).
-        // then(() => app.client.getMainProcessLogs()).
-        // then(function (logs) {
-        //   logs.forEach(function (log) {
-        //     console.log(log);
-        //   });
-        //   console.log("!!!!!!!!!!!!!!!!!!!!");
-        // }).
-        // then(() => app.client.getRenderProcessLogs()).
-        // then(function (logs) {
-        //     logs.forEach(function (log) {
-        //     console.log("XXX", log.message);
-        //   })
-        // }).
+        then(() => {
+          app.client.getWindowCount().should.eventually.equal(2)
+        }).
         then(() => app.client.windowByIndex(2));
 	  });
 
@@ -95,13 +93,7 @@ describe("Add New", function() {
         then(() => app.client.setValue("[name='name']", "A New Name")).
         then(() => app.client.setValue("[name='description']", "A Thing I Made?")).
         then(() => app.client.click(".save")).
-        // then(() => app.client.waitUntilWindowLoaded()).
-        // then(() => app.client.windowByIndex(3)).
-        // getTitle().
-        // then((res) => {
-        //   console.log("hey");
-        //   assert.equal('Before Dawn: Editor', res);
-        // }).
+        then(() => app.client.windowByIndex(2).getTitle().should.eventually.equal("Before Dawn: Editor")).
         then(() => {
           assert(fs.existsSync(src));
         });
