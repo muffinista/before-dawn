@@ -9,10 +9,62 @@ const chaiAsPromised = require("chai-as-promised");
 
 const appPath = require("electron");
 
+
+
 global.before(() => {
   chai.should();
   chai.use(chaiAsPromised);
 });
+
+exports.specifyConfig = (tmpdir, name) => {
+  fs.copySync(
+    path.join(__dirname, "fixtures/" + name + ".json"),
+    path.join(tmpdir, "config.json")
+  );
+};
+
+exports.getTempDir = function() {
+  return tmp.dirSync().name;
+};
+
+exports.addSaver = function(dest, name, source) {
+  // make a subdir in the savers directory and drop screensaver
+  // config there
+  if ( source === undefined ) {
+    source = "saver.json"
+  }
+  var src = path.join(__dirname, "fixtures", source);
+  var testSaverDir = path.join(dest, name);
+  fs.mkdirSync(testSaverDir);
+
+  saverJSONFile = path.join(testSaverDir, "saver.json");
+  fs.copySync(src, saverJSONFile);
+
+  return saverJSONFile;
+};
+
+// exports.addSaver = function(dir, key, fname) {
+//   var src = path.join(__dirname, "fixtures/" + fname);
+//   var dest = path.join(dir, key);
+
+//   fs.mkdirSync(dest);
+//   fs.copySync(src, path.join(dest, "saver.json"));
+// };
+
+
+exports.prefsToJSON = (tmpdir) => {
+  let testFile = path.join(tmpdir, "config.json")
+  let data = {};
+
+  try {
+    data = JSON.parse(fs.readFileSync(testFile));
+  }
+  catch(e) {
+    data = {};
+  }
+
+  return data;
+}
 
 exports.getTempDir = function() {
   var tmpObj = tmp.dirSync();
@@ -69,15 +121,6 @@ exports.removeLocalSource = function(workingDir) {
   var data = exports.savedConfig(workingDir);
   data.localSource = "";
   fs.writeFileSync(src, JSON.stringify(data));
-};
-
-exports.addSaver = function(dir, key, fname) {
-  var src = path.join(__dirname, "fixtures/" + fname);
-  var dest = path.join(dir, key);
-
-  fs.mkdirSync(dest);
-  fs.copySync(src, path.join(dest, "saver.json"));
-  
 };
 
 exports.getWindowByTitle = async (app, title) => {

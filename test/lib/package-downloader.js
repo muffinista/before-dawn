@@ -1,6 +1,7 @@
 "use strict";
 
 const assert = require("assert");
+const helpers = require("../helpers.js");
 
 const SaverPrefs = require("../../src/lib/prefs.js");
 const PackageDownloader = require("../../src/lib/package-downloader.js");
@@ -15,10 +16,6 @@ const sinon = require("sinon");
 var sandbox;
 
 describe("PackageDownloader", () => {
-  var getTempDir = function() {
-    return tmp.dirSync().name;
-  };
-
   var pd;
   var fakePackage;
   var workingDir;
@@ -31,7 +28,7 @@ describe("PackageDownloader", () => {
   
   beforeEach(() => {
     sandbox = sinon.createSandbox();
-    workingDir = getTempDir();
+    workingDir = helpers.getTempDir();
 
     prefs = new SaverPrefs(workingDir);
     fakePackage = new Package(attrs);
