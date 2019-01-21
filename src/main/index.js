@@ -798,33 +798,31 @@ var bootApp = function() {
   appIcon.on("right-click", () => {
     appIcon.popUpContextMenu();
   });
-  
-  
-  if ( testMode === true ) {
-    openTestShim();
-  }
-  else {
-    openGrabberWindow(() => {
-      // check if we should download savers, set something up, etc
-      if ( prefs.needSetup() ) {
-        var pd = new PackageDownloader(prefs);
-        prefs.setDefaultRepo(global.SAVER_REPO);
-        pd.updatePackage().then(openPrefsWindow);
-      }
-      else {
-        var savers = new SaverListManager({
-          prefs: prefs
-        });
-        log.info("checking if " + prefs.current + " is valid");
-        savers.confirmExists(prefs.current).then((result) => {
-          if ( ! result ) {
-            openPrefsWindow();
-          }
-          log.info("I think we're done!");
-        })
-      }
-    });
-  }
+    
+  openGrabberWindow(() => {
+    // check if we should download savers, set something up, etc
+    if ( prefs.needSetup() ) {
+      var pd = new PackageDownloader(prefs);
+      prefs.setDefaultRepo(global.SAVER_REPO);
+      pd.updatePackage().then(openPrefsWindow);
+    }
+    else {
+      var savers = new SaverListManager({
+        prefs: prefs
+      });
+      log.info("checking if " + prefs.current + " is valid");
+      savers.confirmExists(prefs.current).then((result) => {
+        if ( testMode === true ) {
+          log.info("opening shim for test mode");
+          openTestShim();
+        }
+        else if ( ! result ) {
+          openPrefsWindow();
+        }
+        log.info("I think we're done!");
+      })
+    }
+  });
 
   if ( global.CHECK_FOR_RELEASE === true ) {
     releaseChecker = new ReleaseCheck();

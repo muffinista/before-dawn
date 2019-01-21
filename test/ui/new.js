@@ -4,7 +4,7 @@ const assert = require("assert");
 const fs = require("fs-extra");
 const path = require("path");
 
-const helpers = require("./setup.js");
+const helpers = require("../helpers.js")
 
 var saversDir;
 var workingDir;

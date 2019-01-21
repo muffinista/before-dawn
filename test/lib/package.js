@@ -9,7 +9,7 @@ const nock = require("nock");
 
 const Package = require("../../src/lib/package.js");
 
-const helpers = require("./setup.js");
+const helpers = require("../helpers.js")
 
 var attrs;
 

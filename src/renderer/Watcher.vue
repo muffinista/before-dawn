@@ -103,8 +103,8 @@
     <footer class="footer d-flex justify-content-between">
       <div>
         <button class="btn btn-large btn-secondary cancel" v-on:click="closeWindow">Cancel</button>
-        <button class="btn btn-large btn-primary save" v-on:click="saveData" :disabled="disabled">Save</button>
-        <button class="btn btn-large btn-primary save" v-on:click="saveDataAndClose" :disabled="disabled">Save and Close</button>        
+        <button class="btn btn-large btn-primary save" v-on:click.stop.prevent="saveData" :disabled="disabled">Save</button>
+        <button class="btn btn-large btn-primary save" v-on:click.stop.prevent="saveDataAndClose" :disabled="disabled">Save and Close</button>        
       </div>
     </footer>
   </div> <!-- #editor -->
@@ -155,7 +155,9 @@ export default {
         fs.watch(this.folderPath, (eventType, filename) => {
           if (filename) {
             this.reloadPreview();
-            this.showPreview();
+            // note to self -- this is bad if you're on the settings tab and
+            // click save
+            // this.showPreview();
           }
         });
       }      
@@ -210,13 +212,22 @@ export default {
     },
   },
   methods: {
+    clearTabs() {
+      var els = document.querySelectorAll(".nav-tabs > li > a.nav-link, .tab-content > .tab-pane");
+      for ( var i = 0; i < els.length; i++ ) {
+        els[i].classList.remove("active");
+      }
+    },
+    setActiveTab(n) {
+      this.clearTabs();
+      document.querySelector("#" + n).classList.add("active");
+      document.querySelector("[href='#" + n + "']").classList.add("active");
+    },
     showPreview(e) {
-      document.querySelector("#preview").classList.add("active");
-      document.querySelector("#settings").classList.remove("active");
+      this.setActiveTab("preview");
     },
     showSettings(e) {
-      document.querySelector("#preview").classList.remove("active");
-      document.querySelector("#settings").classList.add("active");
+      this.setActiveTab("settings");
     },
     onOptionsChange(e) {
       var name = e.target.name;
@@ -267,7 +278,7 @@ export default {
       this.disabled = true;
 
       this.saver.attrs.options = this.options;
-      this.saver.write(this.saver.attrs);
+      this.saver.write(this.saver.attrs, this.saver.key);
       this.ipcRenderer.send("savers-updated", this.saver.key);
 
       new Noty({
