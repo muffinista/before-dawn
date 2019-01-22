@@ -34,11 +34,15 @@ exports.addSaver = function(dest, name, source) {
     source = "saver.json"
   }
   var src = path.join(__dirname, "fixtures", source);
+  var htmlSrc = path.join(__dirname, "fixtures", "index.html");
   var testSaverDir = path.join(dest, name);
-  fs.mkdirSync(testSaverDir);
 
-  saverJSONFile = path.join(testSaverDir, "saver.json");
+  var saverJSONFile = path.join(testSaverDir, "saver.json");
+  var saverHTMLFile = path.join(testSaverDir, "index.html");
+
+  fs.mkdirSync(testSaverDir);
   fs.copySync(src, saverJSONFile);
+  fs.copySync(htmlSrc, saverHTMLFile);    
 
   return saverJSONFile;
 };

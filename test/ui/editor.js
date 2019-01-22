@@ -8,10 +8,11 @@ const helpers = require("../helpers.js")
 var workingDir;
 let app;
 
-var saverJSON;
 
 describe("Editor", function() {
+  var saverJSON;
   helpers.setupTimeout(this);
+
   let pickEditorWindow = () => {
     return helpers.getWindowByTitle(app, "Before Dawn: Editor");
   }
@@ -22,19 +23,10 @@ describe("Editor", function() {
     workingDir = helpers.getTempDir();
     app = helpers.application(workingDir);
     
-
     var saversDir = helpers.getTempDir();
-    // make a subdir in the savers directory and drop screensaver
-    // config there
-    var testSaverDir = path.join(saversDir, "saver");
-    fs.mkdirSync(testSaverDir);
-    saverJSON = path.join(testSaverDir, "saver.json");
-    var saverHTML = path.join(testSaverDir, "index.html");    
 
-    fs.copySync(path.join(__dirname, "../fixtures/saver.json"), saverJSON);
-    fs.copySync(path.join(__dirname, "../fixtures/index.html"), saverHTML);    
+    saverJSON = helpers.addSaver(saversDir, "saver-one", "saver.json");
 
-    // @todo update
 		return app.start().
       then(() => app.client.waitUntilWindowLoaded() ).
       then(() => app.client.getWindowCount() ).
@@ -148,6 +140,4 @@ describe("Editor", function() {
         assert.equal("slider", opt.type);
       });
     });
-
-  it("works with new screensaver");
 });
