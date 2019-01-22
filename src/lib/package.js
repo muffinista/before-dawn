@@ -160,7 +160,6 @@ module.exports = function Package(_attrs) {
           zipfile.readEntry();
           zipfile.on("entry", function(entry) {
             var fullPath = entry.fileName;
-            
             // the incoming zip filename will have on extra directory on it
             // projectName/dir/etc/file
             //

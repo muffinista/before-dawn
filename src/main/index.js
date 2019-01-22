@@ -182,46 +182,50 @@ var showDock = function() {
  * Open the preferences window
  */
 var openPrefsWindow = function() {
-  var primary = electronScreen.getPrimaryDisplay();
+  return new Promise((resolve, reject) => {
+    var primary = electronScreen.getPrimaryDisplay();
 
-  // take a screenshot of the main screen for use in previews
-  grabScreen(primary, function(message) {
-    var prefsUrl = getUrl("prefs.html");
-
-    prefsWindowHandle = new BrowserWindow({
-      width:800,
-      height:600,
-      minWidth: 800,
-      minHeight: 500,
-      maxWidth: 1200,
-      maxHeight: 1000,
-      resizable:true,
-      webPreferences: {
-        webSecurity: !global.IS_DEV,
-        nodeIntegration: true,
-        preload: global.TRACK_ERRORS ? path.join(__dirname, "assets", "sentry.js") : undefined
-      },
-      icon: path.join(__dirname, "assets", "iconTemplate.png")
+    // take a screenshot of the main screen for use in previews
+    grabScreen(primary, function(message) {
+      var prefsUrl = getUrl("prefs.html");
+  
+      prefsWindowHandle = new BrowserWindow({
+        width:800,
+        height:600,
+        minWidth: 800,
+        minHeight: 500,
+        maxWidth: 1200,
+        maxHeight: 1000,
+        resizable:true,
+        webPreferences: {
+          webSecurity: !global.IS_DEV,
+          nodeIntegration: true,
+          preload: global.TRACK_ERRORS ? path.join(__dirname, "assets", "sentry.js") : undefined
+        },
+        icon: path.join(__dirname, "assets", "iconTemplate.png")
+      });
+  
+      prefsWindowHandle.saverOpts = saverOpts;
+      prefsWindowHandle.screenshot = message.url;
+  
+      prefsUrl = prefsUrl + "?screenshot=" + encodeURIComponent("file://" + message.url);
+      
+      log.info("loading " + prefsUrl);
+      prefsWindowHandle.loadURL(prefsUrl);
+  
+      showDock();
+  
+      prefsWindowHandle.on("closed", function() {
+        prefsWindowHandle = null;
+        hideDockIfInactive();
+      });
+  
+      // we could do something nice with either of these events
+      prefsWindowHandle.webContents.on("crashed", outputError);
+      prefsWindowHandle.webContents.on("unresponsive", outputError);
+  
+      prefsWindowHandle.once("show", resolve);
     });
-
-    prefsWindowHandle.saverOpts = saverOpts;
-    prefsWindowHandle.screenshot = message.url;
-
-    prefsUrl = prefsUrl + "?screenshot=" + encodeURIComponent("file://" + message.url);
-    
-    log.info("loading " + prefsUrl);
-    prefsWindowHandle.loadURL(prefsUrl);
-
-    showDock();
-
-    prefsWindowHandle.on("closed", function() {
-      prefsWindowHandle = null;
-      hideDockIfInactive();
-    });
-
-    // we could do something nice with either of these events
-    prefsWindowHandle.webContents.on("crashed", outputError);
-    prefsWindowHandle.webContents.on("unresponsive", outputError);
   });
 };
 
@@ -738,7 +742,12 @@ var getUrl = function(dest) {
   return url.resolve(baseUrl, dest);
 };
 
-
+var setupForTesting = function() {
+  if ( testMode === true ) {
+    log.info("opening shim for test mode");
+    openTestShim();
+  }    
+}
 
 /**
  * handle initial startup of app
@@ -803,9 +812,12 @@ var bootApp = function() {
     // check if we should download savers, set something up, etc
     // @todo add a test for this somehow
     if ( prefs.needSetup() ) {
+      log.info("needSetup!");
       var pd = new PackageDownloader(prefs);
       prefs.setDefaultRepo(global.SAVER_REPO);
-      pd.updatePackage().then(openPrefsWindow);
+      pd.updatePackage().
+        then(openPrefsWindow).
+        then(setupForTesting);
     }
     else {
       var savers = new SaverListManager({
@@ -813,15 +825,16 @@ var bootApp = function() {
       });
       log.info("checking if " + prefs.current + " is valid");
       savers.confirmExists(prefs.current).then((result) => {
-        if ( testMode === true ) {
-          log.info("opening shim for test mode");
-          openTestShim();
+        if ( ! result ) {
+          log.info("need to pick a saver")
+          openPrefsWindow().then(setupForTesting);
         }
-        else if ( ! result ) {
-          openPrefsWindow();
+        else {
+          setupForTesting();
         }
+
         log.info("I think we're done!");
-      })
+      });
     }
   });
 
