@@ -58,7 +58,7 @@ describe("bootstrap", function() {
     it("re-creates config file", function(done) {
       assert(fs.existsSync(configDest));
       let data = JSON.parse(fs.readFileSync(configDest));
-      assert.equal('muffinista/before-dawn-screensavers', data.sourceRepo);
+      assert.equal("muffinista/before-dawn-screensavers", data.sourceRepo);
       done();
     });  
   });
