@@ -62,4 +62,8 @@ describe("bootstrap", function() {
       done();
     });  
   });
+
+  it("shows prefs");
+  it("downloads package");
+  
 });

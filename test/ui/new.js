@@ -96,7 +96,8 @@ describe("Add New", function() {
         then(() => {
           assert(fs.existsSync(src));
         });
-      
     });
+
+    it("shows editor");
   });
 });

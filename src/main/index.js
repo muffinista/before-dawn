@@ -801,6 +801,7 @@ var bootApp = function() {
     
   openGrabberWindow(() => {
     // check if we should download savers, set something up, etc
+    // @todo add a test for this somehow
     if ( prefs.needSetup() ) {
       var pd = new PackageDownloader(prefs);
       prefs.setDefaultRepo(global.SAVER_REPO);
