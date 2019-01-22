@@ -68,35 +68,29 @@ module.exports = function Package(_attrs) {
 
     return this.data;
   };
-  
+
   this.checkLatestRelease = async function(force) {
     let data = await this.getReleaseInfo();
-    return new Promise((resolve, reject) => {
-      if ( data && (
-        force === true ||
-        data.published_at && new Date(data.published_at) > new Date(self.updated_at) )
-      ) {
-        self.logger("download package updates!");
-        this.downloadFile(data.zipball_url).
-             then((dest) => {
-               self.zipToSavers(dest)
-             }).
-             then(() => {
-               self.downloaded = true;
-               self.updated_at = data.published_at;
-               resolve(self.attrs());
-             }).catch((err) => {
-               self.logger("downloadFile error: " + err);
-               reject(err);
-             });
-      }
-      else {
-        self.logger("no package update available");
-        resolve(self.attrs());
-      }
-    });
+
+    if ( data && (
+      force === true ||
+      data.published_at && new Date(data.published_at) > new Date(self.updated_at) )
+    ) {
+      self.logger("download package updates!");
+      let dest = await this.downloadFile(data.zipball_url);
+      await self.zipToSavers(dest);
+
+      self.downloaded = true;
+      self.updated_at = data.published_at;
+
+      return self.attrs();  
+    }
+    else {
+      self.logger("no package update available");
+      return self.attrs();
+    }
   };
-  
+
   this.checkLocalRelease = async function(dataSrc, zipSrc) {
     let rf = util.promisify(fs.readFile);
     let data = await rf(dataSrc);
@@ -171,7 +165,6 @@ module.exports = function Package(_attrs) {
             parts.shift();
             
             fullPath = path.join(self.dest, path.join(...parts));
-            
             if (/\/$/.test(entry.fileName)) {
               // directory file names end with '/' 
               mkdirp(fullPath, function(err) {

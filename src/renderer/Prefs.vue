@@ -118,6 +118,7 @@ export default {
     this._savers = new SaverListManager({
       prefs: this.prefs
     }, this.logger);
+
     this._savers.setup().then(() => {
       this.getData();
       this.getCurrentSaver();
@@ -131,6 +132,8 @@ export default {
           this.getCurrentSaver();
         }
         this.showScreensavers();
+      }).catch((err) => {
+        this.logger(err);
       });
 
       if ( this.$electron.remote.getGlobal("NEW_RELEASE_AVAILABLE") ) {

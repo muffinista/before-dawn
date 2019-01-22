@@ -9,8 +9,6 @@ const chaiAsPromised = require("chai-as-promised");
 
 const appPath = require("electron");
 
-
-
 global.before(() => {
   chai.should();
   chai.use(chaiAsPromised);
@@ -60,15 +58,6 @@ exports.addSaver = function(dest, name, source) {
 
   return saverJSONFile;
 };
-
-// exports.addSaver = function(dir, key, fname) {
-//   var src = path.join(__dirname, "fixtures/" + fname);
-//   var dest = path.join(dir, key);
-
-//   fs.mkdirSync(dest);
-//   fs.copySync(src, path.join(dest, "saver.json"));
-// };
-
 
 exports.prefsToJSON = (tmpdir) => {
   let testFile = path.join(tmpdir, "config.json")
@@ -194,9 +183,7 @@ exports.outputLogs = function(app) {
       console.log(log.message)
     })
   });
-}
-                  
-
+};
 
 exports.setupTimeout = function (test) {
   if (process.env.CI) {
