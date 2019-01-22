@@ -7,7 +7,6 @@ const SaverPrefs = require("../../src/lib/prefs.js");
 const PackageDownloader = require("../../src/lib/package-downloader.js");
 const Package = require("../../src/lib/package.js");
 
-const tmp = require("tmp");
 const fs = require("fs-extra");
 const rimraf = require("rimraf");
 
@@ -15,7 +14,9 @@ const sinon = require("sinon");
 
 var sandbox;
 
-describe("PackageDownloader", () => {
+describe("PackageDownloader", function() {
+  helpers.setupTimeout(this);
+
   var pd;
   var fakePackage;
   var workingDir;

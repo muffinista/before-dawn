@@ -168,11 +168,13 @@ describe("SaverPrefs", () => {
       prefs = new SaverPrefs(tmpdir);
     });
 
-    it("works", () => {
-      let result = prefs.sources;
+    it("includes localSource", () => {
+      let localSourceDir = helpers.getTempDir();
+      prefs.localSource = localSourceDir;
 
+      let result = prefs.sources;
       assert.deepEqual(
-        [ "/Users/colin/Dropbox/Projects/before-dawn-screensavers" ], result);
+        [ localSourceDir ], result);
     });
 
     it("includes repo", () => {
@@ -181,18 +183,30 @@ describe("SaverPrefs", () => {
       let dest = path.join(tmpdir, "savers");
 
       assert.deepEqual(
-        [ dest,
-          "/Users/colin/Dropbox/Projects/before-dawn-screensavers" ], result);
+        [ dest ], result);
     });
 
-    // it('includes system', () => {
-    //   let result = prefs.sources;
-    //   let dest = path.join(tmpdir, "savers");
+    it("includes both repo and localsource", () => {
+      let saversDir = path.join(tmpdir, "savers");
+      let localSourceDir = helpers.getTempDir();
 
-    //   assert.deepEqual(
-    //     [ dest,
-    //       '/Users/colin/Dropbox/Projects/before-dawn-screensavers' ], result);
-    // });
+      prefs.localSource = localSourceDir;
+      prefs.sourceRepo = "foo";
+
+
+      let result = prefs.sources;
+      assert.deepEqual(
+        [ saversDir, localSourceDir ], result);
+    });
+
+    it('includes system', () => {
+      let systemDir = path.join(tmpdir, "system-savers")
+      fs.mkdirSync(systemDir);
+      let result = prefs.sources;
+
+      assert.deepEqual(
+        [ systemDir ], result);
+    });
   });
 
   // systemSource

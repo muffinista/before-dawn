@@ -23,6 +23,16 @@ exports.specifyConfig = (tmpdir, name) => {
   );
 };
 
+exports.setConfigValue = (workingDir, name, value) => {
+  let f = path.join(workingDir, "config.json");
+  let currentVals = JSON.parse(fs.readFileSync(f));
+  currentVals[name] = value;
+
+  fs.writeFileSync(f, JSON.stringify(currentVals));
+};
+
+
+
 exports.getTempDir = function() {
   return tmp.dirSync().name;
 };
@@ -39,6 +49,10 @@ exports.addSaver = function(dest, name, source) {
 
   var saverJSONFile = path.join(testSaverDir, "saver.json");
   var saverHTMLFile = path.join(testSaverDir, "index.html");
+
+  if ( ! fs.existsSync(dest) ) {
+    fs.mkdirSync(dest);
+  }
 
   fs.mkdirSync(testSaverDir);
   fs.copySync(src, saverJSONFile);
@@ -133,7 +147,7 @@ exports.getWindowByTitle = async (app, title) => {
     for ( var i = 0; i < count; i++ ) {
       if ( result === -1 ) {
         await app.client.windowByIndex(i).getTitle().then((res) => {
-          // console.log(res, title, res === title);
+          //console.log(res, title, res === title);
           if ( res === title ) {
             result = i;
           }
@@ -143,20 +157,44 @@ exports.getWindowByTitle = async (app, title) => {
   });
 
   return result;
-}
+};
 
-      /* then(() => app.client.getMainProcessLogs()).
-          then(function (logs) {
-          logs.forEach(function (log) {
-          console.log(log);
-          })
-          }).
-          then(() => app.client.getRenderProcessLogs()).
-          then(function (logs) {
-          logs.forEach(function (log) {
-          console.log(log.message)
-          })
-          }).*/
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+exports.waitForWindow = async (app, title) => {
+  let maxAttempts = 20;
+  let result = -1;
+  for ( var i = 0; i < maxAttempts; i++ ) {
+    result = await exports.getWindowByTitle(app, title);
+    if ( result != -1 ) {
+      break;
+    }
+    else {
+      await sleep(1000);
+    }
+  }
+};
+
+exports.waitUntilBooted = async(app) => {
+  return exports.waitForWindow(app, "test shim");
+};
+
+
+exports.outputLogs = function(app) {
+  return app.client.getMainProcessLogs().
+  then(function (logs) {
+    logs.forEach(function (log) {
+      console.log(log);
+    })
+  }).
+  then(() => app.client.getRenderProcessLogs()).
+  then(function (logs) {
+    logs.forEach(function (log) {
+      console.log(log.message)
+    })
+  });
+}
                   
 
 

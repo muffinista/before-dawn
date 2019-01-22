@@ -16,9 +16,9 @@ describe("Prefs", function() {
     return helpers.getWindowByTitle(app, "Before Dawn: Preferences");
   }
 
-  beforeEach(() => {
-    let windowCount = 0;
+  let windowCount = 0;
 
+  beforeEach(() => {
     workingDir = helpers.getTempDir();
     saversDir = helpers.getTempDir();
     
@@ -194,7 +194,7 @@ describe("Prefs", function() {
       then(() => app.client.click("button.clear")).
       then(() => app.client.click("button.save")).
       then(() => {
-        app.client.getWindowCount().should.eventually.equal(1)
+        app.client.getWindowCount().should.eventually.equal(windowCount)
       }).
       then(() => {
         assert.equal("", helpers.savedConfig(workingDir).localSource);
