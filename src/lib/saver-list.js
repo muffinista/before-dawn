@@ -35,7 +35,7 @@ module.exports = class SaverListManager {
     if ( typeof(opts) === "string" ) {
       opts = {
         base: opts
-      }
+      };
     }
   
     this.baseDir = this.prefs.baseDir;
@@ -43,7 +43,7 @@ module.exports = class SaverListManager {
   
   get defaultSaversDir() {
     return path.join(this.baseDir, "savers");
-  };
+  }
   
   setup() {
     let _self = this;
@@ -79,7 +79,7 @@ module.exports = class SaverListManager {
         resolve(results);
       });
     });
-  };
+  }
   
   /**
    * reload all our data/config/etc
@@ -87,11 +87,11 @@ module.exports = class SaverListManager {
   reload(load_savers) {
     this.logger("savers.reload");
     return this.setup(load_savers).then(this.handlePackageChecks);  
-  };
+  }
 
   reset() {
     this.loadedScreensavers = [];
-  };
+  }
 
   /**
    * search for all screensavers we can find on the filesystem. if cb is specified,
@@ -137,18 +137,18 @@ module.exports = class SaverListManager {
 
     // filter out failed promises here
     // @see https://davidwalsh.name/promises-results
-    promises = promises.map(p => p.catch(() => undefined))
+    promises = promises.map(p => p.catch(() => undefined));
 
     Promise.all(promises).then(function(data) {
       // remove any undefined screensavers
       _self.loadedScreensavers = data.
         filter(s => s !== undefined).
         sort((a, b) => { 
-          return a.name.toLowerCase().localeCompare(b.name.toLowerCase()) 
+          return a.name.toLowerCase().localeCompare(b.name.toLowerCase()); 
         });
       cb(_self.loadedScreensavers);
     });
-  };
+  }
 
 
   /**
@@ -161,15 +161,15 @@ module.exports = class SaverListManager {
     var idx = Math.floor(Math.random() * tmp.length);
 
     return tmp[idx];
-  };
+  }
 
   confirmExists(key) {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       this.list(() => {
         resolve(this.getByKey(key) !== undefined);
-      })
+      });
     });
-  };
+  }
 
   /**
    * look up a screensaver by key, and return it
@@ -179,7 +179,7 @@ module.exports = class SaverListManager {
       return obj.key === key;
     });
     return result;
-  };
+  }
 
 
   /**
@@ -215,7 +215,7 @@ module.exports = class SaverListManager {
         }
       });
     });
-  };
+  }
 
   loadFromData(contents, stub, settings) {
     var src = this.prefs.localSource;
@@ -244,7 +244,7 @@ module.exports = class SaverListManager {
 
     
     return new Saver(contents);
-  };
+  }
 
 
   /**
@@ -290,7 +290,7 @@ module.exports = class SaverListManager {
     opts.dest = path.join(dest, "saver.json");
     
     return opts;
-  };
+  }
 
 
   /**
@@ -309,10 +309,10 @@ module.exports = class SaverListManager {
     // make sure we're deleting a screensaver that exists and is
     // actually editable
     if ( typeof(s) !== "undefined" && s.editable === true ) {
-      rimraf(p, () => { cbWrapped(true) });
+      rimraf(p, () => { cbWrapped(true); });
     }
     else {
       cb(false);
     }
-  };
-}
+  }
+};

@@ -4,7 +4,7 @@ const assert = require("assert");
 const fs = require("fs-extra");
 const path = require("path");
 
-const helpers = require("../helpers.js")
+const helpers = require("../helpers.js");
 
 describe("bootstrap", function() {
   let configDest;
@@ -66,7 +66,7 @@ describe("bootstrap", function() {
       it("does not show prefs", function() {
         return helpers.getWindowByTitle(app, "Before Dawn: Preferences").
           then((res) => {
-            assert.equal(-1, res)
+            assert.equal(-1, res);
           });
       });
     });
@@ -74,7 +74,7 @@ describe("bootstrap", function() {
     describe("and an invalid screenaver", () => {
       beforeEach(() => {
         let saversDir = path.join(workingDir, "savers");
-        let saverJSONFile = helpers.addSaver(saversDir, "saver");
+        helpers.addSaver(saversDir, "saver");
         helpers.setConfigValue(workingDir, "saver", "i-dont-exist");
         return bootApp();
       });

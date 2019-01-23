@@ -1,7 +1,7 @@
 import Vue from "vue";
 import VueElectron from "vue-electron";
 import VueObserveVisibility from "vue-observe-visibility";
-import BootstrapVue from "bootstrap-vue"
+import BootstrapVue from "bootstrap-vue";
 
 import Prefs from "./Prefs";
 import Watcher from "./Watcher";
@@ -27,7 +27,7 @@ var actions = {
   "editor": { components: { Watcher }, template: "<Watcher/>" },
   "new": { components: { NewScreensaver }, template: "<NewScreensaver/>" },
   "about": { components: { About }, template: "<About/>" }
-}
+};
 
 var id = document.querySelector("body > div").id;
 var opts = actions[id];

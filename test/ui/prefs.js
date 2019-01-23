@@ -1,7 +1,7 @@
 "use strict";
 
 const assert = require("assert");
-const helpers = require("../helpers.js")
+const helpers = require("../helpers.js");
 
 let app;
 var workingDir;
@@ -14,7 +14,7 @@ describe("Prefs", function() {
 
   let pickPrefsWindow = () => {
     return helpers.getWindowByTitle(app, "Before Dawn: Preferences");
-  }
+  };
 
   let windowCount = 0;
 
@@ -34,7 +34,7 @@ describe("Prefs", function() {
                then((res) => { windowCount = res; }). 
                then(() => app.electron.ipcRenderer.send("open-prefs")).
                then(() => {
-                app.client.getWindowCount().should.eventually.equal(windowCount+1)
+                app.client.getWindowCount().should.eventually.equal(windowCount+1);
               });
 	});
 
@@ -72,7 +72,7 @@ describe("Prefs", function() {
        }).
         then(() => app.client.click("button.save")).
         then(() => {
-          app.client.getWindowCount().should.eventually.equal(1)
+          app.client.getWindowCount().should.eventually.equal(1);
         }).
         then(() => {
           assert(helpers.savedConfig(workingDir).saver.lastIndexOf("/saver-one/") !== -1);
@@ -92,7 +92,7 @@ describe("Prefs", function() {
       ).
       then(() => app.client.click("button.save")).
       then(() => {
-        app.client.getWindowCount().should.eventually.equal(1)
+        app.client.getWindowCount().should.eventually.equal(1);
       }).
       then(() => {
         assert.equal(30, helpers.savedConfig(workingDir).delay);
@@ -113,7 +113,7 @@ describe("Prefs", function() {
       then(() => app.client.click("label*=Only run on the primary display?")).
       then(() => app.client.click("button.save")).
       then(() => {
-        app.client.getWindowCount().should.eventually.equal(1)
+        app.client.getWindowCount().should.eventually.equal(1);
       }).
       then(() => {
         assert.equal(!oldConfig.lock, helpers.savedConfig(workingDir).lock);
@@ -132,7 +132,7 @@ describe("Prefs", function() {
       then(() => app.client.waitUntilTextExists("body", "Activate after")).
       then(() => app.client.click("button.save")).
       then(() => {
-        app.client.getWindowCount().should.eventually.equal(1)
+        app.client.getWindowCount().should.eventually.equal(1);
       }).
       then(() => {
         assert.equal(oldConfig.lock, helpers.savedConfig(workingDir).lock);
@@ -155,7 +155,7 @@ describe("Prefs", function() {
         then(() => app.client.setValue("[name='load_url']", "barfoo")).
         then(() => app.client.click("button.save")).
         then(() => {
-          app.client.getWindowCount().should.eventually.equal(1)
+          app.client.getWindowCount().should.eventually.equal(1);
         }).
         then(() => {
           var options = helpers.savedConfig(workingDir).options;
@@ -176,7 +176,7 @@ describe("Prefs", function() {
       then(() => app.client.click("button.pick")).
       then(() => app.client.click("button.save")).
       then(() => {
-        app.client.getWindowCount().should.eventually.equal(1)
+        app.client.getWindowCount().should.eventually.equal(1);
       }).
       then(() => {
         assert.equal("/not/a/real/path", helpers.savedConfig(workingDir).localSource);
@@ -194,7 +194,7 @@ describe("Prefs", function() {
       then(() => app.client.click("button.clear")).
       then(() => app.client.click("button.save")).
       then(() => {
-        app.client.getWindowCount().should.eventually.equal(windowCount)
+        app.client.getWindowCount().should.eventually.equal(windowCount);
       }).
       then(() => {
         assert.equal("", helpers.savedConfig(workingDir).localSource);

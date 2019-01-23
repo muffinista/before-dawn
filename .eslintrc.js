@@ -6,8 +6,11 @@ module.exports = {
   },
   env: {
     browser: true,
-    node: true
+    node: true,
+    mocha: true,
+    es6: true
   },
+  "extends": "eslint:recommended",
 //  extends: 'airbnb-base',
   globals: {
     __static: true
@@ -23,6 +26,7 @@ module.exports = {
     'import/extensions': 0,
     'import/newline-after-import': 0,
     'no-multi-assign': 0,
+    'semi': 1,
     // allow debugger during development
     'no-debugger': process.env.NODE_ENV === 'production' ? 2 : 0
   }

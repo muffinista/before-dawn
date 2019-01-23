@@ -72,6 +72,7 @@ var checkPowerState = true;
 
 const singleLock = app.requestSingleInstanceLock();
 if (! singleLock ) {
+  // eslint-disable-next-line no-console
   console.log("looks like another copy of app is running, exiting!");
   app.quit();
   process.exit();
@@ -182,7 +183,7 @@ var showDock = function() {
  * Open the preferences window
  */
 var openPrefsWindow = function() {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     var primary = electronScreen.getPrimaryDisplay();
 
     // take a screenshot of the main screen for use in previews
@@ -231,7 +232,7 @@ var openPrefsWindow = function() {
 
 var outputError = (e) => {
   log.info(e);
-}
+};
 
 /**
  * handle new screensaver event. open the window to create a screensaver
@@ -524,11 +525,11 @@ var getDisplays = function() {
  * get a list of the non primary displays connected to the computer
  */
 var getNonPrimaryDisplays = function() {
-  var primary = electronScreen.getPrimaryDisplay()
+  var primary = electronScreen.getPrimaryDisplay();
   return electronScreen.getAllDisplays().filter((d) => {
     return d.id !== primary.id;
   });
-}
+};
 
 /**
  * manually trigger screensaver by setting state to run
@@ -557,11 +558,11 @@ var runScreenSaver = function() {
   // check if the user is running the random screensaver. if so, pick one!
   let randomPath = path.join(global.basePath, "system-savers", "random", "saver.json");
   if ( saverKey === randomPath ) {
-    setupPromise = new Promise((resolve, reject) => {
-      savers.list((entries) => {
+    setupPromise = new Promise((resolve) => {
+      savers.list(() => {
         let s = savers.random();
         resolve(s.key);
-      })
+      });
     });
   }
   else {
@@ -587,17 +588,18 @@ var runScreenSaver = function() {
       }
       
       try {
+        var i;
         // turn off idle checks for a couple seconds while loading savers
         stateManager.ignoreReset(true);
 
-        for ( var i in displays ) {
+        for ( i in displays ) {
           runScreenSaverOnDisplay(saver, displays[i]);
         } // for
 
         // if we're only running on primary display, blank out the other ones
         if ( debugMode !== true && prefs.runOnSingleDisplay === true ) {
           var otherDisplays = getNonPrimaryDisplays();
-          for ( var i in otherDisplays ) {
+          for ( i in otherDisplays ) {
             blankScreen(otherDisplays[i]);
           }
         }
@@ -747,7 +749,7 @@ var setupForTesting = function() {
     log.info("opening shim for test mode");
     openTestShim();
   }    
-}
+};
 
 /**
  * handle initial startup of app
@@ -826,7 +828,7 @@ var bootApp = function() {
       log.info("checking if " + prefs.current + " is valid");
       savers.confirmExists(prefs.current).then((result) => {
         if ( ! result ) {
-          log.info("need to pick a saver")
+          log.info("need to pick a saver");
           openPrefsWindow().then(setupForTesting);
         }
         else {
@@ -843,7 +845,7 @@ var bootApp = function() {
 
     releaseChecker.setFeed(global.RELEASE_CHECK_URL);
     releaseChecker.setLogger(log.info);
-    releaseChecker.onUpdate((x) => {
+    releaseChecker.onUpdate(() => {
       global.NEW_RELEASE_AVAILABLE = true;
       trayMenu.items[3].visible = global.NEW_RELEASE_AVAILABLE;
     });
@@ -862,7 +864,7 @@ var bootApp = function() {
 var quitApp = () => {
   exitOnQuit = true;
   app.quit(); 
-}
+};
 
 /**
  * try and guess if we are in fullscreen mode or not
@@ -954,6 +956,12 @@ var checkForNewRelease = function() {
   releaseChecker.checkLatestRelease();
 };
 
+let getStateManager = function() {
+  return stateManager;
+};
+let getAppIcon = function() {
+  return appIcon;
+};
 
 // load a few global variables
 require("./bootstrap.js");
@@ -988,7 +996,7 @@ log.info("use base path", global.basePath);
  */
 
 if ( testMode !== true ) {
-  app.on("second-instance", (commandLine, workingDirectory) => {
+  app.on("second-instance", () => {
     if ( prefsWindowHandle === null ) {
       openPrefsWindow();
     }
@@ -1020,7 +1028,7 @@ trayMenu = Menu.buildFromTemplate(menusAndTrays.trayMenuTemplate());
 // if the user has updated one of their screensavers, we can let
 // the prefs window know that it needs to reload
 //
-ipcMain.on("savers-updated", (event, arg) => {
+ipcMain.on("savers-updated", () => {
   toggleSaversUpdated();
 });
 
@@ -1045,12 +1053,12 @@ ipcMain.on("prefs-updated", (event, arg) => {
 //
 // handle request to open the prefs window
 //
-ipcMain.on("open-prefs", (event) => {
+ipcMain.on("open-prefs", () => {
   log.info("open-prefs");
   openPrefsWindow();
 });
 
-ipcMain.on("open-about", (event) => {
+ipcMain.on("open-about", () => {
   log.info("open-about");
   openAboutWindow();
 });
@@ -1095,7 +1103,9 @@ ipcMain.on("set-autostart", (event, value) => {
         return;
       }
       appLauncher.disable().
-                  then(function(x) { }).
+                  then(function() { 
+                    log.info("appLauncher enabled");
+                  }).
                   catch((err) => {
                     log.info("appLauncher disable failed", err);
                   });
@@ -1107,7 +1117,7 @@ ipcMain.on("set-autostart", (event, value) => {
 app.on("window-all-closed", function() {
   log.info("window-all-closed");
 });
-app.on("before-quit", function(e) {
+app.on("before-quit", function() {
   log.info("before-quit");
 });
 app.on("will-quit", function(e) {
@@ -1132,8 +1142,10 @@ process.on("uncaughtException", function (ex) {
 app.once("ready", bootApp);
 
 
+exports.log = log;
 exports.setStateToRunning = setStateToRunning;
-exports.stateManager = stateManager;
+exports.getStateManager = getStateManager;
+exports.getAppIcon = getAppIcon;
 exports.trayMenu = trayMenu;
 exports.openPrefsWindow = openPrefsWindow;
 exports.openAboutWindow = openAboutWindow;

@@ -98,7 +98,6 @@ import AdvancedPrefsForm from "@/components/AdvancedPrefsForm";
 import PrefsForm from "@/components/PrefsForm";
 import Noty from "noty";
 
-const path = require("path");
 const {dialog} = require("electron").remote;
 
 import SaverPrefs from "@/../lib/prefs";
@@ -153,7 +152,7 @@ export default {
       saver: undefined,
       disabled: false,
       renderIndex: 0
-    }
+    };
   },
   computed: {
     bus: function() {
@@ -162,7 +161,7 @@ export default {
     logger() {
       let l = this.$electron.remote.getCurrentWindow().saverOpts.logger;
       if ( l === undefined ) {
-        l = console.log;
+        l = function() {};
       }
       return l;
     },
@@ -186,7 +185,6 @@ export default {
       return this.savers.findIndex((s) => s.key === this.saver);
     },
     saverOptions: function() {
-      var self = this;
       if ( ! this.isLoaded ) {
         return undefined;
       }
@@ -229,16 +227,16 @@ export default {
       document.querySelector("#" + n).classList.add("active");
       document.querySelector("[href='#" + n + "']").classList.add("active");
     },
-    showPreferences(e) {
+    showPreferences() {
       this.setActiveTab("preferences");
     },
-    showScreensavers(e) {
+    showScreensavers() {
       this.setActiveTab("screensavers");
     },
-    showAdvanced(e) {
+    showAdvanced() {
       this.setActiveTab("advanced");
     },
-    onOptionsChange(e) {
+    onOptionsChange() {
       this.bus.$emit("options-changed", this.options[this.saver]);
     },
     onSaverPicked(e) {
@@ -246,7 +244,7 @@ export default {
       this.bus.$emit("saver-changed", this.saverObj);
       this.renderIndex += 1;
     },
-    resetToDefaults(e) {
+    resetToDefaults() {
       dialog.showMessageBox(
         {
           type: "info",

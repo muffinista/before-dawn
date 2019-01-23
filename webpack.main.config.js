@@ -1,4 +1,4 @@
-"use strict"
+"use strict";
 
 const path = require("path");
 const packageJSON = require("./package.json");
@@ -9,7 +9,7 @@ const webpack = require("webpack");
 
 const outputDir = path.join(__dirname, "output");
 
-const BabiliWebpackPlugin = require("babili-webpack-plugin")
+const BabiliWebpackPlugin = require("babili-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 //
@@ -121,7 +121,7 @@ let mainConfig = {
     extensions: [".js", ".json", ".node"]
   },
   target: "electron-main"
-}
+};
 
 /**
  * Adjust mainConfig for development settings
@@ -131,7 +131,7 @@ if (process.env.NODE_ENV !== "production") {
     new webpack.DefinePlugin({
       "__static": `"${path.join(__dirname, "../static").replace(/\\/g, "\\\\")}"`
     })
-  )
+  );
 }
 
 /**
@@ -143,7 +143,7 @@ if (process.env.NODE_ENV === "production") {
     new webpack.DefinePlugin({
       "process.env.NODE_ENV": "\"production\""
     })
-  )
+  );
 }
 
-module.exports = mainConfig
+module.exports = mainConfig;

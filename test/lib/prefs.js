@@ -68,7 +68,7 @@ describe("SaverPrefs", () => {
 
 
       helpers.specifyConfig(tmpdir, "config-2");
-      prefs.reload()
+      prefs.reload();
       assert.equal("before-dawn-screensavers/blur/saver.json", prefs.current);
       assert(fs.existsSync(configDest));
     });
@@ -79,9 +79,9 @@ describe("SaverPrefs", () => {
     describe("without config", () => {
       it("is true", () => {
         prefs = new SaverPrefs(tmpdir);
-        assert(prefs.noSource)
+        assert(prefs.noSource);
       });
-    })
+    });
 
     describe("with config", () => {
       beforeEach(() => {
@@ -125,7 +125,7 @@ describe("SaverPrefs", () => {
     it("is the working directory", () => {
       let dest = path.join(tmpdir, "savers");
       assert.equal(dest, prefs.defaultSaversDir);
-    })
+    });
   });
 
   // toHash
@@ -139,7 +139,7 @@ describe("SaverPrefs", () => {
       let data = prefs.toHash();
       assert.equal("before-dawn-screensavers/emoji/saver.json", data.saver);
       assert.equal(10, data.delay);
-    })
+    });
   });
 
   // ensureDefaults
@@ -158,7 +158,7 @@ describe("SaverPrefs", () => {
       prefs.ensureDefaults();
       assert.equal(5, prefs.delay);
       assert.equal(10, prefs.sleep);
-    })
+    });
   });
 
   // sources
@@ -199,8 +199,8 @@ describe("SaverPrefs", () => {
         [ saversDir, localSourceDir ], result);
     });
 
-    it('includes system', () => {
-      let systemDir = path.join(tmpdir, "system-savers")
+    it("includes system", () => {
+      let systemDir = path.join(tmpdir, "system-savers");
       fs.mkdirSync(systemDir);
       let result = prefs.sources;
 
@@ -255,7 +255,7 @@ describe("SaverPrefs", () => {
         assert.equal(data.delay, 123);
 
         done();
-      })
+      });
     });
   });
 

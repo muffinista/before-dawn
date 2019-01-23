@@ -13,7 +13,7 @@ module.exports = class PackageDownloader {
       this.logger = logger;
     }
     else {
-      this.logger = function() {}
+      this.logger = function() {};
     }
   }
 
@@ -25,7 +25,7 @@ module.exports = class PackageDownloader {
       updated_at:sourceUpdatedAt,
       dest:this.prefs.defaultSaversDir
     });
-  };
+  }
 
   updatePackage(p) {
     var lastCheckAt = this.prefs.updateCheckTimestamp;
@@ -55,5 +55,5 @@ module.exports = class PackageDownloader {
       this.logger("check package: " + p.repo);
       return p.checkLatestRelease();
     }
-  };
+  }
 };

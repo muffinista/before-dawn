@@ -104,7 +104,7 @@ module.exports = function Package(_attrs) {
         }).catch((err) => {
           self.logger("checkLocalRelease error: " + err);
           reject(err);
-        })
+        });
       }
       else {
         resolve(self.attrs());
@@ -117,7 +117,6 @@ module.exports = function Package(_attrs) {
     var os = require("os");
     var tempName = temp.path({dir: os.tmpdir(), suffix: ".zip"});
     
-    var _resp;
     var opts = {
       url:url,
       headers:this.defaultHeaders
@@ -168,7 +167,9 @@ module.exports = function Package(_attrs) {
             if (/\/$/.test(entry.fileName)) {
               // directory file names end with '/' 
               mkdirp(fullPath, function(err) {
-                //if (err) {throw err;}
+                if (err) {
+                  return reject(err);
+                }
                 zipfile.readEntry();
               });
             }
@@ -181,7 +182,10 @@ module.exports = function Package(_attrs) {
                 
                 // ensure parent directory exists 
                 mkdirp(path.dirname(fullPath), function(err) {
-                  //if (err) {throw err;}
+                  if (err) {
+                    return reject(err);
+                  }
+  
                   readStream.pipe(fs.createWriteStream(fullPath));
                   readStream.on("end", function() {
                     zipfile.readEntry();
@@ -197,8 +201,8 @@ module.exports = function Package(_attrs) {
             });
           });
         });  
-      })
+      });
     });
 
-  }
+  };
 };

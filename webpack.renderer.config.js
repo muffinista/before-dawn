@@ -1,7 +1,7 @@
 "use strict";
 
 const path = require("path");
-const glob = require("glob-all")
+const glob = require("glob-all");
 const packageJSON = require(`${"./package.json"}`);
 
 const productName = packageJSON.productName;
@@ -33,7 +33,7 @@ var htmlPageOptions = function(id, title) {
       removeComments: true
     },
     nodeModules: devMode ? path.resolve(__dirname, "node_modules") : false
-  }
+  };
 };
 
 /**
@@ -211,7 +211,7 @@ let rendererConfig = {
     extensions: [".js", ".vue", ".json", ".css", ".node"]
   },
   target: "electron-renderer"
-}
+};
 
 
 /**
@@ -228,7 +228,7 @@ if (process.env.NODE_ENV === "production") {
     new webpack.LoaderOptionsPlugin({
       minimize: true
     })
-  )
+  );
 }
 
 module.exports = rendererConfig;

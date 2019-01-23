@@ -25,7 +25,7 @@ describe("PackageDownloader", function() {
   var attrs = {
     repo: "muffinista/before-dawn-screensavers",
     dest: workingDir
-  }
+  };
   
   beforeEach(() => {
     sandbox = sinon.createSandbox();
@@ -52,7 +52,7 @@ describe("PackageDownloader", function() {
       let result = pd.getPackage();
       assert.equal("foo/bar", result.repo);
       assert.deepEqual(tmp, result.updated_at);
-    })
+    });
   });
 
   describe("updatePackage", function() {
@@ -61,7 +61,7 @@ describe("PackageDownloader", function() {
       pd.updatePackage(undefined).then((result) => {
         assert(!result.downloaded);
         done();
-      })
+      });
     });
 
     it("gets package if stale", (done) => {
@@ -74,7 +74,7 @@ describe("PackageDownloader", function() {
         assert(result.downloaded);
         assert(prefs.updateCheckTimestamp > oldCheckTime);
         done();
-      })
+      });
     });
 
     it("skips download if fresh", (done) => {
@@ -93,7 +93,7 @@ describe("PackageDownloader", function() {
       prefs.updateCheckTimestamp = oldCheckTime;
 
       sandbox.stub(fakePackage, "downloadFile").rejects();
-      pd.updatePackage(fakePackage).catch((err) => {
+      pd.updatePackage(fakePackage).catch(() => {
         done();
       });
     });

@@ -1,7 +1,7 @@
 "use strict";
 
 const assert = require("assert");
-const helpers = require("../helpers.js")
+const helpers = require("../helpers.js");
 const packageJSON = require("../../package.json");
 
 var workingDir;
@@ -21,7 +21,7 @@ describe("About", function() {
               then((res) => { windowCount = res; }).
               then(() => app.electron.ipcRenderer.send("open-about")).
               then(() => {
-                app.client.getWindowCount().should.eventually.equal(windowCount+1)
+                app.client.getWindowCount().should.eventually.equal(windowCount+1);
               });
             });
 

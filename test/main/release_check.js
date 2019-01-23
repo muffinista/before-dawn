@@ -9,7 +9,7 @@ describe("ReleaseCheck", () => {
   let releaseChecker;
   let version = "0.1.1";
   let server = "https://sillynotreal.domain";
-  let uriPath = `/update/win32/${version}`
+  let uriPath = `/update/win32/${version}`;
   let url = `${server}${uriPath}`;
   let fixturePath;
 
@@ -23,7 +23,7 @@ describe("ReleaseCheck", () => {
       get(uriPath).
       replyWithFile(200, fixturePath, {
         "Content-Type": "application/json",
-      })
+      });
 
     releaseChecker.setFeed(url);
     releaseChecker.onUpdate((result) => {

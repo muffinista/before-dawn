@@ -9,7 +9,7 @@ const nock = require("nock");
 
 const Package = require("../../src/lib/package.js");
 
-const helpers = require("../helpers.js")
+const helpers = require("../helpers.js");
 
 var attrs;
 
@@ -30,7 +30,7 @@ describe("Package", function() {
     attrs = {
       repo: "muffinista/before-dawn-screensavers",
       dest:workingDir
-    }
+    };
   });
   afterEach(function () {
     sandbox.restore();
@@ -94,7 +94,7 @@ describe("Package", function() {
     it("calls downloadFile", async () => {
       var df = sandbox.stub(p, "downloadFile").resolves(zipPath);
 
-      let results = await p.checkLatestRelease();
+      await p.checkLatestRelease();
       assert(df.calledOnce);
     });
 
@@ -104,7 +104,7 @@ describe("Package", function() {
 
       p.updated_at = "2017-06-06T23:55:44Z";
       
-      let results = await p.checkLatestRelease(cb);
+      await p.checkLatestRelease(cb);
       assert(!df.calledOnce);
     });
   });
@@ -130,7 +130,7 @@ describe("Package", function() {
       
       p.updated_at = "2017-06-06T23:55:44Z";
       
-      let results = await p.checkLocalRelease(dataPath, zipPath);
+      await p.checkLocalRelease(dataPath, zipPath);
       assert(!zts.calledOnce);
     });
   });
@@ -140,7 +140,7 @@ describe("Package", function() {
     beforeEach(() => {
       nock("http://test.file").
         get("/savers.zip").
-        reply(200, (uri, requestBody) => {
+        reply(200, () => {
           return fs.createReadStream(zipPath);
         });
       rimraf.sync(workingDir);
@@ -150,9 +150,9 @@ describe("Package", function() {
     it("works", (done) => {
       let p = new Package(attrs);
       p.downloadFile(testUrl).then((dest) => {
-        assert(fs.existsSync(dest))
+        assert(fs.existsSync(dest));
         done();
-      })
+      });
     });
   });
 
@@ -166,7 +166,7 @@ describe("Package", function() {
     });
 
     it("unzips files", (done) => {
-      p.zipToSavers(zipPath).then((attrs) => {
+      p.zipToSavers(zipPath).then(() => {
         var testDest = path.resolve(workingDir, "sparks", "index.html");
         assert(fs.existsSync(testDest));
         done();
@@ -174,9 +174,11 @@ describe("Package", function() {
     });
 
     it("recovers from errors", (done) => {
-      p.zipToSavers(dataPath).then((attrs) => {}).catch( (err) => {
-        done();
-      });
+      p.zipToSavers(dataPath).
+        then(() => {}).
+        catch( () => {
+          done();
+        });
     });
 
     it("keeps files on failure", (done) => {
@@ -185,7 +187,7 @@ describe("Package", function() {
       var testDest = path.resolve(workingDir, "saver-one", "saver.json");
       assert(fs.existsSync(testDest));
       
-      p.zipToSavers(dataPath).catch( (err) => {
+      p.zipToSavers(dataPath).catch( () => {
         assert(fs.existsSync(testDest));
         done();
       });
@@ -199,7 +201,7 @@ describe("Package", function() {
       assert(fs.existsSync(testDest));
 
 
-      p.zipToSavers(zipPath).then((attrs) => {
+      p.zipToSavers(zipPath).then(() => {
         assert(!fs.existsSync(testDest));
         done();
       });     

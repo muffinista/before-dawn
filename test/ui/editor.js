@@ -3,7 +3,7 @@
 const assert = require("assert");
 const fs = require("fs-extra");
 const path = require("path");
-const helpers = require("../helpers.js")
+const helpers = require("../helpers.js");
 
 var workingDir;
 let app;
@@ -15,7 +15,7 @@ describe("Editor", function() {
 
   let pickEditorWindow = () => {
     return helpers.getWindowByTitle(app, "Before Dawn: Editor");
-  }
+  };
  
 	beforeEach(() => {
     let windowCount = 0;
@@ -36,7 +36,7 @@ describe("Editor", function() {
         src: saverJSON
       })).
       then(() => {
-        app.client.getWindowCount().should.eventually.equal(windowCount+1)
+        app.client.getWindowCount().should.eventually.equal(windowCount+1);
       }); 
 	});
 
@@ -63,7 +63,7 @@ describe("Editor", function() {
       then(() => app.client.setValue("#saver-form [name='description']", "A Thing I Made?")).
       then(() => app.client.click("button.save")).
       then(() => {
-        var p = new Promise( (resolve, reject) => {
+        var p = new Promise( (resolve) => {
           setTimeout(() => {
             var x = JSON.parse(fs.readFileSync(saverJSON)).name;
             resolve(x);
@@ -91,7 +91,7 @@ describe("Editor", function() {
       then(() => app.client.selectByVisibleText(".entry[data-index='2'] select", "slider")).
       then(() => app.client.click("button.save")).
       then(() => {
-        var p = new Promise( (resolve, reject) => {
+        var p = new Promise( (resolve) => {
           setTimeout(() => {
             var x = JSON.parse(fs.readFileSync(saverJSON));
             resolve(x);
@@ -119,7 +119,7 @@ describe("Editor", function() {
       then(() => app.client.click(".entry[data-index='1'] button.remove-option")).
       then(() => app.client.click("button.save")).
       then(() => {
-        var p = new Promise( (resolve, reject) => {
+        var p = new Promise( (resolve) => {
           setTimeout(() => {
             var x = JSON.parse(fs.readFileSync(saverJSON));
             resolve(x);

@@ -61,15 +61,15 @@ describe("SaverListManager", function() {
         assert(results.setup);
 
         done();
-      })
+      });
     });
   });
 
   describe("reload", () => {
     it("works", (done) => {
-      savers.reload(true).then((results) => {
+      savers.reload(true).then(() => {
         done();
-      })
+      });
     });
   });
   
@@ -127,7 +127,7 @@ describe("SaverListManager", function() {
         assert.equal(3, data.length);
         done();
       });
-    })
+    });
 
     it("uses cache", (done) => {
       let cache = [0, 1, 2, 3, 4, 5];
@@ -135,7 +135,7 @@ describe("SaverListManager", function() {
       savers.list((data) => {
         assert.deepEqual(cache, data);
         done();
-      })
+      });
     });
 
     it("forces reset", (done) => {
@@ -145,13 +145,13 @@ describe("SaverListManager", function() {
         assert.notDeepEqual(cache, data);
         assert.equal(3, data.length);
         done();
-      }, true)
+      }, true);
     });
   });
 
   describe("reset", function() {
     it("resets cache", function(done) {
-      savers.list(function(data) {
+      savers.list(function() {
         assert.equal(3, savers.loadedScreensavers.length);
         savers.reset();
         assert.equal(0, savers.loadedScreensavers.length);
@@ -166,7 +166,7 @@ describe("SaverListManager", function() {
       savers.list(function(data) {
         assert.equal(3, data.length);
         let foo = savers.random();
-        assert(foo.key !== undefined)
+        assert(foo.key !== undefined);
         done();
       });
     });
@@ -211,7 +211,7 @@ describe("SaverListManager", function() {
         () => {
           savers.create({
             name:"New Screensaver"
-          })
+          });
         },
         Error);
       done();

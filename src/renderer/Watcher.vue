@@ -170,7 +170,7 @@ export default {
       options: [],
       optionValues: {},
       disabled: false
-    }
+    };
   },
   computed: {
     bus: function() {
@@ -178,9 +178,6 @@ export default {
     },
     currentWindow: function() {
       return this.$electron.remote.getCurrentWindow();
-    },
-    manager: function() {
-      return savers;
     },
     ipcRenderer: function() {
       return this.$electron.ipcRenderer;
@@ -223,10 +220,10 @@ export default {
       document.querySelector("#" + n).classList.add("active");
       document.querySelector("[href='#" + n + "']").classList.add("active");
     },
-    showPreview(e) {
+    showPreview() {
       this.setActiveTab("preview");
     },
-    showSettings(e) {
+    showSettings() {
       this.setActiveTab("settings");
     },
     onOptionsChange(e) {
@@ -258,7 +255,7 @@ export default {
       let index = this.options.indexOf(opt);
       this.options.splice(index, 1);
     },
-    addSaverOption(e) {
+    addSaverOption() {
       this.options.push({
         "index": this.lastIndex + 1,
         "name": "", //New Option,
@@ -325,15 +322,9 @@ export default {
         // # most suitable application instead, which is not what we want.
         cmd = "xdg-open";
         args = [ filePath ];
-      };
+      }
       
-      exec(cmd, args, function(error, stdout, stderr) {
-        console.log("stdout: " + stdout);
-        console.log("stderr: " + stderr);
-        if (error !== null) {
-          console.log("exec error: " + error);
-        }
-      });
+      exec(cmd, args, function() {});
     },
     reloadPreview() {
       this.bus.$emit("options-changed", this.optionValues);
@@ -342,5 +333,5 @@ export default {
       this.currentWindow.toggleDevTools();
     },   
   }
-} 
+}; 
 </script>

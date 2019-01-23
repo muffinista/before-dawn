@@ -4,7 +4,7 @@ const assert = require("assert");
 const fs = require("fs-extra");
 const path = require("path");
 
-const helpers = require("../helpers.js")
+const helpers = require("../helpers.js");
 
 var saversDir;
 var workingDir;
@@ -40,15 +40,15 @@ describe("Add New", function() {
         then((res) => { windowCount = res; }).
         then(() => app.electron.ipcRenderer.send("open-add-screensaver", screensaverUrl)).
         then(() => {
-          app.client.getWindowCount().should.eventually.equal(windowCount+1)
+          app.client.getWindowCount().should.eventually.equal(windowCount+1);
         });
-	  });
+    });
 
     it("shows alert if not setup", function() {
       return helpers.getWindowByTitle(app, windowTitle).
         then(() => app.client.waitUntil(() => {
             return app.client.getText("body").then((res) => {
-              return res.indexOf("set a local directory") !== -1
+              return res.indexOf("set a local directory") !== -1;
             });
           })).
         then(() => app.client.getText("body")).
@@ -59,7 +59,7 @@ describe("Add New", function() {
   });
 
   describe("when setup", function() {
-	  beforeEach(() => {
+    beforeEach(() => {
       return app.start().
         then(() => {
           helpers.addLocalSource(workingDir, saversDir);
@@ -71,7 +71,7 @@ describe("Add New", function() {
         then((res) => { windowCount = res; }).
         then(() => app.electron.ipcRenderer.send("open-add-screensaver", screensaverUrl)).
         then(() => {
-          app.client.getWindowCount().should.eventually.equal(windowCount+1)
+          app.client.getWindowCount().should.eventually.equal(windowCount+1);
         });
       });     
 
@@ -80,7 +80,7 @@ describe("Add New", function() {
       return helpers.getWindowByTitle(app, windowTitle).
         then(() => app.client.waitUntil(() => {
           return app.client.getText("body").then((res) => {
-            return res.indexOf("Use this form") !== -1
+            return res.indexOf("Use this form") !== -1;
           });
         })).
         then(() => app.client.setValue("[name='name']", "A New Name")).
