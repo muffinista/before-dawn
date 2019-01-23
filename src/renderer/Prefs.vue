@@ -131,7 +131,6 @@ export default {
           this.getData();
           this.getCurrentSaver();
         }
-        this.showScreensavers();
       }).catch((err) => {
         this.logger(err);
       });
