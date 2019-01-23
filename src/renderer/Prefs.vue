@@ -110,7 +110,7 @@ export default {
   components: {
     SaverList, SaverOptions, SaverPreview, SaverSummary, AdvancedPrefsForm, PrefsForm
   },
-  async mounted() {
+  mounted() {
     let dataPath = this.$electron.remote.getCurrentWindow().saverOpts.base;
 
     this.ipcRenderer.on("savers-updated", this.onSaversUpdated);
