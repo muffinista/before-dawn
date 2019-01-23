@@ -65,21 +65,22 @@ describe("PackageDownloader", function() {
     });
 
     it("gets package if stale", (done) => {
-      var oldCheckTime = prefs.updateCheckTimestamp;
-      sandbox.stub(fakePackage, "downloadFile").resolves();
-      sandbox.stub(fakePackage, "zipToSavers").resolves({});
+      var oldCheckTime = new Date(2010, 1, 1);
+      prefs.updateCheckTimestamp = oldCheckTime;
+  
+      sandbox.stub(fakePackage, "checkLatestRelease").resolves({downloaded:true});
 
       pd.updatePackage(fakePackage).then((result) => {
         assert(result.downloaded);
         assert(prefs.updateCheckTimestamp > oldCheckTime);
         done();
-      }).catch((err) => {
-        console.log("BOOO", err);
-      });
+      })
     });
 
     it("skips download if fresh", (done) => {
       var now = new Date().getTime();
+      sandbox.stub(fakePackage, "checkLatestRelease").resolves();
+
       prefs.updateCheckTimestamp = now;
       pd.updatePackage(fakePackage).then((result) => {
         assert(!result.downloaded);
@@ -88,7 +89,10 @@ describe("PackageDownloader", function() {
     });
 
     it("handles package failure", (done) => {
-      var df = sandbox.stub(fakePackage, "downloadFile").rejects();
+      var oldCheckTime = new Date(2010, 1, 1);
+      prefs.updateCheckTimestamp = oldCheckTime;
+
+      sandbox.stub(fakePackage, "downloadFile").rejects();
       pd.updatePackage(fakePackage).catch((err) => {
         done();
       });
