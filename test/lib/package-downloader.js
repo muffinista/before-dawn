@@ -93,9 +93,11 @@ describe("PackageDownloader", function() {
       prefs.updateCheckTimestamp = oldCheckTime;
 
       sandbox.stub(fakePackage, "downloadFile").rejects();
-      pd.updatePackage(fakePackage).catch(() => {
-        done();
-      });
+      pd.updatePackage(fakePackage).
+        then((res) => {
+          console.log("oops i got here!!!", res);
+        }).
+        catch(() => { done(); });
     });
   });
 });

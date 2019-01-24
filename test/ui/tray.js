@@ -43,7 +43,7 @@ describe("tray", function() {
       return helpers.getWindowByTitle(app, "test shim").
         then(() => app.client.click("button.RunNow")).
         // short delay because we don't launch right away
-        then(() => helpers.sleep(200)).
+        then(() => helpers.sleep(1000)).
         then(() => helpers.getWindowByTitle(app, "screensaver")).
         then(() => app.client.getTitle()).
         then((res) => {
