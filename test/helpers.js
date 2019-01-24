@@ -13,7 +13,7 @@ const assert = require("assert");
 let windowCheckDelay = 250;
 
 if (process.env.CI) {
-  windowCheckDelay = 1000;
+  windowCheckDelay = 1500;
 }
 
 global.before(() => {
