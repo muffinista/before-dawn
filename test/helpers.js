@@ -10,7 +10,11 @@ const chaiAsPromised = require("chai-as-promised");
 const appPath = require("electron");
 const assert = require("assert");
 
-const windowCheckDelay = 250;
+let windowCheckDelay = 250;
+
+if (process.env.CI) {
+  windowCheckDelay = 1000;
+}
 
 global.before(() => {
   chai.should();

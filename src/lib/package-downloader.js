@@ -65,6 +65,7 @@ module.exports = class PackageDownloader {
       return p.checkLatestRelease().then((result) => {
         this.prefs.sourceUpdatedAt = result.updated_at;
         this.prefs.writeSync();
+        return result;
       });
     }
   }
