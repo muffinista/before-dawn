@@ -27,7 +27,7 @@ describe("tray", function() {
 
     app = helpers.application(workingDir);  
     return app.start().
-      then(() => helpers.waitUntilBooted(app));
+      then(() => helpers.waitUntilBooted(app, true));
   });
 
   afterEach(function() {
@@ -36,7 +36,7 @@ describe("tray", function() {
 
   describe("run now", function() {
     it("opens screensaver", function() {
-      return helpers.getWindowByTitle(app, "test shim").
+      return helpers.waitForWindow(app, "test shim").
         then(() => app.client.click("button.RunNow")).
         then(() => helpers.waitForWindow(app, "screensaver"));
     });
@@ -44,26 +44,17 @@ describe("tray", function() {
 
   describe("preferences", function() {
     it("opens prefs window", function() {
-      return helpers.getWindowByTitle(app, "test shim").
+      return helpers.waitForWindow(app, "test shim").
         then(() => app.client.click("button.Preferences")).
-        then(() => helpers.getWindowByTitle(app, "Before Dawn: Preferences")).
-        then(() => app.client.getTitle()).
-        then((res) => {
-          assert.equal("Before Dawn: Preferences", res);
-        }); 
+        then(() => helpers.waitForWindow(app, "Before Dawn: Preferences") ); 
     });
   });
 
   describe("about", function() {
     it("opens about window", function() {
-      return helpers.getWindowByTitle(app, "test shim").
+      return helpers.waitForWindow(app, "test shim").
         then(() => app.client.click("button.AboutBeforeDawn")).
-        then(() => helpers.getWindowByTitle(app, "Before Dawn: About!")).
-        then(() => app.client.getTitle()).
-        then((res) => {
-          assert.equal("Before Dawn: About!", res);
-        }); 
-
+        then(() => helpers.waitForWindow(app, "Before Dawn: About!") );
     });    
   });
 });

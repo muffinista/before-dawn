@@ -10,47 +10,35 @@ let app;
 
 
 describe("Editor", function() {
+  const windowTitle = "Before Dawn: Editor";
+
   var saverJSON;
   helpers.setupTimeout(this);
 
   let pickEditorWindow = () => {
-    return helpers.getWindowByTitle(app, "Before Dawn: Editor");
+    return helpers.waitForWindow(app, windowTitle);
   };
  
 	beforeEach(() => {
-    let windowCount = 0;
-
     workingDir = helpers.getTempDir();
-    app = helpers.application(workingDir);
+    app = helpers.application(workingDir, true);
     
     var saversDir = helpers.getTempDir();
 
     saverJSON = helpers.addSaver(saversDir, "saver-one", "saver.json");
 
 		return app.start().
-      then(() => app.client.waitUntilWindowLoaded() ).
-      then(() => app.client.getWindowCount() ).
-      then((res) => { windowCount = res; }). 
+      then(() => helpers.waitUntilBooted(app) ).
       then(() => app.client.electron.ipcRenderer.send("open-editor", {
         screenshot: "file://" + path.join(__dirname, "../fixtures/screenshot.png"),
         src: saverJSON
       })).
-      then(() => {
-        app.client.getWindowCount().should.eventually.equal(windowCount+1);
-      }); 
-	});
+      then(() => helpers.waitForWindow(app, windowTitle) );
+    });
 
 	afterEach(() => {
     return helpers.stopApp(app);
 	});
-
-  it("opens window", function() {
-    return pickEditorWindow().
-      then(() => app.client.getTitle()).
-      then((res) => {
-        assert.equal("Before Dawn: Editor", res);
-      });
-  });
   
   it("shows settings form", function() {
     return pickEditorWindow().

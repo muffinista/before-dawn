@@ -12,7 +12,6 @@ let app;
 
 describe("Add New", function() {
   let windowTitle = "Before Dawn: Create Screensaver!";
-  let windowCount = 0;
   let screensaverUrl = "file://" + path.join(__dirname, "../fixtures/screenshot.png");
 
   helpers.setupTimeout(this);
@@ -21,7 +20,7 @@ describe("Add New", function() {
     saversDir = helpers.getTempDir();
     workingDir = helpers.getTempDir();
 
-    app = helpers.application(workingDir);
+    app = helpers.application(workingDir, true);
   });
 
   afterEach(() => {
@@ -36,12 +35,8 @@ describe("Add New", function() {
           helpers.removeLocalSource(workingDir);
         }).
         then(() => app.client.waitUntilWindowLoaded() ).
-        then(() => app.client.getWindowCount() ).
-        then((res) => { windowCount = res; }).
         then(() => app.electron.ipcRenderer.send("open-add-screensaver", screensaverUrl)).
-        then(() => {
-          app.client.getWindowCount().should.eventually.equal(windowCount+1);
-        });
+        then(() => helpers.waitForWindow(app, windowTitle) );
     });
 
     it("shows alert if not setup", function() {
@@ -67,12 +62,8 @@ describe("Add New", function() {
           app.client.electron.ipcRenderer.send("prefs-updated");
         }).
         then(() => app.client.waitUntilWindowLoaded() ).
-        then(() => app.client.getWindowCount() ).
-        then((res) => { windowCount = res; }).
         then(() => app.electron.ipcRenderer.send("open-add-screensaver", screensaverUrl)).
-        then(() => {
-          app.client.getWindowCount().should.eventually.equal(windowCount+1);
-        });
+        then(() => helpers.waitForWindow(app, windowTitle) );
       });     
 
     it("creates screensaver and shows editor", function() {
@@ -86,8 +77,7 @@ describe("Add New", function() {
         then(() => app.client.setValue("[name='name']", "A New Name")).
         then(() => app.client.setValue("[name='description']", "A Thing I Made?")).
         then(() => app.client.click(".save")).
-        then(() => helpers.getWindowByTitle(app, "Before Dawn: Editor")).
-        then(() => app.client.getTitle().should.eventually.equal("Before Dawn: Editor")).
+        then(() => helpers.waitForWindow(app, "Before Dawn: Editor") ).
         then(() => {
           assert(fs.existsSync(src));
         }).

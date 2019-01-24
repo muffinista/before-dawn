@@ -34,17 +34,12 @@ describe("bootstrap", function() {
       return bootApp();
     });
     
-    it("creates config file", function(done) {
+    it("creates config file", function() {
       assert(fs.existsSync(configDest));
-      done();
     });  
 
     it("shows prefs", function() {
-      return helpers.getWindowByTitle(app, "Before Dawn: Preferences").
-        then(() => app.client.getTitle()).
-        then((res) => {
-          assert.equal("Before Dawn: Preferences", res);
-        });
+      return helpers.waitForWindow(app, "Before Dawn: Preferences");
     });
   });
 
@@ -64,7 +59,7 @@ describe("bootstrap", function() {
       });
 
       it("does not show prefs", function() {
-        return helpers.getWindowByTitle(app, "Before Dawn: Preferences").
+        return helpers.waitForWindow(app, "Before Dawn: Preferences", true).
           then((res) => {
             assert.equal(-1, res);
           });
@@ -80,11 +75,7 @@ describe("bootstrap", function() {
       });
 
       it("shows prefs", function() {
-        return helpers.getWindowByTitle(app, "Before Dawn: Preferences").
-          then(() => app.client.getTitle()).
-          then((res) => {
-            assert.equal("Before Dawn: Preferences", res);
-          });
+        return helpers.waitForWindow(app, "Before Dawn: Preferences");
       });
     });
   });
@@ -104,11 +95,7 @@ describe("bootstrap", function() {
     });  
 
     it("shows prefs", function() {
-      return helpers.getWindowByTitle(app, "Before Dawn: Preferences").
-        then(() => app.client.getTitle()).
-        then((res) => {
-          assert.equal("Before Dawn: Preferences", res);
-        });
+      return helpers.waitForWindow(app, "Before Dawn: Preferences");
     });
   });
 

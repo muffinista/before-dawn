@@ -10,6 +10,8 @@ const chaiAsPromised = require("chai-as-promised");
 const appPath = require("electron");
 const assert = require("assert");
 
+const windowCheckDelay = 250;
+
 global.before(() => {
   chai.should();
   chai.use(chaiAsPromised);
@@ -29,8 +31,6 @@ exports.setConfigValue = (workingDir, name, value) => {
 
   fs.writeFileSync(f, JSON.stringify(currentVals));
 };
-
-
 
 exports.getTempDir = function() {
   return tmp.dirSync().name;
@@ -86,13 +86,14 @@ exports.savedConfig = function(p) {
   return JSON.parse(json);
 };
 
-exports.application = function(workingDir) {
+exports.application = function(workingDir, quietMode=false) {
   var a = new Application({
     path: appPath,
     args: [path.join(__dirname, "..", "output/main.js")],
     env: {
       BEFORE_DAWN_DIR: workingDir,
-      TEST_MODE: true
+      TEST_MODE: true,
+      QUIET_MODE: quietMode
     }
   });
 
@@ -113,9 +114,19 @@ exports.stopApp = function(app) {
 
 
 exports.setupConfig = function(workingDir) {
-  var src = path.join(__dirname, "fixtures/config.json");
+  var src = path.join(__dirname, "fixtures", "config.json");
   var dest = path.join(workingDir, "config.json");
   fs.copySync(src, dest);
+};
+
+exports.setupFullConfig = function(workingDir) {
+  exports.setupConfig(workingDir);
+
+  exports.setConfigValue(workingDir, "sourceRepo", "foo/bar");
+  exports.setConfigValue(workingDir, "sourceUpdatedAt", new Date(0));
+  let saversDir = path.join(workingDir, "savers");
+  let saverJSONFile = exports.addSaver(saversDir, "saver");
+  exports.setConfigValue(workingDir, "saver", saverJSONFile);
 };
 
 exports.addLocalSource = function(workingDir, saversDir) {
@@ -136,16 +147,20 @@ exports.getWindowByTitle = async (app, title) => {
   let result = -1;
   return await app.client.getWindowCount().then(async (count) => {
     for ( var i = 0; i < count; i++ ) {
-      await app.client.windowByIndex(i).getTitle().then((res) => {
-        //console.log(i, res, title, res === title);
-        if ( res === title ) {
-          result = i;
-          return i;
-        }
-      });  
+      if ( result === -1 ) {
+        await app.client.windowByIndex(i).getTitle().then((res) => {
+          //console.log(i, res, title, res === title);
+          if ( res === title ) {
+            result = i;
+            return i;
+          }
+        });    
+      }
     }
+
     return result;
   });
+
 };
 
 exports.sleep = function sleep(ms) {
@@ -153,21 +168,48 @@ exports.sleep = function sleep(ms) {
 };
 
 
-exports.waitForWindow = async (app, title) => {
+exports.waitForWindow = async (app, title, skipAssert) => {
   let maxAttempts = 20;
   let result = -1;
   for ( var i = 0; i < maxAttempts; i++ ) {
     result = await exports.getWindowByTitle(app, title);
-    //console.log("****", result);
+    //console.log("****", i, result);
     if ( result !== -1 ) {
       break;
     }
     else {
-      await exports.sleep(50);
+      await exports.sleep(windowCheckDelay);
     }
   }
-//  console.log("here!", title, result);
-  return assert.notEqual(-1, result);
+
+  if ( skipAssert !== true ) {
+    assert.notEqual(-1, result, `window ${title} not opened`);
+  }
+
+  return result;
+};
+
+
+exports.waitForWindowToClose = async (app, title) => {
+  let maxAttempts = 20;
+  let result = 0;
+  for ( var i = 0; i < maxAttempts; i++ ) {
+    try {
+      result = await exports.getWindowByTitle(app, title);
+      if ( result === -1 ) {
+        break;
+      }
+      else {
+        await exports.sleep(windowCheckDelay);
+      }
+    }
+    catch(e) {
+      //    'no such window: target window already closed\nfrom unknown error: web view not found',
+      result = -1;
+      break;
+    }
+  }
+  return assert.equal(-1, result);
 };
 
 exports.waitUntilBooted = async(app) => {
