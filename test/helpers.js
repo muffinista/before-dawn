@@ -81,6 +81,7 @@ exports.getTempDir = function() {
 exports.savedConfig = function(p) {
   var data = path.join(p, "config.json");
   var json = fs.readFileSync(data);
+  console.log("savedConfig", json.toString());
   return JSON.parse(json);
 };
 
