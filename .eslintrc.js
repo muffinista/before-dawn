@@ -1,7 +1,11 @@
 module.exports = {
   root: true,
-  parser: 'babel-eslint',
   parserOptions: {
+    parser: 'babel-eslint',
+    ecmaVersion: 2017,
+    ecmaFeatures: {
+      "spread": true
+    },
     sourceType: 'module'
   },
   env: {
@@ -10,13 +14,16 @@ module.exports = {
     mocha: true,
     es6: true
   },
-  "extends": "eslint:recommended",
-//  extends: 'airbnb-base',
+  "extends": [
+    // "eslint:recommended",
+    // "plugin:vue/essential"
+    'plugin:vue/recommended'
+  ],
   globals: {
     __static: true
   },
   plugins: [
-    'html'
+    'vue'
   ],
   'rules': {
     'global-require': 0,
@@ -27,6 +34,11 @@ module.exports = {
     'import/newline-after-import': 0,
     'no-multi-assign': 0,
     'semi': 1,
+    "strict": 0,
+    "eqeqeq": "off",
+    "curly": "warn",
+    "quotes": ["warn", "double"],
+
     // allow debugger during development
     'no-debugger': process.env.NODE_ENV === 'production' ? 2 : 0
   }
