@@ -8,6 +8,7 @@ const chai = require("chai");
 const chaiAsPromised = require("chai-as-promised");
 
 const appPath = require("electron");
+const assert = require("assert");
 
 global.before(() => {
   chai.should();
@@ -39,7 +40,7 @@ exports.addSaver = function(dest, name, source) {
   // make a subdir in the savers directory and drop screensaver
   // config there
   if ( source === undefined ) {
-    source = "saver.json"
+    source = "saver.json";
   }
   var src = path.join(__dirname, "fixtures", source);
   var htmlSrc = path.join(__dirname, "fixtures", "index.html");
@@ -60,7 +61,7 @@ exports.addSaver = function(dest, name, source) {
 };
 
 exports.prefsToJSON = (tmpdir) => {
-  let testFile = path.join(tmpdir, "config.json")
+  let testFile = path.join(tmpdir, "config.json");
   let data = {};
 
   try {
@@ -71,7 +72,7 @@ exports.prefsToJSON = (tmpdir) => {
   }
 
   return data;
-}
+};
 
 exports.getTempDir = function() {
   var tmpObj = tmp.dirSync();
@@ -81,7 +82,7 @@ exports.getTempDir = function() {
 exports.savedConfig = function(p) {
   var data = path.join(p, "config.json");
   var json = fs.readFileSync(data);
-  console.log("savedConfig", json.toString());
+//  console.log("savedConfig", json.toString());
   return JSON.parse(json);
 };
 
@@ -133,38 +134,40 @@ exports.removeLocalSource = function(workingDir) {
 
 exports.getWindowByTitle = async (app, title) => {
   let result = -1;
-  await app.client.getWindowCount().then(async (count) => {
+  return await app.client.getWindowCount().then(async (count) => {
     for ( var i = 0; i < count; i++ ) {
-      if ( result === -1 ) {
-        await app.client.windowByIndex(i).getTitle().then((res) => {
-          // console.log(res, title, res === title);
-          if ( res === title ) {
-            result = i;
-          }
-        });  
-      }
+      await app.client.windowByIndex(i).getTitle().then((res) => {
+        //console.log(i, res, title, res === title);
+        if ( res === title ) {
+          result = i;
+          return i;
+        }
+      });  
     }
+    return result;
   });
-
-  return result;
 };
 
 exports.sleep = function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
-}
+};
+
 
 exports.waitForWindow = async (app, title) => {
   let maxAttempts = 20;
   let result = -1;
   for ( var i = 0; i < maxAttempts; i++ ) {
     result = await exports.getWindowByTitle(app, title);
-    if ( result != -1 ) {
+    //console.log("****", result);
+    if ( result !== -1 ) {
       break;
     }
     else {
-      await exports.sleep(1000);
+      await exports.sleep(50);
     }
   }
+//  console.log("here!", title, result);
+  return assert.notEqual(-1, result);
 };
 
 exports.waitUntilBooted = async(app) => {
@@ -177,13 +180,13 @@ exports.outputLogs = function(app) {
   then(function (logs) {
     logs.forEach(function (log) {
       console.log(log);
-    })
+    });
   }).
   then(() => app.client.getRenderProcessLogs()).
   then(function (logs) {
     logs.forEach(function (log) {
-      console.log(log.message)
-    })
+      console.log(log.message);
+    });
   });
 };
 

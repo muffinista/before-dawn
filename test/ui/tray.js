@@ -7,10 +7,15 @@ const path = require("path");
 describe("tray", function() {
   var workingDir;
   let app;
+  let windowWaitDelay = 1000;
+
+  if ( process.env.CI ) {
+    windowWaitDelay = 5000;
+  }
   
   helpers.setupTimeout(this);
 
-  beforeEach(() => {
+  beforeEach(function() {
     workingDir = helpers.getTempDir();
     let saversDir = path.join(workingDir, "savers");
     let saverJSONFile = helpers.addSaver(saversDir, "saver");
@@ -25,35 +30,20 @@ describe("tray", function() {
       then(() => helpers.waitUntilBooted(app));
   });
 
-  afterEach(() => {
+  afterEach(function() {
     return helpers.stopApp(app);
   });
 
-  // describe("disable/enable", () => {
-  //   it("can disable", () => {
-  //     helpers.getWindowByTitle(app, "Before Dawn: About!");
-  //   })
-  //   it("can enable", () => {
-  //     helpers.getWindowByTitle(app, "Before Dawn: About!");
-  //   })
-  // });
-
-  describe("run now", () => {
-    it("opens screensaver", () => {
+  describe("run now", function() {
+    it("opens screensaver", function() {
       return helpers.getWindowByTitle(app, "test shim").
         then(() => app.client.click("button.RunNow")).
-        // short delay because we don't launch right away
-        then(() => helpers.sleep(1000)).
-        then(() => helpers.getWindowByTitle(app, "screensaver")).
-        then(() => app.client.getTitle()).
-        then((res) => {
-          assert.equal("screensaver", res);
-        }); 
+        then(() => helpers.waitForWindow(app, "screensaver"));
     });
   });
 
-  describe("preferences", () => {
-    it("opens prefs window", () => {
+  describe("preferences", function() {
+    it("opens prefs window", function() {
       return helpers.getWindowByTitle(app, "test shim").
         then(() => app.client.click("button.Preferences")).
         then(() => helpers.getWindowByTitle(app, "Before Dawn: Preferences")).
@@ -64,8 +54,8 @@ describe("tray", function() {
     });
   });
 
-  describe("about", () => {
-    it("opens about window", () => {
+  describe("about", function() {
+    it("opens about window", function() {
       return helpers.getWindowByTitle(app, "test shim").
         then(() => app.client.click("button.AboutBeforeDawn")).
         then(() => helpers.getWindowByTitle(app, "Before Dawn: About!")).
