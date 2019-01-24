@@ -115,6 +115,12 @@ let mainConfig = {
         ignore: [".*"]
       }
     ]),
+    new CopyWebpackPlugin([
+      {
+        from: path.join(__dirname, "src", "shim.html"),
+        to: path.join(outputDir)
+      }
+    ]),
     new webpack.NoEmitOnErrorsPlugin()
   ],
   resolve: {

@@ -151,10 +151,12 @@ var openTestShim = function() {
     }
   });
 
-  var shimUrl = "file://" + __dirname + "/assets/shim.html";
+  var shimUrl = "file://" + __dirname + "/shim.html";
 
   // just open an empty window
   testWindow.loadURL(shimUrl);
+  testWindow.webContents.openDevTools();
+
 };
 
 /**
@@ -369,9 +371,16 @@ var getWindowOpts = function(s) {
 
   // osx will display window immediately if fullscreen is true
   // so we default it to false there
-  if (process.platform !== "darwin") {
+  if (process.platform !== "darwin" ) {
     opts.fullscreen = true;
   }
+
+  if ( testMode === true ) {
+    opts.fullscreen = false;
+    opts.width = 100;
+    opts.height = 100;
+  }
+
 
   return opts;
 
@@ -443,7 +452,7 @@ var runScreenSaverOnDisplay = function(saver, s) {
       
       w.once("ready-to-show", () => {
         log.info("ready-to-show", s.id);
-        if ( debugMode !== true ) {
+        if ( debugMode !== true && testMode !== true ) {
           w.setFullScreen(true);
         }
 
@@ -551,6 +560,7 @@ var runScreenSaver = function() {
     prefs: prefs
   });
 
+
   var settings;
   var saverKey = prefs.current;
   let setupPromise;
@@ -597,7 +607,7 @@ var runScreenSaver = function() {
         } // for
 
         // if we're only running on primary display, blank out the other ones
-        if ( debugMode !== true && prefs.runOnSingleDisplay === true ) {
+        if ( debugMode !== true && testMode !== true && prefs.runOnSingleDisplay === true ) {
           var otherDisplays = getNonPrimaryDisplays();
           for ( i in otherDisplays ) {
             blankScreen(otherDisplays[i]);
@@ -1141,6 +1151,11 @@ process.on("uncaughtException", function (ex) {
 // initialization and is ready to create browser windows.
 app.once("ready", bootApp);
 
+if ( testMode === true ) {
+  exports.getTrayMenuItems = function() {
+    return menusAndTrays.trayMenuTemplate();
+  };  
+}
 
 exports.log = log;
 exports.setStateToRunning = setStateToRunning;

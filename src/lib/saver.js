@@ -81,9 +81,9 @@ module.exports = function Saver(_attrs) {
   if ( this.valid === true ) {
     // figure out the settings from any defaults for this screensaver,
     // and combine with incoming user-specified settings
-    this.settings = _attrs.options.map(function(o, i) {
+    this.settings = _attrs.options.map(function(o) {
       return [o.name, o.default];
-    }).reduce(function(o, v, i) {
+    }).reduce(function(o, v) {
       o[v[0]] = v[1];
       return o; 
     }, {});

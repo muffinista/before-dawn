@@ -136,7 +136,7 @@ exports.getWindowByTitle = async (app, title) => {
     for ( var i = 0; i < count; i++ ) {
       if ( result === -1 ) {
         await app.client.windowByIndex(i).getTitle().then((res) => {
-          //console.log(res, title, res === title);
+          // console.log(res, title, res === title);
           if ( res === title ) {
             result = i;
           }
@@ -148,9 +148,10 @@ exports.getWindowByTitle = async (app, title) => {
   return result;
 };
 
-function sleep(ms) {
+exports.sleep = function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
+
 exports.waitForWindow = async (app, title) => {
   let maxAttempts = 20;
   let result = -1;
@@ -160,7 +161,7 @@ exports.waitForWindow = async (app, title) => {
       break;
     }
     else {
-      await sleep(1000);
+      await exports.sleep(1000);
     }
   }
 };
