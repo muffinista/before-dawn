@@ -1066,7 +1066,7 @@ ipcMain.on("prefs-updated", (event, arg) => {
   updateStateManager();
 });
 
-ipcMain.on("close-window", (event, arg) => {
+ipcMain.on("close-window", (event) => {
   log.info("close-window");
   event.sender.getOwnerBrowserWindow().close();
 });
