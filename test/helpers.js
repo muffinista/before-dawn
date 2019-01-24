@@ -86,15 +86,21 @@ exports.savedConfig = function(p) {
   return JSON.parse(json);
 };
 
-exports.application = function(workingDir, quietMode=false) {
+exports.application = function(workingDir, quietMode=false, localZip) {
+  let env = {
+    BEFORE_DAWN_DIR: workingDir,
+    TEST_MODE: true,
+    QUIET_MODE: quietMode
+  };
+
+  if ( localZip !== undefined ) {
+    env.LOCAL_PACKAGE = localZip;
+  }
+ 
   var a = new Application({
     path: appPath,
     args: [path.join(__dirname, "..", "output/main.js")],
-    env: {
-      BEFORE_DAWN_DIR: workingDir,
-      TEST_MODE: true,
-      QUIET_MODE: quietMode
-    }
+    env: env
   });
 
   fakeDialog.apply(a);

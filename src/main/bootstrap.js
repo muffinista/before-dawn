@@ -25,6 +25,11 @@ global.ISSUES_URL = "https://github.com/muffinista/before-dawn/issues";
 
 global.RELEASE_SERVER = "https://before-dawn.now.sh";
 
+if ( process.env.LOCAL_PACKAGE ) {
+  global.LOCAL_PACKAGE = process.env.LOCAL_PACKAGE;
+}
+
+
 // note -- this is hardcoded to win32 for now because we actually
 // don't care what platform is running
 global.RELEASE_CHECK_URL = `${global.RELEASE_SERVER}/update/win32/${global.APP_VERSION_BASE}`;

@@ -17,14 +17,24 @@ module.exports = class PackageDownloader {
     }
   }
 
+  setLocalFile(f) {
+    this.localZip = f;
+  }
+
   getPackage() {
     var source = this.prefs.sourceRepo;
     var sourceUpdatedAt = this.prefs.sourceUpdatedAt;
-    return new Package({
+    var attrs = {
       repo:source,
       updated_at:sourceUpdatedAt,
       dest:this.prefs.defaultSaversDir
-    });
+    };
+
+    if ( this.localZip ) {
+      attrs.local_zip = this.localZip;
+    }
+
+    return new Package(attrs);
   }
 
   updatePackage(p) {

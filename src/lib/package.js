@@ -17,30 +17,37 @@ const lockfile = require("proper-lockfile");
  * if it's after stored value, download it!
  */
 
-module.exports = function Package(_attrs) {
-  var self = this;
+module.exports = class Package {
+  constructor(_attrs) {
+    this.repo = _attrs.repo;
+    this.dest = _attrs.dest;
+    this.updated_at = _attrs.updated_at;
+    this.downloaded = false;
+    this.url = "https://api.github.com/repos/" + this.repo + "/releases/latest";
 
-  this.repo = _attrs.repo;
-  this.dest = _attrs.dest;
-  this.updated_at = _attrs.updated_at;
-  this.downloaded = false;
-  this.url = "https://api.github.com/repos/" + self.repo + "/releases/latest";
+    this.useLocalFile = false;
 
-  if ( typeof(this.updated_at) === "undefined" ) {
-    this.updated_at = new Date(0);
-  }
+    if ( _attrs.local_zip ) {
+      this.localZip = _attrs.local_zip;
+      this.useLocalFile = true;
+    }
 
-  if ( typeof(_attrs.log) === "undefined" ) {
-    _attrs.log = function() {};
-  }
-
-  this.logger = _attrs.log;
+    if ( typeof(this.updated_at) === "undefined" ) {
+      this.updated_at = new Date(0);
+    }
   
-  this.defaultHeaders = {
-    "User-Agent": "Before Dawn"
-  };
+    if ( typeof(_attrs.log) === "undefined" ) {
+      _attrs.log = function() {};
+    }
   
-  this.attrs = function() {
+    this.logger = _attrs.log;
+    
+    this.defaultHeaders = {
+      "User-Agent": "Before Dawn"
+    };  
+  }
+  
+  attrs() {
     return {
       dest: this.dest,
       updated_at: this.updated_at,
@@ -48,71 +55,68 @@ module.exports = function Package(_attrs) {
     };
   };
 
-  this.getReleaseInfo = async function() {
+  async getReleaseInfo() {
     let self = this;
-    this.data = await request.get({
-      url: this.url,
-      json: true,
-      headers: this.defaultHeaders
-    }).catch(function(err) {
 
-      self.logger(err);
-
-      if ( typeof(self.data) !== "undefined" ) {
-        return self.data;
-      }
-      else {
-        return {};
-      }
-    });
+    if ( this.useLocalFile ) {
+      var stats = fs.statSync(this.localZip);
+      this.data = {
+        created_at: stats.mtime,
+        published_at: stats.mtime,
+        zipball_url: this.localZip
+      };
+    }
+    else {
+      this.data = await request.get({
+        url: this.url,
+        json: true,
+        headers: this.defaultHeaders
+      }).catch(function(err) {
+  
+        self.logger(err);
+  
+        if ( typeof(self.data) !== "undefined" ) {
+          return self.data;
+        }
+        else {
+          return {};
+        }
+      });  
+    }
 
     return this.data;
   };
 
-  this.checkLatestRelease = async function(force) {
+  async checkLatestRelease(force) {
     let data = await this.getReleaseInfo();
 
     if ( data && (
       force === true ||
-      data.published_at && new Date(data.published_at) > new Date(self.updated_at) )
+      data.published_at && new Date(data.published_at) > new Date(this.updated_at) )
     ) {
-      self.logger("download package updates!");
-      let dest = await this.downloadFile(data.zipball_url);
-      await self.zipToSavers(dest);
-
-      self.downloaded = true;
-      self.updated_at = data.published_at;
-
-      return self.attrs();  
-    }
-    else {
-      self.logger("no package update available");
-      return self.attrs();
-    }
-  };
-
-  this.checkLocalRelease = async function(dataSrc, zipSrc) {
-    let rf = util.promisify(fs.readFile);
-    let data = await rf(dataSrc);
-    data = JSON.parse(data);
-
-    return new Promise((resolve, reject) => {
-      if ( new Date(data.published_at) > (self.updated_at) ) {
-        self.updated_at = data.published_at;
-        this.zipToSavers(zipSrc).then(() => {
-          resolve(self.attrs());
-        }).catch((err) => {
-          self.logger("checkLocalRelease error: " + err);
-          reject(err);
-        });
+      this.logger("download package updates!");
+      let dest;
+      if ( this.useLocalFile ) {
+        dest = this.localZip;
       }
       else {
-        resolve(self.attrs());
+        dest = await this.downloadFile(data.zipball_url);
       }
-    });
+
+      await this.zipToSavers(dest);
+
+      this.downloaded = true;
+      this.updated_at = data.published_at;
+
+      return this.attrs();  
+    }
+    else {
+      this.logger("no package update available");
+      return this.attrs();
+    }
   };
 
-  this.downloadFile = async function(url) {
+  async downloadFile(url) {
     var temp = require("temp");
     var os = require("os");
     var tempName = temp.path({dir: os.tmpdir(), suffix: ".zip"});
@@ -124,15 +128,18 @@ module.exports = function Package(_attrs) {
 
     return new Promise((resolve, reject) => {
       request_streaming(opts).
-                              on("error", reject).
-                              on("end", function() {
-                                resolve(tempName);
-                              }).pipe(fs.createWriteStream(tempName));
+        on("error", reject).
+        on("end", function() {
+          resolve(tempName);
+        }).
+        pipe(fs.createWriteStream(tempName));
     });
   };
 
 
-  this.zipToSavers = (tempName) => {
+  zipToSavers(tempName) {
+    let self = this;
+
     return new Promise(function (resolve, reject) {
       lockfile.lock(self.dest, { realpath: false }).then((release) => {
         yauzl.open(tempName, {lazyEntries: true}, (err, zipfile) => {

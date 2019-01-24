@@ -7,12 +7,14 @@ const path = require("path");
 const helpers = require("../helpers.js");
 
 describe("bootstrap", function() {
+  const prefsWindowTitle = "Before Dawn: Preferences";
+  const zipPath = path.join(__dirname, "..", "fixtures", "test-savers.zip");
   let configDest;
   var workingDir;
   let app;
   
   var bootApp = function() {
-    app = helpers.application(workingDir);  
+    app = helpers.application(workingDir, false, zipPath);  
     return app.start().
       then(() => helpers.waitUntilBooted(app));
   };
@@ -39,7 +41,7 @@ describe("bootstrap", function() {
     });  
 
     it("shows prefs", function() {
-      return helpers.waitForWindow(app, "Before Dawn: Preferences");
+      return helpers.waitForWindow(app, prefsWindowTitle);
     });
   });
 
@@ -59,7 +61,7 @@ describe("bootstrap", function() {
       });
 
       it("does not show prefs", function() {
-        return helpers.waitForWindow(app, "Before Dawn: Preferences", true).
+        return helpers.waitForWindow(app, prefsWindowTitle, true).
           then((res) => {
             assert.equal(-1, res);
           });
@@ -75,7 +77,7 @@ describe("bootstrap", function() {
       });
 
       it("shows prefs", function() {
-        return helpers.waitForWindow(app, "Before Dawn: Preferences");
+        return helpers.waitForWindow(app, prefsWindowTitle);
       });
     });
   });
@@ -95,7 +97,7 @@ describe("bootstrap", function() {
     });  
 
     it("shows prefs", function() {
-      return helpers.waitForWindow(app, "Before Dawn: Preferences");
+      return helpers.waitForWindow(app, prefsWindowTitle);
     });
   });
 

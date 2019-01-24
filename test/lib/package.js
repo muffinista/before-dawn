@@ -85,53 +85,43 @@ describe("Package", function() {
   describe("checkLatestRelease", () => {
     var p;
 
-    beforeEach(() => {
-      p = new Package(attrs);
-      sandbox.stub(p, "getReleaseInfo").
-              returns(require("../fixtures/release.json"));
-    });
-     
-    it("calls downloadFile", async () => {
-      var df = sandbox.stub(p, "downloadFile").resolves(zipPath);
-
-      await p.checkLatestRelease();
-      assert(df.calledOnce);
-    });
-
-    it("doesnt call if not needed", async () => {
-      var cb = sinon.spy();
-      var df = sandbox.stub(p, "downloadFile");
-
-      p.updated_at = "2017-06-06T23:55:44Z";
+    describe("remote package", function() {
+      beforeEach(() => {
+        p = new Package(attrs);
+        sandbox.stub(p, "getReleaseInfo").
+                returns(require("../fixtures/release.json"));
+      });
       
-      await p.checkLatestRelease(cb);
-      assert(!df.calledOnce);
-    });
-  });
-   
-  describe("checkLocalRelease", () => {
-    var p;
-    
-    beforeEach(() => {
-      p = new Package(attrs);
-    });
-    
-    it("calls zipToSavers", async () => {
-      var zts = sandbox.stub(p, "zipToSavers").resolves({});
-      
-      let results = await p.checkLocalRelease(dataPath, zipPath);
-      assert(zts.calledOnce);
+      it("calls downloadFile", async () => {
+        var df = sandbox.stub(p, "downloadFile").resolves(zipPath);
 
-      assert.equal(results.updated_at, "2017-06-06T23:55:44Z");
+        await p.checkLatestRelease();
+        assert(df.calledOnce);
+      });
+
+      it("doesnt call if not needed", async () => {
+        var cb = sinon.spy();
+        var df = sandbox.stub(p, "downloadFile");
+
+        p.updated_at = "2017-06-06T23:55:44Z";
+        
+        await p.checkLatestRelease(cb);
+        assert(!df.calledOnce);
+      });
     });
-    
-    it("doesnt call if not needed", async () => {
-      var zts = sandbox.stub(p, "zipToSavers");
+
+    describe("local package", function() {
+      beforeEach(() => {
+        attrs.local_zip = zipPath;
+        p = new Package(attrs);
+      });
       
-      p.updated_at = "2017-06-06T23:55:44Z";
-      
-      await p.checkLocalRelease(dataPath, zipPath);
-      assert(!zts.calledOnce);
+      it("doesnt call downloadFile", async () => {
+        var df = sandbox.stub(p, "downloadFile");
+
+        await p.checkLatestRelease();
+        assert(!df.calledOnce);
+      });
     });
   });
 

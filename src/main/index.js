@@ -826,8 +826,13 @@ var bootApp = function() {
     // @todo add a test for this somehow
     else if ( prefs.needSetup() ) {
       log.info("needSetup!");
-      var pd = new PackageDownloader(prefs);
       prefs.setDefaultRepo(global.SAVER_REPO);
+
+      let pd = new PackageDownloader(prefs);
+      if ( global.LOCAL_PACKAGE ) {
+        pd.setLocalFile(global.LOCAL_PACKAGE);
+      }
+
       pd.updatePackage().
         then(openPrefsWindow).
         then(setupForTesting);
