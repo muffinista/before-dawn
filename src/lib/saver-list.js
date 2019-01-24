@@ -117,11 +117,13 @@ module.exports = class SaverListManager {
 
     glob = require("glob");
 
+    console.log("sources", folders);
     // note: using /**/ here instead of /*/ would
     // also match all subdirectories, which might be desirable
     // or even required, but is a lot slower, so not doing it
     // for now
     pattern = "{" + folders.join(",") + ",}/*/saver.json";
+    console.log("look for savers in " + pattern);
     savers = glob.sync(pattern);
 
     for ( var i = 0; i < savers.length; i++ ) {
