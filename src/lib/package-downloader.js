@@ -61,9 +61,11 @@ module.exports = class PackageDownloader {
       this.prefs.updateCheckTimestamp = now;
       this.prefs.writeSync();
 
-      // @todo handle local check here
       this.logger("check package: " + p.repo);
-      return p.checkLatestRelease();
+      return p.checkLatestRelease().then((result) => {
+        this.prefs.sourceUpdatedAt = result.updated_at;
+        this.prefs.writeSync();
+      });
     }
   }
 };

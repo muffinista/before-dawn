@@ -126,9 +126,11 @@ export default {
         this.prefs.setDefaultRepo(this.$electron.remote.getGlobal("SAVER_REPO"));
       }
       pd.updatePackage().then((r) => {
+        console.log("updatePackage", r);
         if ( r.downloaded === true ) {
+          console.log("ok then!");
           this.getData();
-          this.getCurrentSaver();
+          //this.getCurrentSaver();
         }
       }).catch((err) => {
         this.logger(err);
