@@ -152,11 +152,8 @@ var openTestShim = function() {
   });
 
   var shimUrl = "file://" + __dirname + "/shim.html";
-
-  // just open an empty window
   testWindow.loadURL(shimUrl);
-  testWindow.webContents.openDevTools();
-
+  // testWindow.webContents.openDevTools();
 };
 
 /**
