@@ -82,7 +82,7 @@
       </div>
       <div>
         <button class="btn btn-large btn-secondary cancel" v-on:click="closeWindow">Cancel</button>
-        <button class="btn btn-large btn-primary save"  v-on:click="saveData" :disabled="disabled">Save</button>
+        <button class="btn btn-large btn-primary save"  v-on:click="saveDataClick" :disabled="disabled">Save</button>
       </div>
     </footer>
   </div> <!-- #prefs -->
@@ -109,7 +109,7 @@ export default {
   components: {
     SaverList, SaverOptions, SaverPreview, SaverSummary, AdvancedPrefsForm, PrefsForm
   },
-  mounted() {
+  async mounted() {
     let dataPath = this.$electron.remote.getCurrentWindow().saverOpts.base;
 
     this.ipcRenderer.on("savers-updated", this.onSaversUpdated);
@@ -356,27 +356,24 @@ export default {
     closeWindow() {
       this.currentWindow.close();
     },
-    saveData(doClose) {
-      if ( typeof(doClose) === "undefined" ) {
-        doClose = true;
-      }
-      
+    saveData(cb) {
       this.disabled = true;
 
       // @todo should this use Object.assign?
       this.prefs.current = this.saver;
       this.prefs.options = this.options;
-
-      this.prefs.updatePrefs(this.prefs, (changes) => {
-        this.disabled = false;
-        this.ipcRenderer.send("prefs-updated", changes);
-        this.ipcRenderer.send("set-autostart", this.prefs.auto_start);
-        if ( doClose ) {
-          this.closeWindow();
-        }
-        else {
-          return Promise.resolve();
-        }
+      return new Promise((resolve) => {
+        this.prefs.updatePrefs(this.prefs, (changes) => {
+          this.disabled = false;
+          this.ipcRenderer.send("prefs-updated", changes);
+          this.ipcRenderer.send("set-autostart", this.prefs.auto_start);
+          resolve(changes);
+        });
+      });
+    },
+    saveDataClick(event) {
+      this.saveData().then(() => {
+        this.ipcRenderer.send("close-window");
       });
     },
     renderUpdateNotice() {

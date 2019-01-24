@@ -736,7 +736,7 @@ var getSystemDir = function() {
  */
 var getUrl = function(dest) {
   let baseUrl;
-  if ( process.env.NODE_ENV === "development" ) {
+  if ( !testMode && process.env.NODE_ENV === "development" ) {
     if ( ! process.env.DISABLE_RELOAD ) {
       baseUrl = "http://localhost:9080";
     }
@@ -818,9 +818,13 @@ var bootApp = function() {
   });
     
   openGrabberWindow(() => {
+    if ( process.env.QUIET_MODE && process.env.QUIET_MODE === "true" ) {
+      log.info("Quiet mode, skip setup checks!");
+      setupForTesting();
+    }
     // check if we should download savers, set something up, etc
     // @todo add a test for this somehow
-    if ( prefs.needSetup() ) {
+    else if ( prefs.needSetup() ) {
       log.info("needSetup!");
       var pd = new PackageDownloader(prefs);
       prefs.setDefaultRepo(global.SAVER_REPO);
@@ -1055,6 +1059,11 @@ ipcMain.on("prefs-updated", (event, arg) => {
   log.info("prefs-updated", Object.keys(arg));
   prefs.reload();
   updateStateManager();
+});
+
+ipcMain.on("close-window", (event, arg) => {
+  log.info("close-window");
+  event.sender.getOwnerBrowserWindow().close();
 });
 
 //
