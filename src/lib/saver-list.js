@@ -121,6 +121,7 @@ module.exports = class SaverListManager {
     // also match all subdirectories, which might be desirable
     // or even required, but is a lot slower, so not doing it
     // for now
+    console.log(folders);
     folders = folders.filter((el) => { return el !== undefined && el !== ""})
     pattern = "{" + folders.join(",") + ",}/*/saver.json";
     console.log("look for savers in " + pattern);
