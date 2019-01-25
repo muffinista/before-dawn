@@ -246,9 +246,9 @@ exports.outputLogs = function(app) {
 
 exports.setupTimeout = function (test) {
   if (process.env.CI) {
-    test.timeout(30000);
+    test.timeout(60000);
   }
   else {
-    test.timeout(60000);
+    test.timeout(10000);
   }
 };

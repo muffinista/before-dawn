@@ -61,7 +61,9 @@ describe("bootstrap", function() {
       });
 
       it("does not show prefs", function() {
-        return helpers.waitForWindow(app, prefsWindowTitle, true).
+        return helpers.sleep(5000)).
+          then(() => helpers.outputLogs(app)).
+          then(() => helpers.waitForWindow(app, prefsWindowTitle, true)).
           then((res) => {
             assert.equal(-1, res);
           });
