@@ -249,6 +249,6 @@ exports.setupTimeout = function (test) {
     test.timeout(60000);
   }
   else {
-    test.timeout(10000);
+    test.timeout(30000);
   }
 };
