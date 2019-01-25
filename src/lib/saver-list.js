@@ -123,7 +123,8 @@ module.exports = class SaverListManager {
     // for now
     console.log(folders);
     folders = folders.filter((el) => { return el !== undefined && el !== ""})
-    pattern = "{" + folders.join(",") + ",}/*/saver.json";
+//    pattern = "{" + folders.join(",") + ",}/*/saver.json";
+    pattern = "{" + folders.join(",") + "}/*/saver.json";
     console.log("look for savers in " + pattern);
     savers = glob.sync(pattern);
 
