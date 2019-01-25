@@ -1,38 +1,38 @@
 "use strict";
 
 const assert = require("assert");
-const helpers = require("./setup.js");
+const helpers = require("../helpers.js");
 const packageJSON = require("../../package.json");
 
 var workingDir;
 let app;
 
 describe("About", function() {
-	beforeEach(() => {
-    workingDir = helpers.getTempDir();
-    helpers.setupConfig(workingDir);
+  const windowTitle = "Before Dawn: About!";
+  helpers.setupTimeout(this);
 
-    app = helpers.application(workingDir);
-    helpers.setupTimeout(this);
+  beforeEach(() => {
+    workingDir = helpers.getTempDir();
+    helpers.setupFullConfig(workingDir);
+
+    app = helpers.application(workingDir, true);
+
     return app.start().
-               then(() => app.client.waitUntilWindowLoaded() ).
-			         then(() => app.electron.ipcRenderer.send("open-about")).
-               then(() => {
-                app.client.getWindowCount().should.eventually.equal(2)
-                }).
-                then(() => app.client.windowByIndex(2));
-	});
+              then(() => helpers.waitUntilBooted(app) ).
+              then(() => app.electron.ipcRenderer.send("open-about")).
+              then(() => helpers.waitForWindow(app, windowTitle) );
+  });
 
 	afterEach(() => {
     return helpers.stopApp(app);
 	});
 
   it("has some text and current version number", function() {
-    return app.client.waitUntilWindowLoaded().
-        getText("body").
-        then((res) => {
-          assert(res.lastIndexOf("// screensaver fun //") !== -1);
-          assert(res.lastIndexOf(packageJSON.version) !== -1);
-        });
+    return helpers.waitForWindow(app, windowTitle).
+      then(() => app.client.getText("body")).
+      then((res) => {
+        assert(res.lastIndexOf("// screensaver fun //") !== -1);
+        assert(res.lastIndexOf(packageJSON.version) !== -1);
+      });
   });
 });

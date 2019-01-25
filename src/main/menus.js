@@ -18,9 +18,9 @@ var openUrl = (url) => {
     require("electron").shell.openExternal(url);
   }
   catch(e) {
-    log.info(e);
+    main.log.info(e);
   }
-}
+};
 
 /**
  * open the help section in a browser
@@ -36,7 +36,7 @@ var openIssuesUrl = () => { openUrl(global.ISSUES_URL); };
 /**
  * open the website for the app
  */
-var openHomepage = () => { openUrl("https://github.com/muffinista/before-dawn"); }
+var openHomepage = () => { openUrl("https://github.com/muffinista/before-dawn"); };
 
 /**
  * Build the menubar for the app
@@ -52,7 +52,7 @@ var buildMenuTemplate = function(a) {
         {
           label: "Add New Screensaver",
           accelerator: "CmdOrCtrl+N",
-          click: function(item, focusedWindow) {
+          click: function() {
             main.addNewSaver();
           }
         },
@@ -224,7 +224,9 @@ var trayMenuTemplate = function() {
     {
       label: "Disable",
       click: function() {
-        main.stateManager.pause();
+        let stateManager = main.getStateManager();
+
+        stateManager.pause();
         updateTrayIcon();
         main.trayMenu.items[1].visible = false;
         main.trayMenu.items[2].visible = true;
@@ -233,7 +235,9 @@ var trayMenuTemplate = function() {
     {
       label: "Enable",
       click: function() { 
-        main.stateManager.reset();
+        let stateManager = main.getStateManager();
+        stateManager.reset();
+
         updateTrayIcon();
         main.trayMenu.items[1].visible = true;
         main.trayMenu.items[2].visible = false;
@@ -268,17 +272,17 @@ var trayMenuTemplate = function() {
     {
       label: "Report a Bug",
       click: () => {
-        openIssuesUrl()
+        openIssuesUrl();
       }
     },
     {
       label: "Quit",
       click: () => {
-        main.quitApp()
+        main.quitApp();
       }
     }
   ];
-}
+};
 
 
 /**
@@ -297,7 +301,10 @@ var getIcons = function() {
  */
 var updateTrayIcon = function() {
   var icons = getIcons();
-  if ( stateManager.currentState() === stateManager.states.STATE_PAUSED ) {
+  let stateManager = main.getStateManager();
+  let appIcon = main.getAppIcon();
+
+  if ( stateManager.currentState === stateManager.STATES.STATE_PAUSED ) {
     appIcon.setImage(icons.paused);
   }
   else {

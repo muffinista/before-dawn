@@ -72,6 +72,7 @@ var checkPowerState = true;
 
 const singleLock = app.requestSingleInstanceLock();
 if (! singleLock ) {
+  // eslint-disable-next-line no-console
   console.log("looks like another copy of app is running, exiting!");
   app.quit();
   process.exit();
@@ -150,10 +151,9 @@ var openTestShim = function() {
     }
   });
 
-  var shimUrl = "file://" + __dirname + "/assets/shim.html";
-
-  // just open an empty window
+  var shimUrl = "file://" + __dirname + "/shim.html";
   testWindow.loadURL(shimUrl);
+  // testWindow.webContents.openDevTools();
 };
 
 /**
@@ -182,52 +182,56 @@ var showDock = function() {
  * Open the preferences window
  */
 var openPrefsWindow = function() {
-  var primary = electronScreen.getPrimaryDisplay();
+  return new Promise((resolve) => {
+    var primary = electronScreen.getPrimaryDisplay();
 
-  // take a screenshot of the main screen for use in previews
-  grabScreen(primary, function(message) {
-    var prefsUrl = getUrl("prefs.html");
-
-    prefsWindowHandle = new BrowserWindow({
-      width:800,
-      height:600,
-      minWidth: 800,
-      minHeight: 500,
-      maxWidth: 1200,
-      maxHeight: 1000,
-      resizable:true,
-      webPreferences: {
-        webSecurity: !global.IS_DEV,
-        nodeIntegration: true,
-        preload: global.TRACK_ERRORS ? path.join(__dirname, "assets", "sentry.js") : undefined
-      },
-      icon: path.join(__dirname, "assets", "iconTemplate.png")
+    // take a screenshot of the main screen for use in previews
+    grabScreen(primary, function(message) {
+      var prefsUrl = getUrl("prefs.html");
+  
+      prefsWindowHandle = new BrowserWindow({
+        width:800,
+        height:600,
+        minWidth: 800,
+        minHeight: 500,
+        maxWidth: 1200,
+        maxHeight: 1000,
+        resizable:true,
+        webPreferences: {
+          webSecurity: !global.IS_DEV,
+          nodeIntegration: true,
+          preload: global.TRACK_ERRORS ? path.join(__dirname, "assets", "sentry.js") : undefined
+        },
+        icon: path.join(__dirname, "assets", "iconTemplate.png")
+      });
+  
+      prefsWindowHandle.saverOpts = saverOpts;
+      prefsWindowHandle.screenshot = message.url;
+  
+      prefsUrl = prefsUrl + "?screenshot=" + encodeURIComponent("file://" + message.url);
+      
+      log.info("loading " + prefsUrl);
+      prefsWindowHandle.loadURL(prefsUrl);
+  
+      showDock();
+  
+      prefsWindowHandle.on("closed", function() {
+        prefsWindowHandle = null;
+        hideDockIfInactive();
+      });
+  
+      // we could do something nice with either of these events
+      prefsWindowHandle.webContents.on("crashed", outputError);
+      prefsWindowHandle.webContents.on("unresponsive", outputError);
+  
+      prefsWindowHandle.once("show", resolve);
     });
-
-    prefsWindowHandle.saverOpts = saverOpts;
-    prefsWindowHandle.screenshot = message.url;
-
-    prefsUrl = prefsUrl + "?screenshot=" + encodeURIComponent("file://" + message.url);
-    
-    log.info("loading " + prefsUrl);
-    prefsWindowHandle.loadURL(prefsUrl);
-
-    showDock();
-
-    prefsWindowHandle.on("closed", function() {
-      prefsWindowHandle = null;
-      hideDockIfInactive();
-    });
-
-    // we could do something nice with either of these events
-    prefsWindowHandle.webContents.on("crashed", outputError);
-    prefsWindowHandle.webContents.on("unresponsive", outputError);
   });
 };
 
 var outputError = (e) => {
   log.info(e);
-}
+};
 
 /**
  * handle new screensaver event. open the window to create a screensaver
@@ -364,9 +368,16 @@ var getWindowOpts = function(s) {
 
   // osx will display window immediately if fullscreen is true
   // so we default it to false there
-  if (process.platform !== "darwin") {
+  if (process.platform !== "darwin" ) {
     opts.fullscreen = true;
   }
+
+  if ( testMode === true ) {
+    opts.fullscreen = false;
+    opts.width = 100;
+    opts.height = 100;
+  }
+
 
   return opts;
 
@@ -438,7 +449,7 @@ var runScreenSaverOnDisplay = function(saver, s) {
       
       w.once("ready-to-show", () => {
         log.info("ready-to-show", s.id);
-        if ( debugMode !== true ) {
+        if ( debugMode !== true && testMode !== true ) {
           w.setFullScreen(true);
         }
 
@@ -520,11 +531,11 @@ var getDisplays = function() {
  * get a list of the non primary displays connected to the computer
  */
 var getNonPrimaryDisplays = function() {
-  var primary = electronScreen.getPrimaryDisplay()
+  var primary = electronScreen.getPrimaryDisplay();
   return electronScreen.getAllDisplays().filter((d) => {
     return d.id !== primary.id;
   });
-}
+};
 
 /**
  * manually trigger screensaver by setting state to run
@@ -546,6 +557,7 @@ var runScreenSaver = function() {
     prefs: prefs
   });
 
+
   var settings;
   var saverKey = prefs.current;
   let setupPromise;
@@ -553,11 +565,11 @@ var runScreenSaver = function() {
   // check if the user is running the random screensaver. if so, pick one!
   let randomPath = path.join(global.basePath, "system-savers", "random", "saver.json");
   if ( saverKey === randomPath ) {
-    setupPromise = new Promise((resolve, reject) => {
-      savers.list((entries) => {
+    setupPromise = new Promise((resolve) => {
+      savers.list(() => {
         let s = savers.random();
         resolve(s.key);
-      })
+      });
     });
   }
   else {
@@ -583,17 +595,18 @@ var runScreenSaver = function() {
       }
       
       try {
+        var i;
         // turn off idle checks for a couple seconds while loading savers
         stateManager.ignoreReset(true);
 
-        for ( var i in displays ) {
+        for ( i in displays ) {
           runScreenSaverOnDisplay(saver, displays[i]);
         } // for
 
         // if we're only running on primary display, blank out the other ones
-        if ( debugMode !== true && prefs.runOnSingleDisplay === true ) {
+        if ( debugMode !== true && testMode !== true && prefs.runOnSingleDisplay === true ) {
           var otherDisplays = getNonPrimaryDisplays();
-          for ( var i in otherDisplays ) {
+          for ( i in otherDisplays ) {
             blankScreen(otherDisplays[i]);
           }
         }
@@ -723,7 +736,7 @@ var getSystemDir = function() {
  */
 var getUrl = function(dest) {
   let baseUrl;
-  if ( process.env.NODE_ENV === "development" ) {
+  if ( !testMode && process.env.NODE_ENV === "development" ) {
     if ( ! process.env.DISABLE_RELOAD ) {
       baseUrl = "http://localhost:9080";
     }
@@ -738,7 +751,12 @@ var getUrl = function(dest) {
   return url.resolve(baseUrl, dest);
 };
 
-
+var setupForTesting = function() {
+  if ( testMode === true ) {
+    log.info("opening shim for test mode");
+    openTestShim();
+  }    
+};
 
 /**
  * handle initial startup of app
@@ -798,40 +816,52 @@ var bootApp = function() {
   appIcon.on("right-click", () => {
     appIcon.popUpContextMenu();
   });
-  
-  
-  if ( testMode === true ) {
-    openTestShim();
-  }
-  else {
-    openGrabberWindow(() => {
-      // check if we should download savers, set something up, etc
-      if ( prefs.needSetup() ) {
-        var pd = new PackageDownloader(prefs);
-        prefs.setDefaultRepo(global.SAVER_REPO);
-        pd.updatePackage().then(openPrefsWindow);
+    
+  openGrabberWindow(() => {
+    if ( process.env.QUIET_MODE && process.env.QUIET_MODE === "true" ) {
+      log.info("Quiet mode, skip setup checks!");
+      setupForTesting();
+    }
+    // check if we should download savers, set something up, etc
+    // @todo add a test for this somehow
+    else if ( prefs.needSetup() ) {
+      log.info("needSetup!");
+      prefs.setDefaultRepo(global.SAVER_REPO);
+
+      let pd = new PackageDownloader(prefs);
+      if ( global.LOCAL_PACKAGE ) {
+        pd.setLocalFile(global.LOCAL_PACKAGE);
       }
-      else {
-        var savers = new SaverListManager({
-          prefs: prefs
-        });
-        log.info("checking if " + prefs.current + " is valid");
-        savers.confirmExists(prefs.current).then((result) => {
-          if ( ! result ) {
-            openPrefsWindow();
-          }
-          log.info("I think we're done!");
-        })
-      }
-    });
-  }
+
+      pd.updatePackage().
+        then(openPrefsWindow).
+        then(setupForTesting);
+    }
+    else {
+      var savers = new SaverListManager({
+        prefs: prefs
+      });
+      log.info("checking if " + prefs.current + " is valid");
+      savers.confirmExists(prefs.current).then((result) => {
+        if ( ! result ) {
+          log.info("need to pick a saver");
+          openPrefsWindow().then(setupForTesting);
+        }
+        else {
+          setupForTesting();
+        }
+
+        log.info("I think we're done!");
+      });
+    }
+  });
 
   if ( global.CHECK_FOR_RELEASE === true ) {
     releaseChecker = new ReleaseCheck();
 
     releaseChecker.setFeed(global.RELEASE_CHECK_URL);
     releaseChecker.setLogger(log.info);
-    releaseChecker.onUpdate((x) => {
+    releaseChecker.onUpdate(() => {
       global.NEW_RELEASE_AVAILABLE = true;
       trayMenu.items[3].visible = global.NEW_RELEASE_AVAILABLE;
     });
@@ -850,7 +880,7 @@ var bootApp = function() {
 var quitApp = () => {
   exitOnQuit = true;
   app.quit(); 
-}
+};
 
 /**
  * try and guess if we are in fullscreen mode or not
@@ -942,6 +972,12 @@ var checkForNewRelease = function() {
   releaseChecker.checkLatestRelease();
 };
 
+let getStateManager = function() {
+  return stateManager;
+};
+let getAppIcon = function() {
+  return appIcon;
+};
 
 // load a few global variables
 require("./bootstrap.js");
@@ -976,7 +1012,7 @@ log.info("use base path", global.basePath);
  */
 
 if ( testMode !== true ) {
-  app.on("second-instance", (commandLine, workingDirectory) => {
+  app.on("second-instance", () => {
     if ( prefsWindowHandle === null ) {
       openPrefsWindow();
     }
@@ -1008,7 +1044,7 @@ trayMenu = Menu.buildFromTemplate(menusAndTrays.trayMenuTemplate());
 // if the user has updated one of their screensavers, we can let
 // the prefs window know that it needs to reload
 //
-ipcMain.on("savers-updated", (event, arg) => {
+ipcMain.on("savers-updated", () => {
   toggleSaversUpdated();
 });
 
@@ -1030,15 +1066,20 @@ ipcMain.on("prefs-updated", (event, arg) => {
   updateStateManager();
 });
 
+ipcMain.on("close-window", (event) => {
+  log.info("close-window");
+  event.sender.getOwnerBrowserWindow().close();
+});
+
 //
 // handle request to open the prefs window
 //
-ipcMain.on("open-prefs", (event) => {
+ipcMain.on("open-prefs", () => {
   log.info("open-prefs");
   openPrefsWindow();
 });
 
-ipcMain.on("open-about", (event) => {
+ipcMain.on("open-about", () => {
   log.info("open-about");
   openAboutWindow();
 });
@@ -1083,7 +1124,9 @@ ipcMain.on("set-autostart", (event, value) => {
         return;
       }
       appLauncher.disable().
-                  then(function(x) { }).
+                  then(function() { 
+                    log.info("appLauncher enabled");
+                  }).
                   catch((err) => {
                     log.info("appLauncher disable failed", err);
                   });
@@ -1095,7 +1138,7 @@ ipcMain.on("set-autostart", (event, value) => {
 app.on("window-all-closed", function() {
   log.info("window-all-closed");
 });
-app.on("before-quit", function(e) {
+app.on("before-quit", function() {
   log.info("before-quit");
 });
 app.on("will-quit", function(e) {
@@ -1119,9 +1162,16 @@ process.on("uncaughtException", function (ex) {
 // initialization and is ready to create browser windows.
 app.once("ready", bootApp);
 
+if ( testMode === true ) {
+  exports.getTrayMenuItems = function() {
+    return menusAndTrays.trayMenuTemplate();
+  };  
+}
 
+exports.log = log;
 exports.setStateToRunning = setStateToRunning;
-exports.stateManager = stateManager;
+exports.getStateManager = getStateManager;
+exports.getAppIcon = getAppIcon;
 exports.trayMenu = trayMenu;
 exports.openPrefsWindow = openPrefsWindow;
 exports.openAboutWindow = openAboutWindow;

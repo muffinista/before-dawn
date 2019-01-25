@@ -63,11 +63,12 @@ class SaverPrefs {
 
   get defaultSaversDir() {
     return path.join(this.baseDir, "savers");
-  };
+  }
 
   toHash() {
     let result = {};
     for ( var i = 0; i < PROPERTIES.length; i++ ) {
+      // eslint-disable-next-line no-unused-vars
       let name, key, type, value;
       [name, key, type, value] = PROPERTIES[i];
 
@@ -75,7 +76,7 @@ class SaverPrefs {
     }
 
     return result;
-  };
+  }
   
   /**
    * setup some reasonable defaults
@@ -88,7 +89,7 @@ class SaverPrefs {
         }
       }
     }
-  };
+  }
 
 
   /**
@@ -119,7 +120,7 @@ class SaverPrefs {
     }
 
     return folders;
-  };
+  }
 
   get systemSource() {
     return path.join(this.baseDir, "system-savers");
@@ -130,7 +131,7 @@ class SaverPrefs {
    */
   setConfig(k, v) {
     this._data[k] = v;
-  };
+  }
 
 
   getOptions(name) {
@@ -139,7 +140,7 @@ class SaverPrefs {
     }
 
     return this._data.options[name] || {};
-  };
+  }
 
   updatePrefs(data, cb) {
     for ( var k in data ) {
@@ -153,25 +154,25 @@ class SaverPrefs {
     this.write(() => {
       cb(result);
     });
-  };
+  }
 
   write(cb) {
-    let output = JSON.stringify(this._data);
+    let output = JSON.stringify(this._data, null, 2);
     lockfile.lock(this.configFile, { realpath: false }).then((release) => {
       return fs.writeFile(this.configFile, output, () => {
         cb();
         return release();
       });
     });
-  };
+  }
   
   writeSync() {
-    let output = JSON.stringify(this._data);
+    let output = JSON.stringify(this._data, null, 2);
     let release = lockfile.lockSync(this.configFile, { realpath: false });
 
     fs.writeFileSync(this.configFile, output);
     release();
-  };
+  }
 
   setDefaultRepo(r) {
     this.sourceRepo = r;

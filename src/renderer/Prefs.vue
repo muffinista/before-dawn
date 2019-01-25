@@ -82,7 +82,7 @@
       </div>
       <div>
         <button class="btn btn-large btn-secondary cancel" v-on:click="closeWindow">Cancel</button>
-        <button class="btn btn-large btn-primary save"  v-on:click="saveData" :disabled="disabled">Save</button>
+        <button class="btn btn-large btn-primary save"  v-on:click="saveDataClick" :disabled="disabled">Save</button>
       </div>
     </footer>
   </div> <!-- #prefs -->
@@ -98,7 +98,6 @@ import AdvancedPrefsForm from "@/components/AdvancedPrefsForm";
 import PrefsForm from "@/components/PrefsForm";
 import Noty from "noty";
 
-const path = require("path");
 const {dialog} = require("electron").remote;
 
 import SaverPrefs from "@/../lib/prefs";
@@ -118,6 +117,7 @@ export default {
     this._savers = new SaverListManager({
       prefs: this.prefs
     }, this.logger);
+
     this._savers.setup().then(() => {
       this.getData();
       this.getCurrentSaver();
@@ -126,11 +126,14 @@ export default {
         this.prefs.setDefaultRepo(this.$electron.remote.getGlobal("SAVER_REPO"));
       }
       pd.updatePackage().then((r) => {
+        console.log("updatePackage", r);
         if ( r.downloaded === true ) {
+          console.log("ok then!");
           this.getData();
-          this.getCurrentSaver();
+          //this.getCurrentSaver();
         }
-        this.showScreensavers();
+      }).catch((err) => {
+        this.logger(err);
       });
 
       if ( this.$electron.remote.getGlobal("NEW_RELEASE_AVAILABLE") ) {
@@ -151,7 +154,7 @@ export default {
       saver: undefined,
       disabled: false,
       renderIndex: 0
-    }
+    };
   },
   computed: {
     bus: function() {
@@ -160,7 +163,7 @@ export default {
     logger() {
       let l = this.$electron.remote.getCurrentWindow().saverOpts.logger;
       if ( l === undefined ) {
-        l = console.log;
+        l = function() {};
       }
       return l;
     },
@@ -184,7 +187,6 @@ export default {
       return this.savers.findIndex((s) => s.key === this.saver);
     },
     saverOptions: function() {
-      var self = this;
       if ( ! this.isLoaded ) {
         return undefined;
       }
@@ -227,16 +229,16 @@ export default {
       document.querySelector("#" + n).classList.add("active");
       document.querySelector("[href='#" + n + "']").classList.add("active");
     },
-    showPreferences(e) {
+    showPreferences() {
       this.setActiveTab("preferences");
     },
-    showScreensavers(e) {
+    showScreensavers() {
       this.setActiveTab("screensavers");
     },
-    showAdvanced(e) {
+    showAdvanced() {
       this.setActiveTab("advanced");
     },
-    onOptionsChange(e) {
+    onOptionsChange() {
       this.bus.$emit("options-changed", this.options[this.saver]);
     },
     onSaverPicked(e) {
@@ -244,7 +246,7 @@ export default {
       this.bus.$emit("saver-changed", this.saverObj);
       this.renderIndex += 1;
     },
-    resetToDefaults(e) {
+    resetToDefaults() {
       dialog.showMessageBox(
         {
           type: "info",
@@ -356,27 +358,24 @@ export default {
     closeWindow() {
       this.currentWindow.close();
     },
-    saveData(doClose) {
-      if ( typeof(doClose) === "undefined" ) {
-        doClose = true;
-      }
-      
+    saveData(cb) {
       this.disabled = true;
 
       // @todo should this use Object.assign?
       this.prefs.current = this.saver;
       this.prefs.options = this.options;
-
-      this.prefs.updatePrefs(this.prefs, (changes) => {
-        this.disabled = false;
-        this.ipcRenderer.send("prefs-updated", changes);
-        this.ipcRenderer.send("set-autostart", this.prefs.auto_start);
-        if ( doClose ) {
-          this.closeWindow();
-        }
-        else {
-          return Promise.resolve();
-        }
+      return new Promise((resolve) => {
+        this.prefs.updatePrefs(this.prefs, (changes) => {
+          this.disabled = false;
+          this.ipcRenderer.send("prefs-updated", changes);
+          this.ipcRenderer.send("set-autostart", this.prefs.auto_start);
+          resolve(changes);
+        });
+      });
+    },
+    saveDataClick(event) {
+      this.saveData().then(() => {
+        this.ipcRenderer.send("close-window");
       });
     },
     renderUpdateNotice() {

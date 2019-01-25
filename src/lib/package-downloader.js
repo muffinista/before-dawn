@@ -13,19 +13,29 @@ module.exports = class PackageDownloader {
       this.logger = logger;
     }
     else {
-      this.logger = function() {}
+      this.logger = function() {};
     }
+  }
+
+  setLocalFile(f) {
+    this.localZip = f;
   }
 
   getPackage() {
     var source = this.prefs.sourceRepo;
     var sourceUpdatedAt = this.prefs.sourceUpdatedAt;
-    return new Package({
+    var attrs = {
       repo:source,
       updated_at:sourceUpdatedAt,
       dest:this.prefs.defaultSaversDir
-    });
-  };
+    };
+
+    if ( this.localZip ) {
+      attrs.local_zip = this.localZip;
+    }
+
+    return new Package(attrs);
+  }
 
   updatePackage(p) {
     var lastCheckAt = this.prefs.updateCheckTimestamp;
@@ -51,9 +61,12 @@ module.exports = class PackageDownloader {
       this.prefs.updateCheckTimestamp = now;
       this.prefs.writeSync();
 
-      // @todo handle local check here
       this.logger("check package: " + p.repo);
-      return p.checkLatestRelease();
+      return p.checkLatestRelease().then((result) => {
+        this.prefs.sourceUpdatedAt = result.updated_at;
+        this.prefs.writeSync();
+        return result;
+      });
     }
-  };
+  }
 };

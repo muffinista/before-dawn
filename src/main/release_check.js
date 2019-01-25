@@ -10,17 +10,17 @@ module.exports = class ReleaseCheck {
   }
   setFeed(u) {
     this.url = u;
-  };
+  }
   setLogger(l) {
     this.logger = l;
-  };
+  }
 
   onUpdate(f) {
     this.onUpdateCallback = f;
-  };
+  }
   onNoUpdate(f) {
     this.onNoUpdateCallback = f;
-  };
+  }
 
   checkLatestRelease() {
     this.logger(`check ${this.url} for new release`);
@@ -45,9 +45,9 @@ module.exports = class ReleaseCheck {
       });
     }
     catch(ex) {
-      console.log("error in checkLatestRelease");
-      console.log(ex);
+      // console.log("error in checkLatestRelease");
+      // console.log(ex);
       this.onNoUpdateCallback();
     }
-  };
+  }
 };

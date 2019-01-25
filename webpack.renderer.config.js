@@ -1,7 +1,7 @@
 "use strict";
 
 const path = require("path");
-const glob = require("glob-all")
+const glob = require("glob-all");
 const packageJSON = require(`${"./package.json"}`);
 
 const productName = packageJSON.productName;
@@ -33,7 +33,7 @@ var htmlPageOptions = function(id, title) {
       removeComments: true
     },
     nodeModules: devMode ? path.resolve(__dirname, "node_modules") : false
-  }
+  };
 };
 
 /**
@@ -89,31 +89,8 @@ let rendererConfig = {
           devMode ? "style-loader" : MiniCssExtractPlugin.loader,
           //'vue-style-loader',
           "css-loader",
-//          'postcss-loader',
           "sass-loader",
         ]
-        
-        // [
-        //   {
-        //     loader: MiniCssExtractPlugin.loader,
-        //     options: {
-        //       // you can specify a publicPath here
-        //       // by default it use publicPath in webpackOptions.output
-        //       //publicPath: '../'
-        //     }
-        //   },
-        //   "css-loader"
-        // ]
-        //   {
-        //     loader: "style-loader", // inject CSS to page
-        //   },
-        //   {
-        //     loader: "css-loader", // translates CSS into CommonJS modules
-        //   },
-        //   {
-        //     loader: "sass-loader" // compiles SASS to CSS
-        //   }
-        // ]
       },
       {
         test: /\.js$/,
@@ -160,6 +137,12 @@ let rendererConfig = {
     new HtmlWebpackPlugin(htmlPageOptions("editor", "Editor")),    
     new HtmlWebpackPlugin(htmlPageOptions("new", "Create Screensaver!")),
     new HtmlWebpackPlugin(htmlPageOptions("about", "About!")),
+    new CopyWebpackPlugin([
+      {
+        from: path.join(__dirname, "src", "shim.html"),
+        to: path.join(outputDir)
+      }
+    ]),
     new PurgecssPlugin({
       paths: glob.sync([
         path.join(__dirname, "./src/index.ejs"),
@@ -211,7 +194,7 @@ let rendererConfig = {
     extensions: [".js", ".vue", ".json", ".css", ".node"]
   },
   target: "electron-renderer"
-}
+};
 
 
 /**
@@ -228,7 +211,7 @@ if (process.env.NODE_ENV === "production") {
     new webpack.LoaderOptionsPlugin({
       minimize: true
     })
-  )
+  );
 }
 
 module.exports = rendererConfig;

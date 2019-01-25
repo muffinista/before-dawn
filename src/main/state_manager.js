@@ -61,7 +61,7 @@ class StateManager {
     else {
       this.switchState(STATES.STATE_IDLE);
     }
-  };
+  }
 
 
   /**
@@ -69,7 +69,7 @@ class StateManager {
    */
   reset() {
     this.switchState(STATES.STATE_IDLE);
-  };
+  }
 
 
   /**
@@ -77,38 +77,38 @@ class StateManager {
    */
   pause() {
     this.switchState(STATES.STATE_PAUSED);
-  };
+  }
 
   /**
    * start running the state machine
    */
   run() {
     this.switchState(STATES.STATE_RUNNING);
-  };
+  }
 
   /**
    * handle calling the onIdleTime callback specified in setup
    */
-  onIdleTime(f) {
+  onIdleTime() {
     if ( typeof(this._onIdleTime) !== "undefined" ) {
       this._onIdleTime();
     }
-  };
+  }
 
   /**
    * handle calling the onBlankTime callback specified in setup
    */
-  onBlankTime(f) {
+  onBlankTime() {
     if ( typeof(this._onBlankTime) !== "undefined" ) {
       this._onBlankTime();
     }
-  };
+  }
 
-  onReset(f) {
+  onReset() {
     if ( typeof(this._onReset) !== "undefined" ) {
       this._onReset();
     } 
-  };
+  }
 
   /**
    * switch to a new state. if we're not already in that state, or if
@@ -126,7 +126,7 @@ class StateManager {
     if ( callEnterState ) {
       this.onEnterState(s);
     }
-  };
+  }
 
 
   /**
@@ -146,12 +146,12 @@ class StateManager {
       case STATES.STATE_PAUSED:
         break;
     }
-  };
+  }
 
 
   getCurrentState() {
     return this.currentState;
-  };
+  }
 
   /**
    * based on our current state, figure out the timestamp
@@ -162,14 +162,14 @@ class StateManager {
       return this._blankTime;
     }
     return this._idleTime;
-  };
+  }
 
   ignoreReset(val) {
     this._ignoreReset = val;
     if ( this._ignoreReset === false ) {
       this.lastTime = -1;
     } 
-  };
+  }
 
   /**
    * check idle time and determine if we should switch states
@@ -207,15 +207,15 @@ class StateManager {
     if ( runAgain !== false ) {
       this.scheduleTick();
     }
-  };
+  }
 
   scheduleTick() {
     if ( this.keepTicking ) {
       setTimeout(() => {
-        this.tick()
+        this.tick();
       }, IDLE_CHECK_RATE);
     }
-  };
+  }
 
   startTicking() {
     this.scheduleTick();

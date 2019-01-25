@@ -1,15 +1,26 @@
 "use strict";
 
 const assert = require("assert");
-const helpers = require("./setup.js");
+const helpers = require("../helpers.js");
 
 let app;
 var workingDir;
 var saversDir;
-
+const SaverPrefs = require("../../src/lib/prefs.js");
 
 describe("Prefs", function() { 
-	beforeEach(() => {
+  const fakeDialogOpts = [ { method: "showOpenDialog", value: ["/not/a/real/path"] } ];
+  helpers.setupTimeout(this);
+
+  let pickPrefsWindow = function() {
+    return helpers.getWindowByTitle(app, "Before Dawn: Preferences");
+  };
+
+  let currentPrefs = function() {
+    return new SaverPrefs(workingDir);
+  };
+
+  beforeEach(function() {
     workingDir = helpers.getTempDir();
     saversDir = helpers.getTempDir();
     
@@ -17,58 +28,56 @@ describe("Prefs", function() {
     helpers.addLocalSource(workingDir, saversDir);
     helpers.addSaver(saversDir, "saver-one", "saver.json");
 
-    app = helpers.application(workingDir);
-    helpers.setupTimeout(this);
+    app = helpers.application(workingDir, true);
     return app.start().
-              then(() =>
-              app.fakeDialog.mock([ { method: "showOpenDialog", value: ["/not/a/real/path"] } ])).
-               then(() => app.client.waitUntilWindowLoaded() ).
-			         then(() => app.electron.ipcRenderer.send("open-prefs")).
-               then(() => {
-                app.client.getWindowCount().should.eventually.equal(2)
-                }).
-                then(() => app.client.windowByIndex(2));
+              then(() => app.fakeDialog.mock(fakeDialogOpts)).
+              then(() => app.client.waitUntilWindowLoaded() ).
+              then(() => app.electron.ipcRenderer.send("open-prefs")).
+              then(() => helpers.waitForWindow(app, "Before Dawn: Preferences") );
 	});
 
-	afterEach(() => {
+	afterEach(function() {
     return helpers.stopApp(app);
 	});
 
-  it("sets title", function() {
-    return app.client.waitUntilWindowLoaded().getTitle().then((res) => {
-      assert.equal("Before Dawn: Preferences", res);
-    });
-  });
+  // it("sets title", function() {
+  //   return pickPrefsWindow().
+  //     then(() => app.client.getTitle()).
+  //     then((res) => {
+  //       assert.equal("Before Dawn: Preferences", res);
+  //     });
+  // });
 
   it("lists screensavers", function() {
-    return app.client.waitUntilTextExists("body", "Screensaver One").getText("body").then((text) => {
-      assert(text.lastIndexOf("Screensaver One") !== -1);
-    });
+    return pickPrefsWindow().
+      then(() => app.client.waitUntilTextExists("body", "Screensaver One")).
+      then(() => app.client.getText("body")).
+      then((text) => {
+        assert(text.lastIndexOf("Screensaver One") !== -1);
+      });
   });
 
   it("allows picking a screensaver", function() {
-    return app.client.waitUntilTextExists("body", "Screensaver One", 10000)
-       .getAttribute("[type=radio]","data-name")
-       .then(() => {
-         app.client.click("[type=radio][data-name='Screensaver One']").
-             getText("body").
-             then((text) => {
-               assert(text.lastIndexOf("A Screensaver") !== -1);
-             });
-       }).
-        then(() => app.client.click("button.save")).
-        then(() => {
-          app.client.getWindowCount().should.eventually.equal(1)
-        }).
-        then(() => {
-          assert(helpers.savedConfig(workingDir).saver.lastIndexOf("/saver-one/") !== -1);
-        });
+    return pickPrefsWindow().
+      then(() => app.client.waitUntilTextExists("body", "Screensaver One")).
+//      then(() => app.client.getAttribute("[type=radio]","data-name")).
+      then(() => app.client.click("[type=radio][data-name='Screensaver One']")).
+      then(() => app.client.getText(".saver-description")).
+      then((text) => {
+        assert(text.lastIndexOf("A Screensaver") !== -1);
+      }).
+      then(() => app.client.click("button.save")).
+      then(() => helpers.waitForWindowToClose(app, "Before Dawn: Preferences")).
+      then(function() {
+        assert(currentPrefs().current.lastIndexOf("/saver-one/") !== -1);
+      });
   });
 
-  it("set general preferences", () => {
-    return app.client.waitUntilTextExists("body", "Preferences", 10000).
-      click("=Preferences").
-      waitUntilTextExists("body", "Activate after").
+  it("set general preferences", function() {
+    return pickPrefsWindow().
+      then(() => app.client.waitUntilTextExists("body", "Screensaver One")).
+      then(() => app.client.click("=Preferences")).
+      then(() => app.client.waitUntilTextExists("body", "Activate after")).
       then(() => 
         app.client.selectByVisibleText("[name=delay]", "30 minutes")
       ).
@@ -76,58 +85,55 @@ describe("Prefs", function() {
         app.client.selectByVisibleText("[name=\"sleep\"]", "15 minutes")
       ).
       then(() => app.client.click("button.save")).
-      then(() => {
-        app.client.getWindowCount().should.eventually.equal(1)
-      }).
-      then(() => {
-        assert.equal(30, helpers.savedConfig(workingDir).delay);
-        assert.equal(15, helpers.savedConfig(workingDir).sleep);  
+      then(() => helpers.waitForWindowToClose(app, "Before Dawn: Preferences")).
+      then(function() {
+        assert.equal(30, currentPrefs().delay);
+        assert.equal(15, currentPrefs().sleep);
       });
   });
 
-  it("toggles checkboxes", () => {
-    let oldConfig = helpers.savedConfig(workingDir);
+  it("toggles checkboxes", function() {
+    let oldConfig = currentPrefs();
 
-    return app.client.waitUntilTextExists("body", "Screensaver One", 10000).
-      click("=Preferences").
-      waitUntilTextExists("body", "Activate after").
+    return pickPrefsWindow().
+      then(() => app.client.waitUntilTextExists("body", "Screensaver One")).
+      then(() => app.client.click("=Preferences")).
+      then(() => app.client.waitUntilTextExists("body", "Activate after")).
       then(() => app.client.click("label*=Lock screen after running")).
       then(() => app.client.click("label*=Disable when on battery?")).
       then(() => app.client.click("label*=Auto start on login?")).
       then(() => app.client.click("label*=Only run on the primary display?")).
       then(() => app.client.click("button.save")).
-      then(() => {
-        app.client.getWindowCount().should.eventually.equal(1)
-      }).
-      then(() => {
-        assert.equal(!oldConfig.lock, helpers.savedConfig(workingDir).lock);
-        assert.equal(!oldConfig.disable_on_battery, helpers.savedConfig(workingDir).disable_on_battery);
-        assert.equal(!oldConfig.auto_start, helpers.savedConfig(workingDir).auto_start);
-        assert.equal(!oldConfig.run_on_single_display, helpers.savedConfig(workingDir).run_on_single_display);
+      then(() => helpers.waitForWindowToClose(app, "Before Dawn: Preferences")).
+      then(function() {
+        assert.equal(!oldConfig.lock, currentPrefs().lock);
+        assert.equal(!oldConfig.disableOnBattery, currentPrefs().disableOnBattery);
+        assert.equal(!oldConfig.auto_start, currentPrefs().auto_start);
+        assert.equal(!oldConfig.runOnSingleDisplay, currentPrefs().runOnSingleDisplay);
       });
   });
 
-  it("leaves checkboxes", () => {
-    let oldConfig = helpers.savedConfig(workingDir);
+  it("leaves checkboxes", function() {
+    let oldConfig = currentPrefs();
 
-    return app.client.waitUntilTextExists("body", "Screensaver One", 10000).
-      click("=Preferences").
-      waitUntilTextExists("body", "Activate after").
+    return pickPrefsWindow().
+      then(() => app.client.waitUntilTextExists("body", "Screensaver One")).
+      then(() => app.client.click("=Preferences")).
+      then(() => app.client.waitUntilTextExists("body", "Activate after")).
       then(() => app.client.click("button.save")).
-      then(() => {
-        app.client.getWindowCount().should.eventually.equal(1)
-      }).
-      then(() => {
-        assert.equal(oldConfig.lock, helpers.savedConfig(workingDir).lock);
-        assert.equal(oldConfig.disable_on_battery, helpers.savedConfig(workingDir).disable_on_battery);
-        assert.equal(oldConfig.auto_start, helpers.savedConfig(workingDir).auto_start);
-        assert.equal(oldConfig.run_on_single_display, helpers.savedConfig(workingDir).run_on_single_display);
+      then(() => helpers.waitForWindowToClose(app, "Before Dawn: Preferences")).
+      then(function() {
+        assert.equal(oldConfig.lock, currentPrefs().lock);
+        assert.equal(oldConfig.disableOnBattery, currentPrefs().disableOnBattery);
+        assert.equal(oldConfig.auto_start, currentPrefs().auto_start);
+        assert.equal(oldConfig.runOnSingleDisplay, currentPrefs().runOnSingleDisplay);
       });
   });
 
   it("sets options for screensaver", function() {
-    return app.client.waitUntilTextExists("body", "Screensaver One", 10000).
-       getAttribute("[type=radio]","data-name").
+    return pickPrefsWindow().
+      then(() => app.client.waitUntilTextExists("body", "Screensaver One")).
+      then(() => app.client.getAttribute("[type=radio]","data-name")).
         then(() => app.client.click("[type=radio][data-name='Screensaver One']")).
         then(() => app.client.getText("body")).
         then((text) => {
@@ -136,11 +142,9 @@ describe("Prefs", function() {
         then(() => app.client.click("[name='sound'][value='false']")).
         then(() => app.client.setValue("[name='load_url']", "barfoo")).
         then(() => app.client.click("button.save")).
-        then(() => {
-          app.client.getWindowCount().should.eventually.equal(1)
-        }).
-        then(() => {
-          var options = helpers.savedConfig(workingDir).options;
+        then(() => helpers.waitForWindowToClose(app, "Before Dawn: Preferences")).
+        then(function() {
+          var options = currentPrefs().options;
           var k = Object.keys(options).find((i) => {
             return i.indexOf("saver-one") !== -1;
           });
@@ -152,30 +156,30 @@ describe("Prefs", function() {
   
 
   it("allows setting path via dialog", function() {
-    return app.client.waitUntilWindowLoaded().click("=Advanced").
+    return pickPrefsWindow().
+      then(() => app.client.waitUntilTextExists("body", "Screensaver One")).
+      then(() => app.client.click("=Advanced")).
       then(() => app.client.click("button.pick")).
       then(() => app.client.click("button.save")).
-      then(() => {
-        app.client.getWindowCount().should.eventually.equal(1)
-      }).
-      then(() => {
-        assert.equal("/not/a/real/path", helpers.savedConfig(workingDir).localSource);
+      then(() => helpers.waitForWindowToClose(app, "Before Dawn: Preferences")).
+      then(function() {
+        assert.equal("/not/a/real/path", currentPrefs().localSource);
       });
   });
 
   it("clears localSource", function() {
-    return app.client.waitUntilWindowLoaded().click("=Advanced").
-    then(() => {
-      let ls = helpers.savedConfig(workingDir).localSource;
-      assert( ls != "" && ls !== undefined);
-    }).
-    then(() => app.client.click("button.clear")).
-    then(() => app.client.click("button.save")).
-    then(() => {
-      app.client.getWindowCount().should.eventually.equal(1)
-    }).
-    then(() => {
-      assert.equal("", helpers.savedConfig(workingDir).localSource);
-    });
+    return pickPrefsWindow().
+      then(() => app.client.waitUntilTextExists("body", "Screensaver One")).
+      then(() => app.client.click("=Advanced")).
+      then(function() {
+        let ls = currentPrefs().localSource;
+        assert( ls != "" && ls !== undefined);
+      }).
+      then(() => app.client.click("button.clear")).
+      then(() => app.client.click("button.save")).
+      then(() => helpers.waitForWindowToClose(app, "Before Dawn: Preferences")).
+      then(function() {
+        assert.equal("", currentPrefs().localSource);
+      });
   });
 });

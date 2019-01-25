@@ -1,35 +1,17 @@
 "use strict";
 
-const assert = require("assert");
-
-const SaverPrefs = require("../../src/lib/prefs.js");
-
 const tmp = require("tmp");
 const fs = require("fs-extra");
 const path = require("path");
+const assert = require("assert");
+
+const helpers = require("../helpers.js");
+
+const SaverPrefs = require("../../src/lib/prefs.js");
+
 
 describe("SaverPrefs", () => {
   var tmpdir, prefs;
-  let specifyConfig = (name) => {
-    fs.copySync(
-      path.join(__dirname, "../fixtures/" + name + ".json"),
-      path.join(tmpdir, "config.json")
-    );
-  };
-
-  let prefsToJSON = () => {
-    let testFile = path.join(tmpdir, "config.json")
-    let data = {};
-
-    try {
-      data = JSON.parse(fs.readFileSync(testFile));
-    }
-    catch(e) {
-      data = {};
-    }
-
-    return data;
-  }
 
   beforeEach(() => {
     tmpdir = tmp.dirSync().name;
@@ -51,7 +33,7 @@ describe("SaverPrefs", () => {
 
   describe("with config", () => {
     it("recovers from corrupt config", () => {
-      specifyConfig("bad-config");
+      helpers.specifyConfig(tmpdir, "bad-config");
       prefs = new SaverPrefs(tmpdir);
 
       assert(prefs.firstLoad);
@@ -60,7 +42,7 @@ describe("SaverPrefs", () => {
     });
 
     it("works with existing config", () => {
-      specifyConfig("config");
+      helpers.specifyConfig(tmpdir, "config");
       prefs = new SaverPrefs(tmpdir);
 
       assert(!prefs.firstLoad);
@@ -72,12 +54,12 @@ describe("SaverPrefs", () => {
   // reload
   describe("reload", () => {
     beforeEach(() => {
-      specifyConfig("config");
+      helpers.specifyConfig(tmpdir, "config");
       prefs = new SaverPrefs(tmpdir);
     });
   
     it("works with existing config", () => {
-      specifyConfig("config");
+      helpers.specifyConfig(tmpdir, "config");
       prefs = new SaverPrefs(tmpdir);
 
       assert.equal("before-dawn-screensavers/emoji/saver.json", prefs.current);
@@ -85,8 +67,8 @@ describe("SaverPrefs", () => {
       assert(fs.existsSync(configDest));
 
 
-      specifyConfig("config-2");
-      prefs.reload()
+      helpers.specifyConfig(tmpdir, "config-2");
+      prefs.reload();
       assert.equal("before-dawn-screensavers/blur/saver.json", prefs.current);
       assert(fs.existsSync(configDest));
     });
@@ -97,13 +79,13 @@ describe("SaverPrefs", () => {
     describe("without config", () => {
       it("is true", () => {
         prefs = new SaverPrefs(tmpdir);
-        assert(prefs.noSource)
+        assert(prefs.noSource);
       });
-    })
+    });
 
     describe("with config", () => {
       beforeEach(() => {
-        specifyConfig("config");
+        helpers.specifyConfig(tmpdir, "config");
         prefs = new SaverPrefs(tmpdir);
       });
 
@@ -143,13 +125,13 @@ describe("SaverPrefs", () => {
     it("is the working directory", () => {
       let dest = path.join(tmpdir, "savers");
       assert.equal(dest, prefs.defaultSaversDir);
-    })
+    });
   });
 
   // toHash
   describe("toHash", () => {
     beforeEach(() => {
-      specifyConfig("config");
+      helpers.specifyConfig(tmpdir, "config");
       prefs = new SaverPrefs(tmpdir);
     });
 
@@ -157,7 +139,7 @@ describe("SaverPrefs", () => {
       let data = prefs.toHash();
       assert.equal("before-dawn-screensavers/emoji/saver.json", data.saver);
       assert.equal(10, data.delay);
-    })
+    });
   });
 
   // ensureDefaults
@@ -176,21 +158,23 @@ describe("SaverPrefs", () => {
       prefs.ensureDefaults();
       assert.equal(5, prefs.delay);
       assert.equal(10, prefs.sleep);
-    })
+    });
   });
 
   // sources
   describe("sources", () => {
     beforeEach(() => {
-      specifyConfig("config");
+      helpers.specifyConfig(tmpdir, "config");
       prefs = new SaverPrefs(tmpdir);
     });
 
-    it("works", () => {
-      let result = prefs.sources;
+    it("includes localSource", () => {
+      let localSourceDir = helpers.getTempDir();
+      prefs.localSource = localSourceDir;
 
+      let result = prefs.sources;
       assert.deepEqual(
-        [ "/Users/colin/Dropbox/Projects/before-dawn-screensavers" ], result);
+        [ localSourceDir ], result);
     });
 
     it("includes repo", () => {
@@ -199,18 +183,30 @@ describe("SaverPrefs", () => {
       let dest = path.join(tmpdir, "savers");
 
       assert.deepEqual(
-        [ dest,
-          "/Users/colin/Dropbox/Projects/before-dawn-screensavers" ], result);
+        [ dest ], result);
     });
 
-    // it('includes system', () => {
-    //   let result = prefs.sources;
-    //   let dest = path.join(tmpdir, "savers");
+    it("includes both repo and localsource", () => {
+      let saversDir = path.join(tmpdir, "savers");
+      let localSourceDir = helpers.getTempDir();
 
-    //   assert.deepEqual(
-    //     [ dest,
-    //       '/Users/colin/Dropbox/Projects/before-dawn-screensavers' ], result);
-    // });
+      prefs.localSource = localSourceDir;
+      prefs.sourceRepo = "foo";
+
+
+      let result = prefs.sources;
+      assert.deepEqual(
+        [ saversDir, localSourceDir ], result);
+    });
+
+    it("includes system", () => {
+      let systemDir = path.join(tmpdir, "system-savers");
+      fs.mkdirSync(systemDir);
+      let result = prefs.sources;
+
+      assert.deepEqual(
+        [ systemDir ], result);
+    });
   });
 
   // systemSource
@@ -228,7 +224,7 @@ describe("SaverPrefs", () => {
   // getOptions
   describe("getOptions", () => {
     beforeEach(() => {
-      specifyConfig("config-with-options");
+      helpers.specifyConfig(tmpdir, "config-with-options");
       prefs = new SaverPrefs(tmpdir);
     });
 
@@ -250,16 +246,16 @@ describe("SaverPrefs", () => {
     });
 
     it("works", (done) => {
-      let data = prefsToJSON();
+      let data = helpers.prefsToJSON(tmpdir);
       assert.notEqual(data.delay, 123);
 
       prefs.delay = 123;
       prefs.write(() => {
-        data = prefsToJSON();
+        data = helpers.prefsToJSON(tmpdir);
         assert.equal(data.delay, 123);
 
         done();
-      })
+      });
     });
   });
 
@@ -270,13 +266,13 @@ describe("SaverPrefs", () => {
     });
 
     it("works", () => {
-      let data = prefsToJSON();
+      let data = helpers.prefsToJSON(tmpdir);
       assert.notEqual(data.delay, 123);
 
       prefs.delay = 123;
       prefs.writeSync();
       
-      data = prefsToJSON();
+      data = helpers.prefsToJSON(tmpdir);
       assert.equal(data.delay, 123);
     });
   });
@@ -288,13 +284,13 @@ describe("SaverPrefs", () => {
     });
 
     it("works", (done) => {
-      let data = prefsToJSON();
+      let data = helpers.prefsToJSON(tmpdir);
       assert.notEqual(data.delay, 123);
 
       prefs.updatePrefs({
         delay: 123
       }, () => {
-        data = prefsToJSON();
+        data = helpers.prefsToJSON(tmpdir);
         assert.equal(data.delay, 123);
 
         done();
@@ -305,7 +301,7 @@ describe("SaverPrefs", () => {
   // setDefaultRepo
   describe("setDefaultRepo", () => {
     beforeEach(() => {
-      specifyConfig("default-repo");
+      helpers.specifyConfig(tmpdir, "default-repo");
       prefs = new SaverPrefs(tmpdir);
     });
 

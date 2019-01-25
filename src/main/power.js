@@ -4,11 +4,8 @@ module.exports.charging = function() {
   if ( process.platform === "darwin") {
     var osxBattery = require("osx-battery");
 
-	  return osxBattery().then(res => {
-		  return res.isCharging || res.fullyCharged;
-	  }).catch(err => {
-      console.log(err);
-      return true;
+    return osxBattery().then(res => {
+      return res.isCharging || res.fullyCharged;
     });
     
   }
@@ -16,11 +13,8 @@ module.exports.charging = function() {
     var linuxBattery = require("linux-battery");
     
     // NOTE: this is not actually tested
-	  return linuxBattery().then(res => {
+    return linuxBattery().then(res => {
       return ( res.state !== "discharging" );
-	  }).catch(err => {
-      console.log(err);
-      return true;
     });    
   } 
   else {
@@ -32,11 +26,10 @@ module.exports.charging = function() {
       //Other (1)
       //The battery is discharging.
       var exec = require("child_process").execFile;
-      exec(cmd, args, function(error, stdout, stderr) {
+      exec(cmd, args, function(error, stdout) {
         // console.log("stdout: " + stdout);
         // console.log("stderr: " + stderr);
         if (error !== null) {
-          console.log("exec error: " + error);
           reject(error);
         }
 

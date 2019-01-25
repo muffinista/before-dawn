@@ -24,6 +24,8 @@ var serialize = function(obj) {
 };
 
 const _path = require("path");
+const fs = require("fs");
+
 
 module.exports = function Saver(_attrs) {
   this.UNWRITABLE_KEYS = ["key", "path", "url", "settings", "editable"];
@@ -79,9 +81,9 @@ module.exports = function Saver(_attrs) {
   if ( this.valid === true ) {
     // figure out the settings from any defaults for this screensaver,
     // and combine with incoming user-specified settings
-    this.settings = _attrs.options.map(function(o, i) {
+    this.settings = _attrs.options.map(function(o) {
       return [o.name, o.default];
-    }).reduce(function(o, v, i) {
+    }).reduce(function(o, v) {
       o[v[0]] = v[1];
       return o; 
     }, {});
@@ -141,9 +143,6 @@ module.exports = function Saver(_attrs) {
 
   // write a new set of attributes for this saver to its JSON file
   this.write = function(attrs, configDest) {
-    var _path = require("path");
-    var fs = require("fs");
-
     if ( typeof(configDest) === "undefined" ) {
       configDest = _path.join(this.path, "saver.json");
     }

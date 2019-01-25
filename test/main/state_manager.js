@@ -5,8 +5,8 @@ const sinon = require("sinon");
 
 const StateManager = require("../../src/main/state_manager.js");
 const fakeIdler = {
-  getIdleTime: () => { return 0 }
-}
+  getIdleTime: () => { return 0; }
+};
 
 describe("StateManager", () => {
   let hitIdle, hitBlank, hitReset;

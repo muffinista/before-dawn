@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-unused-vars
 const { init } = require("@sentry/electron");
 
 var version = undefined;
@@ -8,7 +9,8 @@ try {
   version = packageJSON.version;
 }
 catch(e) {
-  console.log("Unable to set version!", e);
+  version = "0.0.0";
+//  console.log("Unable to set version!", e);
 }
 
 global.APP_NAME = "Before Dawn";
@@ -22,6 +24,11 @@ global.HELP_URL = "https://muffinista.github.io/before-dawn/";
 global.ISSUES_URL = "https://github.com/muffinista/before-dawn/issues";
 
 global.RELEASE_SERVER = "https://before-dawn.now.sh";
+
+if ( process.env.LOCAL_PACKAGE ) {
+  global.LOCAL_PACKAGE = process.env.LOCAL_PACKAGE;
+}
+
 
 // note -- this is hardcoded to win32 for now because we actually
 // don't care what platform is running

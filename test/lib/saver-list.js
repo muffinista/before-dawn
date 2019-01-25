@@ -2,38 +2,20 @@
 
 const assert = require("assert");
 const sinon = require("sinon");
+const helpers = require("../helpers.js");
 
-const SaverPrefs = require("../../src/lib/prefs.js");
-const SaverListManager = require("../../src/lib/saver-list.js");
-
-const tmp = require("tmp");
 const rimraf = require("rimraf");
 const fs = require("fs-extra");
 const path = require("path");
+
+const SaverPrefs = require("../../src/lib/prefs.js");
+const SaverListManager = require("../../src/lib/saver-list.js");
 
 var sandbox;
 
 describe("SaverListManager", function() { 
   var savers;
   var prefs;
-
-  var getTempDir = function() {
-    return tmp.dirSync().name;
-  };
-
-  var addSaver = function(dest, name, source) {
-    // make a subdir in the savers directory and drop screensaver
-    // config there
-    if ( source === undefined ) {
-      source = "saver.json"
-    }
-    var src = path.join(__dirname, "../fixtures/" + source);
-    var testSaverDir = path.join(dest, name);
-    fs.mkdirSync(testSaverDir);
-
-    saverJSONFile = path.join(testSaverDir, "saver.json");
-    fs.copySync(src, saverJSONFile);
-  };
   
   var workingDir;
   var saversDir;
@@ -44,19 +26,19 @@ describe("SaverListManager", function() {
     sandbox = sinon.createSandbox();
 
     // this will be the working directory of the app
-    workingDir = getTempDir();
+    workingDir = helpers.getTempDir();
 
     // this will be the separate directory to hold screensavers
-    saversDir = getTempDir();
+    saversDir = helpers.getTempDir();
 
-    addSaver(saversDir, "saver");
-    addSaver(saversDir, "saver2");    
+    saverJSONFile = helpers.addSaver(saversDir, "saver");
+    helpers.addSaver(saversDir, "saver2");    
 
     systemDir = path.join(workingDir, "system-savers");
     fs.mkdirSync(systemDir);
 
-    addSaver(systemDir, "random-saver");
-    addSaver(systemDir, "__template");    
+    helpers.addSaver(systemDir, "random-saver");
+    helpers.addSaver(systemDir, "__template");    
 
     prefs = new SaverPrefs(workingDir);
     prefs.localSource = saversDir;
@@ -79,15 +61,15 @@ describe("SaverListManager", function() {
         assert(results.setup);
 
         done();
-      })
+      });
     });
   });
 
   describe("reload", () => {
     it("works", (done) => {
-      savers.reload(true).then((results) => {
+      savers.reload(true).then(() => {
         done();
-      })
+      });
     });
   });
   
@@ -140,12 +122,12 @@ describe("SaverListManager", function() {
     });
 
     it("handles bad data", (done) => {
-      addSaver(saversDir, "invalid", "invalid.json");
+      helpers.addSaver(saversDir, "invalid", "invalid.json");
       savers.list(function(data) {
         assert.equal(3, data.length);
         done();
       });
-    })
+    });
 
     it("uses cache", (done) => {
       let cache = [0, 1, 2, 3, 4, 5];
@@ -153,7 +135,7 @@ describe("SaverListManager", function() {
       savers.list((data) => {
         assert.deepEqual(cache, data);
         done();
-      })
+      });
     });
 
     it("forces reset", (done) => {
@@ -163,13 +145,13 @@ describe("SaverListManager", function() {
         assert.notDeepEqual(cache, data);
         assert.equal(3, data.length);
         done();
-      }, true)
+      }, true);
     });
   });
 
   describe("reset", function() {
     it("resets cache", function(done) {
-      savers.list(function(data) {
+      savers.list(function() {
         assert.equal(3, savers.loadedScreensavers.length);
         savers.reset();
         assert.equal(0, savers.loadedScreensavers.length);
@@ -184,7 +166,7 @@ describe("SaverListManager", function() {
       savers.list(function(data) {
         assert.equal(3, data.length);
         let foo = savers.random();
-        assert(foo.key !== undefined)
+        assert(foo.key !== undefined);
         done();
       });
     });
@@ -229,7 +211,7 @@ describe("SaverListManager", function() {
         () => {
           savers.create({
             name:"New Screensaver"
-          })
+          });
         },
         Error);
       done();

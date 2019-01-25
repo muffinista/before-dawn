@@ -1,18 +1,16 @@
 import Vue from "vue";
 import VueElectron from "vue-electron";
 import VueObserveVisibility from "vue-observe-visibility";
-import BootstrapVue from "bootstrap-vue"
+import BootstrapVue from "bootstrap-vue";
 
 import Prefs from "./Prefs";
 import Watcher from "./Watcher";
 import NewScreensaver from "./NewScreensaver";
 import About from "./About";
 
-import "bootstrap/dist/css/bootstrap.min.css"
-import "bootstrap-vue/dist/bootstrap-vue.css"
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap-vue/dist/bootstrap-vue.css";
 import "../css/styles.scss";
-
-
 
 
 if (!process.env.IS_WEB) {
@@ -24,34 +22,14 @@ Vue.use(VueElectron);
 Vue.use(BootstrapVue);
 Vue.use(VueObserveVisibility);
 
-if ( document.getElementById("prefs") ) {
-  // eslint-disable no-new 
-  new Vue({
-    components: { Prefs },
-    template: "<Prefs/>"
-  }).$mount("#prefs");
-}
+var actions = {
+  "prefs": { components: { Prefs }, template: "<Prefs/>" },
+  "editor": { components: { Watcher }, template: "<Watcher/>" },
+  "new": { components: { NewScreensaver }, template: "<NewScreensaver/>" },
+  "about": { components: { About }, template: "<About/>" }
+};
 
-if ( document.getElementById("editor") ) {
-  // eslint-disable no-new 
-  new Vue({
-    components: { Watcher },
-    template: "<Watcher/>"
-  }).$mount("#editor");
-}
+var id = document.querySelector("body > div").id;
+var opts = actions[id];
 
-if ( document.getElementById("new") ) {
-  // eslint-disable no-new 
-  new Vue({
-    components: { NewScreensaver },
-    template: "<NewScreensaver/>"
-  }).$mount("#new");
-}
-
-if ( document.getElementById("about") ) {
-  // eslint-disable no-new 
-  new Vue({
-    components: { About },
-    template: "<About/>"
-  }).$mount("#about");
-}
+new Vue(opts).$mount("#" + id);
