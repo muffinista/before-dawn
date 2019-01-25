@@ -6,7 +6,6 @@ var request = require("request-promise-native");
 const request_streaming = require("request");
 var yauzl = require("yauzl");
 var mkdirp = require("mkdirp");
-const util = require("util");
 const rimraf = require("rimraf");
 const lockfile = require("proper-lockfile");
 
@@ -53,7 +52,7 @@ module.exports = class Package {
       updated_at: this.updated_at,
       downloaded: this.downloaded
     };
-  };
+  }
 
   async getReleaseInfo() {
     let self = this;
@@ -85,7 +84,7 @@ module.exports = class Package {
     }
 
     return this.data;
-  };
+  }
 
   async checkLatestRelease(force) {
     let data = await this.getReleaseInfo();
@@ -114,7 +113,7 @@ module.exports = class Package {
       this.logger("no package update available");
       return this.attrs();
     }
-  };
+  }
 
   async downloadFile(url) {
     var temp = require("temp");
@@ -134,7 +133,7 @@ module.exports = class Package {
         }).
         pipe(fs.createWriteStream(tempName));
     });
-  };
+  }
 
 
   zipToSavers(tempName) {
@@ -211,5 +210,5 @@ module.exports = class Package {
       });
     });
 
-  };
+  }
 };

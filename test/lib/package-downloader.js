@@ -94,9 +94,9 @@ describe("PackageDownloader", function() {
 
       sandbox.stub(fakePackage, "downloadFile").rejects();
       pd.updatePackage(fakePackage).
-        then((res) => {
-          console.log("oops i got here!!!", res);
-        }).
+        // then((res) => {
+        //   console.log("oops i got here!!!", res);
+        // }).
         catch(() => { done(); });
     });
   });

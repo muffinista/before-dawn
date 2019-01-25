@@ -17,7 +17,7 @@
 const electron = require("electron");
 const log = require("electron-log");
 
-const {app, BrowserWindow, ipcMain, Menu, Tray} = require("electron");
+const {app, dialog, BrowserWindow, ipcMain, Menu, Tray} = require("electron");
 
 const fs = require("fs");
 const path = require("path");
@@ -39,6 +39,8 @@ var releaseChecker;
 const menusAndTrays = require("./menus.js");
 const dock = require("./dock.js");
 const windows = require("./windows.js");
+const autostarter = require("./autostarter.js");
+
 
 // NOTE -- this needs to be global, otherwise the app icon gets
 // garbage collected and won't show up in the system tray
@@ -700,38 +702,24 @@ var setupIfNeeded = function() {
         pd.setLocalFile(global.LOCAL_PACKAGE);
       }
 
-      return pd.updatePackage().
-        then(() => resolve({
-          setup: true,
-          new: true,
-          package: true,
-          missing: false
-        }));
+      return pd.updatePackage().then(() => resolve({ setup: true }));
     }
 
     var savers = new SaverListManager({
       prefs: prefs
     });
+
     log.info("checking if " + prefs.current + " is valid");
     savers.confirmExists(prefs.current).then((exists) => {
+      let results = { setup: !exists };
       if ( ! exists ) {
         log.info("need to pick a new screensaver");
-        return resolve({
-          setup: true,
-          new: false,
-          package: false,
-          missing: true
-        });
       }
       else {
         log.info("looks like we are good to go");
-        return resolve({
-          setup: false,
-          new: false,
-          package: false,
-          missing: false
-        });
       }
+      return resolve(results);
+
     });
   });
 };
@@ -782,9 +770,33 @@ var setupPackageCheck = function() {
 };
 
 /**
+ * Check if we should move the app to the actual application folder.
+ * This is important because the app is pretty fragile on OSX otherwise.
+ */
+var askAboutApplicationsFolder = function() {
+  if ( testMode === true || global.IS_DEV === true || app.isInApplicationsFolder === undefined ) {
+    return;
+  }
+
+  if ( !app.isInApplicationsFolder() ) {
+    const chosen = dialog.showMessageBox({
+      type: "question",
+      buttons: ["Move to Applications", "Do Not Move"],
+      message: "Move to Applications folder?",
+      detail: "Hello! I work better in your Applications folder, should I move myself there?"
+    });
+
+    if ( chosen === 0 ) {
+      app.moveToApplicationsFolder();
+    }
+  }
+};
+
+/**
  * handle initial startup of app
  */
 var bootApp = function() {
+  askAboutApplicationsFolder();
 
   global.NEW_RELEASE_AVAILABLE = false;
 
@@ -1043,41 +1055,8 @@ ipcMain.on("open-editor", (event, args) => {
 });
 
 ipcMain.on("set-autostart", (event, value) => {
-  var AutoLaunch = require("auto-launch");
-  var appName = global.APP_NAME;
-  var appLauncher = new AutoLaunch({
-    name: appName
-  });
-
-  if ( value === true ) {
-    appLauncher.isEnabled().then((isEnabled) => {
-      if ( isEnabled ) {
-        return;
-      }
-      
-      appLauncher.enable().
-                  then((err) =>{
-                    log.info("appLauncher enable", err);
-                  }).catch((err) => {
-                    log.info("appLauncher enable failed", err);
-                  });
-    });
-  }
-  else {
-    log.info("set auto start == false");
-    appLauncher.isEnabled().then((isEnabled) => {
-      if ( !isEnabled ) {
-        return;
-      }
-      appLauncher.disable().
-                  then(function() { 
-                    log.info("appLauncher enabled");
-                  }).
-                  catch((err) => {
-                    log.info("appLauncher disable failed", err);
-                  });
-    });
-  }
+  log.info("set-autostart");
+  autostarter.toggle(global.APP_NAME, value);
 });
 
 // seems like we need to catch this event to keep OSX from exiting app after screensaver runs?

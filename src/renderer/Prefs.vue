@@ -275,9 +275,7 @@ export default {
         this.prefs.setDefaultRepo(this.$electron.remote.getGlobal("SAVER_REPO"));
       }
       pd.updatePackage().then((r) => {
-        console.log("updatePackage", r);
         if ( r.downloaded === true ) {
-          console.log("ok then!");
           this.getData();
           //this.getCurrentSaver();
         }
@@ -436,7 +434,7 @@ export default {
     closeWindow() {
       this.currentWindow.close();
     },
-    saveData(cb) {
+    saveData() {
       this.disabled = true;
 
       // @todo should this use Object.assign?
@@ -451,7 +449,7 @@ export default {
         });
       });
     },
-    saveDataClick(event) {
+    saveDataClick() {
       this.saveData().then(() => {
         this.ipcRenderer.send("close-window");
       });

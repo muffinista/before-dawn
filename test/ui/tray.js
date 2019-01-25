@@ -1,17 +1,11 @@
 "use strict";
 
-const assert = require("assert");
 const helpers = require("../helpers.js");
 const path = require("path");
 
 describe("tray", function() {
   var workingDir;
   let app;
-  let windowWaitDelay = 1000;
-
-  if ( process.env.CI ) {
-    windowWaitDelay = 5000;
-  }
   
   helpers.setupTimeout(this);
 

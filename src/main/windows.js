@@ -78,7 +78,7 @@ var forceWindowClose = function(w) {
       w.destroy();
     }
     catch (e) {
-      log.info(e);
+      main.log.info(e);
     }
   }
 };
