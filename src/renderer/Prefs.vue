@@ -180,7 +180,6 @@ const {dialog} = require("electron").remote;
 
 import SaverPrefs from "@/../lib/prefs";
 import SaverListManager from "@/../lib/saver-list";
-import PackageDownloader from "@/../lib/package-downloader";
 
 export default {
   name: "Prefs",
