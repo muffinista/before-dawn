@@ -1,79 +1,164 @@
 <template>
   <div id="editor">
-    <ul role="tablist" class="nav nav-tabs">
-      <li role="presentation" class="active nav-item" id="preview-tab">
-        <a aria-expanded="true" aria-controls="preview"
-          role="tab" data-toggle="tab"
-          class="nav-link active" href="#preview" v-on:click="showPreview">Preview</a>
+    <ul
+      role="tablist"
+      class="nav nav-tabs"
+    >
+      <li
+        id="preview-tab"
+        role="presentation"
+        class="active nav-item"
+      >
+        <a
+          aria-expanded="true"
+          aria-controls="preview"
+          role="tab"
+          data-toggle="tab"
+          class="nav-link active"
+          href="#preview"
+          @click="showPreview"
+        >
+          Preview
+        </a>
       </li>
-      <li role="presentation" class="nav-item" id="settings-tab">
-        <a aria-expanded="false" aria-controls="settings"
-          role="tab" data-toggle="tab"
-          class="nav-link" href="#settings" v-on:click="showSettings">Settings</a>
+      <li
+        id="settings-tab"
+        role="presentation"
+        class="nav-item"
+      >
+        <a
+          aria-expanded="false"
+          aria-controls="settings"
+          role="tab"
+          data-toggle="tab"
+          class="nav-link"
+          href="#settings"
+          @click="showSettings"
+        >
+          Settings
+        </a>
       </li>
       <b-button-group>
-        <b-button variant="default" @click="openFolder"
-                  v-b-tooltip.hover title="Open screensaver folder">
-          <span class="icon"><img src="assets/img/folder.svg" width="14" height="14" /></span>
+        <b-button
+          v-b-tooltip.hover
+          variant="default"
+          title="Open screensaver folder"
+          @click="openFolder"
+        >
+          <span class="icon">
+            <img
+              src="assets/img/folder.svg"
+              width="14"
+              height="14"
+            >
+          </span>
         </b-button>
-        <b-button variant="default" @click="saveData"
-                  v-b-tooltip.hover title="Save changes">
-          <span class="icon"><img src="assets/img/save.svg" width="14" height="14" /></span>
+        <b-button
+          v-b-tooltip.hover
+          variant="default"
+          title="Save changes"
+          @click="saveData"
+        >
+          <span class="icon">
+            <img
+              src="assets/img/save.svg"
+              width="14"
+              height="14"
+            >
+          </span>
         </b-button>
-        <b-button variant="default" @click="reloadPreview"
-                  v-b-tooltip.hover title="Reload preview">
-          <span class="icon"><img src="assets/img/cycle.svg" width="14" height="14" /></span>
+        <b-button
+          v-b-tooltip.hover
+          variant="default"
+          title="Reload preview"
+          @click="reloadPreview"
+        >
+          <span class="icon">
+            <img
+              src="assets/img/cycle.svg"
+              width="14"
+              height="14"
+            >
+          </span>
         </b-button>
-        <b-button variant="default" @click="openConsole"
-                  v-b-tooltip.hover title="View Developer Console">
-          <span class="icon"><img src="assets/img/bug.svg" width="14" height="14" /></span>
+        <b-button
+          v-b-tooltip.hover
+          variant="default"
+          title="View Developer Console"
+          @click="openConsole"
+        >
+          <span class="icon">
+            <img
+              src="assets/img/bug.svg"
+              width="14"
+              height="14"
+            >
+          </span>
         </b-button>
       </b-button-group>
     </ul>
 
     <div class="content">
       <div class="tab-content">
-        <div class="tab-pane active" aria-labelledby="preview-tab" id="preview" role="tabpanel">
+        <div
+          id="preview"
+          class="tab-pane active"
+          aria-labelledby="preview-tab"
+          role="tabpanel"
+        >
           <div class="container-fluid space-at-bottom">
             <template v-if="saver !== undefined">
               <template v-if="options.length > 0">
                 <h4>Options</h4>
-                <small>Tweak the values here and they will be sent along
-                  to your preview.</small>
+                <small>
+                  Tweak the values here and they will be sent along
+                  to your preview.
+                </small>
                 <saver-options
                   :saver="saver"
                   :options="options"
                   :values="optionDefaults"
-                  @change="onOptionsChange"></saver-options>
+                  @change="onOptionsChange"
+                />
               </template>
               
               <h4>Preview</h4>
               <saver-preview
+                v-if="isLoaded"
                 :bus="bus"
-                v-bind:saver="saver"
-                v-bind:screenshot="screenshot"
-                v-if="isLoaded"></saver-preview>
+                :saver="saver"
+                :screenshot="screenshot"
+              />
             </template>
           </div>
         </div>
-        <div class="tab-pane" aria-labelledby="settings-tab" id="settings" role="tabpanel">
+        <div
+          id="settings"
+          class="tab-pane"
+          aria-labelledby="settings-tab"
+          role="tabpanel"
+        >
           <div class="container-fluid">
             <h4>Basic Information</h4>
-            <small>You can enter the basics about this screensaver
-              here.</small>
+            <small>
+              You can enter the basics about this screensaver
+              here.
+            </small>
             <template v-if="saver !== undefined">
-              
               <!-- NOTE: passing the attrs here because its really all
                   we need for this form and makes saving the data later a
                   lot easier -->
               <saver-form
-                v-bind:saver="saver.attrs"
-                v-if="isLoaded"></saver-form>
+                v-if="isLoaded"
+                :saver="saver.attrs"
+              />
               
               
               <h4>Configurable Options</h4>
-              <small>You can offer users configurable options to control
-                your screensaver. Manage those here.</small>
+              <small>
+                You can offer users configurable options to control
+                your screensaver. Manage those here.
+              </small>
               
               
               <!--
@@ -83,17 +168,21 @@
               <div v-if="isLoaded">
                 <saver-option-input
                   v-for="(option, index) in options"
-                  v-bind:option="option"
+                  :key="option.index"
+                  :option="option"
                   :index="index"
-                  v-bind:key="option.index"
-                  v-on:deleteOption="deleteOption(option)"></saver-option-input>      
+                  @deleteOption="deleteOption(option)"
+                />      
               </div>
               
               <div class="padded-top padded-bottom">
                 <button
                   type="button"
                   class="btn btn-primary add-option"
-                  v-on:click="addSaverOption">Add Option</button>
+                  @click="addSaverOption"
+                >
+                  Add Option
+                </button>
               </div>
             </template>
           </div>
@@ -102,9 +191,26 @@
     </div>
     <footer class="footer d-flex justify-content-between">
       <div>
-        <button class="btn btn-large btn-secondary cancel" v-on:click="closeWindow">Cancel</button>
-        <button class="btn btn-large btn-primary save" v-on:click.stop.prevent="saveData" :disabled="disabled">Save</button>
-        <button class="btn btn-large btn-primary save" v-on:click.stop.prevent="saveDataAndClose" :disabled="disabled">Save and Close</button>        
+        <button
+          class="btn btn-large btn-secondary cancel"
+          @click="closeWindow"
+        >
+          Cancel
+        </button>
+        <button
+          class="btn btn-large btn-primary save"
+          :disabled="disabled"
+          @click.stop.prevent="saveData"
+        >
+          Save
+        </button>
+        <button
+          class="btn btn-large btn-primary save"
+          :disabled="disabled"
+          @click.stop.prevent="saveDataAndClose"
+        >
+          Save and Close
+        </button>        
       </div>
     </footer>
   </div> <!-- #editor -->
@@ -129,39 +235,9 @@ import SaverPrefs from "@/../lib/prefs";
 import SaverListManager from "@/../lib/saver-list";
 
 export default {
-  name: "editor",
+  name: "Editor",
   components: {
     SaverForm, SaverPreview, SaverOptionInput, SaverOptions
-  },
-  async mounted() {
-    if ( this.src === null ) {
-      return;
-    }
-
-    let dataPath = remote.getCurrentWindow().saverOpts.base;
-
-    this._prefs = new SaverPrefs(dataPath);
-    this._savers = new SaverListManager({
-      prefs: this._prefs
-    });
-
-    this._savers.loadFromFile(this.src).then((result) => {
-      this.saver = result;
-      this.options = result.options;
-      this.lastIndex = result.options.length;
-
-      // make sure folder actually exists
-      if ( fs.existsSync(this.folderPath) ) {
-        fs.watch(this.folderPath, (eventType, filename) => {
-          if (filename) {
-            this.reloadPreview();
-            // note to self -- this is bad if you're on the settings tab and
-            // click save
-            // this.showPreview();
-          }
-        });
-      }      
-    });
   },
   data() {
     return {
@@ -207,6 +283,36 @@ export default {
 
       return result;
     },
+  },
+  async mounted() {
+    if ( this.src === null ) {
+      return;
+    }
+
+    let dataPath = remote.getCurrentWindow().saverOpts.base;
+
+    this._prefs = new SaverPrefs(dataPath);
+    this._savers = new SaverListManager({
+      prefs: this._prefs
+    });
+
+    this._savers.loadFromFile(this.src).then((result) => {
+      this.saver = result;
+      this.options = result.options;
+      this.lastIndex = result.options.length;
+
+      // make sure folder actually exists
+      if ( fs.existsSync(this.folderPath) ) {
+        fs.watch(this.folderPath, (eventType, filename) => {
+          if (filename) {
+            this.reloadPreview();
+            // note to self -- this is bad if you're on the settings tab and
+            // click save
+            // this.showPreview();
+          }
+        });
+      }      
+    });
   },
   methods: {
     clearTabs() {

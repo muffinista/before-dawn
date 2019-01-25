@@ -1,39 +1,52 @@
 <template>
-<div id="new">
-  <div class="content">
-    <div class="container-fluid">
-      <template v-if="!canAdd">
-        <div class="need-setup-message">
+  <div id="new">
+    <div class="content">
+      <div class="container-fluid">
+        <template v-if="!canAdd">
+          <div class="need-setup-message">
+            <p>
+              Screensavers in Before Dawn are web pages, so if you can use HTML, 
+              CSS, and/or Javascript, you can make your own screensaver. But before 
+              you can do that, you'll need to set a local directory in the preferences 
+              window!
+            </p>
+          </div>
+        </template>  
+
+        <template v-if="canAdd">
           <p>
             Screensavers in Before Dawn are web pages, so if you can use HTML, 
-            CSS, and/or Javascript, you can make your own screensaver. But before 
-            you can do that, you'll need to set a local directory in the preferences 
-            window!
+            CSS, and/or Javascript, you can make your own screensaver.
           </p>
-        </div>
-      </template>  
 
-      <template v-if="canAdd">
-        <p>
-          Screensavers in Before Dawn are web pages, so if you can use HTML, 
-          CSS, and/or Javascript, you can make your own screensaver.
-        </p>
-
-        <p>Use this form to create a new screensaver. A template will be
-          added to the system that you can fill in with your code.</p>
-        <saver-form
-           v-bind:saver="saver"></saver-form>
-      </template>
+          <p>
+            Use this form to create a new screensaver. A template will be
+            added to the system that you can fill in with your code.
+          </p>
+          <saver-form
+            :saver="saver"
+          />
+        </template>
+      </div>
     </div>
-  </div>
-  <footer class="footer d-flex justify-content-between">
-    <div>
-      <button class="btn btn-large btn-secondary cancel" v-on:click="closeWindow">Cancel</button>
-      <button class="btn btn-large btn-primary save"
-              v-on:click="saveData" :disabled="disabled || !canAdd">Save</button>
-    </div>
-  </footer>
-</div> <!-- #new -->
+    <footer class="footer d-flex justify-content-between">
+      <div>
+        <button
+          class="btn btn-large btn-secondary cancel"
+          @click="closeWindow"
+        >
+          Cancel
+        </button>
+        <button
+          class="btn btn-large btn-primary save"
+          :disabled="disabled || !canAdd"
+          @click="saveData"
+        >
+          Save
+        </button>
+      </div>
+    </footer>
+  </div> <!-- #new -->
 </template>
 
 <script>
@@ -46,17 +59,9 @@ import SaverPrefs from "@/../lib/prefs";
 import SaverListManager from "@/../lib/saver-list";
 
 export default {
-  name: "new-screensaver",
+  name: "NewScreensaver",
   components: {
     SaverForm
-  },
-  mounted() {
-    let dataPath = remote.getCurrentWindow().saverOpts.base;
-    this.prefs = new SaverPrefs(dataPath);
-
-    this._savers = new SaverListManager({
-      prefs: this.prefs
-    });
   },
   data() {
     return {
@@ -92,6 +97,14 @@ export default {
         this.prefs.localSource !== undefined &&
         this.prefs.localSource !== "";
     }
+  },
+  mounted() {
+    let dataPath = remote.getCurrentWindow().saverOpts.base;
+    this.prefs = new SaverPrefs(dataPath);
+
+    this._savers = new SaverListManager({
+      prefs: this.prefs
+    });
   },
   methods: {
     closeWindow() {

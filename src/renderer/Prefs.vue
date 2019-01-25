@@ -1,76 +1,138 @@
 <template>
   <div id="prefs">
-    <ul role="tablist" class="nav nav-tabs">
-      <li role="presentation" class="active nav-item" id="screensavers-tab">
-        <a aria-expanded="true" aria-controls="screensavers"
-          role="tab" data-toggle="tab"
-          class="nav-link active" href="#screensavers" v-on:click="showScreensavers">Screensavers</a>
+    <ul
+      role="tablist"
+      class="nav nav-tabs"
+    >
+      <li
+        id="screensavers-tab"
+        role="presentation"
+        class="active nav-item"
+      >
+        <a
+          aria-expanded="true"
+          aria-controls="screensavers"
+          role="tab"
+          data-toggle="tab"
+          class="nav-link active"
+          href="#screensavers"
+          @click="showScreensavers"
+        >
+          Screensavers
+        </a>
       </li>
-      <li role="presentation" class="nav-item" id="preferences-tab">
-        <a aria-expanded="false" aria-controls="preferences"
-          role="tab" data-toggle="tab"
-          class="nav-link" href="#preferences" v-on:click="showPreferences">Preferences</a>
+      <li
+        id="preferences-tab"
+        role="presentation"
+        class="nav-item"
+      >
+        <a
+          aria-expanded="false"
+          aria-controls="preferences"
+          role="tab"
+          data-toggle="tab"
+          class="nav-link"
+          href="#preferences"
+          @click="showPreferences"
+        >
+          Preferences
+        </a>
       </li>
-      <li role="presentation" class="nav-item" id="advanced-tab">
-        <a aria-expanded="false" aria-controls="advanced"
-          role="tab" data-toggle="tab"
-          class="nav-link" href="#advanced" v-on:click="showAdvanced">Advanced</a>
+      <li
+        id="advanced-tab"
+        role="presentation"
+        class="nav-item"
+      >
+        <a
+          aria-expanded="false"
+          aria-controls="advanced"
+          role="tab"
+          data-toggle="tab"
+          class="nav-link"
+          href="#advanced"
+          @click="showAdvanced"
+        >
+          Advanced
+        </a>
       </li>
     </ul>
     <div class="content">
       <div class="tab-content">
-        <div class="active tab-pane" aria-labelledby="screensavers-tab" id="screensavers" role="tabpanel">
+        <div
+          id="screensavers"
+          class="active tab-pane"
+          aria-labelledby="screensavers-tab"
+          role="tabpanel"
+        >
           <div class="container-fluid">
             <div class="row">
               <div class="savers-grid">
                 <!-- left pane -->
                 <div>
                   <saver-list
-                    v-bind:savers="savers"
-                    v-bind:current="saver"
-                    v-on:editSaver="editSaver"
-                    v-on:deleteSaver="deleteSaver"
-                    @change="onSaverPicked"></saver-list>
+                    :savers="savers"
+                    :current="saver"
+                    @editSaver="editSaver"
+                    @deleteSaver="deleteSaver"
+                    @change="onSaverPicked"
+                  />
                 </div>
               
                 <!-- right pane -->
                 <div class="saver-detail">
                   <template v-if="saverIsPicked">
                     <saver-preview
+                      v-if="savers[saverIndex] !== undefined"
+                      :key="renderIndex"
                       :bus="bus"
                       :saver="saverObj"
                       :screenshot="screenshot"
                       :options="options[saver]"
-                      :key="renderIndex"
-                      v-if="savers[saverIndex] !== undefined"></saver-preview>
-                    <saver-summary :saver="saverObj"></saver-summary>
+                    />
+                    <saver-summary :saver="saverObj" />
                     <saver-options
                       :saver="saver"
                       :options="saverOptions"
                       :values="options[saver]"
                       @change="onOptionsChange"
-                      v-on:saverOption="updateSaverOption"></saver-options>
+                      @saverOption="updateSaverOption"
+                    />
                   </template>
                 </div>
               </div>
             </div>
           </div>
         </div>
-        <div class="tab-pane" aria-labelledby="preferences-tab" id="preferences" role="tabpanel">
+        <div
+          id="preferences"
+          class="tab-pane"
+          aria-labelledby="preferences-tab"
+          role="tabpanel"
+        >
           <div class="container-fluid">
             <template v-if="prefs !== undefined">
-              <prefs-form :prefs="prefs"></prefs-form>
+              <prefs-form :prefs="prefs" />
             </template>
           </div>
         </div>
-        <div class="tab-pane" aria-labelledby="advanced-tab" id="advanced" role="tabpanel">
+        <div
+          id="advanced"
+          class="tab-pane"
+          aria-labelledby="advanced-tab"
+          role="tabpanel"
+        >
           <div class="container-fluid">
             <template v-if="prefs !== undefined">
               <advanced-prefs-form
                 :prefs="prefs"
-                v-on:localSourceChange="localSourceChange"></advanced-prefs-form>
-              <button class="btn btn-large btn-primary reset-to-defaults"
-                      v-on:click="resetToDefaults">Reset to Defaults</button>
+                @localSourceChange="localSourceChange"
+              />
+              <button
+                class="btn btn-large btn-primary reset-to-defaults"
+                @click="resetToDefaults"
+              >
+                Reset to Defaults
+              </button>
             </template>
           </div>
         </div>
@@ -78,11 +140,27 @@
     </div> <!-- content -->
     <footer class="footer d-flex justify-content-between">
       <div class="">
-        <button class="align-middle btn btn-large btn-primary create" v-on:click="createNewScreensaver">Create Screensaver</button>
+        <button
+          class="align-middle btn btn-large btn-primary create"
+          @click="createNewScreensaver"
+        >
+          Create Screensaver
+        </button>
       </div>
       <div>
-        <button class="btn btn-large btn-secondary cancel" v-on:click="closeWindow">Cancel</button>
-        <button class="btn btn-large btn-primary save"  v-on:click="saveDataClick" :disabled="disabled">Save</button>
+        <button
+          class="btn btn-large btn-secondary cancel"
+          @click="closeWindow"
+        >
+          Cancel
+        </button>
+        <button
+          class="btn btn-large btn-primary save"
+          :disabled="disabled"
+          @click="saveDataClick"
+        >
+          Save
+        </button>
       </div>
     </footer>
   </div> <!-- #prefs -->
@@ -105,46 +183,9 @@ import SaverListManager from "@/../lib/saver-list";
 import PackageDownloader from "@/../lib/package-downloader";
 
 export default {
-  name: "prefs",
+  name: "Prefs",
   components: {
     SaverList, SaverOptions, SaverPreview, SaverSummary, AdvancedPrefsForm, PrefsForm
-  },
-  async mounted() {
-    let dataPath = this.$electron.remote.getCurrentWindow().saverOpts.base;
-
-    this.ipcRenderer.on("savers-updated", this.onSaversUpdated);
-    this.prefs = new SaverPrefs(dataPath);
-    this._savers = new SaverListManager({
-      prefs: this.prefs
-    }, this.logger);
-
-    this._savers.setup().then(() => {
-      this.getData();
-      this.getCurrentSaver();
-      var pd = new PackageDownloader(this.prefs);
-      if ( this.prefs.needSetup() ) {
-        this.prefs.setDefaultRepo(this.$electron.remote.getGlobal("SAVER_REPO"));
-      }
-      pd.updatePackage().then((r) => {
-        console.log("updatePackage", r);
-        if ( r.downloaded === true ) {
-          console.log("ok then!");
-          this.getData();
-          //this.getCurrentSaver();
-        }
-      }).catch((err) => {
-        this.logger(err);
-      });
-
-      if ( this.$electron.remote.getGlobal("NEW_RELEASE_AVAILABLE") ) {
-        this.$nextTick(() => {
-          this.renderUpdateNotice();
-        });
-      }
-    });
-  },
-  beforeDestroy() {
-    this.ipcRenderer.removeListener("savers-updated", this.onSaversUpdated);
   },
   data() {
     return {
@@ -216,6 +257,43 @@ export default {
       // the main app will pass us a screenshot URL, here it is
       return decodeURIComponent(this.params.get("screenshot"));
     }
+  },
+  async mounted() {
+    let dataPath = this.$electron.remote.getCurrentWindow().saverOpts.base;
+
+    this.ipcRenderer.on("savers-updated", this.onSaversUpdated);
+    this.prefs = new SaverPrefs(dataPath);
+    this._savers = new SaverListManager({
+      prefs: this.prefs
+    }, this.logger);
+
+    this._savers.setup().then(() => {
+      this.getData();
+      this.getCurrentSaver();
+      var pd = new PackageDownloader(this.prefs);
+      if ( this.prefs.needSetup() ) {
+        this.prefs.setDefaultRepo(this.$electron.remote.getGlobal("SAVER_REPO"));
+      }
+      pd.updatePackage().then((r) => {
+        console.log("updatePackage", r);
+        if ( r.downloaded === true ) {
+          console.log("ok then!");
+          this.getData();
+          //this.getCurrentSaver();
+        }
+      }).catch((err) => {
+        this.logger(err);
+      });
+
+      if ( this.$electron.remote.getGlobal("NEW_RELEASE_AVAILABLE") ) {
+        this.$nextTick(() => {
+          this.renderUpdateNotice();
+        });
+      }
+    });
+  },
+  beforeDestroy() {
+    this.ipcRenderer.removeListener("savers-updated", this.onSaversUpdated);
   },
   methods: {
     clearTabs() {
