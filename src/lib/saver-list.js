@@ -121,23 +121,27 @@ module.exports = class SaverListManager {
     // also match all subdirectories, which might be desirable
     // or even required, but is a lot slower, so not doing it
     // for now
-    console.log(folders);
-    folders = folders.filter((el) => { return el !== undefined && el !== ""})
-//    pattern = "{" + folders.join(",") + ",}/*/saver.json";
-    pattern = "{" + folders.join(",") + "}/*/saver.json";
-    console.log("look for savers in " + pattern);
-    savers = glob.sync(pattern);
+    folders = folders.filter((el) => { 
+      return el !== undefined && el !== "" && fs.existsSync(el);
+    });
 
-    for ( var i = 0; i < savers.length; i++ ) {
-      var f = savers[i];
-      var folder = path.dirname(f);
-      var doLoad = ! folder.split(path.sep).reverse()[0].match(/^__/) &&
-                  ! skipFolder(folder);
-      
-      if ( doLoad ) {
-        promises.push(this.loadFromFile(f));
-      }
-    }
+    folders.forEach((sourceFolder) => {
+      pattern = `${sourceFolder}/*/saver.json`;
+      savers = glob.sync(pattern);
+
+      for ( var i = 0; i < savers.length; i++ ) {
+        var f = savers[i];
+        var folder = path.dirname(f);
+
+        // exclude skippable folders
+        var doLoad = ! folder.split(path.sep).reverse()[0].match(/^__/) &&
+                    ! skipFolder(folder);
+        
+        if ( doLoad ) {
+          promises.push(this.loadFromFile(f));
+        }
+      }  
+    });
 
     // filter out failed promises here
     // @see https://davidwalsh.name/promises-results

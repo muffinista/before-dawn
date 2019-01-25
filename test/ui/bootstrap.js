@@ -16,8 +16,6 @@ describe("bootstrap", function() {
   var bootApp = function() {
     app = helpers.application(workingDir, false, zipPath);  
     return app.start().
-      then(() => helpers.sleep(5000)).
-      then(() => helpers.outputLogs(app)).
       then(() => helpers.waitUntilBooted(app));
   };
 

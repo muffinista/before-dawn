@@ -10,11 +10,14 @@ const chaiAsPromised = require("chai-as-promised");
 const appPath = require("electron");
 const assert = require("assert");
 
-let windowCheckDelay = 250;
+let windowCheckDelay = 5000;
 
 if (process.env.CI) {
-  windowCheckDelay = 1500;
+  windowCheckDelay = 15000;
 }
+
+const delayStep = 10;
+
 
 global.before(() => {
   chai.should();
@@ -179,16 +182,16 @@ exports.sleep = function sleep(ms) {
 
 
 exports.waitForWindow = async (app, title, skipAssert) => {
-  let maxAttempts = 20;
+  //let maxAttempts = 20;
   let result = -1;
-  for ( var i = 0; i < maxAttempts; i++ ) {
+  for ( var totalTime = 0; totalTime < windowCheckDelay; totalTime += delayStep ) {
     result = await exports.getWindowByTitle(app, title);
     //console.log("****", i, result);
     if ( result !== -1 ) {
       break;
     }
     else {
-      await exports.sleep(windowCheckDelay);
+      await exports.sleep(delayStep);
     }
   }
 
@@ -201,16 +204,15 @@ exports.waitForWindow = async (app, title, skipAssert) => {
 
 
 exports.waitForWindowToClose = async (app, title) => {
-  let maxAttempts = 20;
   let result = 0;
-  for ( var i = 0; i < maxAttempts; i++ ) {
+  for ( var totalTime = 0; totalTime < windowCheckDelay; totalTime += delayStep ) {
     try {
       result = await exports.getWindowByTitle(app, title);
       if ( result === -1 ) {
         break;
       }
       else {
-        await exports.sleep(windowCheckDelay);
+        await exports.sleep(delayStep);
       }
     }
     catch(e) {
