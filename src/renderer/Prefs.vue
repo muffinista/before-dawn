@@ -270,18 +270,6 @@ export default {
     this._savers.setup().then(() => {
       this.getData();
       this.getCurrentSaver();
-      var pd = new PackageDownloader(this.prefs);
-      if ( this.prefs.needSetup() ) {
-        this.prefs.setDefaultRepo(this.$electron.remote.getGlobal("SAVER_REPO"));
-      }
-      pd.updatePackage().then((r) => {
-        if ( r.downloaded === true ) {
-          this.getData();
-          //this.getCurrentSaver();
-        }
-      }).catch((err) => {
-        this.logger(err);
-      });
 
       if ( this.$electron.remote.getGlobal("NEW_RELEASE_AVAILABLE") ) {
         this.$nextTick(() => {

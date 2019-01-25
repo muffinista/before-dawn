@@ -757,16 +757,19 @@ var setupReleaseCheck = function() {
   setInterval(checkForNewRelease, RELEASE_CHECK_INTERVAL);
 };
 
+var checkForPackageUpdates = function() {  
+  log.info("checkForPackageUpdates");
+  let pd = new PackageDownloader(prefs);
+  return pd.updatePackage().then(log.info); 
+};
+
 var setupPackageCheck = function() {
   if ( global.CHECK_FOR_RELEASE === true ) {
     return;
   }
 
   log.info("Setup package check");
-  setInterval(() => {
-    let pd = new PackageDownloader(prefs);
-    pd.updatePackage();  
-  }, RELEASE_CHECK_INTERVAL);
+  setInterval(() => checkForPackageUpdates, RELEASE_CHECK_INTERVAL);
 };
 
 /**
@@ -1022,6 +1025,7 @@ ipcMain.on("prefs-updated", (event, arg) => {
   log.info("prefs-updated", Object.keys(arg));
   prefs.reload();
   updateStateManager();
+  checkForPackageUpdates();
 });
 
 ipcMain.on("close-window", (event) => {
