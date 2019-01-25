@@ -37,6 +37,7 @@ const ReleaseCheck = require("./release_check.js");
 var releaseChecker;
 
 const menusAndTrays = require("./menus.js");
+const dock = require("./dock.js");
 
 // NOTE -- this needs to be global, otherwise the app icon gets
 // garbage collected and won't show up in the system tray
@@ -69,6 +70,8 @@ let saverOpts = {};
 // so that manually running screensaver works just fine
 var checkPowerState = true;
 
+const RELEASE_CHECK_INTERVAL = 1000 * 60 * 60 * 12;
+
 
 const singleLock = app.requestSingleInstanceLock();
 if (! singleLock ) {
@@ -84,26 +87,27 @@ if (! singleLock ) {
  * 
  * @param {function} cb - callback triggered when window is ready
  */
-var openGrabberWindow = (cb) => {
-  var grabberUrl = "file://" + __dirname + "/assets/grabber.html";
-  grabberWindow = new BrowserWindow({
-    show: debugMode === true,
-    width:100,
-    height:100,
-    x: 4000,
-    y: 2000,
-    webPreferences: {
-      nodeIntegration: true,
-      webSecurity: !global.IS_DEV,
-      preload: global.TRACK_ERRORS ? path.join(__dirname, "assets", "sentry.js") : undefined
-    }
+var openGrabberWindow = function() {
+  return new Promise((resolve) => {
+    var grabberUrl = "file://" + __dirname + "/assets/grabber.html";
+    grabberWindow = new BrowserWindow({
+      show: debugMode === true,
+      width:100,
+      height:100,
+      x: 4000,
+      y: 2000,
+      webPreferences: {
+        nodeIntegration: true,
+        webSecurity: !global.IS_DEV,
+        preload: global.TRACK_ERRORS ? path.join(__dirname, "assets", "sentry.js") : undefined
+      }
+    });
+    grabberWindow.noTray = true;
+    
+    grabberWindow.on("closed", () => {});
+    grabberWindow.once("ready-to-show", resolve);
+    grabberWindow.loadURL(grabberUrl);  
   });
-  grabberWindow.noTray = true;
-  
-  grabberWindow.on("closed", () => {});
-
-  grabberWindow.once("ready-to-show", cb);
-  grabberWindow.loadURL(grabberUrl);
 };
 
 /**
@@ -157,28 +161,6 @@ var openTestShim = function() {
 };
 
 /**
- * if we're using the dock, and all our windows are closed, hide the
- * dock icon
- */
-var hideDockIfInactive = function() {
-  let openWindowCount = BrowserWindow.getAllWindows().
-                                      filter(win => win.noTray !== true ).length;
-
-  if ( typeof(app.dock) !== "undefined" && openWindowCount === 0 ) {
-    app.dock.hide();
-  }
-};
-
-/**
- * show the dock if it's available
- */
-var showDock = function() {
-  if ( typeof(app.dock) !== "undefined" ) {
-    app.dock.show();
-  }
-};
-
-/**
  * Open the preferences window
  */
 var openPrefsWindow = function() {
@@ -213,11 +195,11 @@ var openPrefsWindow = function() {
       log.info("loading " + prefsUrl);
       prefsWindowHandle.loadURL(prefsUrl);
   
-      showDock();
+      dock.showDock(app);
   
       prefsWindowHandle.on("closed", function() {
         prefsWindowHandle = null;
-        hideDockIfInactive();
+        dock.hideDockIfInactive(app);
       });
   
       // we could do something nice with either of these events
@@ -261,10 +243,10 @@ var addNewSaver = function() {
 
     w.loadURL(newUrl);
 
-    showDock();
+    dock.showDock(app);
     w.on("closed", () => {
       w = null;
-      hideDockIfInactive();
+      dock.hideDockIfInactive(app);
     });
   });
 };
@@ -288,11 +270,11 @@ var openAboutWindow = function() {
 
   w.loadURL(aboutUrl);
 
-  showDock();
+  dock.showDock(app);
 
   w.on("closed", () => {
     w = null;
-    hideDockIfInactive();
+    dock.hideDockIfInactive(app);
   });
 };
 
@@ -327,10 +309,10 @@ var openEditor = (args) => {
 
   w.on("closed", () => {
     w = null;
-    hideDockIfInactive();
+    dock.hideDockIfInactive(app);
   });
   
-  showDock();
+  dock.showDock(app);
 };
 
 /**
@@ -589,9 +571,7 @@ var runScreenSaver = function() {
       
       // limit to a single screen when debugging
       if ( debugMode === true ) {
-        if ( typeof(app.dock) !== "undefined" ) {
-          app.dock.show();
-        }
+        dock.showDock(app);
       }
       
       try {
@@ -758,20 +738,137 @@ var setupForTesting = function() {
   }    
 };
 
-/**
- * handle initial startup of app
- */
-var bootApp = function() {
+var setupMenuAndTray = function() {
   var icons = menusAndTrays.getIcons();
   var menu = Menu.buildFromTemplate(menusAndTrays.buildMenuTemplate(app));
 
   Menu.setApplicationMenu(menu);
 
-  log.info("Loading prefs");
-  prefs = new SaverPrefs(global.basePath);
+  //
+  // build the tray menu
+  //
+  trayMenu = Menu.buildFromTemplate(menusAndTrays.trayMenuTemplate());
+
+  trayMenu.items[3].visible = global.NEW_RELEASE_AVAILABLE;
+
+  appIcon = new Tray(icons.active);
+  appIcon.setToolTip(global.APP_NAME);
+  appIcon.setContextMenu(trayMenu); 
+  
+  // show tray menu on right click
+  // @todo should this be osx only?
+  appIcon.on("right-click", () => {
+    appIcon.popUpContextMenu();
+  });
+};
+
+
+var setupIfNeeded = function() {
+  log.info("setupIfNeeded");
+
+  return new Promise((resolve) => {
+    if ( process.env.QUIET_MODE && process.env.QUIET_MODE === "true" ) {
+      log.info("Quiet mode, skip setup checks!");
+      return resolve({setup: false});
+    }
+
+    // check if we should download savers, set something up, etc
+    // @todo add a test for this somehow
+    if ( prefs.needSetup() ) {
+      log.info("needSetup!");
+      prefs.setDefaultRepo(global.SAVER_REPO);
+
+      let pd = new PackageDownloader(prefs);
+      if ( global.LOCAL_PACKAGE ) {
+        pd.setLocalFile(global.LOCAL_PACKAGE);
+      }
+
+      return pd.updatePackage().
+        then(() => resolve({
+          setup: true,
+          new: true,
+          package: true,
+          missing: false
+        }));
+    }
+
+    var savers = new SaverListManager({
+      prefs: prefs
+    });
+    log.info("checking if " + prefs.current + " is valid");
+    savers.confirmExists(prefs.current).then((exists) => {
+      if ( ! exists ) {
+        log.info("need to pick a new screensaver");
+        return resolve({
+          setup: true,
+          new: false,
+          package: false,
+          missing: true
+        });
+      }
+      else {
+        log.info("looks like we are good to go");
+        return resolve({
+          setup: false,
+          new: false,
+          package: false,
+          missing: false
+        });
+      }
+    });
+  });
+};
+
+var openPrefsWindowIfNeeded = function(status) {
+  log.info("openPrefsWindowIfNeeded");
+  if ( status.setup === true ) {
+    return openPrefsWindow();
+  }
+
+  return Promise.resolve();
+}
+
+var setupReleaseCheck = function() {
+  if ( global.CHECK_FOR_RELEASE === true ) {
+    releaseChecker = new ReleaseCheck();
+
+    releaseChecker.setFeed(global.RELEASE_CHECK_URL);
+    releaseChecker.setLogger(log.info);
+    releaseChecker.onUpdate(() => {
+      global.NEW_RELEASE_AVAILABLE = true;
+      trayMenu.items[3].visible = global.NEW_RELEASE_AVAILABLE;
+    });
+    releaseChecker.onNoUpdate(() => {
+      global.NEW_RELEASE_AVAILABLE = false;
+      trayMenu.items[3].visible = global.NEW_RELEASE_AVAILABLE;
+    });
+
+    // check for a new release every 12 hours
+    log.info("Setup release check");
+    checkForNewRelease();
+    setInterval(checkForNewRelease, RELEASE_CHECK_INTERVAL);
+  }
+};
+
+var setupPackageCheck = function() {
+  if ( global.CHECK_FOR_RELEASE === true ) {
+    log.info("Setup package check");
+    setInterval(() => {
+      let pd = new PackageDownloader(prefs);
+      pd.updatePackage();  
+    }, RELEASE_CHECK_INTERVAL);
+  }
+};
+
+/**
+ * handle initial startup of app
+ */
+var bootApp = function() {
 
   global.NEW_RELEASE_AVAILABLE = false;
-  trayMenu.items[3].visible = global.NEW_RELEASE_AVAILABLE;
+
+  log.info("Loading prefs");
+  prefs = new SaverPrefs(global.basePath);
 
   //
   // setup some event handlers for when screen count changes, mostly
@@ -807,74 +904,15 @@ var bootApp = function() {
   updateStateManager();
   stateManager.startTicking();
   
-  appIcon = new Tray(icons.active);
-  appIcon.setToolTip(global.APP_NAME);
-  appIcon.setContextMenu(trayMenu); 
+  setupMenuAndTray();
   
-  // show tray menu on right click
-  // @todo should this be osx only?
-  appIcon.on("right-click", () => {
-    appIcon.popUpContextMenu();
-  });
-    
-  openGrabberWindow(() => {
-    if ( process.env.QUIET_MODE && process.env.QUIET_MODE === "true" ) {
-      log.info("Quiet mode, skip setup checks!");
-      setupForTesting();
-    }
-    // check if we should download savers, set something up, etc
-    // @todo add a test for this somehow
-    else if ( prefs.needSetup() ) {
-      log.info("needSetup!");
-      prefs.setDefaultRepo(global.SAVER_REPO);
+  openGrabberWindow().
+    then(() => setupIfNeeded()).
+    then((result) => openPrefsWindowIfNeeded(result)).
+    then(() => setupForTesting());
 
-      let pd = new PackageDownloader(prefs);
-      if ( global.LOCAL_PACKAGE ) {
-        pd.setLocalFile(global.LOCAL_PACKAGE);
-      }
-
-      pd.updatePackage().
-        then(openPrefsWindow).
-        then(setupForTesting);
-    }
-    else {
-      var savers = new SaverListManager({
-        prefs: prefs
-      });
-      log.info("checking if " + prefs.current + " is valid");
-      savers.confirmExists(prefs.current).then((result) => {
-        if ( ! result ) {
-          log.info("need to pick a saver");
-          openPrefsWindow().then(setupForTesting);
-        }
-        else {
-          setupForTesting();
-        }
-
-        log.info("I think we're done!");
-      });
-    }
-  });
-
-  if ( global.CHECK_FOR_RELEASE === true ) {
-    releaseChecker = new ReleaseCheck();
-
-    releaseChecker.setFeed(global.RELEASE_CHECK_URL);
-    releaseChecker.setLogger(log.info);
-    releaseChecker.onUpdate(() => {
-      global.NEW_RELEASE_AVAILABLE = true;
-      trayMenu.items[3].visible = global.NEW_RELEASE_AVAILABLE;
-    });
-    releaseChecker.onNoUpdate(() => {
-      global.NEW_RELEASE_AVAILABLE = false;
-      trayMenu.items[3].visible = global.NEW_RELEASE_AVAILABLE;
-    });
-
-    // check for a new release every 12 hours
-    log.info("Setup release check");
-    checkForNewRelease();
-    setInterval(checkForNewRelease, 1000 * 60 * 60 * 12);
-  }
+  setupReleaseCheck();
+  setupPackageCheck();
 };
 
 var quitApp = () => {
@@ -1029,15 +1067,7 @@ if ( testMode !== true ) {
 globalCSSCode = fs.readFileSync( path.join(__dirname, "assets", "global.css"), "ascii");  
 
 // don't show app in dock
-if ( typeof(app.dock) !== "undefined" ) {
-  app.dock.hide();
-}
-
-
-//
-// build the tray menu
-//
-trayMenu = Menu.buildFromTemplate(menusAndTrays.trayMenuTemplate());
+dock.hideDockIfInactive(app);
 
 
 //
