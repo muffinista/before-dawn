@@ -88,15 +88,12 @@ describe("PackageDownloader", function() {
       });
     });
 
-    xit("handles package failure", (done) => {
+    it("handles package failure", (done) => {
       var oldCheckTime = new Date(2010, 1, 1);
       prefs.updateCheckTimestamp = oldCheckTime;
 
       sandbox.stub(fakePackage, "downloadFile").rejects();
       pd.updatePackage(fakePackage).
-        // then((res) => {
-        //   console.log("oops i got here!!!", res);
-        // }).
         catch(() => { done(); });
     });
   });
