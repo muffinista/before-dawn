@@ -17,7 +17,7 @@
 const electron = require("electron");
 const log = require("electron-log");
 
-const {app, BrowserWindow, ipcMain, crashReporter, Menu, Tray} = require("electron");
+const {app, BrowserWindow, ipcMain, Menu, Tray} = require("electron");
 
 const fs = require("fs");
 const path = require("path");
@@ -38,6 +38,7 @@ var releaseChecker;
 
 const menusAndTrays = require("./menus.js");
 const dock = require("./dock.js");
+const windows = require("./windows.js");
 
 // NOTE -- this needs to be global, otherwise the app icon gets
 // garbage collected and won't show up in the system tray
@@ -46,11 +47,11 @@ let appIcon = null;
 let debugMode = ( process.env.DEBUG_MODE !== undefined );
 let testMode = ( process.env.TEST_MODE !== undefined );
 
-let saverWindows = [];
-
 var exitOnQuit = false;
 
-var globalCSSCode;
+// load some global CSS we'll inject into running screensavers
+const globalCSSCode = fs.readFileSync( path.join(__dirname, "assets", "global.css"), "ascii");  
+
 
 var prefsWindowHandle = null;
 var trayMenu;
@@ -203,17 +204,14 @@ var openPrefsWindow = function() {
       });
   
       // we could do something nice with either of these events
-      prefsWindowHandle.webContents.on("crashed", outputError);
-      prefsWindowHandle.webContents.on("unresponsive", outputError);
+      // prefsWindowHandle.webContents.on("crashed", outputError);
+      // prefsWindowHandle.webContents.on("unresponsive", outputError);
   
       prefsWindowHandle.once("show", resolve);
     });
   });
 };
 
-var outputError = (e) => {
-  log.info(e);
-};
 
 /**
  * handle new screensaver event. open the window to create a screensaver
@@ -315,20 +313,6 @@ var openEditor = (args) => {
   dock.showDock(app);
 };
 
-/**
- * forcefully close a screensaver window
- */
-var forceWindowClose = function(w) {
-  // 100% close/kill this window
-  if ( typeof(w) !== "undefined" ) {
-    try {
-      w.destroy();
-    }
-    catch (e) {
-      log.info(e);
-    }
-  }
-};
 
 
 /**
@@ -362,7 +346,6 @@ var getWindowOpts = function(s) {
 
 
   return opts;
-
 };
 
 /**
@@ -396,7 +379,7 @@ var runScreenSaverOnDisplay = function(saver, s) {
   var runSaver = function(message) {
     var url;
     var w = new BrowserWindow(windowOpts);       
-    saverWindows.push(w);
+    w.isSaver = true;
    
     diff = process.hrtime(tickCount);
     log.info("got screenshot back, let's do this", s.id, diff[0] * 1e9 + diff[1]);
@@ -404,12 +387,7 @@ var runScreenSaverOnDisplay = function(saver, s) {
     try {   
       // Emitted when the window is closed.
       w.on("closed", function() {
-        saverWindows = saverWindows.filter((w2) => {
-          return (w2 !== w);
-        });
-        log.info("running windows: " + saverWindows.length + " closed: " + s.id);
-
-        forceWindowClose(w);
+        windows.forceWindowClose(w);
       });
       
       // inject our custom JS and CSS into the screensaver window
@@ -459,7 +437,7 @@ var runScreenSaverOnDisplay = function(saver, s) {
     }
     catch (e) {
       log.info(e);
-      forceWindowClose(w);
+      windows.forceWindowClose(w);
     }
   };
 
@@ -481,12 +459,11 @@ var runScreenSaverOnDisplay = function(saver, s) {
  */
 var blankScreen = function(s) {
   var windowOpts = getWindowOpts(s);
-  var w = new BrowserWindow(windowOpts);       
+  var w = new BrowserWindow(windowOpts);     
+  w.isSaver = true;  
   w.setFullScreen(true);
 
   log.info("blankScreen", s.id, windowOpts);
-
-  saverWindows.push(w);
 
   w.show();
 };
@@ -604,65 +581,6 @@ var runScreenSaver = function() {
   });
 };
 
-/**
- * check if the screensaver is still running
- */
-var screenSaverIsRunning = function() {
-  return ( saverWindows.length > 0 );
-};
-
-
-/**
- * check if the specified window exists and isn't destroyed
- */
-var activeWindowHandle = function(w) {
-  return (typeof(w) !== "undefined" && ! w.isDestroyed());
-};
-
-/**
- * when the display count changes, close any running windows
- */
-var handleDisplayChange = function() {
-  log.info("display change, let's close running screensavers");
-  closeRunningScreensavers();
-};
-
-/**
- * close any running screensavers
- */
-var closeRunningScreensavers = function() {
-  log.info("closeRunningScreensavers");
-  if ( debugMode !== true ) {
-    attemptToStopScreensavers();
-    setTimeout(forcefullyCloseScreensavers, 2500);
-  }
-};
-
-/**
- * iterate through our list of running screensaver windows and attempt
- * to close them nicely
- */
-var attemptToStopScreensavers = function() {
-  saverWindows.forEach((w) => {
-    if ( activeWindowHandle(w) ) {
-      w.close();
-    }    
-  });
-};
-
-/**
- * iterate through our list of running screensaver windows and close
- * them forcefully if needed
- */
-var forcefullyCloseScreensavers = function() {
-  saverWindows.forEach((w) => {
-    if ( activeWindowHandle(w) ) {
-      w.destroy();
-    }
-  });
-
-  saverWindows = [];
-};
 
 
 /**
@@ -678,7 +596,6 @@ var shouldLockScreen = function() {
 var stopScreenSaver = function(fromBlank) {
   log.info("received stopScreenSaver call");
 
-  
   if ( fromBlank !== true ) {
     stateManager.reset();
   }
@@ -688,7 +605,7 @@ var stopScreenSaver = function(fromBlank) {
     screenLock.doLockScreen();
   }
 
-  closeRunningScreensavers();
+  windows.closeRunningScreensavers();
 };
 
 
@@ -826,38 +743,42 @@ var openPrefsWindowIfNeeded = function(status) {
   }
 
   return Promise.resolve();
-}
+};
 
 var setupReleaseCheck = function() {
-  if ( global.CHECK_FOR_RELEASE === true ) {
-    releaseChecker = new ReleaseCheck();
-
-    releaseChecker.setFeed(global.RELEASE_CHECK_URL);
-    releaseChecker.setLogger(log.info);
-    releaseChecker.onUpdate(() => {
-      global.NEW_RELEASE_AVAILABLE = true;
-      trayMenu.items[3].visible = global.NEW_RELEASE_AVAILABLE;
-    });
-    releaseChecker.onNoUpdate(() => {
-      global.NEW_RELEASE_AVAILABLE = false;
-      trayMenu.items[3].visible = global.NEW_RELEASE_AVAILABLE;
-    });
-
-    // check for a new release every 12 hours
-    log.info("Setup release check");
-    checkForNewRelease();
-    setInterval(checkForNewRelease, RELEASE_CHECK_INTERVAL);
+  if ( global.CHECK_FOR_RELEASE !== true ) {
+    return;
   }
+
+  releaseChecker = new ReleaseCheck();
+
+  releaseChecker.setFeed(global.RELEASE_CHECK_URL);
+  releaseChecker.setLogger(log.info);
+  releaseChecker.onUpdate(() => {
+    global.NEW_RELEASE_AVAILABLE = true;
+    trayMenu.items[3].visible = global.NEW_RELEASE_AVAILABLE;
+  });
+  releaseChecker.onNoUpdate(() => {
+    global.NEW_RELEASE_AVAILABLE = false;
+    trayMenu.items[3].visible = global.NEW_RELEASE_AVAILABLE;
+  });
+
+  // check for a new release every 12 hours
+  log.info("Setup release check");
+  checkForNewRelease();
+  setInterval(checkForNewRelease, RELEASE_CHECK_INTERVAL);
 };
 
 var setupPackageCheck = function() {
   if ( global.CHECK_FOR_RELEASE === true ) {
-    log.info("Setup package check");
-    setInterval(() => {
-      let pd = new PackageDownloader(prefs);
-      pd.updatePackage();  
-    }, RELEASE_CHECK_INTERVAL);
+    return;
   }
+
+  log.info("Setup package check");
+  setInterval(() => {
+    let pd = new PackageDownloader(prefs);
+    pd.updatePackage();  
+  }, RELEASE_CHECK_INTERVAL);
 };
 
 /**
@@ -870,26 +791,6 @@ var bootApp = function() {
   log.info("Loading prefs");
   prefs = new SaverPrefs(global.basePath);
 
-  //
-  // setup some event handlers for when screen count changes, mostly
-  // to ensure that we wake up if the user plugs in or removes a
-  // monitor
-  //
-  electronScreen = electron.screen;
-  electronScreen.on("display-added", handleDisplayChange);
-  electronScreen.on("display-removed", handleDisplayChange);
-  electronScreen.on("display-metrics-changed", handleDisplayChange);    
-
-  electron.powerMonitor.on("suspend", () => {
-    log.info("The system is going to sleep, stop screensavers");
-    closeRunningScreensavers();
-  });
-  electron.powerMonitor.on("resume", () => {
-    log.info("The system just woke up, stop screensavers");
-    closeRunningScreensavers();
-  });
-
-
   // these are some variables we'll pass to windows so they
   // can bootstrap access to data/etc
   saverOpts = {
@@ -897,6 +798,27 @@ var bootApp = function() {
     systemDir: getSystemDir(),
     logger: log.info
   };
+
+  //
+  // setup some event handlers for when screen count changes, mostly
+  // to ensure that we wake up if the user plugs in or removes a
+  // monitor
+  //
+  electronScreen = electron.screen;
+  electronScreen.on("display-added", windows.handleDisplayChange);
+  electronScreen.on("display-removed", windows.handleDisplayChange);
+  electronScreen.on("display-metrics-changed", windows.handleDisplayChange);    
+
+  electron.powerMonitor.on("suspend", () => {
+    log.info("The system is going to sleep, stop screensavers");
+    windows.closeRunningScreensavers();
+  });
+  electron.powerMonitor.on("resume", () => {
+    log.info("The system just woke up, stop screensavers");
+    windows.closeRunningScreensavers();
+  });
+
+
 
   stateManager = new StateManager();
   stateManager.idleFn = idler.getIdleTime;
@@ -909,10 +831,14 @@ var bootApp = function() {
   openGrabberWindow().
     then(() => setupIfNeeded()).
     then((result) => openPrefsWindowIfNeeded(result)).
-    then(() => setupForTesting());
+    then(() => setupForTesting()).
+    then(() => {
+      setupReleaseCheck();
+      setupPackageCheck();    
 
-  setupReleaseCheck();
-  setupPackageCheck();
+      // don't show app in dock
+      dock.hideDockIfInactive(app);
+    });
 };
 
 var quitApp = () => {
@@ -946,7 +872,7 @@ var runScreenSaverIfNotFullscreen = function() {
 var runScreenSaverIfPowered = function() {
   log.info("runScreenSaverIfPowered");
 
-  if ( screenSaverIsRunning() ) {
+  if ( windows.screenSaverIsRunning() ) {
     log.info("looks like we're already running");
     return;
   }
@@ -974,7 +900,7 @@ var runScreenSaverIfPowered = function() {
  */
 var blankScreenIfNeeded = function() {
   log.info("blankScreenIfNeeded");
-  if ( screenSaverIsRunning() ) {
+  if ( windows.screenSaverIsRunning() ) {
     log.info("running, close windows");
     stopScreenSaver(true);
     screenLock.doSleep();
@@ -996,7 +922,7 @@ var updateStateManager = function() {
     blankTime: (prefs.delay + prefs.sleep) * 60000,
     onIdleTime: runScreenSaverIfPowered,
     onBlankTime: blankScreenIfNeeded,
-    onReset: closeRunningScreensavers
+    onReset: windows.closeRunningScreensavers
   });
 };
 
@@ -1022,10 +948,6 @@ require("./bootstrap.js");
 
 log.transports.file.level = "debug";
 log.transports.file.maxSize = 1 * 1024 * 1024;
-
-if ( typeof(global.CRASH_REPORTER) !== "undefined" ) {
-  crashReporter.start(global.CRASH_REPORTER);
-}
 
 log.info("Hello from version: " + global.APP_VERSION_BASE);
 
@@ -1063,20 +985,11 @@ if ( testMode !== true ) {
   });
 }
 
-// load some global CSS we'll inject into running screensavers
-globalCSSCode = fs.readFileSync( path.join(__dirname, "assets", "global.css"), "ascii");  
-
-// don't show app in dock
-dock.hideDockIfInactive(app);
-
 
 //
 // if the user has updated one of their screensavers, we can let
 // the prefs window know that it needs to reload
 //
-ipcMain.on("savers-updated", () => {
-  toggleSaversUpdated();
-});
 
 let toggleSaversUpdated = (arg) => {
   prefs.reload();  
@@ -1085,6 +998,9 @@ let toggleSaversUpdated = (arg) => {
   }
 };
 
+ipcMain.on("savers-updated", () => {
+  toggleSaversUpdated();
+});
 
 
 //
