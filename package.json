@@ -35,7 +35,6 @@
     "fs-extra": "^7.0.0",
     "glob": "^7.1.2",
     "linux-battery": "^3.0.1",
-    "lodash.debounce": "^4.0.8",
     "mkdirp": "^0.5.1",
     "node-system-idle-time": "muffinista/node-system-idle-time.git#master",
     "osx-battery": "gillstrom/osx-battery.git",
@@ -44,7 +43,6 @@
     "request-promise-native": "^1.0.5",
     "rimraf": "^2.6.2",
     "temp": "^0.9.0",
-    "vue-observe-visibility": "^0.4.3",
     "yauzl": "^2.10.0"
   },
   "devDependencies": {
@@ -91,6 +89,7 @@
     "html-webpack-plugin": "^3.2.0",
     "inject-loader": "^4.0.1",
     "jquery": "^3.3.1",
+    "lodash.debounce": "^4.0.8",
     "mini-css-extract-plugin": "^0.5.0",
     "mocha": "^5.2.0",
     "nock": "^10.0.6",
@@ -110,6 +109,7 @@
     "vue-electron": "^1.0.6",
     "vue-html-loader": "^1.2.4",
     "vue-loader": "^15.4.2",
+    "vue-observe-visibility": "^0.4.3",
     "vue-style-loader": "^4.1.1",
     "vue-template-compiler": "^2.5.16",
     "webpack": "^4.29.0",
