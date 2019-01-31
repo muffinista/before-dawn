@@ -401,12 +401,8 @@ var runScreenSaverOnDisplay = function(saver, s) {
       });
 
       // we could do something nice with either of these events
-      w.webContents.on("crashed", function (e) {
-        log.info(e);
-      });
-      w.webContents.on("unresponsive", function (e) {
-        log.info(e);
-      });
+      w.webContents.on("crashed", log.info);
+      w.webContents.on("unresponsive", log.info);
 
       
       w.once("ready-to-show", () => {
@@ -415,8 +411,10 @@ var runScreenSaverOnDisplay = function(saver, s) {
           w.setFullScreen(true);
         }
 
-        w.show();
-        w.moveTop();
+        if ( ! w.isVisible() ) {
+          w.show();
+          w.moveTop();
+        }
 
         diff = process.hrtime(tickCount);
         log.info(`rendered in ${diff[0] * 1e9 + diff[1]} nanoseconds`);
