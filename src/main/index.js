@@ -408,12 +408,7 @@ var runScreenSaverOnDisplay = function(saver, s) {
       w.once("ready-to-show", () => {
         log.info("ready-to-show", s.id);
         if ( debugMode !== true && testMode !== true ) {
-          w.setFullScreen(true);
-        }
-
-        if ( ! w.isVisible() ) {
-          w.show();
-          w.moveTop();
+          windows.setFullScreen(w);
         }
 
         diff = process.hrtime(tickCount);
@@ -460,8 +455,9 @@ var runScreenSaverOnDisplay = function(saver, s) {
 var blankScreen = function(s) {
   var windowOpts = getWindowOpts(s);
   var w = new BrowserWindow(windowOpts);     
-  w.isSaver = true;  
-  w.setFullScreen(true);
+  w.isSaver = true;
+
+  windows.setFullScreen(w);
 
   log.info("blankScreen", s.id, windowOpts);
 
@@ -749,9 +745,11 @@ var setupReleaseCheck = function() {
     trayMenu.items[3].visible = global.NEW_RELEASE_AVAILABLE;
   });
 
+  log.info("Run initial release check");
+  checkForNewRelease();
+
   // check for a new release every 12 hours
   log.info("Setup release check");
-  checkForNewRelease();
   setInterval(checkForNewRelease, RELEASE_CHECK_INTERVAL);
 };
 

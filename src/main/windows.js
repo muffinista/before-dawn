@@ -83,7 +83,27 @@ var forceWindowClose = function(w) {
   }
 };
 
+/**
+ * Set full screen mode for the given window. Use OSX's 
+ * fast/simple fullscreen mode if available.
+ * @param {BrowserWindow} w the window to apply
+ */
+var setFullScreen = function(w) {
+  if ( process.platform !== "darwin" ) {
+    w.setFullScreen(true);
+  }
+  else {
+    w.setSimpleFullScreen(true);
+  }
+
+  if ( ! w.isVisible() ) {
+    w.show();
+    w.moveTop();
+  }
+};
+
 exports.screenSaverIsRunning = screenSaverIsRunning;
 exports.handleDisplayChange = handleDisplayChange;
 exports.closeRunningScreensavers = closeRunningScreensavers;
 exports.forceWindowClose = forceWindowClose;
+exports.setFullScreen = setFullScreen;
