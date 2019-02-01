@@ -95,11 +95,8 @@ var setFullScreen = function(w) {
   else {
     w.setSimpleFullScreen(true);
   }
-
-  if ( ! w.isVisible() ) {
-    w.show();
-    w.moveTop();
-  }
+  w.show();
+  w.moveTop();
 };
 
 exports.screenSaverIsRunning = screenSaverIsRunning;
