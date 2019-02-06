@@ -7,6 +7,11 @@ var packageJSON;
 try {
   packageJSON = require("../../package.json");
   version = packageJSON.version;
+
+  if ( ! process.env.BEFORE_DAWN_RELEASE_NAME ) {
+    process.env.BEFORE_DAWN_RELEASE_NAME = `${packageJSON.productName} ${packageJSON.version}`;
+  }
+  
 }
 catch(e) {
   version = "0.0.0";

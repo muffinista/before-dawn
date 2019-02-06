@@ -23,7 +23,7 @@ describe("SaverPrefs", () => {
     });
 
     it("should load", () => {
-      assert(prefs.needSetup());
+      assert(prefs.needSetup);
     });
 
     it("should set noSource", () => {

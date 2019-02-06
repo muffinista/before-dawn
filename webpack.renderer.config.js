@@ -20,6 +20,7 @@ const VueLoaderPlugin = require("vue-loader/lib/plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 const devMode = (process.env.NODE_ENV !== "production");
+const releaseName = `${packageJSON.productName} ${packageJSON.version}`;
 
 var htmlPageOptions = function(id, title) {
   return {
@@ -151,6 +152,9 @@ let rendererConfig = {
       ]),
       whitelistPatterns: [/nav/, /nav-tabs/, /nav-link/, /nav-item/, /tablist/, /tabindex/, /tooltip/, /button-group/, /btn/, /noty/]
     }),
+    // new PurgecssPlugin({
+    //   paths: glob.sync(`${path.join(__dirname, "./src")}/**/*`,  { nodir: true }),
+    // }),
     new CopyWebpackPlugin(
       [
         {
@@ -206,7 +210,8 @@ if (process.env.NODE_ENV === "production") {
   rendererConfig.plugins.push(
     new BabiliWebpackPlugin(),
     new webpack.DefinePlugin({
-      "process.env.NODE_ENV": "\"production\""
+      "process.env.NODE_ENV": JSON.stringify("production"),
+      "process.env.BEFORE_DAWN_RELEASE_NAME": JSON.stringify(releaseName)
     }),
     new webpack.LoaderOptionsPlugin({
       minimize: true
