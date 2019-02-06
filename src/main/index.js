@@ -512,10 +512,11 @@ var runScreenSaver = function() {
     prefs: prefs
   });
 
-
   var settings;
   var saverKey = prefs.current;
   let setupPromise;
+
+  log.info("runScreenSaver");
 
   // check if the user is running the random screensaver. if so, pick one!
   let randomPath = path.join(global.basePath, "system-savers", "random", "saver.json");
@@ -686,10 +687,11 @@ var setupIfNeeded = function() {
     }
 
     // check if we should download savers, set something up, etc
-    // @todo add a test for this somehow
-    if ( prefs.needSetup() ) {
+    if ( process.env.FORCE_SETUP || prefs.needSetup ) {
       log.info("needSetup!");
       prefs.setDefaultRepo(global.SAVER_REPO);
+      prefs.ensureDefaults();
+      prefs.writeSync();
 
       let pd = new PackageDownloader(prefs);
       if ( global.LOCAL_PACKAGE ) {

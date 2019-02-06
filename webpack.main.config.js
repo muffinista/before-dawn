@@ -11,6 +11,10 @@ const outputDir = path.join(__dirname, "output");
 
 const BabiliWebpackPlugin = require("babili-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
+//const SentryWebpackPlugin = require("@sentry/webpack-plugin");
+
+const releaseName = `${packageJSON.productName} ${packageJSON.version}`;
+
 
 //
 // get a list of node dependencies, and then
@@ -121,7 +125,13 @@ let mainConfig = {
         to: path.join(outputDir)
       }
     ]),
-    new webpack.NoEmitOnErrorsPlugin()
+    new webpack.NoEmitOnErrorsPlugin(),
+    // new SentryWebpackPlugin({
+    //   include: ".", //path.join(__dirname, "output"),
+    //   ignoreFile: ".gitignore",
+    //   ignore: ["node_modules", "test", "bin", "webpack.main.config.js", "webpack.renderer.config.js"],
+    //   configFile: "sentry.properties"
+    // })
   ],
   resolve: {
     extensions: [".js", ".json", ".node"]
@@ -147,7 +157,8 @@ if (process.env.NODE_ENV === "production") {
   mainConfig.plugins.push(
     new BabiliWebpackPlugin(),
     new webpack.DefinePlugin({
-      "process.env.NODE_ENV": "\"production\""
+      "process.env.NODE_ENV": JSON.stringify("production"),
+      "process.env.BEFORE_DAWN_RELEASE_NAME": JSON.stringify(releaseName)
     })
   );
 }
