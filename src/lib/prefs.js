@@ -49,7 +49,7 @@ class SaverPrefs {
     } 
   }
 
-  needSetup() {
+  get needSetup() {
     return this.firstLoad === true || 
       this.noSource === true || 
       this.current === undefined ||
@@ -137,6 +137,10 @@ class SaverPrefs {
   getOptions(name) {
     if ( typeof(name) === "undefined" ) {
       name = this.current;
+    }
+
+    if ( this._data.options === undefined ) {
+      this._data.options = {};
     }
 
     return this._data.options[name] || {};
