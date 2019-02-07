@@ -306,8 +306,8 @@ export default {
         fs.watch(this.folderPath, (eventType, filename) => {
           if (filename) {
             this.reloadPreview();
-            // note to self -- this is bad if you're on the settings tab and
-            // click save
+            // note to self -- this is bad if you're on the
+            // settings tab and click save
             // this.showPreview();
           }
         });
