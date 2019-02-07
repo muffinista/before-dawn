@@ -476,10 +476,17 @@ var getDisplays = function() {
     ];
   }
   else {
-    displays = electronScreen.getAllDisplays();
+    displays = getAllDisplays();
   }
 
   return displays;
+};
+
+/**
+ * get a list of all displays
+ */
+var getAllDisplays = function() {
+  return electronScreen.getAllDisplays();
 };
 
 /**
@@ -506,48 +513,56 @@ var setStateToRunning = function() {
  * run the user's chosen screensaver on any available screens
  */
 var runScreenSaver = function() {
-  var displays = getDisplays();
-
   var savers = new SaverListManager({
     prefs: prefs
   });
 
-  var settings;
-  var saverKey = prefs.current;
   let setupPromise;
 
   log.info("runScreenSaver");
 
   // check if the user is running the random screensaver. if so, pick one!
   let randomPath = path.join(global.basePath, "system-savers", "random", "saver.json");
-  if ( saverKey === randomPath ) {
+  if ( prefs.current === randomPath ) {
     setupPromise = new Promise((resolve) => {
       savers.list(() => {
         let s = savers.random();
-        resolve(s.key);
+        resolve(s.key, prefs.getOptions(s.key));
       });
     });
   }
   else {
-    setupPromise = Promise.resolve(saverKey);
+    setupPromise = Promise.resolve(prefs.current, prefs.getOptions(prefs.current));
   }
 
-  setupPromise.then((k) => {
-    saverKey = k;
-    settings = prefs.getOptions(saverKey);    
-
-    savers.loadFromFile(saverKey, settings).then((saver) => {
+  setupPromise.
+    then((saverKey, settings) => savers.loadFromFile(saverKey, settings)).
+    catch((err) => {
+      log.info("================ loading saver failed?");
+      log.info(err);
+      return undefined;
+    }).
+    then((saver) => {
+      var displays = [];
+      var blanks = [];
+        
       // make sure we have something to display
       if ( typeof(saver) === "undefined" ) {
         log.info("No screensaver defined!");
-        return;
+        blanks = getAllDisplays();
+      }
+      else {
+        displays = getDisplays();
+        if ( debugMode !== true && testMode !== true && prefs.runOnSingleDisplay === true ) {
+          blanks = getNonPrimaryDisplays();
+        }
       }
       
       // limit to a single screen when debugging
       if ( debugMode === true ) {
         dock.showDock(app);
       }
-      
+
       try {
         var i;
         // turn off idle checks for a couple seconds while loading savers
@@ -558,16 +573,14 @@ var runScreenSaver = function() {
         } // for
 
         // if we're only running on primary display, blank out the other ones
-        if ( debugMode !== true && testMode !== true && prefs.runOnSingleDisplay === true ) {
-          var otherDisplays = getNonPrimaryDisplays();
-          for ( i in otherDisplays ) {
-            blankScreen(otherDisplays[i]);
-          }
+        for ( i in blanks ) {
+          blankScreen(blanks[i]);
         }
       }
       catch (e) {
-        stateManager.ignoreReset(false);
+        log.info("running screensaver failed");
         log.info(e);
+        stateManager.ignoreReset(false);
       }
       finally {
         setTimeout(function() {
@@ -575,7 +588,6 @@ var runScreenSaver = function() {
         }, 2500);
       }
     });
-  });
 };
 
 
