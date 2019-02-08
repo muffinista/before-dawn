@@ -51,4 +51,21 @@ describe("tray", function() {
         then(() => helpers.waitForWindow(app, "Before Dawn: About!") );
     });    
   });
+
+  describe("enable/disable", function() {
+    it("toggles app status", function() {
+      return helpers.waitForWindow(app, "test shim").
+        then(() => app.client.waitUntilTextExists("body", "idle")).
+        then(() => app.client.click("button.Disable")).
+        then(() => {
+          helpers.sleep(1000);
+        }).
+        then(() => app.client.waitUntilTextExists("body", "paused")).
+        then(() => app.client.click("button.Enable")).
+        then(() => {
+          helpers.sleep(1000);
+        }).
+        then(() => app.client.waitUntilTextExists("body", "idle"))
+    });
+  });
 });
