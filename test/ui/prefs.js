@@ -40,14 +40,6 @@ describe("Prefs", function() {
     return helpers.stopApp(app);
 	});
 
-  // it("sets title", function() {
-  //   return pickPrefsWindow().
-  //     then(() => app.client.getTitle()).
-  //     then((res) => {
-  //       assert.equal("Before Dawn: Preferences", res);
-  //     });
-  // });
-
   it("lists screensavers", function() {
     return pickPrefsWindow().
       then(() => app.client.waitUntilTextExists("body", "Screensaver One")).
@@ -60,7 +52,6 @@ describe("Prefs", function() {
   it("allows picking a screensaver", function() {
     return pickPrefsWindow().
       then(() => app.client.waitUntilTextExists("body", "Screensaver One")).
-//      then(() => app.client.getAttribute("[type=radio]","data-name")).
       then(() => app.client.click("[type=radio][data-name='Screensaver One']")).
       then(() => app.client.getText(".saver-description")).
       then((text) => {

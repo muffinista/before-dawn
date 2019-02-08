@@ -153,6 +153,10 @@ class StateManager {
     return this.currentState;
   }
 
+  get currentStateString() {
+    return this.currentState.toString();
+  }
+
   /**
    * based on our current state, figure out the timestamp
    * that we will enter the next state

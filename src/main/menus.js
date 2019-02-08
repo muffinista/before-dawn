@@ -228,8 +228,8 @@ var trayMenuTemplate = function() {
 
         stateManager.pause();
         updateTrayIcon();
-        main.trayMenu.items[1].visible = false;
-        main.trayMenu.items[2].visible = true;
+        main.getTrayMenu().items[1].visible = false;
+        main.getTrayMenu().items[2].visible = true;
       }
     },
     {
@@ -239,8 +239,8 @@ var trayMenuTemplate = function() {
         stateManager.reset();
 
         updateTrayIcon();
-        main.trayMenu.items[1].visible = true;
-        main.trayMenu.items[2].visible = false;
+        main.getTrayMenu().items[1].visible = true;
+        main.getTrayMenu().items[2].visible = false;
       },
       visible: false
     },

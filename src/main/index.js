@@ -152,7 +152,7 @@ var grabScreen = function(s, cb) {
 var openTestShim = function() {
   testWindow = new BrowserWindow({
     width: 200,
-    height: 200,
+    height: 400,
     webPreferences: {
       nodeIntegration: true
     }
@@ -160,7 +160,7 @@ var openTestShim = function() {
 
   var shimUrl = "file://" + __dirname + "/shim.html";
   testWindow.loadURL(shimUrl);
-  // testWindow.webContents.openDevTools();
+  //testWindow.webContents.openDevTools();
 };
 
 /**
@@ -752,11 +752,15 @@ var setupReleaseCheck = function() {
   releaseChecker.setLogger(log.info);
   releaseChecker.onUpdate(() => {
     global.NEW_RELEASE_AVAILABLE = true;
-    trayMenu.items[3].visible = global.NEW_RELEASE_AVAILABLE;
+    log.info("update available, show it");
+
+    getTrayMenu().items[3].visible = global.NEW_RELEASE_AVAILABLE;
   });
   releaseChecker.onNoUpdate(() => {
     global.NEW_RELEASE_AVAILABLE = false;
-    trayMenu.items[3].visible = global.NEW_RELEASE_AVAILABLE;
+
+    log.info("no update available, hide it");
+    getTrayMenu().items[3].visible = global.NEW_RELEASE_AVAILABLE;
   });
 
   log.info("Run initial release check");
@@ -967,6 +971,9 @@ let getStateManager = function() {
 let getAppIcon = function() {
   return appIcon;
 };
+let getTrayMenu = function() {
+  return trayMenu;
+};
 
 // load a few global variables
 require("./bootstrap.js");
@@ -1111,7 +1118,7 @@ exports.log = log;
 exports.setStateToRunning = setStateToRunning;
 exports.getStateManager = getStateManager;
 exports.getAppIcon = getAppIcon;
-exports.trayMenu = trayMenu;
+exports.getTrayMenu = getTrayMenu;
 exports.openPrefsWindow = openPrefsWindow;
 exports.openAboutWindow = openAboutWindow;
 exports.addNewSaver = addNewSaver;

@@ -26,8 +26,11 @@
     test shim!
     <ul>
     </ul>
+
+    <div id="currentState"></div>
     <script>
-      let items = require("electron").remote.require("./main.js").getTrayMenuItems();
+      let main = require("electron").remote.require("./main.js");
+      let items = main.getTrayMenuItems();
       var root = document.querySelector("ul");
       for ( var i = 0; i < items.length; i++ ) {
         var item = items[i];
@@ -35,6 +38,13 @@
           addTestItem(item);
         }
       }
+
+      setInterval(function() {
+        let sm = require("electron").remote.require("./main.js").getStateManager();
+        console.log(sm.currentStateString);
+        document.querySelector("#currentState").innerHTML = sm.currentStateString;
+     }, 100);
+
     </script>
   </body>
 </html>
