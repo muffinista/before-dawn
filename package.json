@@ -19,7 +19,8 @@
     "test": "yarn compile && xvfb-maybe mocha test test/**",
     "test-lib": "nyc --reporter=html mocha test test/lib/** test/main/**",
     "run-local": "yarn compile && electron output/main.js",
-    "release": "yarn dist"
+    "release": "yarn dist",
+    "publish-release": "yarn bin/generate-release.js && yarn bin/sentry-symbols.js"
   },
   "repository": {
     "type": "git",
@@ -66,6 +67,7 @@
     "copy-webpack-plugin": "^4.6.0",
     "css-loader": "^2.1.0",
     "devtron": "^1.4.0",
+    "dotenv": "^6.2.0",
     "electron": "~> 4.0.3",
     "electron-builder": "20.38.5",
     "electron-debug": "^2.1.0",

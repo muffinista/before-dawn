@@ -1,13 +1,15 @@
 #!/usr/bin/env node
 
+/* eslint-disable no-console */
+require("dotenv").config();
+
+const SentryCli = require("@sentry/cli");
 const Octokit = require("@octokit/rest");
 const path = require("path");
-const { exec } = require("child_process");
-
-var pjson = require(path.join(__dirname, "..", "package.json"));
+const pjson = require(path.join(__dirname, "..", "package.json"));
 
 let opts = {
-  auth: process.env.GITHUB_AUTH_TOKEN
+  auth: `token ${process.env.GITHUB_AUTH_TOKEN}`
 };
 
 const octokit = new Octokit(opts);
@@ -16,39 +18,55 @@ let owner = "muffinista";
 let repo = "before-dawn";
 let tag_name = `v${pjson.version}`;
 let draft = true;
+let releaseName = `${pjson.productName} ${pjson.version}`;
 
-let release = {
-  owner, 
-  repo, 
-  tag_name, 
-  draft
-};
+const sentryCli = new SentryCli("./sentry.properties");
 
-// eslint-disable-next-line no-console
-console.log(`checking ${owner}/${repo} for ${tag_name}`);
+async function main() {
+  let release = {
+    owner: owner, 
+    repo: repo, 
+    tag_name: tag_name, 
+    target_commitish: "master",
+    name: tag_name,
+    body: "description",
+    draft: draft
+  };
+  
+  console.log(`checking ${owner}/${repo} for ${tag_name}`);
 
-octokit.repos.getLatestRelease({owner, repo}).
-  then((result) => {
-    if ( result.data.tag_name != tag_name ) {
-      octokit.repos.createRelease(release).then((result) => {
-        // eslint-disable-next-line no-console
-        console.log(result);
+  let result = await octokit.repos.getLatestRelease({owner, repo});
+  if ( result.data.tag_name === tag_name ) {
+    console.log("release already created!");
+    return;
+  }
 
-        exec("bin/create-sentry-release.sh", (err, stdout, stderr) => {
-          if (err) {
-            // node couldn't execute the command
-            return;
-          }
-        
-          // eslint-disable-next-line no-console
-          console.log(`stdout: ${stdout}`);
-          // eslint-disable-next-line no-console
-          console.log(`stderr: ${stderr}`);
-        });        
-      });
-    }
-    else {
-      // eslint-disable-next-line no-console
-      console.log("release already created!");
-    }
-  });
+  console.log(release);
+  result = await octokit.repos.createRelease(release);
+
+  console.log(result);
+
+  // Create a release
+
+  console.log("Create new release on sentry");
+  await sentryCli.execute(["releases", "new", releaseName], true);
+
+  console.log("Add commits to release");
+  await sentryCli.execute(["releases", "set-commits", "--auto", releaseName], true);
+
+  console.log("Upload sourcemaps")
+  await sentryCli.execute(["releases", "files", releaseName, "upload-sourcemaps", "output"], true);
+
+  console.log("Finalize release");
+  await sentryCli.execute(["releases", "finalize", releaseName], true);
+
+  console.log("Set new deploy");
+  await sentryCli.execute(["releases", "deploys", releaseName, "new", "--env", "production"], true);
+
+  //# upload symbols
+  //bin/sentry-symbols.js
+}
+
+main().catch(e => console.error(e));
+
+/* eslint-enable no-console */
