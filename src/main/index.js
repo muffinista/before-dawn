@@ -110,6 +110,8 @@ var openGrabberWindow = function() {
     grabberWindow.on("closed", () => {});
     grabberWindow.once("ready-to-show", resolve);
     grabberWindow.loadURL(grabberUrl);  
+    //grabberWindow.webContents.openDevTools();
+
   });
 };
 
