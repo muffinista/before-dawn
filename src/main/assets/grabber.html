@@ -108,9 +108,11 @@
     // this seems to handle a problem where CPU load spikes
     // after capture
     //
-    s.getVideoTracks().forEach((track) => {
-      track.stop();
-    });
+    if ( s !== undefined ) {
+      s.getVideoTracks().forEach((track) => {
+        track.stop();
+      });
+    }
     
     // https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Using_HTML5_audio_and_video
     video.pause();
@@ -173,8 +175,12 @@
               });
             }).
             catch((ex) => {
+              if ( typeof(window.Sentry) !== "undefined" ) {
+                window.Sentry.captureException(ex);
+              }
+
               getUserMediaError(ex);
-              cleanup(video, canvas, photo, mediaStream);
+              cleanup(video, canvas, photo);
             });
         });
       });

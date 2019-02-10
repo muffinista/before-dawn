@@ -52,11 +52,11 @@ global.CONFIG_DEFAULTS = {
 };
 
 
-global.TRACK_ERRORS = false;
+//global.TRACK_ERRORS = false;
 
 // this is a free sentry account and the URL will be in every copy of
 // the app that gets distributed, so i'm committing it to the repo for now
-if ( process.env.TEST_MODE === undefined && ! global.IS_DEV ) {
+//if ( process.env.TEST_MODE === undefined && ! global.IS_DEV ) {
   global.TRACK_ERRORS = true;
   require("./assets/sentry.js");
-}
+//}
