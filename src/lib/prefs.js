@@ -139,6 +139,10 @@ class SaverPrefs {
       name = this.current;
     }
 
+    if ( name === "undefined" ) {
+      return {};
+    }
+
     if ( this._data.options === undefined ) {
       this._data.options = {};
     }

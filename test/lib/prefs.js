@@ -237,6 +237,12 @@ describe("SaverPrefs", () => {
       let opts = prefs.getOptions("/Users/colin/Projects/before-dawn-screensavers/key/saver.json");
       assert.deepEqual({ baz: "boo", level: 10 }, opts);
     });
+
+    it("returns empty hash when key is undefined", () => {
+      prefs.current = undefined;
+      let opts = prefs.getOptions();
+      assert.deepEqual({}, opts);
+    });
   });
 
   // write

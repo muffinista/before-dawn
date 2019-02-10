@@ -515,7 +515,7 @@ var setStateToRunning = function() {
  * run the user's chosen screensaver on any available screens
  */
 var runScreenSaver = function() {
-  var savers = new SaverListManager({
+  let savers = new SaverListManager({
     prefs: prefs
   });
 
