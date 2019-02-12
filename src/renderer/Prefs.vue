@@ -367,7 +367,6 @@ export default {
         // However, new properties added to the object will not
         // trigger changes. In such cases, create a fresh object
         // with properties from both the original object and the mixin object:
-//        this.prefs = Object.assign({}, this.prefs, tmp);
         this.prefs = Object.assign(this.prefs, tmp);
 
 

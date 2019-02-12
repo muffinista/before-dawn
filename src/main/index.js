@@ -807,7 +807,10 @@ var setupReleaseCheck = function() {
 var checkForPackageUpdates = function() {  
   log.info("checkForPackageUpdates");
   let pd = new PackageDownloader(prefs);
-  return pd.updatePackage().then(log.info); 
+  return pd.updatePackage().then((result) => {
+    log.info(result);
+    toggleSaversUpdated();
+  }); 
 };
 
 var setupPackageCheck = function() {
