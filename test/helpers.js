@@ -89,7 +89,6 @@ exports.getTempDir = function() {
 exports.savedConfig = function(p) {
   var data = path.join(p, "config.json");
   var json = fs.readFileSync(data);
-//  console.log("savedConfig", json.toString());
   return JSON.parse(json);
 };
 
@@ -186,6 +185,7 @@ exports.waitForWindow = async (app, title, skipAssert) => {
   let result = -1;
   for ( var totalTime = 0; totalTime < windowCheckDelay; totalTime += delayStep ) {
     result = await exports.getWindowByTitle(app, title);
+    //console.log(title, result);
     if ( result !== -1 ) {
       break;
     }
@@ -232,12 +232,14 @@ exports.outputLogs = function(app) {
   return app.client.getMainProcessLogs().
   then(function (logs) {
     logs.forEach(function (log) {
+      // eslint-disable-next-line no-console
       console.log(log);
     });
   }).
   then(() => app.client.getRenderProcessLogs()).
   then(function (logs) {
     logs.forEach(function (log) {
+      // eslint-disable-next-line no-console
       console.log(log.message);
     });
   });
