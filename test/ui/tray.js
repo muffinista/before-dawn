@@ -65,7 +65,7 @@ describe("tray", function() {
         then(() => {
           helpers.sleep(1000);
         }).
-        then(() => app.client.waitUntilTextExists("body", "idle"))
+        then(() => app.client.waitUntilTextExists("body", "idle"));
     });
   });
 });

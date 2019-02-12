@@ -60,10 +60,6 @@ var trayMenu;
 
 var electronScreen;
 
-var testWindow;
-
-let grabberWindow = null;
-
 let prefs = undefined;
 let stateManager = undefined;
 let saverOpts = {};
@@ -93,11 +89,11 @@ if (! singleLock ) {
 var openGrabberWindow = function() {
   return new Promise((resolve) => {
     var grabberUrl = "file://" + __dirname + "/assets/grabber.html";
-    grabberWindow = new BrowserWindow({
-      show: debugMode === true,
+    var grabberWindow = new BrowserWindow({
+      show:false,
       width:100,
       height:100,
-      x: 4000,
+      x: 6000,
       y: 2000,
       webPreferences: {
         nodeIntegration: true,
@@ -107,10 +103,11 @@ var openGrabberWindow = function() {
     });
     grabberWindow.noTray = true;
     
-    grabberWindow.on("closed", () => {});
-    grabberWindow.once("ready-to-show", resolve);
+    grabberWindow.once("ready-to-show", () => {
+      resolve(grabberWindow);
+    });
+
     grabberWindow.loadURL(grabberUrl); 
-    //grabberWindow.webContents.openDevTools();
   });
 };
 
@@ -119,28 +116,44 @@ var openGrabberWindow = function() {
  * @param {Screen} s the screen to grab
  * @param {Function} cb callback triggered when work is done
  */
-var grabScreen = function(s, cb) {
-  // bypass screen capture in test mode
-  // this is a hack and if i can find a better
-  // way to do it (listening for the prefs window, etc),
-  // i'll do that instead
-  if ( testMode === true ) {
-    cb({
-      url: "file://" + __dirname + "/../test/fixtures/screenshot.png"
-    });
-    return;
-  }
-  
-  ipcMain.once("screenshot-" + s.id, function(e, message) {
-    log.info("got screenshot!", message);
-    cb(message);
+var grabScreen = function(s) {
+  return new Promise((resolve) => {
+    // bypass screen capture in test mode
+    // this is a hack and if i can find a better
+    // way to do it (listening for the prefs window, etc),
+    // i'll do that instead
+    if ( testMode === true ) {
+      resolve({
+        url: "file://" + __dirname + "/../test/fixtures/screenshot.png"
+      });
+    }
+    else {
+      let windowRef;
+      ipcMain.once("screenshot-" + s.id, function(e, message) {
+        log.info("got screenshot!", message);
+
+        try {
+          windowRef.close();
+        }
+        catch(ex) {
+          if ( typeof(Sentry) !== "undefined" ) {
+            // eslint-disable-next-line no-undef
+            Sentry.captureException(ex);
+          }
+        }
+
+        resolve(message);
+      });
+
+      openGrabberWindow().then((w) => {
+        windowRef = w;
+        windowRef.webContents.send("request-screenshot", { 
+          id: s.id, 
+          width: s.bounds.width, 
+          height: s.bounds.height});  
+      });
+    }
   });
-
-  grabberWindow.webContents.send("request-screenshot", { 
-    id: s.id, 
-    width: s.bounds.width, 
-    height: s.bounds.height});
-
 };
 
 
@@ -151,7 +164,7 @@ var grabScreen = function(s, cb) {
  * an app that doesn't open a window.
  */
 var openTestShim = function() {
-  testWindow = new BrowserWindow({
+  var testWindow = new BrowserWindow({
     width: 200,
     height: 400,
     webPreferences: {
@@ -161,21 +174,28 @@ var openTestShim = function() {
 
   var shimUrl = "file://" + __dirname + "/shim.html";
   testWindow.loadURL(shimUrl);
-  //testWindow.webContents.openDevTools();
 };
 
 /**
  * Open the preferences window
  */
 var openPrefsWindow = function() {
+  if ( prefsWindowHandle !== null ) {
+    return new Promise((resolve) => {
+      prefsWindowHandle.show();
+      resolve();
+    });
+  }
+
   return new Promise((resolve) => {
     var primary = electronScreen.getPrimaryDisplay();
 
     // take a screenshot of the main screen for use in previews
-    grabScreen(primary, function(message) {
+    grabScreen(primary).then((message) => {
       var prefsUrl = getUrl("prefs.html");
   
       prefsWindowHandle = new BrowserWindow({
+        show: false,
         width:800,
         height:600,
         minWidth: 800,
@@ -191,26 +211,24 @@ var openPrefsWindow = function() {
         icon: path.join(__dirname, "assets", "iconTemplate.png")
       });
   
+      prefsUrl = prefsUrl + "?screenshot=" + encodeURIComponent("file://" + message.url);
       prefsWindowHandle.saverOpts = saverOpts;
       prefsWindowHandle.screenshot = message.url;
-  
-      prefsUrl = prefsUrl + "?screenshot=" + encodeURIComponent("file://" + message.url);
-      
-      log.info("loading " + prefsUrl);
-      prefsWindowHandle.loadURL(prefsUrl);
-  
-      dock.showDock(app);
-  
-      prefsWindowHandle.on("closed", function() {
+        
+      prefsWindowHandle.on("closed", () => {
         prefsWindowHandle = null;
         dock.hideDockIfInactive(app);
       });
-  
-      // we could do something nice with either of these events
-      // prefsWindowHandle.webContents.on("crashed", outputError);
-      // prefsWindowHandle.webContents.on("unresponsive", outputError);
+
+      prefsWindowHandle.once("ready-to-show", () => {
+        prefsWindowHandle.show();
+        dock.showDock(app);
+      });
   
       prefsWindowHandle.once("show", resolve);
+  
+      log.info("loading " + prefsUrl);
+      prefsWindowHandle.loadURL(prefsUrl);
     });
   });
 };
@@ -224,10 +242,11 @@ var addNewSaver = function() {
   var primary = electronScreen.getPrimaryDisplay();
 
   // take a screenshot of the main screen for use in previews
-  grabScreen(primary, function(message) {
+  grabScreen(primary).then((message) => {
     newUrl = newUrl + "?screenshot=" + encodeURIComponent("file://" + message.url);
 
     var w = new BrowserWindow({
+      show: false,
       width:450,
       height:620,
       resizable:true,
@@ -242,13 +261,17 @@ var addNewSaver = function() {
     w.saverOpts = saverOpts;
     w.screenshot = message.url;
 
-    w.loadURL(newUrl);
-
-    dock.showDock(app);
     w.on("closed", () => {
       w = null;
       dock.hideDockIfInactive(app);
     });
+
+    w.once("ready-to-show", () => {
+      w.show();
+      dock.showDock(app);
+    });
+
+    w.loadURL(newUrl);
   });
 };
 
@@ -258,6 +281,7 @@ var addNewSaver = function() {
 var openAboutWindow = function() {
   var aboutUrl = getUrl("about.html");
   var w = new BrowserWindow({
+    show: false,
     width:500,
     height:600,
     resizable:false,
@@ -269,14 +293,17 @@ var openAboutWindow = function() {
     }
   });
 
-  w.loadURL(aboutUrl);
-
-  dock.showDock(app);
-
   w.on("closed", () => {
     w = null;
     dock.hideDockIfInactive(app);
   });
+
+  w.once("ready-to-show", () => {
+    w.show();
+    dock.showDock(app);
+  });
+
+  w.loadURL(aboutUrl);
 };
 
 
@@ -291,6 +318,7 @@ var openEditor = (args) => {
   var screenshot = args.screenshot;
 
   var w = new BrowserWindow({
+    show: false,
     webPreferences: {
       nodeIntegration: true,
       webSecurity: !global.IS_DEV,
@@ -306,14 +334,18 @@ var openEditor = (args) => {
 
   w.saverOpts = saverOpts;
   w.screenshot = screenshot;
-  w.loadURL(target);
+
+  w.once("ready-to-show", () => {
+    w.show();
+    dock.showDock(app);
+  });
 
   w.on("closed", () => {
     w = null;
     dock.hideDockIfInactive(app);
   });
-  
-  dock.showDock(app);
+
+  w.loadURL(target);  
 };
 
 
@@ -443,7 +475,7 @@ var runScreenSaverOnDisplay = function(saver, s) {
   //
   reqs = saver.getRequirements();
   if ( reqs.findIndex((x) => { return x === "screen"; }) > -1 ) {
-    grabScreen(s, runSaver);
+    grabScreen(s).then(runSaver);
   }
   else {
     runSaver();
@@ -858,8 +890,7 @@ var bootApp = function() {
   
   setupMenuAndTray();
   
-  openGrabberWindow().
-    then(() => setupIfNeeded()).
+  setupIfNeeded().
     then((result) => openPrefsWindowIfNeeded(result)).
     then(() => setupForTesting()).
     then(() => {
