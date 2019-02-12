@@ -899,6 +899,8 @@ var bootApp = function() {
 
       // don't show app in dock
       dock.hideDockIfInactive(app);
+
+      log.info("done with setup flow");
     });
 };
 
@@ -1066,7 +1068,6 @@ ipcMain.on("savers-updated", () => {
   toggleSaversUpdated();
 });
 
-
 //
 // user has updated their preferences, let's reload
 //
@@ -1110,6 +1111,11 @@ ipcMain.on("open-editor", (event, args) => {
 ipcMain.on("set-autostart", (event, value) => {
   log.info("set-autostart");
   autostarter.toggle(global.APP_NAME, value);
+});
+
+ipcMain.on("quit-app", () => {
+  log.info("quit-app");
+  quitApp();
 });
 
 // seems like we need to catch this event to keep OSX from exiting app after screensaver runs?

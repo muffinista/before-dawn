@@ -438,7 +438,15 @@ export default {
     },
     saveDataClick() {
       this.saveData().then(() => {
-        this.ipcRenderer.send("close-window");
+        new Noty({
+          type: "success",
+          layout: "topRight",
+          timeout: 2000,
+          text: "Changes saved!",
+          animation: {
+            open: null
+          }
+        }).show();
       });
     },
     renderUpdateNotice() {

@@ -58,7 +58,7 @@ describe("Prefs", function() {
         assert(text.lastIndexOf("A Screensaver") !== -1);
       }).
       then(() => app.client.click("button.save")).
-      then(() => helpers.waitForWindowToClose(app, "Before Dawn: Preferences")).
+      then(() => app.client.waitUntilTextExists("body", "Changes saved!")).
       then(function() {
         assert(currentPrefs().current.lastIndexOf("/saver-one/") !== -1);
       });
@@ -76,7 +76,7 @@ describe("Prefs", function() {
         app.client.selectByVisibleText("[name=\"sleep\"]", "15 minutes")
       ).
       then(() => app.client.click("button.save")).
-      then(() => helpers.waitForWindowToClose(app, "Before Dawn: Preferences")).
+      then(() => app.client.waitUntilTextExists("body", "Changes saved!")).
       then(function() {
         assert.equal(30, currentPrefs().delay);
         assert.equal(15, currentPrefs().sleep);
@@ -95,7 +95,7 @@ describe("Prefs", function() {
       then(() => app.client.click("label*=Auto start on login?")).
       then(() => app.client.click("label*=Only run on the primary display?")).
       then(() => app.client.click("button.save")).
-      then(() => helpers.waitForWindowToClose(app, "Before Dawn: Preferences")).
+      then(() => app.client.waitUntilTextExists("body", "Changes saved!")).
       then(function() {
         assert.equal(!oldConfig.lock, currentPrefs().lock);
         assert.equal(!oldConfig.disableOnBattery, currentPrefs().disableOnBattery);
@@ -112,7 +112,7 @@ describe("Prefs", function() {
       then(() => app.client.click("=Preferences")).
       then(() => app.client.waitUntilTextExists("body", "Activate after")).
       then(() => app.client.click("button.save")).
-      then(() => helpers.waitForWindowToClose(app, "Before Dawn: Preferences")).
+      then(() => app.client.waitUntilTextExists("body", "Changes saved!")).
       then(function() {
         assert.equal(oldConfig.lock, currentPrefs().lock);
         assert.equal(oldConfig.disableOnBattery, currentPrefs().disableOnBattery);
@@ -133,7 +133,7 @@ describe("Prefs", function() {
         then(() => app.client.click("[name='sound'][value='false']")).
         then(() => app.client.setValue("[name='load_url']", "barfoo")).
         then(() => app.client.click("button.save")).
-        then(() => helpers.waitForWindowToClose(app, "Before Dawn: Preferences")).
+        then(() => app.client.waitUntilTextExists("body", "Changes saved!")).
         then(function() {
           var options = currentPrefs().options;
           var k = Object.keys(options).find((i) => {
@@ -152,7 +152,7 @@ describe("Prefs", function() {
       then(() => app.client.click("=Advanced")).
       then(() => app.client.click("button.pick")).
       then(() => app.client.click("button.save")).
-      then(() => helpers.waitForWindowToClose(app, "Before Dawn: Preferences")).
+      then(() => app.client.waitUntilTextExists("body", "Changes saved!")).
       then(function() {
         assert.equal("/not/a/real/path", currentPrefs().localSource);
       });
@@ -168,7 +168,7 @@ describe("Prefs", function() {
       }).
       then(() => app.client.click("button.clear")).
       then(() => app.client.click("button.save")).
-      then(() => helpers.waitForWindowToClose(app, "Before Dawn: Preferences")).
+      then(() => app.client.waitUntilTextExists("body", "Changes saved!")).
       then(function() {
         assert.equal("", currentPrefs().localSource);
       });
