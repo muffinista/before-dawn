@@ -24,7 +24,9 @@ describe("bootstrap", function() {
   beforeEach(() => {
     workingDir = helpers.getTempDir();
     configDest = path.join(workingDir, "config.json");  
+    app = helpers.application(workingDir, false, zipPath);
   });
+
   afterEach(() => {
     return helpers.stopApp(app);
   });
@@ -32,16 +34,16 @@ describe("bootstrap", function() {
 
   describe("without config", () => {
     beforeEach(() => {
-      assert(!fs.existsSync(configDest));
-      return bootApp();
+     assert(!fs.existsSync(configDest));
+      return app.start().
+        then(() => helpers.waitUntilBooted(app));
     });
-    
-    it("creates config file", function() {
-      assert(fs.existsSync(configDest));
-    });  
 
-    it("shows prefs", function() {
-      return helpers.waitForWindow(app, prefsWindowTitle);
+    it("creates config file and shows prefs", function() {
+      return helpers.sleep(1000).
+        then(() => { assert(fs.existsSync(configDest)); }).
+        then(() => helpers.waitForWindow(app, prefsWindowTitle)).
+        then(() => helpers.outputLogs(app));
     });
   });
 
@@ -62,6 +64,7 @@ describe("bootstrap", function() {
 
       it("does not show prefs", function() {
         return helpers.waitForWindow(app, prefsWindowTitle, true).
+          then(() => helpers.outputLogs(app)).
           then((res) => {
             assert.equal(-1, res);
           });
@@ -99,8 +102,6 @@ describe("bootstrap", function() {
     it("shows prefs", function() {
       return helpers.waitForWindow(app, prefsWindowTitle);
     });
-  });
+  });  
 
-  it("downloads package");
-  
 });

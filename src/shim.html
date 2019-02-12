@@ -41,7 +41,6 @@
 
       setInterval(function() {
         let sm = require("electron").remote.require("./main.js").getStateManager();
-        console.log(sm.currentStateString);
         document.querySelector("#currentState").innerHTML = sm.currentStateString;
      }, 100);
 

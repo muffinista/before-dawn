@@ -13,7 +13,7 @@ const assert = require("assert");
 let windowCheckDelay = 5000;
 
 if (process.env.CI) {
-  windowCheckDelay = 15000;
+  windowCheckDelay = 10000;
 }
 
 const delayStep = 10;
@@ -120,9 +120,9 @@ exports.application = function(workingDir, quietMode=false, localZip) {
 
 
 exports.stopApp = function(app) {
-	if (app && app.isRunning()) {
-		return app.stop();
-	}
+  if (app && app.isRunning()) {
+    return app.stop();
+  }
 };
 
 
@@ -186,7 +186,6 @@ exports.waitForWindow = async (app, title, skipAssert) => {
   let result = -1;
   for ( var totalTime = 0; totalTime < windowCheckDelay; totalTime += delayStep ) {
     result = await exports.getWindowByTitle(app, title);
-    //console.log("****", i, result);
     if ( result !== -1 ) {
       break;
     }

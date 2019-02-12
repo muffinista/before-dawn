@@ -8,7 +8,7 @@ const {app, BrowserWindow} = require("electron");
  */
 var hideDockIfInactive = function() {
   let openWindowCount = BrowserWindow.getAllWindows().
-                                      filter(win => win.noTray !== true ).length;
+                                      filter(win => (win !== undefined && win.noTray !== true) ).length;
 
   if ( typeof(app.dock) !== "undefined" && openWindowCount === 0 ) {
     app.dock.hide();
