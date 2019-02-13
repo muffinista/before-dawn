@@ -139,7 +139,7 @@
       </div>
     </div> <!-- content -->
     <footer class="footer d-flex justify-content-between">
-      <div class="">
+      <div>
         <button
           class="align-middle btn btn-large btn-primary create"
           @click="createNewScreensaver"
@@ -148,12 +148,6 @@
         </button>
       </div>
       <div>
-        <button
-          class="btn btn-large btn-secondary cancel"
-          @click="closeWindow"
-        >
-          Cancel
-        </button>
         <button
           class="btn btn-large btn-primary save"
           :disabled="disabled"
@@ -367,7 +361,6 @@ export default {
         // However, new properties added to the object will not
         // trigger changes. In such cases, create a fresh object
         // with properties from both the original object and the mixin object:
-//        this.prefs = Object.assign({}, this.prefs, tmp);
         this.prefs = Object.assign(this.prefs, tmp);
 
 
@@ -438,7 +431,15 @@ export default {
     },
     saveDataClick() {
       this.saveData().then(() => {
-        this.ipcRenderer.send("close-window");
+        new Noty({
+          type: "success",
+          layout: "topRight",
+          timeout: 2000,
+          text: "Changes saved!",
+          animation: {
+            open: null
+          }
+        }).show();
       });
     },
     renderUpdateNotice() {

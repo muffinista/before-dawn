@@ -81,26 +81,28 @@ if (! singleLock ) {
 }
 
 
+const GRABBER_WINDOW_OPTS = {
+  show:false,
+  width:100,
+  height:100,
+  x: 6000,
+  y: 2000,
+  webPreferences: {
+    nodeIntegration: true,
+    webSecurity: !global.IS_DEV,
+    preload: global.TRACK_ERRORS ? path.join(__dirname, "assets", "sentry.js") : undefined
+  }
+};
+
 /**
  * Open the screengrab window
  * 
- * @param {function} cb - callback triggered when window is ready
+ * @returns {Promise} Promise that resolves once window is loaded
  */
 var openGrabberWindow = function() {
   return new Promise((resolve) => {
     var grabberUrl = "file://" + __dirname + "/assets/grabber.html";
-    var grabberWindow = new BrowserWindow({
-      show:false,
-      width:100,
-      height:100,
-      x: 6000,
-      y: 2000,
-      webPreferences: {
-        nodeIntegration: true,
-        webSecurity: !global.IS_DEV,
-        preload: global.TRACK_ERRORS ? path.join(__dirname, "assets", "sentry.js") : undefined
-      }
-    });
+    var grabberWindow = new BrowserWindow(GRABBER_WINDOW_OPTS);
     grabberWindow.noTray = true;
     
     grabberWindow.once("ready-to-show", () => {
@@ -114,7 +116,7 @@ var openGrabberWindow = function() {
 /**
  * open our screen grabber tool and issue a screengrab request
  * @param {Screen} s the screen to grab
- * @param {Function} cb callback triggered when work is done
+ * @returns {Promise} Promise that resolves with object containing URL of screenshot
  */
 var grabScreen = function(s) {
   return new Promise((resolve) => {
@@ -178,9 +180,10 @@ var openTestShim = function() {
 
 /**
  * Open the preferences window
+ * @returns {Promise} Promise that resolves when prefs window is shown
  */
 var openPrefsWindow = function() {
-  if ( prefsWindowHandle !== null ) {
+  if ( prefsWindowHandle !== null && prefsWindowHandle !== undefined ) {
     return new Promise((resolve) => {
       prefsWindowHandle.show();
       resolve();
@@ -697,6 +700,9 @@ var setupForTesting = function() {
   }    
 };
 
+/**
+ * build and apply an application menu and tray menu
+ */
 var setupMenuAndTray = function() {
   var icons = menusAndTrays.getIcons();
   var menu = Menu.buildFromTemplate(menusAndTrays.buildMenuTemplate(app));
@@ -721,14 +727,18 @@ var setupMenuAndTray = function() {
   });
 };
 
-
+/**
+ * setup any requirements for the app
+ * 
+ * @returns {Promise} Promise that resolves with true if setup for first time, false if app was ready
+ */
 var setupIfNeeded = function() {
   log.info("setupIfNeeded");
 
   return new Promise((resolve) => {
     if ( process.env.QUIET_MODE && process.env.QUIET_MODE === "true" ) {
       log.info("Quiet mode, skip setup checks!");
-      return resolve({setup: false});
+      return resolve(false);
     }
 
     // check if we should download savers, set something up, etc
@@ -743,7 +753,7 @@ var setupIfNeeded = function() {
         pd.setLocalFile(global.LOCAL_PACKAGE);
       }
 
-      return pd.updatePackage().then(() => resolve({ setup: true }));
+      return pd.updatePackage().then(() => resolve(true));
     }
 
     var savers = new SaverListManager({
@@ -752,7 +762,7 @@ var setupIfNeeded = function() {
 
     log.info("checking if " + prefs.current + " is valid");
     savers.confirmExists(prefs.current).then((exists) => {
-      let results = { setup: !exists };
+      let results = !exists;
       if ( ! exists ) {
         log.info("need to pick a new screensaver");
       }
@@ -765,15 +775,23 @@ var setupIfNeeded = function() {
   });
 };
 
+/**
+ * open the preferences window if needed
+ * 
+ * @param {Boolean} status true if we need to open the prefs window
+ */
 var openPrefsWindowIfNeeded = function(status) {
   log.info("openPrefsWindowIfNeeded");
-  if ( status.setup === true ) {
+  if ( status === true ) {
     return openPrefsWindow();
   }
 
   return Promise.resolve();
 };
 
+/**
+ * setup our periodic release check
+ */
 var setupReleaseCheck = function() {
   if ( global.CHECK_FOR_RELEASE !== true ) {
     return;
@@ -804,14 +822,23 @@ var setupReleaseCheck = function() {
   setInterval(checkForNewRelease, RELEASE_CHECK_INTERVAL);
 };
 
+/**
+ * check for screensaver package updates
+ */
 var checkForPackageUpdates = function() {  
   log.info("checkForPackageUpdates");
   let pd = new PackageDownloader(prefs);
-  return pd.updatePackage().then(log.info); 
+  return pd.updatePackage().then((result) => {
+    log.info(result);
+    toggleSaversUpdated();
+  }); 
 };
 
+/**
+ * setup our recurring screensaver package check
+ */
 var setupPackageCheck = function() {
-  if ( global.CHECK_FOR_RELEASE === true ) {
+  if ( global.CHECK_FOR_RELEASE !== true ) {
     return;
   }
 
@@ -899,9 +926,14 @@ var bootApp = function() {
 
       // don't show app in dock
       dock.hideDockIfInactive(app);
+
+      log.info("done with setup flow");
     });
 };
 
+/**
+ * toggle our 'ok to quit' variable and quit
+ */
 var quitApp = () => {
   exitOnQuit = true;
   app.quit(); 
@@ -997,12 +1029,26 @@ var checkForNewRelease = function() {
   releaseChecker.checkLatestRelease();
 };
 
+/**
+ * return our state manager
+ * @returns {StateManager}
+ */
 let getStateManager = function() {
   return stateManager;
 };
+
+/**
+ * return the app icon
+ * @returns {Tray}
+ */
 let getAppIcon = function() {
   return appIcon;
 };
+
+/**
+ * return the tray menu
+ * @returns {Menu}
+ */
 let getTrayMenu = function() {
   return trayMenu;
 };
@@ -1037,7 +1083,7 @@ log.info("use base path", global.basePath);
 
 if ( testMode !== true ) {
   app.on("second-instance", () => {
-    if ( prefsWindowHandle === null ) {
+    if ( prefsWindowHandle === null && prefsWindowHandle !== undefined ) {
       openPrefsWindow();
     }
     else {
@@ -1050,11 +1096,11 @@ if ( testMode !== true ) {
 }
 
 
-//
-// if the user has updated one of their screensavers, we can let
-// the prefs window know that it needs to reload
-//
 
+/**
+ * if the user has updated one of their screensavers, we can let
+ * the prefs window know that it needs to reload
+ */
 let toggleSaversUpdated = (arg) => {
   prefs.reload();  
   if ( prefsWindowHandle !== null ) {
@@ -1065,7 +1111,6 @@ let toggleSaversUpdated = (arg) => {
 ipcMain.on("savers-updated", () => {
   toggleSaversUpdated();
 });
-
 
 //
 // user has updated their preferences, let's reload
@@ -1110,6 +1155,11 @@ ipcMain.on("open-editor", (event, args) => {
 ipcMain.on("set-autostart", (event, value) => {
   log.info("set-autostart");
   autostarter.toggle(global.APP_NAME, value);
+});
+
+ipcMain.on("quit-app", () => {
+  log.info("quit-app");
+  quitApp();
 });
 
 // seems like we need to catch this event to keep OSX from exiting app after screensaver runs?

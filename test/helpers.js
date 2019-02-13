@@ -89,7 +89,6 @@ exports.getTempDir = function() {
 exports.savedConfig = function(p) {
   var data = path.join(p, "config.json");
   var json = fs.readFileSync(data);
-//  console.log("savedConfig", json.toString());
   return JSON.parse(json);
 };
 
@@ -186,6 +185,7 @@ exports.waitForWindow = async (app, title, skipAssert) => {
   let result = -1;
   for ( var totalTime = 0; totalTime < windowCheckDelay; totalTime += delayStep ) {
     result = await exports.getWindowByTitle(app, title);
+    //console.log(title, result);
     if ( result !== -1 ) {
       break;
     }
@@ -202,26 +202,26 @@ exports.waitForWindow = async (app, title, skipAssert) => {
 };
 
 
-exports.waitForWindowToClose = async (app, title) => {
-  let result = 0;
-  for ( var totalTime = 0; totalTime < windowCheckDelay; totalTime += delayStep ) {
-    try {
-      result = await exports.getWindowByTitle(app, title);
-      if ( result === -1 ) {
-        break;
-      }
-      else {
-        await exports.sleep(delayStep);
-      }
-    }
-    catch(e) {
-      //    'no such window: target window already closed\nfrom unknown error: web view not found',
-      result = -1;
-      break;
-    }
-  }
-  return assert.equal(-1, result);
-};
+// exports.waitForWindowToClose = async (app, title) => {
+//   let result = 0;
+//   for ( var totalTime = 0; totalTime < windowCheckDelay; totalTime += delayStep ) {
+//     try {
+//       result = await exports.getWindowByTitle(app, title);
+//       if ( result === -1 ) {
+//         break;
+//       }
+//       else {
+//         await exports.sleep(delayStep);
+//       }
+//     }
+//     catch(e) {
+//       //    'no such window: target window already closed\nfrom unknown error: web view not found',
+//       result = -1;
+//       break;
+//     }
+//   }
+//   return assert.equal(-1, result);
+// };
 
 exports.waitUntilBooted = async(app) => {
   return exports.waitForWindow(app, "test shim");
@@ -232,12 +232,14 @@ exports.outputLogs = function(app) {
   return app.client.getMainProcessLogs().
   then(function (logs) {
     logs.forEach(function (log) {
+      // eslint-disable-next-line no-console
       console.log(log);
     });
   }).
   then(() => app.client.getRenderProcessLogs()).
   then(function (logs) {
     logs.forEach(function (log) {
+      // eslint-disable-next-line no-console
       console.log(log.message);
     });
   });
