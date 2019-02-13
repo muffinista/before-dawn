@@ -139,7 +139,7 @@
       </div>
     </div> <!-- content -->
     <footer class="footer d-flex justify-content-between">
-      <div class="">
+      <div>
         <button
           class="align-middle btn btn-large btn-primary create"
           @click="createNewScreensaver"
@@ -148,12 +148,6 @@
         </button>
       </div>
       <div>
-        <button
-          class="btn btn-large btn-secondary cancel"
-          @click="closeWindow"
-        >
-          Cancel
-        </button>
         <button
           class="btn btn-large btn-primary save"
           :disabled="disabled"
