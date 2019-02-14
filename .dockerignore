@@ -1,0 +1,11 @@
+build/*
+dist/*
+output/*
+yarn-error.log
+.git
+tools/*
+docs/*
+assets/*
+coverage/*
+node_modules
+.electron-symbols
