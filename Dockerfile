@@ -24,14 +24,10 @@ RUN curl -sL https://deb.nodesource.com/setup_10.x | bash -
 RUN apt-get update && \
   apt-get -y install yarn nodejs
 
-    # \
-    # libx11-dev \
-    # icnsutils \
-    # graphicsmagick \
-    # libappindicator1
-
 RUN mkdir -p /app
 WORKDIR /app
 COPY . /app
 
-RUN yarn
+#RUN yarn
+
+#docker run -it before-dawn yarn test
