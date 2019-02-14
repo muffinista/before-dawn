@@ -6,9 +6,7 @@ const path = require("path");
 
 const helpers = require("../helpers.js");
 
-// this is skipped for the moment because
-// something weird is happening with spectron
-describe.skip("bootstrap", function() {
+describe("bootstrap", function() {
   const prefsWindowTitle = "Before Dawn: Preferences";
   const zipPath = path.join(__dirname, "..", "fixtures", "test-savers.zip");
   let configDest;
@@ -42,10 +40,8 @@ describe.skip("bootstrap", function() {
     });
 
     it("creates config file and shows prefs", function() {
-      return helpers.sleep(1000).
-        then(() => { assert(fs.existsSync(configDest)); }).
-        then(() => helpers.waitForWindow(app, prefsWindowTitle)).
-        then(() => helpers.outputLogs(app));
+      return helpers.waitForWindow(app, prefsWindowTitle).
+        then(() => { assert(fs.existsSync(configDest)); });
     });
   });
 
@@ -66,7 +62,6 @@ describe.skip("bootstrap", function() {
 
       it("does not show prefs", function() {
         return helpers.waitForWindow(app, prefsWindowTitle, true).
-          then(() => helpers.outputLogs(app)).
           then((res) => {
             assert.equal(-1, res);
           });

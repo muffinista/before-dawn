@@ -94,6 +94,9 @@ const GRABBER_WINDOW_OPTS = {
   }
 };
 
+const grabberUrl = "file://" + __dirname + "/assets/grabber.html";
+
+
 /**
  * Open the screengrab window
  * 
@@ -101,7 +104,6 @@ const GRABBER_WINDOW_OPTS = {
  */
 var openGrabberWindow = function() {
   return new Promise((resolve) => {
-    var grabberUrl = "file://" + __dirname + "/assets/grabber.html";
     var grabberWindow = new BrowserWindow(GRABBER_WINDOW_OPTS);
     grabberWindow.noTray = true;
     
@@ -134,6 +136,7 @@ var grabScreen = function(s) {
       ipcMain.once("screenshot-" + s.id, function(e, message) {
         log.info("got screenshot!", message);
 
+        // close the screen grabber window
         try {
           windowRef.close();
         }
@@ -753,7 +756,9 @@ var setupIfNeeded = function() {
         pd.setLocalFile(global.LOCAL_PACKAGE);
       }
 
-      return pd.updatePackage().then(() => resolve(true));
+      pd.updatePackage().then(() => {
+        return resolve(true);
+      });
     }
 
     var savers = new SaverListManager({
@@ -770,7 +775,6 @@ var setupIfNeeded = function() {
         log.info("looks like we are good to go");
       }
       return resolve(results);
-
     });
   });
 };
@@ -783,6 +787,7 @@ var setupIfNeeded = function() {
 var openPrefsWindowIfNeeded = function(status) {
   log.info("openPrefsWindowIfNeeded");
   if ( status === true ) {
+    log.info("we do need to open prefs window");
     return openPrefsWindow();
   }
 

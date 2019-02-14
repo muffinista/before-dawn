@@ -2,6 +2,8 @@
 
 const fs = require("fs-extra");
 const path = require("path");
+const mkdirp = require("mkdirp");
+
 const lockfile = require("proper-lockfile");
 
 const CONFIG_FILE_NAME = "config.json";
@@ -27,6 +29,7 @@ class SaverPrefs {
     this.configFile = path.join(baseDir, CONFIG_FILE_NAME);
     this.defaults = _defaults;
 
+    mkdirp.sync(this.baseDir);
     this.reload();
   }
 

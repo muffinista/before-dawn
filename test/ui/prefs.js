@@ -145,7 +145,6 @@ describe("Prefs", function() {
         });
   });
   
-
   it("allows setting path via dialog", function() {
     return pickPrefsWindow().
       then(() => app.client.waitUntilTextExists("body", "Screensaver One")).
