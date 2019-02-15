@@ -30,7 +30,8 @@ COPY . /app
 
 # we could run yarn to compile everything, but the
 # test lib does that too so don't bother
-#RUN yarn
+RUN yarn
 
-# docker run -it -v $PWD:/app before-dawn bash
-#docker run -it before-dawn yarn test
+# docker build -t before-dawn . && docker run -it -v $PWD:/app before-dawn bash
+# docker run -it before-dawn yarn test
+# tail -f ~/.config/Electron/log.log
