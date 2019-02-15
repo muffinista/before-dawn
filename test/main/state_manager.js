@@ -44,7 +44,7 @@ describe("StateManager", () => {
   });
 
   it("does nothing", (done) => {
-    sandbox.stub(fakeIdler, "getIdleTime").returns(10);
+    sandbox.stub(fakeIdler, "getIdleTime").returns(0.01);
     stateManager.idleFn = fakeIdler.getIdleTime;
 
     stateManager.tick(false);
@@ -58,7 +58,7 @@ describe("StateManager", () => {
   });
 
   it("idles", (done) => {
-    sandbox.stub(fakeIdler, "getIdleTime").returns(2500);
+    sandbox.stub(fakeIdler, "getIdleTime").returns(200);
     stateManager.idleFn = fakeIdler.getIdleTime;
 
     stateManager.tick(false);
@@ -71,7 +71,7 @@ describe("StateManager", () => {
   });
 
   it("blanks", (done) => {
-    sandbox.stub(fakeIdler, "getIdleTime").returns(2500);
+    sandbox.stub(fakeIdler, "getIdleTime").returns(1000);
     stateManager.idleFn = fakeIdler.getIdleTime;
     stateManager.switchState(stateManager.STATES.STATE_RUNNING);
 

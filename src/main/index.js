@@ -26,7 +26,7 @@ const url = require("url");
 const screenLock = require("./screen.js");
 const power = require("./power.js");
 
-const idler = require("node-system-idle-time");
+const idler = require("desktop-idle");
 
 const StateManager = require("./state_manager.js");
 const SaverPrefs = require("../lib/prefs.js");
@@ -1016,8 +1016,8 @@ var updateStateManager = function() {
   );
 
   stateManager.setup({
-    idleTime: prefs.delay * 60000,
-    blankTime: (prefs.delay + prefs.sleep) * 60000,
+    idleTime: prefs.delay * 60,
+    blankTime: (prefs.delay + prefs.sleep) * 60,
     onIdleTime: runScreenSaverIfPowered,
     onBlankTime: blankScreenIfNeeded,
     onReset: windows.closeRunningScreensavers
