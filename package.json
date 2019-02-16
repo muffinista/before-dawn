@@ -47,7 +47,7 @@
     "yauzl": "^2.10.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.2.2",
+    "@babel/core": "^7.3.3",
     "@babel/preset-env": "^7.3.1",
     "@octokit/rest": "^16.15.0",
     "@sentry/cli": "^1.37.4",
@@ -72,7 +72,7 @@
     "electron-builder": "20.38.5",
     "electron-debug": "^2.1.0",
     "electron-devtools-installer": "^2.2.4",
-    "eslint": "^5.12.1",
+    "eslint": "^5.14.0",
     "eslint-config-standard": "^12.0.0",
     "eslint-friendly-formatter": "^4.0.1",
     "eslint-loader": "^2.1.0",
@@ -81,7 +81,7 @@
     "eslint-plugin-node": "^8.0.0",
     "eslint-plugin-promise": "^4.0.1",
     "eslint-plugin-standard": "^4.0.0",
-    "eslint-plugin-vue": "5.1.0",
+    "eslint-plugin-vue": "^5.2.0",
     "extract-text-webpack-plugin": "^4.0.0-beta.0",
     "file-loader": "^3.0.1",
     "glob-all": "^3.1.0",
