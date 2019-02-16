@@ -60,7 +60,7 @@
     "babel-preset-stage-0": "^6.24.1",
     "babel-register": "^6.24.1",
     "babili-webpack-plugin": "^0.1.2",
-    "bootstrap": "~> 4.2.1",
+    "bootstrap": "~> 4.3.1",
     "bootstrap-vue": "^2.0.0-rc.11",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
