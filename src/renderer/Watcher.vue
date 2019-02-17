@@ -325,6 +325,7 @@ export default {
       this.clearTabs();
       document.querySelector("#" + n).classList.add("active");
       document.querySelector("[href='#" + n + "']").classList.add("active");
+      document.querySelector("#" + n + " h4").scrollIntoView();
     },
     showPreview() {
       this.setActiveTab("preview");

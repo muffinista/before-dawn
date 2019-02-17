@@ -19,8 +19,14 @@ body {
 }
 
 body, input, button {
-  // font: menu;
   font: caption;
+}
+select {
+  font: menu;
+}
+
+h1 {
+  font-size: 1.8rem;
 }
 
 small {
@@ -30,7 +36,6 @@ small {
 .savers-grid {
   width: 100%;
   display: grid;
-  //grid-gap: 1rem;
   grid-template-columns: 400px 1fr;
 }
 
@@ -38,10 +43,6 @@ small {
   .savers-grid {
     grid-template-columns: 99%;
   }
-}
-
-select, label, .form-control {
-  font-size: 0.9rem;
 }
 
 .form-check {
@@ -56,6 +57,9 @@ body > #editor > .content {
   overflow-y: scroll;
 }
 
+body > #editor #settings > div {
+  padding-top: 35px;
+}
 
 @media (max-height: 600px) {
   body > div > .content {
@@ -119,6 +123,10 @@ button.add-option {
   li.list-group-item {
     border: none;
   }
+
+  label {
+    font-size: 0.9rem;
+  }
 }
 .saver-detail {
   height: calc(98vh - #{$nav_height+$tab_padding+$footer_height});
@@ -136,10 +144,6 @@ iframe.preview, webview.preview {
   width: 100%;
   overflow:hidden;
 }
-
-// input[type=radio], div.body > a {
-//   margin: 4px;
-// }
 
 .hint {
   color: #888888;
@@ -177,7 +181,10 @@ h1 .hint {
   margin-bottom: 5px;  
 }
 #about h2 {
-  font-size: 175%;
+  font-size: 1.3rem;
+}
+#about h3 {
+  font-size: 1.1rem;
 }
 #about p {
   font-size: 120%;
@@ -220,7 +227,8 @@ form.submit-attempt {
 }
 
 form.entry {
-  margin-bottom: 10px;
+  margin-top: 5px;
+  margin-bottom: 5px;
 }
 
 form.input {
