@@ -882,6 +882,16 @@ var bootApp = function() {
 
   global.NEW_RELEASE_AVAILABLE = false;
 
+  // ensure proper data in about panel when available
+  if ( app.setAboutPanelOptions ) {
+    app.setAboutPanelOptions({
+      applicationName: global.APP_NAME,
+      applicationVersion: global.APP_VERSION,
+      version: global.APP_VERSION_BASE,
+      credits: global.APP_CREDITS
+    });
+  }
+
   log.info("Loading prefs");
   prefs = new SaverPrefs(global.basePath);
 
@@ -911,8 +921,6 @@ var bootApp = function() {
     log.info("The system just woke up, stop screensavers");
     windows.closeRunningScreensavers();
   });
-
-
 
   stateManager = new StateManager();
   stateManager.idleFn = idler.getIdleTime;

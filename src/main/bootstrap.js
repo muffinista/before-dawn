@@ -27,6 +27,7 @@ global.APP_VERSION = "v" + version;
 global.NEW_RELEASE_AVAILABLE = false;
 global.HELP_URL = "https://muffinista.github.io/before-dawn/";
 global.ISSUES_URL = "https://github.com/muffinista/before-dawn/issues";
+global.APP_CREDITS = "by Colin Mitchell // muffinlabs.com";
 
 global.RELEASE_SERVER = "https://before-dawn.now.sh";
 
