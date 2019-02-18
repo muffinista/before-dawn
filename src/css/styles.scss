@@ -78,6 +78,7 @@ body > div > footer {
 body > div > footer > div {
   height: $footer_inner_height;
   margin-top: #{($footer_height/2 - $footer_inner_height/2) + 1};
+  margin-right: #{($footer_height/2 - $footer_inner_height/2) + 1};
 }
 
 
@@ -130,7 +131,7 @@ button.add-option {
 }
 .saver-detail {
   height: calc(98vh - #{$nav_height+$tab_padding+$footer_height});
-  overflow-y: scroll;
+  overflow-y: auto;
   padding-left: 5px;
   padding-right: 5px;
 }
