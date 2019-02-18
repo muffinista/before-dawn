@@ -108,10 +108,14 @@ The editor has a preview section:
 
 ![editor window](assets/editor.png "Editor Window")
 
+And a section to describe the screensaver:
+
+![editor window](assets/editor-description.png "Editor Description Window")
+
 
 And also a section where you can add custom options for your screensaver:
 
-![editor window](assets/editor-settings.png "Editor Settings Window")
+![editor window](assets/editor-options.png "Editor Options Window")
 
 
 ## Contributing

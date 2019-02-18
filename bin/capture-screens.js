@@ -74,13 +74,21 @@ app.start().
       fs.writeFileSync(path.join(__dirname, "..", "assets", "editor.png"), imageBuffer);
     })
   ).
-  then(() => app.client.click("=Settings")).
+  then(() => app.client.click("=Description")).
   then(() => helpers.sleep(200) ).
-  then(() => app.browserWindow.setSize(800, 1300) ).
+//  then(() => app.browserWindow.setSize(800, 1300) ).
   then(() => 
     app.browserWindow.capturePage().then(function (imageBuffer) {
-      console.log("editor-settings");
-      fs.writeFileSync(path.join(__dirname, "..", "assets", "editor-settings.png"), imageBuffer);
+      console.log("editor-description");
+      fs.writeFileSync(path.join(__dirname, "..", "assets", "editor-description.png"), imageBuffer);
+    })
+  ).
+  then(() => app.client.click("=Options")).
+  then(() => helpers.sleep(200) ).
+  then(() => 
+    app.browserWindow.capturePage().then(function (imageBuffer) {
+      console.log("editor-options");
+      fs.writeFileSync(path.join(__dirname, "..", "assets", "editor-options.png"), imageBuffer);
     })
   ).
 
