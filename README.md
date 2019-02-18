@@ -29,11 +29,19 @@ way. Here's the Flying Emoji screensaver:
 You can get a quick preview of the other screensavers via this
 [preview page](http://muffinista.github.io/before-dawn-screensavers/).
 
-And here's what the preferences window looks like:
+
+The first time you open the application, the preferences window will open. You
+can preview and pick screensavers there:
 
 ![preferences window](assets/prefs.png "Preferences Window")
 
+There's a 'Settings' section where you can specify certain options for how the
+application should run.
+
 ![preferences window](assets/prefs-settings.png "Preferences Settings")
+
+Finally, there's a section for advanced settings. You can use this area to add a
+local directory for storing your own screensavers.
 
 ![preferences window](assets/prefs-advanced.png "Preferences Advanced Options")
 
@@ -92,9 +100,16 @@ smoothly as possible. There's a bunch of specific implementation
 details in
 [the wiki](https://github.com/muffinista/before-dawn/wiki/Writing-A-Screensaver).
 
-There's also a very basic editor mode built into Before Dawn, which will generate some basic code for you to work from, and will make it easier to add some configurable options to your work.
+There's also a very basic editor mode built into Before Dawn, which will
+generate some basic code for you to work from, and will make it easier to add
+some configurable options to your work.
+
+The editor has a preview section:
 
 ![editor window](assets/editor.png "Editor Window")
+
+
+And also a section where you can add custom options for your screensaver:
 
 ![editor window](assets/editor-settings.png "Editor Settings Window")
 
@@ -121,8 +136,10 @@ help or have a suggestion, please feel free to open an issue here.
 
 ## Copyright/License
 
-Unless otherwise stated, Copyright (c) 2019 [Colin Mitchell](http://muffinlabs.com).
+Unless otherwise stated, Copyright (c) 2019 [Colin
+Mitchell](http://muffinlabs.com).
 
-Before Dawn is is distributed under the MIT licence -- Please see LICENSE.txt for further details.
+Before Dawn is is distributed under the MIT licence -- Please see LICENSE.txt
+for further details.
 
 
