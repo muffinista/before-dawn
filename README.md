@@ -33,7 +33,9 @@ And here's what the preferences window looks like:
 
 ![preferences window](assets/prefs.png "Preferences Window")
 
-![preferences window](assets/prefs2.png "Preferences Window Part Two")
+![preferences window](assets/prefs-settings.png "Preferences Settings")
+
+![preferences window](assets/prefs-advanced.png "Preferences Advanced Options")
 
 
 ## Downloads
@@ -42,10 +44,14 @@ Installers are available from the [releases](https://github.com/muffinista/befor
 
 ## Status
 
-Right now the application itself is pretty stable. This repo includes the main code for running the actual screensaver, a simple app for picking your screensaver and setting some options, and
-a bunch of modules to pull it all together.
+Right now the application itself is pretty stable. This repo includes the main
+code for running the actual screensaver, a simple app for picking your
+screensaver and setting some options, and a bunch of modules to pull it all
+together.
 
-The actual code for the screensavers is in [a separate repo](https://github.com/muffinista/before-dawn-screensavers). If you want to write a screensaver, please add it to the project via a PR!
+The actual code for the screensavers is in [a separate
+repo](https://github.com/muffinista/before-dawn-screensavers). If you want to
+write a screensaver, please add it to the project via a PR!
 
 ## Running It
 
@@ -86,6 +92,13 @@ smoothly as possible. There's a bunch of specific implementation
 details in
 [the wiki](https://github.com/muffinista/before-dawn/wiki/Writing-A-Screensaver).
 
+There's also a very basic editor mode built into Before Dawn, which will generate some basic code for you to work from, and will make it easier to add some configurable options to your work.
+
+![editor window](assets/editor.png "Editor Window")
+
+![editor window](assets/editor-settings.png "Editor Settings Window")
+
+
 ## Contributing
 
 Contributions and suggestions are eagerly accepted. Please check out
@@ -108,7 +121,7 @@ help or have a suggestion, please feel free to open an issue here.
 
 ## Copyright/License
 
-Unless otherwise stated, Copyright (c) 2017 [Colin Mitchell](http://muffinlabs.com).
+Unless otherwise stated, Copyright (c) 2019 [Colin Mitchell](http://muffinlabs.com).
 
 Before Dawn is is distributed under the MIT licence -- Please see LICENSE.txt for further details.
 
