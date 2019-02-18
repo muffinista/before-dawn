@@ -22,22 +22,39 @@
         </a>
       </li>
       <li
-        id="settings-tab"
+        id="description-tab"
         role="presentation"
         class="nav-item"
       >
         <a
           aria-expanded="false"
-          aria-controls="settings"
+          aria-controls="description"
           role="tab"
           data-toggle="tab"
           class="nav-link"
-          href="#settings"
-          @click="showSettings"
+          href="#description"
+          @click="showDescription"
         >
-          Settings
+          Description
         </a>
       </li>
+     <li
+        id="options-tab"
+        role="presentation"
+        class="nav-item"
+      >
+        <a
+          aria-expanded="false"
+          aria-controls="options"
+          role="tab"
+          data-toggle="tab"
+          class="nav-link"
+          href="#options"
+          @click="showOptions"
+        >
+          Options
+        </a>
+      </li>      
       <b-button-group>
         <b-button
           v-b-tooltip.hover
@@ -104,8 +121,7 @@
           id="preview"
           class="tab-pane active"
           aria-labelledby="preview-tab"
-          role="tabpanel"
-        >
+          role="tabpanel">
           <div class="container-fluid space-at-bottom">
             <template v-if="saver !== undefined">
               <template v-if="options.length > 0">
@@ -133,13 +149,12 @@
           </div>
         </div>
         <div
-          id="settings"
+          id="description"
           class="tab-pane"
-          aria-labelledby="settings-tab"
-          role="tabpanel"
-        >
+          aria-labelledby="description-tab"
+          role="tabpanel">
           <div class="container-fluid">
-            <h4>Basic Information</h4>
+            <h4>Description</h4>
             <small>
               You can enter the basics about this screensaver
               here.
@@ -152,8 +167,16 @@
                 v-if="isLoaded"
                 :saver="saver.attrs"
               />
-              
-              
+            </template>
+          </div>
+        </div>
+        <div
+          id="options"
+          class="tab-pane"
+          aria-labelledby="options-tab"
+          role="tabpanel">
+          <div class="container-fluid">
+            <template v-if="saver !== undefined">
               <h4>Configurable Options</h4>
               <small>
                 You can offer users configurable options to control
@@ -306,9 +329,6 @@ export default {
         fs.watch(this.folderPath, (eventType, filename) => {
           if (filename) {
             this.reloadPreview();
-            // note to self -- this is bad if you're on the
-            // settings tab and click save
-            // this.showPreview();
           }
         });
       }      
@@ -330,8 +350,11 @@ export default {
     showPreview() {
       this.setActiveTab("preview");
     },
-    showSettings() {
-      this.setActiveTab("settings");
+    showDescription() {
+      this.setActiveTab("description");
+    },
+    showOptions() {
+      this.setActiveTab("options");
     },
     onOptionsChange(e) {
       var name = e.target.name;

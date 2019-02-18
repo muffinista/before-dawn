@@ -42,7 +42,7 @@ describe("Editor", function() {
   
   it("shows settings form", function() {
     return pickEditorWindow().
-      then(() => app.client.click("=Settings")).
+      then(() => app.client.click("=Description")).
       then(() => app.client.getValue("#saver-form [name='name']")).
       then((res) => {
         assert.equal("Screensaver One", res);
@@ -65,8 +65,8 @@ describe("Editor", function() {
 
   it("adds and removes options", function() {
     return pickEditorWindow().
-      then(() => app.client.waitUntilTextExists("body", "Settings", 60000)).
-      then(() => app.client.click("=Settings")).
+      then(() => app.client.waitUntilTextExists("body", "Options", 60000)).
+      then(() => app.client.click("=Options")).
       then(() => app.client.setValue(".entry[data-index='0'] [name='name']", "My Option")).
       then(() => app.client.setValue(".entry[data-index='0'] [name='description']", "An Option I Guess?")).
       then(() => app.client.click("button.add-option")).
