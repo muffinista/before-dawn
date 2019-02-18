@@ -4,7 +4,7 @@ import VueObserveVisibility from "vue-observe-visibility";
 import BootstrapVue from "bootstrap-vue";
 
 import Prefs from "./Prefs";
-import Watcher from "./Watcher";
+import Editor from "./Editor";
 import NewScreensaver from "./NewScreensaver";
 import About from "./About";
 
@@ -24,7 +24,7 @@ Vue.use(VueObserveVisibility);
 
 var actions = {
   "prefs": { components: { Prefs }, template: "<Prefs/>" },
-  "editor": { components: { Watcher }, template: "<Watcher/>" },
+  "editor": { components: { Editor }, template: "<Editor/>" },
   "new": { components: { NewScreensaver }, template: "<NewScreensaver/>" },
   "about": { components: { About }, template: "<About/>" }
 };
