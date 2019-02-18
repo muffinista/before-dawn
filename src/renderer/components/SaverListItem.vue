@@ -15,8 +15,9 @@
 
       <template v-if="saver.editable">
         <div>
-          <a class="btn btn-outline-secondary btn-sm" 
+          <a class="btn btn-outline-secondary btn-sm edit" 
             href="#" role="button" 
+            :data-name="saver.name" 
             v-on:click="onEditClick(saver)">edit</a>
           <a class="btn btn-outline-secondary btn-sm" 
             href="#" role="button" 

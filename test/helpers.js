@@ -18,11 +18,12 @@ if (process.env.CI) {
 
 const delayStep = 10;
 
-
-global.before(() => {
-  chai.should();
-  chai.use(chaiAsPromised);
-});
+if ( global.before ) {
+  global.before(() => {
+    chai.should();
+    chai.use(chaiAsPromised);
+  });  
+}
 
 exports.specifyConfig = (tmpdir, name) => {
   fs.copySync(
