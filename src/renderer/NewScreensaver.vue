@@ -99,8 +99,11 @@ export default {
     }
   },
   mounted() {
-    let dataPath = remote.getCurrentWindow().saverOpts.base;
-    this.prefs = new SaverPrefs(dataPath);
+    let opts = this.$electron.remote.getCurrentWindow().saverOpts;
+    this.prefs = new SaverPrefs({
+      baseDir: opts.base,
+      systemSource: opts.systemDir
+    });
 
     this._savers = new SaverListManager({
       prefs: this.prefs
@@ -120,7 +123,11 @@ export default {
 
       this.disabled = true;
 
-      let systemPath = remote.getCurrentWindow().saverOpts.systemDir;
+      let opts = this.$electron.remote.getCurrentWindow().saverOpts;
+      let systemPath = opts.systemDir;
+
+      // eslint-disable-next-line no-console
+      console.log(opts);
 
       var src = path.join(systemPath, "__template");
       var data = this.manager.create(src, this.saver);

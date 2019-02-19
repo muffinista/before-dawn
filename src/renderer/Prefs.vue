@@ -252,10 +252,13 @@ export default {
     }
   },
   async mounted() {
-    let dataPath = this.$electron.remote.getCurrentWindow().saverOpts.base;
+    let opts = this.$electron.remote.getCurrentWindow().saverOpts;
 
     this.ipcRenderer.on("savers-updated", this.onSaversUpdated);
-    this.prefs = new SaverPrefs(dataPath);
+    this.prefs = new SaverPrefs({
+      baseDir: opts.base,
+      systemSource: opts.systemDir
+    });
     this._savers = new SaverListManager({
       prefs: this.prefs
     }, this.logger);

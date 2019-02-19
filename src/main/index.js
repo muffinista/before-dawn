@@ -560,8 +560,10 @@ var runScreenSaver = function() {
 
   log.info("runScreenSaver");
 
+  let workingPath = getSystemDir();
   // check if the user is running the random screensaver. if so, pick one!
-  let randomPath = path.join(global.basePath, "system-savers", "random", "saver.json");
+  let randomPath = path.join(workingPath, "system-savers", "random", "saver.json");
+  log.info("random: " + randomPath);
   if ( prefs.current === randomPath ) {
     setupPromise = new Promise((resolve) => {
       savers.list(() => {
@@ -667,7 +669,7 @@ var getSystemDir = function() {
     return process.env.BEFORE_DAWN_SYSTEM_DIR;
   }
   
-  if ( global.IS_DEV ) {
+  if ( global.IS_DEV || process.env.TEST_MODE) {
     return __dirname;
   }
 
@@ -892,16 +894,23 @@ var bootApp = function() {
     });
   }
 
-  log.info("Loading prefs");
-  prefs = new SaverPrefs(global.basePath);
-
   // these are some variables we'll pass to windows so they
   // can bootstrap access to data/etc
   saverOpts = {
     base: global.basePath,
-    systemDir: getSystemDir(),
+    systemDir: path.join(getSystemDir(), "system-savers"),
     logger: log.info
   };
+
+
+  log.info("Loading prefs");
+  log.info(`baseDir: ${saverOpts.base}`);
+  log.info(`systemSource: ${saverOpts.systemDir}`);
+  prefs = new SaverPrefs({
+    baseDir: saverOpts.base,
+    systemSource: saverOpts.systemDir
+  });
+
 
   //
   // setup some event handlers for when screen count changes, mostly

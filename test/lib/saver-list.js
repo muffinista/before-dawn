@@ -194,7 +194,7 @@ describe("SaverListManager", function() {
     it("works", function(done) {
 
       // this should be the path to our __template in the main app
-      var src = path.join(__dirname, "..", "..", "src", "main", "__template");
+      var src = path.join(__dirname, "..", "..", "src", "main", "system-savers", "__template");
       savers.create(src,
                                   {
                                     name:"New Screensaver"

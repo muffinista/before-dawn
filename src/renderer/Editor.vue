@@ -312,9 +312,13 @@ export default {
       return;
     }
 
-    let dataPath = remote.getCurrentWindow().saverOpts.base;
 
-    this._prefs = new SaverPrefs(dataPath);
+    let opts = this.$electron.remote.getCurrentWindow().saverOpts;
+    this._prefs = new SaverPrefs({
+      baseDir: opts.base,
+      systemSource: opts.systemDir
+    });
+
     this._savers = new SaverListManager({
       prefs: this._prefs
     });
