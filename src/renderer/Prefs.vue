@@ -346,6 +346,10 @@ export default {
         if ( tmp.options === undefined ) {
           tmp.options = {};
         }
+
+        if ( this.savers.length <= 0 ) {
+          return;
+        }
         
         // ensure default settings in the config for all savers
         for(var i = 0, l = this.savers.length; i < l; i++ ) {
