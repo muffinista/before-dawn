@@ -15,6 +15,9 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 const releaseName = `${packageJSON.productName} ${packageJSON.version}`;
 
 
+const CleanWebpackPlugin = require("clean-webpack-plugin");
+
+
 //
 // get a list of node dependencies, and then
 // convert it to an array of package names
@@ -84,6 +87,7 @@ let mainConfig = {
     sourceMapFilename: "[name].js.map"
   },
   plugins: [
+    new CleanWebpackPlugin(["output"]),
     new CopyWebpackPlugin([
       {
         from: path.join(__dirname, "package.json"),

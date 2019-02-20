@@ -65,6 +65,7 @@
     "bootstrap-vue": "^2.0.0-rc.11",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
+    "clean-webpack-plugin": "^1.0.1",
     "copy-webpack-plugin": "^4.6.0",
     "css-loader": "^2.1.0",
     "devtron": "^1.4.0",
