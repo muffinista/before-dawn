@@ -24,9 +24,17 @@ const PROPERTIES = [
 ];
 
 class SaverPrefs {
-  constructor(baseDir, _defaults) {
-    this.baseDir = baseDir;
-    this.configFile = path.join(baseDir, CONFIG_FILE_NAME);
+  constructor(paths, _defaults) {
+    if ( typeof(paths) === "string" ) {
+      this.baseDir = paths;
+      this._systemSource = path.join(this.baseDir, "system-savers");
+    }
+    else {
+      this.baseDir = paths.baseDir;
+      this._systemSource = paths.systemSource;
+    }
+
+    this.configFile = path.join(this.baseDir, CONFIG_FILE_NAME);
     this.defaults = _defaults;
 
     mkdirp.sync(this.baseDir);
@@ -118,17 +126,20 @@ class SaverPrefs {
       folders = folders.concat( local );
     }
 
-    if ( fs.existsSync(system) ) {
-      folders = folders.concat( system );
-    }
+    
+    folders = folders.concat( system );
 
     return folders;
   }
 
   get systemSource() {
-    return path.join(this.baseDir, "system-savers");
+    return this._systemSource;
   }
   
+  set systemSource(val) {
+    this._systemSource = val;
+  }
+
   /**
    * set config var k to value v
    */

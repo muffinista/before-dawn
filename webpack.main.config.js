@@ -11,9 +11,11 @@ const outputDir = path.join(__dirname, "output");
 
 const BabiliWebpackPlugin = require("babili-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
-//const SentryWebpackPlugin = require("@sentry/webpack-plugin");
 
 const releaseName = `${packageJSON.productName} ${packageJSON.version}`;
+
+
+const CleanWebpackPlugin = require("clean-webpack-plugin");
 
 
 //
@@ -85,6 +87,7 @@ let mainConfig = {
     sourceMapFilename: "[name].js.map"
   },
   plugins: [
+    new CleanWebpackPlugin(["output"]),
     new CopyWebpackPlugin([
       {
         from: path.join(__dirname, "package.json"),
@@ -107,15 +110,8 @@ let mainConfig = {
     ]),
     new CopyWebpackPlugin([
       {
-        from: path.join(__dirname, "system-savers"),
+        from: path.join(__dirname, "src", "main", "system-savers"),
         to: path.join(outputDir, "system-savers"),
-        ignore: [".*"]
-      }
-    ]),
-    new CopyWebpackPlugin([
-      {
-        from: path.join(__dirname, "src", "main", "__template"),
-        to: path.join(outputDir, "__template"),
         ignore: [".*"]
       }
     ]),
@@ -126,12 +122,6 @@ let mainConfig = {
       }
     ]),
     new webpack.NoEmitOnErrorsPlugin(),
-    // new SentryWebpackPlugin({
-    //   include: ".", //path.join(__dirname, "output"),
-    //   ignoreFile: ".gitignore",
-    //   ignore: ["node_modules", "test", "bin", "webpack.main.config.js", "webpack.renderer.config.js"],
-    //   configFile: "sentry.properties"
-    // })
   ],
   resolve: {
     extensions: [".js", ".json", ".node"]

@@ -163,9 +163,11 @@ describe("SaverPrefs", () => {
 
   // sources
   describe("sources", () => {
+    let systemDir;
     beforeEach(() => {
       helpers.specifyConfig(tmpdir, "config");
       prefs = new SaverPrefs(tmpdir);
+      systemDir = path.join(tmpdir, "system-savers");
     });
 
     it("includes localSource", () => {
@@ -174,7 +176,7 @@ describe("SaverPrefs", () => {
 
       let result = prefs.sources;
       assert.deepEqual(
-        [ localSourceDir ], result);
+        [ localSourceDir, systemDir ], result);
     });
 
     it("includes repo", () => {
@@ -183,7 +185,7 @@ describe("SaverPrefs", () => {
       let dest = path.join(tmpdir, "savers");
 
       assert.deepEqual(
-        [ dest ], result);
+        [ dest, systemDir ], result);
     });
 
     it("includes both repo and localsource", () => {
@@ -196,11 +198,10 @@ describe("SaverPrefs", () => {
 
       let result = prefs.sources;
       assert.deepEqual(
-        [ saversDir, localSourceDir ], result);
+        [ saversDir, localSourceDir, systemDir ], result);
     });
 
     it("includes system", () => {
-      let systemDir = path.join(tmpdir, "system-savers");
       fs.mkdirSync(systemDir);
       let result = prefs.sources;
 
