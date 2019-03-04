@@ -34,6 +34,14 @@
                class="form-control" />
         <div class="hint">The author of this screensaver.</div>
       </div>
+
+      <div class="form-group">
+        <h5>Requirements:</h5>
+        <input type="checkbox" id="screen" value="screen" v-model="saver.requirements">
+        <label for="screen">Screen capture</label>
+        <div class="hint">This screensaver will be sent an image of the desktop</div>
+      </div>
+
     </form>
   </div>
 </template>

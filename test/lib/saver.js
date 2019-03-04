@@ -166,10 +166,35 @@ describe("Saver", function() {
       
       s.write(s.toHash());
 
-      
       var data = JSON.parse(fs.readFileSync(dest));
       s = new Saver(data);
       assert.equal("New Name To Write", s.name);
+    });
+
+    it("sets default requirements", function() {
+      var p = tmp.dirSync().name;
+      var dest = path.join(p, "saver.json");
+
+      var s = loadSaver({path: p});
+      delete s.attrs.requirements;
+      s.write(s.toHash());
+      
+      var data = JSON.parse(fs.readFileSync(dest));
+      s = new Saver(data);
+      assert.equal("none", s.requirements[0]);
+    });
+
+    it("allows requirements", function() {
+      var p = tmp.dirSync().name;
+      var dest = path.join(p, "saver.json");
+
+      var s = loadSaver({path: p});
+      s.attrs.requirements = ["magic"];
+      s.write(s.toHash());
+      
+      var data = JSON.parse(fs.readFileSync(dest));
+      s = new Saver(data);
+      assert.equal(1, s.requirements.length);
     });
   });
 
