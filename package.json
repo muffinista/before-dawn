@@ -28,7 +28,7 @@
     "url": "git://github.com/muffinista/before-dawn.git"
   },
   "dependencies": {
-    "@sentry/electron": "^0.15.0",
+    "@sentry/electron": "^0.16.0",
     "auto-launch": "^5.0.5",
     "cross-env": "^5.2.0",
     "desktop-idle": "^1.1.2",
