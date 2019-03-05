@@ -19,7 +19,7 @@ describe("SaverPrefs", () => {
 
   describe("without config", () => {
     beforeEach(() => {
-      prefs = new SaverPrefs(tmpdir);
+      prefs = new SaverPrefs({baseDir: tmpdir});
     });
 
     it("should load", () => {
@@ -34,7 +34,7 @@ describe("SaverPrefs", () => {
   describe("with config", () => {
     it("recovers from corrupt config", () => {
       helpers.specifyConfig(tmpdir, "bad-config");
-      prefs = new SaverPrefs(tmpdir);
+      prefs = new SaverPrefs({baseDir: tmpdir});
 
       assert(prefs.firstLoad);
       let configDest = path.join(tmpdir, "config.json");
@@ -43,7 +43,7 @@ describe("SaverPrefs", () => {
 
     it("works with existing config", () => {
       helpers.specifyConfig(tmpdir, "config");
-      prefs = new SaverPrefs(tmpdir);
+      prefs = new SaverPrefs({baseDir: tmpdir});
 
       assert(!prefs.firstLoad);
       let configDest = path.join(tmpdir, "config.json");
@@ -55,12 +55,12 @@ describe("SaverPrefs", () => {
   describe("reload", () => {
     beforeEach(() => {
       helpers.specifyConfig(tmpdir, "config");
-      prefs = new SaverPrefs(tmpdir);
+      prefs = new SaverPrefs({baseDir: tmpdir});
     });
   
     it("works with existing config", () => {
       helpers.specifyConfig(tmpdir, "config");
-      prefs = new SaverPrefs(tmpdir);
+      prefs = new SaverPrefs({baseDir: tmpdir});
 
       assert.equal("before-dawn-screensavers/emoji/saver.json", prefs.current);
       let configDest = path.join(tmpdir, "config.json");
@@ -74,11 +74,45 @@ describe("SaverPrefs", () => {
     });
   });
 
+  describe("needSetup", function() {
+    it("is false with config", () => {
+      helpers.specifyConfig(tmpdir, "config");
+      prefs = new SaverPrefs({baseDir: tmpdir});
+  
+      assert(!prefs.needSetup);
+    });
+
+    it("is true with noSource", () => {
+      prefs = new SaverPrefs({baseDir: tmpdir});
+      assert(prefs.noSource);
+      assert(prefs.needSetup);
+    });
+
+    it("is true if current is undefined", () => {
+      helpers.specifyConfig(tmpdir, "config");
+      prefs = new SaverPrefs({baseDir: tmpdir});
+
+      assert(!prefs.needSetup);
+
+      prefs.current = undefined;
+      assert(prefs.needSetup);
+    });
+
+    it("is true if current is blank", () => {
+      helpers.specifyConfig(tmpdir, "config");
+      prefs = new SaverPrefs({baseDir: tmpdir});
+  
+      assert(!prefs.needSetup);
+      prefs.current = "";
+      assert(prefs.needSetup);
+    });
+  });
+
   // no source
   describe("noSource", () => {
     describe("without config", () => {
       it("is true", () => {
-        prefs = new SaverPrefs(tmpdir);
+        prefs = new SaverPrefs({baseDir: tmpdir});
         assert(prefs.noSource);
       });
     });
@@ -86,7 +120,7 @@ describe("SaverPrefs", () => {
     describe("with config", () => {
       beforeEach(() => {
         helpers.specifyConfig(tmpdir, "config");
-        prefs = new SaverPrefs(tmpdir);
+        prefs = new SaverPrefs({baseDir: tmpdir});
       });
 
       it("is true if no source repo and no local source", () => {
@@ -119,7 +153,7 @@ describe("SaverPrefs", () => {
   // defaultSaversDir
   describe("defaultSaversDir", () => {
     beforeEach(() => {
-      prefs = new SaverPrefs(tmpdir);
+      prefs = new SaverPrefs({baseDir: tmpdir});
     });
 
     it("is the working directory", () => {
@@ -132,7 +166,7 @@ describe("SaverPrefs", () => {
   describe("toHash", () => {
     beforeEach(() => {
       helpers.specifyConfig(tmpdir, "config");
-      prefs = new SaverPrefs(tmpdir);
+      prefs = new SaverPrefs({baseDir: tmpdir});
     });
 
     it("works", () => {
@@ -145,7 +179,7 @@ describe("SaverPrefs", () => {
   // ensureDefaults
   describe("ensureDefaults", () => {
     beforeEach(() => {
-      prefs = new SaverPrefs(tmpdir);
+      prefs = new SaverPrefs({baseDir: tmpdir});
     });
 
     it("works", () => {
@@ -166,7 +200,7 @@ describe("SaverPrefs", () => {
     let systemDir;
     beforeEach(() => {
       helpers.specifyConfig(tmpdir, "config");
-      prefs = new SaverPrefs(tmpdir);
+      prefs = new SaverPrefs({baseDir: tmpdir});
       systemDir = path.join(tmpdir, "system-savers");
     });
 
@@ -213,7 +247,7 @@ describe("SaverPrefs", () => {
   // systemSource
   describe("sources", () => {
     beforeEach(() => {
-      prefs = new SaverPrefs(tmpdir);
+      prefs = new SaverPrefs({baseDir: tmpdir});
     });
 
     it("works", () => {
@@ -226,7 +260,7 @@ describe("SaverPrefs", () => {
   describe("getOptions", () => {
     beforeEach(() => {
       helpers.specifyConfig(tmpdir, "config-with-options");
-      prefs = new SaverPrefs(tmpdir);
+      prefs = new SaverPrefs({baseDir: tmpdir});
     });
 
     it("works without key", () => {
@@ -249,7 +283,7 @@ describe("SaverPrefs", () => {
   // write
   describe("write", () => {
     beforeEach(() => {
-      prefs = new SaverPrefs(tmpdir);
+      prefs = new SaverPrefs({baseDir: tmpdir});
     });
 
     it("works", (done) => {
@@ -269,7 +303,7 @@ describe("SaverPrefs", () => {
   // writeSync
   describe("writeSync", () => {
     beforeEach(() => {
-      prefs = new SaverPrefs(tmpdir);
+      prefs = new SaverPrefs({baseDir: tmpdir});
     });
 
     it("works", () => {
@@ -287,7 +321,7 @@ describe("SaverPrefs", () => {
   // updatePrefs
   describe("updatePrefs", () => {
     beforeEach(() => {
-      prefs = new SaverPrefs(tmpdir);
+      prefs = new SaverPrefs({baseDir: tmpdir});
     });
 
     it("works", (done) => {
@@ -309,7 +343,7 @@ describe("SaverPrefs", () => {
   describe("setDefaultRepo", () => {
     beforeEach(() => {
       helpers.specifyConfig(tmpdir, "default-repo");
-      prefs = new SaverPrefs(tmpdir);
+      prefs = new SaverPrefs({baseDir: tmpdir});
     });
 
     it("works", () => {

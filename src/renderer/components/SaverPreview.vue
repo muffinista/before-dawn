@@ -77,6 +77,7 @@
           width: this.screenWidth,
           height: this.screenWidth * this.aspectRatio,
           preview: 1,
+          platform: process.platform,
           screenshot: this.screenshot,
           _: Math.random()
         };

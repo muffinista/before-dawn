@@ -28,7 +28,7 @@
     "url": "git://github.com/muffinista/before-dawn.git"
   },
   "dependencies": {
-    "@sentry/electron": "^0.15.0",
+    "@sentry/electron": "^0.16.0",
     "auto-launch": "^5.0.5",
     "cross-env": "^5.2.0",
     "desktop-idle": "^1.1.2",
@@ -60,12 +60,11 @@
     "babel-preset-env": "^1.7.0",
     "babel-preset-stage-0": "^6.24.1",
     "babel-register": "^6.24.1",
-    "babili-webpack-plugin": "^0.1.2",
     "bootstrap": "~> 4.3.1",
     "bootstrap-vue": "^2.0.0-rc.11",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
-    "clean-webpack-plugin": "^1.0.1",
+    "clean-webpack-plugin": "^2.0.0",
     "copy-webpack-plugin": "^5.0.0",
     "css-loader": "^2.1.0",
     "devtron": "^1.4.0",

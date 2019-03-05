@@ -89,7 +89,7 @@ const GRABBER_WINDOW_OPTS = {
   y: 2000,
   webPreferences: {
     nodeIntegration: true,
-    webSecurity: !global.IS_DEV,
+    webSecurity: false, //!global.IS_DEV
     preload: global.TRACK_ERRORS ? path.join(__dirname, "assets", "sentry.js") : undefined
   }
 };
@@ -210,7 +210,7 @@ var openPrefsWindow = function() {
         maxHeight: 1000,
         resizable:true,
         webPreferences: {
-          webSecurity: !global.IS_DEV,
+          webSecurity: false, //!global.IS_DEV
           nodeIntegration: true,
           preload: global.TRACK_ERRORS ? path.join(__dirname, "assets", "sentry.js") : undefined
         },
@@ -257,7 +257,7 @@ var addNewSaver = function() {
       height:620,
       resizable:true,
       webPreferences: {
-        webSecurity: !global.IS_DEV,
+        webSecurity: false, //!global.IS_DEV
         nodeIntegration: true,
         preload: global.TRACK_ERRORS ? path.join(__dirname, "assets", "sentry.js") : undefined
       },
@@ -294,7 +294,7 @@ var openAboutWindow = function() {
     icon: path.join(__dirname, "assets", "iconTemplate.png"),
     webPreferences: {
       nodeIntegration: true,
-      webSecurity: !global.IS_DEV,
+      webSecurity: false, //!global.IS_DEV
       preload: global.TRACK_ERRORS ? path.join(__dirname, "assets", "sentry.js") : undefined
     }
   });
@@ -327,7 +327,7 @@ var openEditor = (args) => {
     show: false,
     webPreferences: {
       nodeIntegration: true,
-      webSecurity: !global.IS_DEV,
+      webSecurity: false, //!global.IS_DEV
       preload: global.TRACK_ERRORS ? path.join(__dirname, "assets", "sentry.js") : undefined
     },
   });
@@ -405,7 +405,6 @@ var runScreenSaverOnDisplay = function(saver, s) {
   var tickCount;
   var diff;
   var reqs;
-
 
   log.info("runScreenSaverOnDisplay", s.id, windowOpts);
 

@@ -65,7 +65,9 @@ export default {
   },
   data() {
     return {
-      saver: {},
+      saver: {
+        requirements: ["screen"]
+      },
       disabled: false,
       prefs: undefined
     };

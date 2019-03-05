@@ -27,11 +27,14 @@ class SaverPrefs {
   constructor(paths, _defaults) {
     if ( typeof(paths) === "string" ) {
       this.baseDir = paths;
-      this._systemSource = path.join(this.baseDir, "system-savers");
     }
     else {
       this.baseDir = paths.baseDir;
-      this._systemSource = paths.systemSource;
+      this.systemSource = paths.systemSource;
+    }
+
+    if ( this.systemSource === undefined ) {
+      this.systemSource = path.join(this.baseDir, "system-savers");
     }
 
     this.configFile = path.join(this.baseDir, CONFIG_FILE_NAME);

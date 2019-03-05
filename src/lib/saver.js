@@ -151,6 +151,18 @@ module.exports = function Saver(_attrs) {
       delete(attrs[this.UNWRITABLE_KEYS[i]]);
     }
 
+    if ( ! attrs.requirements ) {
+      attrs.requirements = [];
+    }
+    else {
+      attrs.requirements = attrs.requirements.filter(r => r !== "none");
+    }
+
+    if ( attrs.requirements.length === 0 ) {
+      attrs.requirements = ["none"];
+    }
+    
+
     var output = JSON.stringify(attrs, null, 2);
     fs.writeFileSync(configDest, output);
   };

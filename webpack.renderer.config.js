@@ -12,7 +12,6 @@ const webpack = require("webpack");
 
 const outputDir = path.join(__dirname, "output");
 
-const BabiliWebpackPlugin = require("babili-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const PurgecssPlugin = require("purgecss-webpack-plugin");
@@ -208,7 +207,6 @@ if (process.env.NODE_ENV === "production") {
   rendererConfig.devtool = "source-map";
 
   rendererConfig.plugins.push(
-    new BabiliWebpackPlugin(),
     new webpack.DefinePlugin({
       "process.env.NODE_ENV": JSON.stringify("production"),
       "process.env.BEFORE_DAWN_RELEASE_NAME": JSON.stringify(releaseName)
