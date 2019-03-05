@@ -9,7 +9,6 @@ const webpack = require("webpack");
 
 const outputDir = path.join(__dirname, "output");
 
-const BabiliWebpackPlugin = require("babili-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 const releaseName = `${packageJSON.productName} ${packageJSON.version}`;
@@ -87,7 +86,7 @@ let mainConfig = {
     sourceMapFilename: "[name].js.map"
   },
   plugins: [
-    new CleanWebpackPlugin(["output"]),
+    new CleanWebpackPlugin(),
     new CopyWebpackPlugin([
       {
         from: path.join(__dirname, "package.json"),
@@ -145,7 +144,6 @@ if (process.env.NODE_ENV !== "production") {
  */
 if (process.env.NODE_ENV === "production") {
   mainConfig.plugins.push(
-    new BabiliWebpackPlugin(),
     new webpack.DefinePlugin({
       "process.env.NODE_ENV": JSON.stringify("production"),
       "process.env.BEFORE_DAWN_RELEASE_NAME": JSON.stringify(releaseName)
