@@ -37,7 +37,7 @@ const deps = [].concat(
 
 
 let mainConfig = {
-  devtool: "source-map",
+  devtool: "inline-source-map",
   mode: (process.env.NODE_ENV === "production" ? "production" : "development"),
   entry: {
     main: path.join(__dirname, "src/main/index.js")
@@ -143,6 +143,8 @@ if (process.env.NODE_ENV !== "production") {
  * Adjust mainConfig for production settings
  */
 if (process.env.NODE_ENV === "production") {
+  mainConfig.devtool = "source-map";
+  
   mainConfig.plugins.push(
     new webpack.DefinePlugin({
       "process.env.NODE_ENV": JSON.stringify("production"),
