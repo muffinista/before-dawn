@@ -309,6 +309,7 @@ var openAboutWindow = function() {
     dock.showDock(app);
   });
 
+  log.info(`open ${aboutUrl}`);
   w.loadURL(aboutUrl);
 };
 
@@ -688,13 +689,10 @@ var getUrl = function(dest) {
       return url.resolve(baseUrl, dest);
     }
     
-    //baseUrl = "file://" + __dirname + "/../../output";
     return `${__dirname}/../../output/${dest}`;
   }
   else {
-
-    //baseUrl = "file://" + __dirname + "/";
-    return `${__dirname}/${dest}`;
+    return `file://${__dirname}/${dest}`;
   }
 
 };
