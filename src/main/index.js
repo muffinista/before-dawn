@@ -685,16 +685,18 @@ var getUrl = function(dest) {
   if ( !testMode && process.env.NODE_ENV === "development" ) {
     if ( ! process.env.DISABLE_RELOAD ) {
       baseUrl = "http://localhost:9080";
+      return url.resolve(baseUrl, dest);
     }
-    else {
-      baseUrl = "file://" + __dirname + "/../../output";
-    }
+    
+    //baseUrl = "file://" + __dirname + "/../../output";
+    return `${__dirname}/../../output/${dest}`;
   }
   else {
-    baseUrl = "file://" + __dirname + "/";
+
+    //baseUrl = "file://" + __dirname + "/";
+    return `${__dirname}/${dest}`;
   }
 
-  return url.resolve(baseUrl, dest);
 };
 
 var setupForTesting = function() {
