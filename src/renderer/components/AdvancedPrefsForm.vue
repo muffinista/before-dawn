@@ -59,6 +59,10 @@ export default {
       document.querySelector("[name=localSource]").value = this.prefs.localSource;
     },
     handlePathChoice(result) {
+      if ( result === undefined ) {
+        return;
+      }
+
       this.$emit("localSourceChange", result[0]);
 
       // blah this is weird
