@@ -89,7 +89,7 @@
     canvas.height = video.videoHeight;
     context.drawImage(video, 0, 0, width, height);
     
-    var data = canvas.toDataURL('image/png');
+    var data = canvas.toDataURL('image/png', 1.0);
 
     context.clearRect(0, 0, canvas.width, canvas.height);
   
