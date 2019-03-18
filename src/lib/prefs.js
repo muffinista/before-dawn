@@ -184,9 +184,8 @@ class SaverPrefs {
   write(cb) {
     let output = JSON.stringify(this._data, null, 2);
     lockfile.lock(this.configFile, { realpath: false }).then((release) => {
-      return fs.writeFile(this.configFile, output, () => {
-        cb();
-        return release();
+      fs.writeFile(this.configFile, output, () => {
+        release().then(cb);
       });
     });
   }

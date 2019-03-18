@@ -140,72 +140,82 @@ module.exports = class Package {
     let self = this;
 
     return new Promise(function (resolve, reject) {
-      lockfile.lock(self.dest, { realpath: false }).then((release) => {
+      lockfile.lock(self.dest, { realpath: false, stale: 30000 }).then((release) => {
         yauzl.open(tempName, {lazyEntries: true}, (err, zipfile) => {
           if (err) {
-            return reject(err);
+            release().then(() => {
+              reject(err);
+            });
           }
-  
-          //
-          // clean out existing files
-          //
-          try {
-            rimraf.sync(self.dest);
-          }
-          catch (err) {
-            self.logger(err);
-          }
-  
-          zipfile.readEntry();
-          zipfile.on("entry", function(entry) {
-            var fullPath = entry.fileName;
-            // the incoming zip filename will have on extra directory on it
-            // projectName/dir/etc/file
+          else {
             //
-            // example: muffinista-before-dawn-screensavers-d388377/starfield/index.html
+            // clean out existing files
             //
-            // let's get rid of the projectName
-            //
-            var parts = fullPath.split(/\//);
-            parts.shift();
-            
-            fullPath = path.join(self.dest, path.join(...parts));
-            if (/\/$/.test(entry.fileName)) {
-              // directory file names end with '/' 
-              mkdirp(fullPath, function(err) {
-                if (err) {
-                  return reject(err);
-                }
-                zipfile.readEntry();
-              });
+            try {
+              rimraf.sync(self.dest);
             }
-            else {
-              // file entry 
-              zipfile.openReadStream(entry, function(err, readStream) {
-                if (err) {
-                  return reject(err);
-                }
-                
-                // ensure parent directory exists 
-                mkdirp(path.dirname(fullPath), function(err) {
+            catch (err) {
+              self.logger(err);
+            }
+
+            zipfile.readEntry();
+            zipfile.on("entry", function(entry) {
+              var fullPath = entry.fileName;
+              // the incoming zip filename will have on extra directory on it
+              // projectName/dir/etc/file
+              //
+              // example: muffinista-before-dawn-screensavers-d388377/starfield/index.html
+              //
+              // let's get rid of the projectName
+              //
+              var parts = fullPath.split(/\//);
+              parts.shift();
+              
+              fullPath = path.join(self.dest, path.join(...parts));
+              if (/\/$/.test(entry.fileName)) {
+                // directory file names end with '/' 
+                mkdirp(fullPath, function(err) {
                   if (err) {
-                    return reject(err);
+                    release().then(() => {
+                      return reject(err);
+                    });
                   }
-  
-                  readStream.pipe(fs.createWriteStream(fullPath));
-                  readStream.on("end", function() {
-                    zipfile.readEntry();
+                  zipfile.readEntry();
+                });
+              }
+              else {
+                // file entry 
+                zipfile.openReadStream(entry, function(err, readStream) {
+                  if (err) {
+                    release().then(() => {
+                      return reject(err);
+                    });
+                  }
+                  
+                  // ensure parent directory exists 
+                  mkdirp(path.dirname(fullPath), function(err) {
+                    if (err) {
+                      release().then(() => {
+                        return reject(err);
+                      });
+                    }
+    
+                    readStream.pipe(fs.createWriteStream(fullPath));
+                    readStream.on("end", function() {
+                      zipfile.readEntry();
+                    });
                   });
                 });
-              });
-            }
-          });
-          
-          zipfile.on("end", function() {
-            release().then(() => {
-              resolve(self.attrs());
+              }
             });
-          });
+            
+            zipfile.on("end", function() {
+              release().then(() => {
+                resolve(self.attrs());
+              });
+            });  
+          }
+ 
         });  
       });
     });
