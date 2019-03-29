@@ -317,24 +317,21 @@ export default {
         },
         (result) => {
           if ( result === 1 ) {
-            var tmp = this.manager.getDefaults();
-            this.prefs = Object.assign(this.prefs, tmp);
+            this.prefs.defaults = this.$electron.remote.getGlobal('CONFIG_DEFAULTS');
+            this.prefs.reset();
+            this.prefs.write(() => {
+              this.getData();
 
-            this.saveData(false).then(() => {
-              this.manager.reload(() => {
-                this.getData();
-
-                new Noty({
-                  type: "success",
-                  layout: "topRight",
-                  timeout: 1000,
-                  text: "Settings reset!",
-                  animation: {
-                    open: null
-                  }
-                }).show();
-              }); // reload
-            }); // saveData
+              new Noty({
+                type: "success",
+                layout: "topRight",
+                timeout: 1000,
+                text: "Settings reset!",
+                animation: {
+                  open: null
+                }
+              }).show();
+            }); // reload
           }
         }
       );

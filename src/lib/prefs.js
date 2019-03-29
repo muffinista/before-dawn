@@ -44,6 +44,10 @@ class SaverPrefs {
     this.reload();
   }
 
+  set defaults(_defaults) {
+    this._defaults = _defaults;
+  }
+
   loadData() {
     this._data = JSON.parse(fs.readFileSync(this.configFile));
   }
@@ -61,6 +65,14 @@ class SaverPrefs {
       this.loadData();
       this.firstLoad = true;
     } 
+  }
+
+  reset() {
+    this.firstLoad = true;
+    this._data = {};
+    this.ensureDefaults();
+    this.writeSync();
+    this.loadData();
   }
 
   get needSetup() {
@@ -96,10 +108,10 @@ class SaverPrefs {
    * setup some reasonable defaults
    */
   ensureDefaults() {
-    if ( typeof(this.defaults) !== undefined ) {
-      for ( var k in this.defaults ) {
+    if ( typeof(this._defaults) !== undefined ) {
+      for ( var k in this._defaults ) {
         if ( this._data[k] === undefined ) {
-          this.setConfig(k, this.defaults[k]);
+          this.setConfig(k, this._defaults[k]);
         }
       }
     }

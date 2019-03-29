@@ -10,6 +10,7 @@ const SaverPrefs = require("../../src/lib/prefs.js");
 
 describe("Prefs", function() { 
   const fakeDialogOpts = [ { method: "showOpenDialog", value: ["/not/a/real/path"] } ];
+
   helpers.setupTimeout(this);
 
   let pickPrefsWindow = function() {
@@ -168,6 +169,21 @@ describe("Prefs", function() {
       then(() => app.client.click("button.clear")).
       then(() => app.client.click("button.save")).
       then(() => app.client.waitUntilTextExists("body", "Changes saved!")).
+      then(function() {
+        assert.equal("", currentPrefs().localSource);
+      });
+  });
+
+
+  it("resets defaults", function() {
+    const resetDialogOpts = [ { method: "showMessageBox", value: 1 } ];
+
+    return pickPrefsWindow().
+      then(() => app.fakeDialog.mock(resetDialogOpts)).
+      then(() => app.client.waitUntilTextExists("body", "Screensaver One")).
+      then(() => app.client.click("=Advanced")).
+      then(() => app.client.click("button.reset-to-defaults")).
+      then(() => app.client.waitUntilTextExists("body", "Settings reset")).
       then(function() {
         assert.equal("", currentPrefs().localSource);
       });
