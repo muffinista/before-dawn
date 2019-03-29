@@ -567,6 +567,8 @@ var runScreenSaver = function() {
   if ( prefs.current === randomPath ) {
     setupPromise = new Promise((resolve) => {
       savers.list(() => {
+        // @todo s can be undefined
+        // https://sentry.io/organizations/colin-mitchell/issues/955633850/?project=172824&query=is%3Aunresolved&statsPeriod=14d&utc=false
         let s = savers.random();
         resolve(s.key, prefs.getOptions(s.key));
       });

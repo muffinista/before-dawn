@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Dimmer</title>
+    <script>
+     // this little javascript snippet will parse any incoming URL
+     // parameters and place them in the window.urlParams object
+     window.urlParams = window.location.search.split(/[?&]/).slice(1).map(function(paramPair) {
+       return paramPair.split(/=(.+)?/).slice(0, 2);
+     }).reduce(function (obj, pairArray) {            
+       obj[pairArray[0]] = pairArray[1];
+       return obj;
+     }, {});
+    </script>
+    <style>
+      * {
+      padding: 0;
+      margin: 0;
+      }
+     img {
+      filter: brightness(30%);
+      transition: 10s filter linear;
+     }
+    </style>
+  </head>
+  <body>
+    <img id="screen" />
+  </body>
+  <script>
+   var img = document.getElementById("screen");
+   var url = unescape(decodeURIComponent(window.urlParams.screenshot));
+   img.src = url;
+   
+   if ( typeof(window.urlParams.width) !== "undefined" ) {
+     img.width = window.urlParams.width;
+     img.height = window.urlParams.height;
+   }
+  </script>
+</html>

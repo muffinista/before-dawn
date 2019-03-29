@@ -1,0 +1,9 @@
+{
+  "name": "Dimmer",
+  "description": "Dim the screen a bit",
+  "author": "Colin Mitchell",
+  "source": "index.html",
+  "requirements": [
+    "screen"
+  ]
+}
