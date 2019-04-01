@@ -51,8 +51,8 @@ describe("Package", function() {
   describe("getReleaseInfo", () => {
     describe("withValidResponse", () => {
       it("does stuff", async () => {
-        nock('https://api.github.com').
-          get('/repos/muffinista/before-dawn-screensavers/releases/latest').
+        nock("https://api.github.com").
+          get("/repos/muffinista/before-dawn-screensavers/releases/latest").
           replyWithFile(200, dataPath, {
             "Content-Type": "application/json",
         });
@@ -65,11 +65,11 @@ describe("Package", function() {
 
     describe("withReject", () => {
       it("survives", async () => {
-        nock('https://api.github.com').
-          get('/repos/muffinista/before-dawn-screensavers/releases/latest').
+        nock("https://api.github.com").
+          get("/repos/muffinista/before-dawn-screensavers/releases/latest").
           replyWithError({
-            message: 'something awful happened',
-            code: 'AWFUL_ERROR',
+            message: "something awful happened",
+            code: "AWFUL_ERROR",
           });
         var p = new Package(attrs);
         let results = await p.getReleaseInfo();

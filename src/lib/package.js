@@ -2,7 +2,7 @@
 
 const fs = require("fs");
 const path = require("path");
-const fetch = require('node-fetch');
+const fetch = require("node-fetch");
 const yauzl = require("yauzl");
 const mkdirp = require("mkdirp");
 const rimraf = require("rimraf");

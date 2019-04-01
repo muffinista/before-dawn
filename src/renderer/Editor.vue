@@ -38,7 +38,7 @@
           Description
         </a>
       </li>
-     <li
+      <li
         id="options-tab"
         role="presentation"
         class="nav-item"
@@ -121,7 +121,8 @@
           id="preview"
           class="tab-pane active"
           aria-labelledby="preview-tab"
-          role="tabpanel">
+          role="tabpanel"
+        >
           <div class="container-fluid space-at-bottom">
             <template v-if="saver !== undefined">
               <template v-if="options.length > 0">
@@ -152,7 +153,8 @@
           id="description"
           class="tab-pane"
           aria-labelledby="description-tab"
-          role="tabpanel">
+          role="tabpanel"
+        >
           <div class="container-fluid">
             <h4>Description</h4>
             <small>
@@ -174,7 +176,8 @@
           id="options"
           class="tab-pane"
           aria-labelledby="options-tab"
-          role="tabpanel">
+          role="tabpanel"
+        >
           <div class="container-fluid">
             <template v-if="saver !== undefined">
               <h4>Configurable Options</h4>
@@ -251,8 +254,6 @@ import SaverForm from "@/components/SaverForm";
 import SaverOptionInput from "@/components/SaverOptionInput";
 import SaverOptions from "@/components/SaverOptions";
 import Noty from "noty";
-
-const remote = require("electron").remote;
 
 import SaverPrefs from "@/../lib/prefs";
 import SaverListManager from "@/../lib/saver-list";

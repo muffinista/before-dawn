@@ -53,7 +53,6 @@
 const path = require("path");
 
 import SaverForm from "@/components/SaverForm";
-const remote = require("electron").remote;
 
 import SaverPrefs from "@/../lib/prefs";
 import SaverListManager from "@/../lib/saver-list";

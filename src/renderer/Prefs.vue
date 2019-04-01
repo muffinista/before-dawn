@@ -317,7 +317,7 @@ export default {
         },
         (result) => {
           if ( result === 1 ) {
-            this.prefs.defaults = this.$electron.remote.getGlobal('CONFIG_DEFAULTS');
+            this.prefs.defaults = this.$electron.remote.getGlobal("CONFIG_DEFAULTS");
             this.prefs.reset();
             this.prefs.write(() => {
               this.getData();

@@ -36,7 +36,6 @@
       window.addEventListener("resize", this.debounceHandleResize);
     },
     beforeDestroy: function () {
-      //console.log("soon i will be dead");
       this.webview.zoomable = false;
       window.removeEventListener("resize", this.debounceHandleResize);
     },
@@ -101,7 +100,7 @@
         this.handleRedraw();
       },
       handleResize() {
-        var webview = this.webview; //this.$el.querySelector("webview");
+        var webview = this.webview;
         if ( this.webviewWidth() > 0 ) {
           // only set the height manually! use css to set one dimension
           webview.style.height = this.webviewHeight() + "px";
@@ -114,8 +113,7 @@
         }
 
         let self = this;
-        let webview = this.webview; //this.$el.querySelector("webview");
-        // webview.loadURL(this.saver.getUrl(this.urlOpts(this.saver)));
+        let webview = this.webview;
         webview.src = this.saver.getUrl(this.urlOpts(this.saver));
 
         webview.addEventListener("dom-ready", () => {
@@ -124,7 +122,7 @@
         }, { once: true });
       },
       setZoom() {
-        let webview = this.webview; //this.$el.querySelector("webview");
+        let webview = this.webview;
         if ( webview.zoomable ) {
           webview.setZoomFactor(this.webviewZoomLevel());
         }
