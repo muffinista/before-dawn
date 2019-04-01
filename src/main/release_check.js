@@ -1,13 +1,14 @@
 "use strict";
 
-const request = require("request");
+const fetch = require("node-fetch");
+
 module.exports = class ReleaseCheck {
   constructor() {
     this.onUpdateCallback = () => {};
     this.onNoUpdateCallback = () => {};
-    this.logger = () => {};
-    
+    this.logger = () => {};   
   }
+
   setFeed(u) {
     this.url = u;
   }
@@ -24,30 +25,28 @@ module.exports = class ReleaseCheck {
 
   checkLatestRelease() {
     this.logger(`check ${this.url} for new release`);
-    try {
-      let _self = this;
-      request({
-        url: this.url,
-        json: true,
-        timeout: 5000,
-        headers: {
-          "User-Agent": "Before Dawn"
-        }
-      }, function(error, response, body) {
-        _self.logger(body);
-        
-        if ( response !== undefined && response.statusCode === 200 ) {
-          _self.onUpdateCallback(body);
-        }
-        else {
-          _self.onNoUpdateCallback();
-        }
-      });
-    }
-    catch(ex) {
-      // console.log("error in checkLatestRelease");
-      // console.log(ex);
+    let _self = this;
+    fetch(this.url, {
+      timeout: 5000,
+      headers: {
+        "User-Agent": "Before Dawn"
+      }
+    }).then(function(response) {
+      if ( response.ok ) {
+        return response.json();
+      }
+      return undefined;
+    }).then(function(body) {
+      _self.logger(body);
+      
+      if ( body !== undefined ) {
+        _self.onUpdateCallback(body);
+      }
+      else {
+        _self.onNoUpdateCallback();
+      }
+    }).catch(() => {
       this.onNoUpdateCallback();
-    }
+    });
   }
 };

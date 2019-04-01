@@ -1,11 +1,10 @@
 "use strict";
 
-var fs = require("fs");
-var path = require("path");
-var request = require("request-promise-native");
-const request_streaming = require("request");
-var yauzl = require("yauzl");
-var mkdirp = require("mkdirp");
+const fs = require("fs");
+const path = require("path");
+const fetch = require('node-fetch');
+const yauzl = require("yauzl");
+const mkdirp = require("mkdirp");
 const rimraf = require("rimraf");
 const lockfile = require("proper-lockfile");
 
@@ -55,8 +54,6 @@ module.exports = class Package {
   }
 
   async getReleaseInfo() {
-    let self = this;
-
     if ( this.useLocalFile ) {
       var stats = fs.statSync(this.localZip);
       this.data = {
@@ -66,23 +63,21 @@ module.exports = class Package {
       };
     }
     else {
-      this.data = await request.get({
-        url: this.url,
-        json: true,
-        headers: this.defaultHeaders
-      }).catch(function(err) {
-  
-        self.logger(err);
-  
-        if ( typeof(self.data) !== "undefined" ) {
-          return self.data;
-        }
-        else {
-          return {};
-        }
-      });  
+      this.data = await fetch(this.url, this.defaultHeaders)
+        .then(res => res.json())
+        .then((json) => {
+          return json;
+        })
+        .catch((err) => {
+          this.logger(err);
+          if ( typeof(this.data) !== "undefined" ) {
+            return this.data;
+          }
+          else {
+            return {};
+          }
+        });
     }
-
     return this.data;
   }
 
@@ -120,21 +115,18 @@ module.exports = class Package {
     var os = require("os");
     var tempName = temp.path({dir: os.tmpdir(), suffix: ".zip"});
     
-    var opts = {
-      url:url,
-      headers:this.defaultHeaders
-    };
-
-    return new Promise((resolve, reject) => {
-      request_streaming(opts).
-        on("error", reject).
-        on("end", function() {
-          resolve(tempName);
-        }).
-        pipe(fs.createWriteStream(tempName));
+    const res = await fetch(url, this.defaultHeaders);
+    return await new Promise((resolve, reject) => {
+      const fileStream = fs.createWriteStream(tempName);
+      res.body.pipe(fileStream);
+      res.body.on("error", (err) => {
+        reject(err);
+      });
+      fileStream.on("finish", function() {
+        resolve(tempName);
+      });
     });
   }
-
 
   zipToSavers(tempName) {
     let self = this;
