@@ -17,7 +17,7 @@
 const electron = require("electron");
 const log = require("electron-log");
 
-const {app, dialog, BrowserWindow, ipcMain, Menu, Tray} = require("electron");
+const {app, dialog, globalShortcut, BrowserWindow, ipcMain, Menu, Tray} = require("electron");
 
 const fs = require("fs");
 const path = require("path");
@@ -946,6 +946,7 @@ var bootApp = function() {
     then(() => {
       setupReleaseCheck();
       setupPackageCheck();    
+      setupLaunchShortcut();
 
       // don't show app in dock
       dock.hideDockIfInactive(app);
@@ -1051,6 +1052,26 @@ var checkForNewRelease = function() {
   log.info("checkForNewRelease");
   releaseChecker.checkLatestRelease();
 };
+
+var setupLaunchShortcut = function() {
+  globalShortcut.unregisterAll();
+  if ( prefs.launchShortcut !== undefined && prefs.launchShortcut !== "" ) {
+    log.info(`register launch shortcut: ${prefs.launchShortcut}`);
+    const ret = globalShortcut.register(prefs.launchShortcut, () => {
+      log.info("shortcut triggered!");
+      setTimeout(setStateToRunning, 50);
+    });
+    if ( ! ret ) {
+      log.info("shortcut registration failed");
+    }
+
+    log.info(`registered? ${globalShortcut.isRegistered(prefs.launchShortcut)}`);
+
+  }
+
+
+};
+
 
 /**
  * return our state manager
@@ -1180,6 +1201,11 @@ ipcMain.on("set-autostart", (event, value) => {
   autostarter.toggle(global.APP_NAME, value);
 });
 
+ipcMain.on("set-global-launch-shortcut", () => {
+  log.info("set-global-launch-shortcut");
+  setupLaunchShortcut();
+});
+
 ipcMain.on("quit-app", () => {
   log.info("quit-app");
   quitApp();
@@ -1197,6 +1223,9 @@ app.on("will-quit", function(e) {
   if ( testMode !== true && global.IS_DEV !== true && exitOnQuit !== true ) {
     log.info(`don't quit yet! testMode: ${testMode} IS_DEV ${global.IS_DEV} exitOnQuit ${exitOnQuit}`);
     e.preventDefault();
+  }
+  else {
+    globalShortcut.unregisterAll();
   }
 });
 app.on("quit", function() {

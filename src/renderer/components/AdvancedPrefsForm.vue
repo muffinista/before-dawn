@@ -35,6 +35,19 @@
           We will load screensavers from any directories listed here. Use this to add your own screensavers!
         </small>
       </div>
+
+      <div class="form-group">
+        <label for="hotkey">Global hotkey:</label>
+        <input type="text"
+          name="hotkey"
+          readonly="readonly" class="form-control"
+          v-model="prefs.launchShortcut"
+          v-on:keydown="updateHotkey" />
+        <small class="form-text text-muted">
+          Enter a key combination that will be used to run a screensaver.
+        </small>
+      </div>
+
     </form>
   </div>
 </template>
@@ -46,6 +59,43 @@ export default {
   components: {},
   props: ["prefs"],
   methods: {
+    updateHotkey(event) {
+      if ( event.key == "Control" || event.key == "Shift" || event.key == "Alt" || event.key == "Meta" ) {
+        return;
+      }
+
+      let output = [];
+      if ( event.ctrlKey ) {
+        output.push("Control");
+      }
+      if ( event.altKey ) {
+        output.push("Alt");
+      }
+      if ( event.metaKey) {
+        output.push("Command");
+      }
+      if ( event.shiftKey ) {
+        output.push("Shift");
+      }
+
+      if ( output.length === 0 ) {
+        if ( event.key == "Backspace" ) {
+          event.target.value = "";
+          this.$emit("launchShortcutChange", "");
+          this.prefs.launchShortcut = undefined;
+        }
+
+        return;
+      }
+
+      output.push(`${event.key}`.toUpperCase());
+      output = output.join("+");
+
+      this.$emit("launchShortcutChange", output);
+      this.prefs.launchShortcut = output;
+
+      event.target.value = output;
+    },
     showPathChooser() {
       dialog.showOpenDialog(
         {
