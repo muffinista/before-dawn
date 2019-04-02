@@ -317,7 +317,7 @@ export default {
         },
         (result) => {
           if ( result === 1 ) {
-            this.prefs.defaults = this.$electron.remote.getGlobal('CONFIG_DEFAULTS');
+            this.prefs.defaults = this.$electron.remote.getGlobal("CONFIG_DEFAULTS");
             this.prefs.reset();
             this.prefs.write(() => {
               this.getData();
@@ -429,6 +429,7 @@ export default {
           this.disabled = false;
           this.ipcRenderer.send("prefs-updated", changes);
           this.ipcRenderer.send("set-autostart", this.prefs.auto_start);
+          this.ipcRenderer.send("set-global-launch-shortcut", this.prefs.launchShortcut);
           resolve(changes);
         });
       });

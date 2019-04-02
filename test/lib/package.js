@@ -50,15 +50,13 @@ describe("Package", function() {
 
   describe("getReleaseInfo", () => {
     describe("withValidResponse", () => {
-      var request = require("request-promise-native");
-      beforeEach(() => {
-        sinon.stub(request, "get").resolves(require("../fixtures/release.json"));
-      });
-      afterEach(() => {
-        request.get.restore();
-      });
-      
       it("does stuff", async () => {
+        nock("https://api.github.com").
+          get("/repos/muffinista/before-dawn-screensavers/releases/latest").
+          replyWithFile(200, dataPath, {
+            "Content-Type": "application/json",
+        });
+  
         var p = new Package(attrs);
         let results = await p.getReleaseInfo();
         assert.equal("muffinista", results.author.login);
@@ -66,15 +64,13 @@ describe("Package", function() {
     });
 
     describe("withReject", () => {
-      var request = require("request-promise-native");
-      beforeEach(() => {
-        sinon.stub(request, "get").rejects();
-      });
-      afterEach(() => {
-        request.get.restore();
-      });
-
       it("survives", async () => {
+        nock("https://api.github.com").
+          get("/repos/muffinista/before-dawn-screensavers/releases/latest").
+          replyWithError({
+            message: "something awful happened",
+            code: "AWFUL_ERROR",
+          });
         var p = new Package(attrs);
         let results = await p.getReleaseInfo();
         assert.deepEqual({}, results);

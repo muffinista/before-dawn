@@ -20,7 +20,8 @@ const PROPERTIES = [
   ["localSource", "localSource", "string", ""],
   ["sourceUpdatedAt", "sourceUpdatedAt", "date", undefined],
   ["options", "options", "hash", {}],
-  ["updateCheckTimestamp", "sourceCheckTimestamp", "integer", 0]
+  ["updateCheckTimestamp", "sourceCheckTimestamp", "integer", 0],
+  ["launchShortcut", "launchShortcut", "string", undefined],
 ];
 
 class SaverPrefs {
