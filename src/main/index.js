@@ -1059,17 +1059,28 @@ var setupLaunchShortcut = function() {
     log.info(`register launch shortcut: ${prefs.launchShortcut}`);
     const ret = globalShortcut.register(prefs.launchShortcut, () => {
       log.info("shortcut triggered!");
-      setTimeout(setStateToRunning, 50);
+      try {
+        // turn off idle checks for a couple seconds while loading savers
+        stateManager.ignoreReset(true);
+        setStateToRunning();
+      }
+      catch (e) {
+        log.info(e);
+        stateManager.ignoreReset(false);
+      }
+      finally {
+        setTimeout(function() {
+          stateManager.ignoreReset(false);
+        }, 2500);
+      }
     });
+
     if ( ! ret ) {
       log.info("shortcut registration failed");
     }
 
     log.info(`registered? ${globalShortcut.isRegistered(prefs.launchShortcut)}`);
-
   }
-
-
 };
 
 
