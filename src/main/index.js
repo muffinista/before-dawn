@@ -1059,6 +1059,11 @@ var setupLaunchShortcut = function() {
     log.info(`register launch shortcut: ${prefs.launchShortcut}`);
     const ret = globalShortcut.register(prefs.launchShortcut, () => {
       log.info("shortcut triggered!");
+      if ( prefsWindowHandle && prefsWindowHandle.isFocused() ) {
+        log.info("no shortcut when prefs active!");
+        return;
+      }
+
       try {
         // turn off idle checks for a couple seconds while loading savers
         stateManager.ignoreReset(true);
@@ -1149,7 +1154,6 @@ if ( testMode !== true ) {
     }
   });
 }
-
 
 
 /**
