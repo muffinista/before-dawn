@@ -66,10 +66,12 @@
         return this.$el.clientWidth;
       },
       webviewHeight() {
-        return this.webviewWidth() * this.aspectRatio;
+        return 320;
+//        return this.webviewWidth() * this.aspectRatio;
       },
       webviewZoomLevel() {
-        return this.webviewWidth() / this.screenWidth;
+        console.log("ZOOM LEVEL", this.webviewWidth(), this.screenWidth, this.webviewWidth() / this.screenWidth);
+        return (this.webviewWidth() / this.screenWidth) - 0.1;
       },
       urlOpts(s) {
         var base = {
@@ -103,7 +105,7 @@
         var webview = this.webview;
         if ( this.webviewWidth() > 0 ) {
           // only set the height manually! use css to set one dimension
-          webview.style.height = this.webviewHeight() + "px";
+          //webview.style.height = this.webviewHeight() + "px";
           this.handleRedraw();
         }
       },
@@ -136,3 +138,10 @@
     },
   };
 </script>
+
+<style>
+  webview {
+    width: 480px;
+    height: 320px;
+  }
+</style>

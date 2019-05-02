@@ -27,7 +27,7 @@ control how Before Dawn runs:
 
 - *Activate after* -- you can set how long your computer is idle
 before your screensaver starts
-- *Disable displays after* - you can set a time that Before Dawn will
+- *Sleep after* - you can set a time that Before Dawn will
 stop running and blank the screens. It's possible that your OS will do
 a better job of this, but since Before Dawn is a bit of an experiment,
 having this setting might save your CPU from running when your

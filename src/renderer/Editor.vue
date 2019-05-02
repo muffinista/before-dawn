@@ -1,220 +1,146 @@
 <template>
   <div id="editor">
-    <ul
-      role="tablist"
-      class="nav nav-tabs"
-    >
-      <li
-        id="preview-tab"
-        role="presentation"
-        class="active nav-item"
+    <b-button-group>
+      <b-button
+        v-b-tooltip.hover
+        variant="default"
+        title="Open screensaver folder"
+        @click="openFolder"
       >
-        <a
-          aria-expanded="true"
-          aria-controls="preview"
-          role="tab"
-          data-toggle="tab"
-          class="nav-link active"
-          href="#preview"
-          @click="showPreview"
-        >
-          Preview
-        </a>
-      </li>
-      <li
-        id="description-tab"
-        role="presentation"
-        class="nav-item"
+        <span class="icon">
+          <img
+            src="assets/img/folder.svg"
+            width="14"
+            height="14"
+          >
+        </span>
+      </b-button>
+      <b-button
+        v-b-tooltip.hover
+        variant="default"
+        title="Save changes"
+        @click="saveData"
       >
-        <a
-          aria-expanded="false"
-          aria-controls="description"
-          role="tab"
-          data-toggle="tab"
-          class="nav-link"
-          href="#description"
-          @click="showDescription"
-        >
-          Description
-        </a>
-      </li>
-      <li
-        id="options-tab"
-        role="presentation"
-        class="nav-item"
+        <span class="icon">
+          <img
+            src="assets/img/save.svg"
+            width="14"
+            height="14"
+          >
+        </span>
+      </b-button>
+      <b-button
+        v-b-tooltip.hover
+        variant="default"
+        title="Reload preview"
+        @click="reloadPreview"
       >
-        <a
-          aria-expanded="false"
-          aria-controls="options"
-          role="tab"
-          data-toggle="tab"
-          class="nav-link"
-          href="#options"
-          @click="showOptions"
-        >
-          Options
-        </a>
-      </li>      
-      <b-button-group>
-        <b-button
-          v-b-tooltip.hover
-          variant="default"
-          title="Open screensaver folder"
-          @click="openFolder"
-        >
-          <span class="icon">
-            <img
-              src="assets/img/folder.svg"
-              width="14"
-              height="14"
-            >
-          </span>
-        </b-button>
-        <b-button
-          v-b-tooltip.hover
-          variant="default"
-          title="Save changes"
-          @click="saveData"
-        >
-          <span class="icon">
-            <img
-              src="assets/img/save.svg"
-              width="14"
-              height="14"
-            >
-          </span>
-        </b-button>
-        <b-button
-          v-b-tooltip.hover
-          variant="default"
-          title="Reload preview"
-          @click="reloadPreview"
-        >
-          <span class="icon">
-            <img
-              src="assets/img/cycle.svg"
-              width="14"
-              height="14"
-            >
-          </span>
-        </b-button>
-        <b-button
-          v-b-tooltip.hover
-          variant="default"
-          title="View Developer Console"
-          @click="openConsole"
-        >
-          <span class="icon">
-            <img
-              src="assets/img/bug.svg"
-              width="14"
-              height="14"
-            >
-          </span>
-        </b-button>
-      </b-button-group>
-    </ul>
+        <span class="icon">
+          <img
+            src="assets/img/cycle.svg"
+            width="14"
+            height="14"
+          >
+        </span>
+      </b-button>
+      <b-button
+        v-b-tooltip.hover
+        variant="default"
+        title="View Developer Console"
+        @click="openConsole"
+      >
+        <span class="icon">
+          <img
+            src="assets/img/bug.svg"
+            width="14"
+            height="14"
+          >
+        </span>
+      </b-button>
+    </b-button-group>
 
-    <div class="content">
-      <div class="tab-content">
-        <div
-          id="preview"
-          class="tab-pane active"
-          aria-labelledby="preview-tab"
-          role="tabpanel"
-        >
-          <div class="container-fluid space-at-bottom">
-            <template v-if="saver !== undefined">
-              <template v-if="options.length > 0">
-                <h4>Options</h4>
-                <small>
-                  Tweak the values here and they will be sent along
-                  to your preview.
-                </small>
-                <saver-options
-                  :saver="saver"
-                  :options="options"
-                  :values="optionDefaults"
-                  @change="onOptionsChange"
-                />
-              </template>
-              
-              <h4>Preview</h4>
-              <saver-preview
-                v-if="isLoaded"
-                :bus="bus"
-                :saver="saver"
-                :screenshot="screenshot"
-              />
-            </template>
-          </div>
-        </div>
-        <div
-          id="description"
-          class="tab-pane"
-          aria-labelledby="description-tab"
-          role="tabpanel"
-        >
-          <div class="container-fluid">
-            <h4>Description</h4>
+    <div id="preview">
+      <div class="container-fluid space-at-bottom">
+        <template v-if="saver !== undefined">
+          <template v-if="options.length > 0">
+            <h4>Options</h4>
             <small>
-              You can enter the basics about this screensaver
-              here.
+              Tweak the values here and they will be sent along
+              to your preview.
             </small>
-            <template v-if="saver !== undefined">
-              <!-- NOTE: passing the attrs here because its really all
-                  we need for this form and makes saving the data later a
-                  lot easier -->
-              <saver-form
-                v-if="isLoaded"
-                :saver="saver.attrs"
-              />
-            </template>
-          </div>
-        </div>
-        <div
-          id="options"
-          class="tab-pane"
-          aria-labelledby="options-tab"
-          role="tabpanel"
-        >
-          <div class="container-fluid">
-            <template v-if="saver !== undefined">
-              <h4>Configurable Options</h4>
-              <small>
-                You can offer users configurable options to control
-                your screensaver. Manage those here.
-              </small>
-              
-              
-              <!--
-                  note: is track-by ok here?
-                  https://v1.vuejs.org/guide/list.html#track-by-index 
-                -->
-              <div v-if="isLoaded">
-                <saver-option-input
-                  v-for="(option, index) in options"
-                  :key="option.index"
-                  :option="option"
-                  :index="index"
-                  @deleteOption="deleteOption(option)"
-                />      
-              </div>
-              
-              <div class="padded-top padded-bottom">
-                <button
-                  type="button"
-                  class="btn btn-primary add-option"
-                  @click="addSaverOption"
-                >
-                  Add Option
-                </button>
-              </div>
-            </template>
-          </div>
-        </div>
+            <saver-options
+              :saver="saver"
+              :options="options"
+              :values="optionDefaults"
+              @change="onOptionsChange"
+            />
+          </template>
+          
+          <h4>Preview</h4>
+          <saver-preview
+            v-if="isLoaded"
+            :bus="bus"
+            :saver="saver"
+            :screenshot="screenshot"
+          />
+        </template>
       </div>
     </div>
+    <div id="description">
+      <div class="container-fluid">
+        <h4>Description</h4>
+        <small>
+          You can enter the basics about this screensaver
+          here.
+        </small>
+        <template v-if="saver !== undefined">
+          <!-- NOTE: passing the attrs here because its really all
+              we need for this form and makes saving the data later a
+              lot easier -->
+          <saver-form
+            v-if="isLoaded"
+            :saver="saver.attrs"
+          />
+        </template>
+      </div>
+    </div>
+    <div id="options">
+      <div class="container-fluid">
+        <template v-if="saver !== undefined">
+          <h4>Configurable Options</h4>
+          <small>
+            You can offer users configurable options to control
+            your screensaver. Manage those here.
+          </small>
+          
+          
+          <!--
+              note: is track-by ok here?
+              https://v1.vuejs.org/guide/list.html#track-by-index 
+            -->
+          <div v-if="isLoaded">
+            <saver-option-input
+              v-for="(option, index) in options"
+              :key="option.index"
+              :option="option"
+              :index="index"
+              @deleteOption="deleteOption(option)"
+            />      
+          </div>
+          
+          <div class="padded-top padded-bottom">
+            <button
+              type="button"
+              class="btn btn-primary add-option"
+              @click="addSaverOption"
+            >
+              Add Option
+            </button>
+          </div>
+        </template>
+      </div>
+    </div>
+
     <footer class="footer d-flex justify-content-between">
       <div>
         <button
@@ -340,27 +266,6 @@ export default {
     });
   },
   methods: {
-    clearTabs() {
-      var els = document.querySelectorAll(".nav-tabs > li > a.nav-link, .tab-content > .tab-pane");
-      for ( var i = 0; i < els.length; i++ ) {
-        els[i].classList.remove("active");
-      }
-    },
-    setActiveTab(n) {
-      this.clearTabs();
-      document.querySelector("#" + n).classList.add("active");
-      document.querySelector("[href='#" + n + "']").classList.add("active");
-      document.querySelector("#" + n + " h4").scrollIntoView();
-    },
-    showPreview() {
-      this.setActiveTab("preview");
-    },
-    showDescription() {
-      this.setActiveTab("description");
-    },
-    showOptions() {
-      this.setActiveTab("options");
-    },
     onOptionsChange(e) {
       var name = e.target.name;
       var value = e.target.value;

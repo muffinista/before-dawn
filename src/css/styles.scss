@@ -3,6 +3,7 @@ $footer_height: 50px;
 $footer_inner_height: 40px;
 $tab_padding:6px;
 $grid_gap:10px;
+$preview_height: 320px;
 
 /* purgecss start ignore */
 @import "~noty/lib/noty.css";
@@ -14,8 +15,6 @@ html {
 }
 body {
   min-height: 100%;
-  display: grid;
-  grid-template-rows: auto 1fr;
 }
 
 body, input, button {
@@ -33,24 +32,66 @@ small {
   font-size: 90%;
 }
 
-.savers-grid {
-  width: 100%;
-  display: grid;
-  grid-template-columns: 400px 1fr;
-}
-
-@media (max-width: 600px) {
-  .savers-grid {
-    grid-template-columns: 99%;
-  }
-}
-
 .form-check {
   margin-bottom: 0.3rem;
 }
+.btn:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+.input-group-btn.spaced {
+  margin-left: 3px;
+}
 
-body > div > .content {
-  height: calc(100vh - #{$footer_height});
+//
+// prefs page
+//
+#prefs {
+  display: grid;
+  grid-template-columns: 400px 1fr;
+  grid-template-areas: "header header"
+    "saver-list saver-preview"
+    "prefs saver-detail"
+    "advanced-prefs saver-detail"
+    "footer footer";
+}
+
+#prefs > header {
+  grid-area: header;
+}
+ul.saver-list {
+  grid-area: saver-list;
+}
+div.saver-detail {
+  grid-area: saver-preview;
+  height: $preview_height;
+}
+div.saver-wrap {
+  grid-area: saver-detail; 
+}
+//div.saver-options {
+//  grid-area: saver-options;
+//}
+#preferences {
+  grid-area: prefs;
+}
+#advanced {
+  grid-area: advanced-prefs;
+  margin-bottom: 50px;
+}
+footer.footer {
+  grid-area: footer;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+#prefs h1 {
+  font-size: 1.4rem;
+}
+#advanced-prefs-form > h1 {
+  margin-top: 30px;
 }
 
 body > #editor > .content {
@@ -61,25 +102,24 @@ body > #editor #settings > div {
   padding-top: 35px;
 }
 
-@media (max-height: 600px) {
-  body > div > .content {
-    overflow-y: scroll;
-  }  
-}
-body > div > footer {
+// @media (max-height: 600px) {
+//   body > div > .content {
+//     overflow-y: scroll;
+//   }  
+// }
+
+footer.footer {
   height: $footer_height;
   background-color: #f5f5f5;
-  grid-row-start: 2;
-  grid-row-end: 3;
   padding-left: 5px;
   padding-right: 5px;
 }
 
-body > div > footer > div {
-  height: $footer_inner_height;
-  margin-top: #{($footer_height/2 - $footer_inner_height/2) + 1};
-  margin-right: #{($footer_height/2 - $footer_inner_height/2) + 1};
-}
+// body > div > footer > div {
+//   height: $footer_inner_height;
+//   margin-top: #{($footer_height/2 - $footer_inner_height/2) + 1};
+//   margin-right: #{($footer_height/2 - $footer_inner_height/2) + 1};
+// }
 
 
 ul {
@@ -116,7 +156,8 @@ button.add-option {
 }
 
 .saver-list {
-  height: calc(98vh - #{$nav_height+$tab_padding+$footer_height});
+//  height: calc(98vh - #{$nav_height+$tab_padding+$footer_height});
+  height: $preview_height;
   margin-bottom: 0px;
   overflow-y: scroll;
   font: small-caption;
@@ -130,7 +171,7 @@ button.add-option {
   }
 }
 .saver-detail {
-  height: calc(98vh - #{$nav_height+$tab_padding+$footer_height});
+//  height: calc(98vh - #{$nav_height+$tab_padding+$footer_height});
   overflow-y: auto;
   padding-left: 5px;
   padding-right: 5px;
@@ -221,14 +262,6 @@ form.submit-attempt {
   }
 }
 
-.tab-content {
-  width: 100%;
-}
-
-#prefs .tab-content > .tab-pane:last-child {
-  margin-bottom: 30px;
-}
-
 form.entry {
   margin-top: 5px;
   margin-bottom: 5px;
@@ -249,17 +282,9 @@ label.for-option {
 input[type="range"] {
   max-width: 250px;
 }
-.saver-detail > * {
-  margin-bottom: 10px;
-}
 
-.btn:focus {
-  outline: none !important;
-  box-shadow: none !important;
-}
-.input-group-btn.spaced {
-  margin-left: 3px;
-}
+
+// new screensaver
 
 .need-setup-message {
   display: flex;

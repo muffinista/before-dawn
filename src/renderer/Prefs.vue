@@ -1,143 +1,55 @@
 <template>
   <div id="prefs">
-    <ul
-      role="tablist"
-      class="nav nav-tabs"
-    >
-      <li
-        id="screensavers-tab"
-        role="presentation"
-        class="active nav-item"
-      >
-        <a
-          aria-expanded="true"
-          aria-controls="screensavers"
-          role="tab"
-          data-toggle="tab"
-          class="nav-link active"
-          href="#screensavers"
-          @click="showScreensavers"
-        >
-          Screensavers
-        </a>
-      </li>
-      <li
-        id="preferences-tab"
-        role="presentation"
-        class="nav-item"
-      >
-        <a
-          aria-expanded="false"
-          aria-controls="preferences"
-          role="tab"
-          data-toggle="tab"
-          class="nav-link"
-          href="#preferences"
-          @click="showPreferences"
-        >
-          Preferences
-        </a>
-      </li>
-      <li
-        id="advanced-tab"
-        role="presentation"
-        class="nav-item"
-      >
-        <a
-          aria-expanded="false"
-          aria-controls="advanced"
-          role="tab"
-          data-toggle="tab"
-          class="nav-link"
-          href="#advanced"
-          @click="showAdvanced"
-        >
-          Advanced
-        </a>
-      </li>
-    </ul>
-    <div class="content">
-      <div class="tab-content">
-        <div
-          id="screensavers"
-          class="active tab-pane"
-          aria-labelledby="screensavers-tab"
-          role="tabpanel"
-        >
-          <div class="container-fluid">
-            <div class="row">
-              <div class="savers-grid">
-                <!-- left pane -->
-                <div>
-                  <saver-list
-                    :savers="savers"
-                    :current="saver"
-                    @editSaver="editSaver"
-                    @deleteSaver="deleteSaver"
-                    @change="onSaverPicked"
-                  />
-                </div>
-              
-                <!-- right pane -->
-                <div class="saver-detail">
-                  <template v-if="saverIsPicked">
-                    <saver-preview
-                      v-if="savers[saverIndex] !== undefined"
-                      :key="renderIndex"
-                      :bus="bus"
-                      :saver="saverObj"
-                      :screenshot="screenshot"
-                      :options="options[saver]"
-                    />
-                    <saver-summary :saver="saverObj" />
-                    <saver-options
-                      :saver="saver"
-                      :options="saverOptions"
-                      :values="options[saver]"
-                      @change="onOptionsChange"
-                      @saverOption="updateSaverOption"
-                    />
-                  </template>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div
-          id="preferences"
-          class="tab-pane"
-          aria-labelledby="preferences-tab"
-          role="tabpanel"
-        >
-          <div class="container-fluid">
-            <template v-if="prefs !== undefined">
-              <prefs-form :prefs="prefs" />
-            </template>
-          </div>
-        </div>
-        <div
-          id="advanced"
-          class="tab-pane"
-          aria-labelledby="advanced-tab"
-          role="tabpanel"
-        >
-          <div class="container-fluid">
-            <template v-if="prefs !== undefined">
-              <advanced-prefs-form
-                :prefs="prefs"
-                @localSourceChange="localSourceChange"
-              />
-              <button
-                class="btn btn-large btn-primary reset-to-defaults"
-                @click="resetToDefaults"
-              >
-                Reset to Defaults
-              </button>
-            </template>
-          </div>
+    <saver-list
+      :savers="savers"
+      :current="saver"
+      @editSaver="editSaver"
+      @deleteSaver="deleteSaver"
+      @change="onSaverPicked"
+    />
+    <template v-if="saverIsPicked">
+      <div class="saver-detail">
+        <saver-preview
+          v-if="savers[saverIndex] !== undefined"
+          :key="renderIndex"
+          :bus="bus"
+          :saver="saverObj"
+          :screenshot="screenshot"
+          :options="options[saver]"
+        />
+      </div>
+      <div class="saver-wrap">
+        <saver-summary :saver="saverObj" />
+        <div class="saver-options">
+          <saver-options
+            :saver="saver"
+            :options="saverOptions"
+            :values="options[saver]"
+            @change="onOptionsChange"
+            @saverOption="updateSaverOption"
+          />
         </div>
       </div>
-    </div> <!-- content -->
+    </template>
+   
+    <div id="preferences">
+      <div class="container-fluid">
+        <template v-if="prefs !== undefined">
+          <prefs-form :prefs="prefs" />
+        </template>
+      </div>
+    </div>
+    <div id="advanced">
+      <div class="container-fluid">
+        <template v-if="prefs !== undefined">
+          <advanced-prefs-form
+            :prefs="prefs"
+            @localSourceChange="localSourceChange"
+          />
+        </template>
+      </div>
+    </div>
+
     <footer class="footer d-flex justify-content-between">
       <div>
         <button
@@ -147,16 +59,22 @@
           Create Screensaver
         </button>
       </div>
+
       <div>
+        <button
+          class="btn btn-large btn-primary reset-to-defaults"
+          @click="resetToDefaults">
+          Reset to Defaults
+        </button>
         <button
           class="btn btn-large btn-primary save"
           :disabled="disabled"
-          @click="saveDataClick"
-        >
+          @click="saveDataClick">
           Save
         </button>
       </div>
     </footer>
+
   </div> <!-- #prefs -->
 </template>
 
@@ -278,26 +196,6 @@ export default {
     this.ipcRenderer.removeListener("savers-updated", this.onSaversUpdated);
   },
   methods: {
-    clearTabs() {
-      var els = document.querySelectorAll(".nav-tabs > li > a.nav-link, .tab-content > .tab-pane");
-      for ( var i = 0; i < els.length; i++ ) {
-        els[i].classList.remove("active");
-      }
-    },
-    setActiveTab(n) {
-      this.clearTabs();
-      document.querySelector("#" + n).classList.add("active");
-      document.querySelector("[href='#" + n + "']").classList.add("active");
-    },
-    showPreferences() {
-      this.setActiveTab("preferences");
-    },
-    showScreensavers() {
-      this.setActiveTab("screensavers");
-    },
-    showAdvanced() {
-      this.setActiveTab("advanced");
-    },
     onOptionsChange() {
       this.bus.$emit("options-changed", this.options[this.saver]);
     },
@@ -473,3 +371,6 @@ export default {
   }
 }; 
 </script>
+
+<style>
+</style>
