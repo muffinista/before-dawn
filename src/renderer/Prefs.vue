@@ -9,14 +9,6 @@
     />
     <template v-if="saverIsPicked">
       <div class="saver-detail">
-        <saver-preview
-          v-if="savers[saverIndex] !== undefined"
-          :key="renderIndex"
-          :bus="bus"
-          :saver="saverObj"
-          :screenshot="screenshot"
-          :options="options[saver]"
-        />
       </div>
       <div class="saver-wrap">
         <saver-summary :saver="saverObj" />
@@ -190,19 +182,71 @@ export default {
           this.renderUpdateNotice();
         });
       }
+
+      this.resizeInterval = window.setInterval(() => {
+        this.checkResize();
+      }, 100);
+
     });
   },
   beforeDestroy() {
     this.ipcRenderer.removeListener("savers-updated", this.onSaversUpdated);
   },
   methods: {
-    onOptionsChange() {
-      this.bus.$emit("options-changed", this.options[this.saver]);
+    // https://github.com/stream-labs/streamlabs-obs/blob/163e9a7eaf39200077874ae80d00e66108c106dc/app/components/Chat.vue.ts#L41
+    rectChanged(rect) {
+      return (
+        rect.left !== this.currentPosition.x ||
+        rect.top !== this.currentPosition.y ||
+        rect.width !== this.currentPosition.width ||
+        rect.height !== this.currentPosition.height
+      );
     },
+    checkResize() {
+      const el = document.querySelector(".saver-detail");
+      const rect = el.getBoundingClientRect();
+      if (this.currentPosition == null || this.rectChanged(rect)) {
+        this.currentPosition = { x: rect.left, y: rect.top, width: rect.width, height: rect.height };
+        this.ipcRenderer.send("prefs-preview-bounds", this.currentPosition);
+      }
+    },
+    onOptionsChange() {
+      this.ipcRenderer.send("prefs-preview-url", {
+        url: this.saverObj.getUrl(this.urlOpts(this.saver))
+      });
+    },
+    urlOpts(s) {
+      var screen = this.$electron.screen;
+      var size = screen.getPrimaryDisplay().bounds;
+
+      var base = {
+        width: size.width,
+        height: size.height,
+        preview: 1,
+        platform: process.platform,
+        screenshot: this.screenshot,
+        _: Math.random()
+      };
+
+      if ( typeof(s) === "undefined" ) {
+        s = this.saver;
+      }
+      
+      var mergedOpts = Object.assign(
+        base,
+        s.settings,
+        this.options[this.saver]);
+
+      return mergedOpts;
+    },
+
     onSaverPicked(e) {
       this.saver = e.target.value;
       this.bus.$emit("saver-changed", this.saverObj);
       this.renderIndex += 1;
+      this.ipcRenderer.send("prefs-preview-url", {
+        url: this.saverObj.getUrl(this.urlOpts(this.saver))
+      });
     },
     resetToDefaults() {
       dialog.showMessageBox(
@@ -273,6 +317,9 @@ export default {
         }
 
         this.bus.$emit("saver-changed", this.saverObj);
+        this.ipcRenderer.send("prefs-preview-url", {
+          url: this.saverObj.getUrl(this.urlOpts(this.saver))
+        });
       });
     },
     onSaversUpdated() {

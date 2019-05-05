@@ -17,7 +17,7 @@
 const electron = require("electron");
 const log = require("electron-log");
 
-const {app, dialog, globalShortcut, BrowserWindow, ipcMain, Menu, Tray} = require("electron");
+const {app, dialog, globalShortcut, BrowserWindow, BrowserView, ipcMain, Menu, Tray} = require("electron");
 
 const fs = require("fs");
 const path = require("path");
@@ -55,7 +55,9 @@ var exitOnQuit = false;
 const globalCSSCode = fs.readFileSync( path.join(__dirname, "assets", "global.css"), "ascii");  
 
 
-var prefsWindowHandle = null;
+let prefsWindowHandle = null;
+let prefsPreviewViewHandle = null;
+
 var trayMenu;
 
 var electronScreen;
@@ -181,6 +183,12 @@ var openTestShim = function() {
   testWindow.loadURL(shimUrl);
 };
 
+
+let prefPreviewBounds = {
+  width: 320,
+  height: 0
+};
+
 /**
  * Open the preferences window
  * @returns {Promise} Promise that resolves when prefs window is shown
@@ -216,7 +224,29 @@ var openPrefsWindow = function() {
         },
         icon: path.join(__dirname, "assets", "iconTemplate.png")
       });
-  
+
+      var size = primary.bounds;
+      var ratio = size.height / size.width;
+      prefPreviewBounds.height = prefPreviewBounds.width * ratio;
+
+      // eslint-disable-next-line no-console
+      console.log(`bounds: ${prefPreviewBounds.width}x${prefPreviewBounds.height}`);
+
+      prefsPreviewViewHandle = new BrowserView({
+        webPreferences: {
+          zoomFactor: 0.07
+        }
+      });
+      prefsWindowHandle.setBrowserView(prefsPreviewViewHandle);
+      prefsPreviewViewHandle.setBounds({ x: 410, y: 10, width: prefPreviewBounds.width, height: prefPreviewBounds.height + 40 });
+      // prefsPreviewViewHandle.setAutoResize({
+      //   width: true,
+      //   height: true,
+      //   horizontal: true,
+      //   vertical: true
+      // });
+      //prefsPreviewViewHandle.webContents.loadURL("https://electronjs.org");
+
       prefsUrl = prefsUrl + "?screenshot=" + encodeURIComponent("file://" + message.url);
       prefsWindowHandle.saverOpts = saverOpts;
       prefsWindowHandle.screenshot = message.url;
@@ -1169,6 +1199,38 @@ let toggleSaversUpdated = (arg) => {
 
 ipcMain.on("savers-updated", () => {
   toggleSaversUpdated();
+});
+
+ipcMain.on("prefs-preview-url", (_event, arg) => {
+  // prefsPreviewViewHandle.webContents.once("did-stop-loading", function() {
+  //   log.info("preview dom-ready");
+  //   var size = electronScreen.getPrimaryDisplay().bounds;
+  //   var factor = prefPreviewBounds.width / size.width / 2.0;
+
+  //   // eslint-disable-next-line no-console
+  //   console.log(`set zoom factor to ${factor}`);
+  //   // prefsPreviewViewHandle.webContents.setZoomFactor(factor);
+
+  //   // eslint-disable-next-line no-console
+  //   // console.log(`set zoom factor to ${factor}`);
+  //   // prefsPreviewViewHandle.setBounds({
+  //   //   x: 410,
+  //   //   y: 10,
+  //   //   width: 482, //prefPreviewBounds.width + 250,
+  //   //   height: prefPreviewBounds.height + 120
+  //   // });
+
+  //   // eslint-disable-next-line no-console
+  //   console.log(`ok ${prefsPreviewViewHandle.webContents.getZoomFactor()}`);
+  // });
+
+  // eslint-disable-next-line no-console
+  console.log(`switch preview to ${arg.url}`);
+  prefsPreviewViewHandle.webContents.loadURL(arg.url);
+});
+
+ipcMain.on("prefs-preview-bounds", (_event, arg) => {
+  prefsPreviewViewHandle.setBounds(arg);
 });
 
 //

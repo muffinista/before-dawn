@@ -47,6 +47,7 @@ small {
 // prefs page
 //
 #prefs {
+  padding: 0.5rem;
   display: grid;
   grid-template-columns: 400px 1fr;
   grid-template-areas: "header header"
