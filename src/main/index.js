@@ -57,6 +57,8 @@ const globalCSSCode = fs.readFileSync( path.join(__dirname, "assets", "global.cs
 
 let prefsWindowHandle = null;
 let prefsPreviewViewHandle = null;
+let editorPreviewViewHandle = null;
+let editorWindowHandle = null;
 
 var trayMenu;
 
@@ -229,9 +231,6 @@ var openPrefsWindow = function() {
       var ratio = size.height / size.width;
       prefPreviewBounds.height = prefPreviewBounds.width * ratio;
 
-      // eslint-disable-next-line no-console
-      console.log(`bounds: ${prefPreviewBounds.width}x${prefPreviewBounds.height}`);
-
       prefsPreviewViewHandle = new BrowserView({
         webPreferences: {
           zoomFactor: 0.07
@@ -383,14 +382,31 @@ var openEditor = (args) => {
   var key = args.src;
   var screenshot = args.screenshot;
 
-  var w = new BrowserWindow({
-    show: false,
-    webPreferences: {
-      nodeIntegration: true,
-      webSecurity: false, //!global.IS_DEV
-      preload: global.TRACK_ERRORS ? path.join(__dirname, "assets", "sentry.js") : undefined
-    },
-  });
+  if ( editorWindowHandle == null ) {
+    editorWindowHandle = new BrowserWindow({
+      show: false,
+      webPreferences: {
+        nodeIntegration: true,
+        webSecurity: false, //!global.IS_DEV
+        preload: global.TRACK_ERRORS ? path.join(__dirname, "assets", "sentry.js") : undefined
+      },
+    });  
+  }
+
+  if ( editorPreviewViewHandle == null ) {
+    editorPreviewViewHandle = new BrowserView({
+      webPreferences: {
+        zoomFactor: 0.07
+      }
+    });
+    editorWindowHandle.setBrowserView(editorPreviewViewHandle);
+    editorPreviewViewHandle.setBounds({
+      x: 0,
+      y: 10,
+      width: 600,
+      height: 480
+    });
+  }
 
   var editorUrl = getUrl("editor.html");
  
@@ -398,20 +414,21 @@ var openEditor = (args) => {
                "src=" + encodeURIComponent(key) +
                "&screenshot=" + encodeURIComponent(screenshot);
 
-  w.saverOpts = saverOpts;
-  w.screenshot = screenshot;
+  editorWindowHandle.saverOpts = saverOpts;
+  editorWindowHandle.screenshot = screenshot;
 
-  w.once("ready-to-show", () => {
-    w.show();
+  editorWindowHandle.once("ready-to-show", () => {
+    editorWindowHandle.show();
     dock.showDock(app);
   });
 
-  w.on("closed", () => {
-    w = null;
+  editorWindowHandle.on("closed", () => {
+    editorWindowHandle = null;
+    editorPreviewViewHandle = null;
     dock.hideDockIfInactive(app);
   });
 
-  w.loadURL(target);  
+  editorWindowHandle.loadURL(target);  
 };
 
 
@@ -1245,6 +1262,19 @@ ipcMain.on("prefs-preview-url", (_event, arg) => {
 
 ipcMain.on("prefs-preview-bounds", (_event, arg) => {
   prefsPreviewViewHandle.setBounds(arg);
+});
+
+ipcMain.on("editor-preview-url", (_event, arg) => {
+  editorPreviewViewHandle.webContents.once("did-stop-loading", function() {
+    editorPreviewViewHandle.webContents.insertCSS("body { overflow: hidden; }");
+  });
+
+  log.info(`switch preview to ${arg.url}`);
+  editorPreviewViewHandle.webContents.loadURL(arg.url);
+});
+ipcMain.on("editor-preview-bounds", (_event, arg) => {
+  log.info(arg);
+  editorPreviewViewHandle.setBounds(arg);
 });
 
 //

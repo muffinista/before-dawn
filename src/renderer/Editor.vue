@@ -33,7 +33,7 @@
         v-b-tooltip.hover
         variant="default"
         title="Reload preview"
-        @click="reloadPreview"
+        @click="renderPreview"
       >
         <span class="icon">
           <img
@@ -77,12 +77,8 @@
           </template>
           
           <h4>Preview</h4>
-          <saver-preview
-            v-if="isLoaded"
-            :bus="bus"
-            :saver="saver"
-            :screenshot="screenshot"
-          />
+          <div class="saver-detail">
+          </div>
         </template>
       </div>
     </div>
@@ -175,7 +171,6 @@ const url = require("url");
 const exec = require("child_process").execFile;
 
 import Vue from "vue";
-import SaverPreview from "@/components/SaverPreview";
 import SaverForm from "@/components/SaverForm";  
 import SaverOptionInput from "@/components/SaverOptionInput";
 import SaverOptions from "@/components/SaverOptions";
@@ -187,7 +182,7 @@ import SaverListManager from "@/../lib/saver-list";
 export default {
   name: "Editor",
   components: {
-    SaverForm, SaverPreview, SaverOptionInput, SaverOptions
+    SaverForm, SaverOptionInput, SaverOptions
   },
   data() {
     return {
@@ -233,12 +228,14 @@ export default {
 
       return result;
     },
+    previewWrapper: function() {
+      return document.querySelector(".saver-detail");
+    }
   },
   async mounted() {
     if ( this.src === null ) {
       return;
     }
-
 
     let opts = this.$electron.remote.getCurrentWindow().saverOpts;
     this._prefs = new SaverPrefs({
@@ -259,13 +256,60 @@ export default {
       if ( fs.existsSync(this.folderPath) ) {
         fs.watch(this.folderPath, (eventType, filename) => {
           if (filename) {
-            this.reloadPreview();
+            this.renderPreview();
           }
         });
-      }      
+      }
+
+      this.renderPreview();
+      this.resizeInterval = window.setInterval(() => {
+        this.checkResize();
+      }, 100);
     });
   },
   methods: {
+    // https://github.com/stream-labs/streamlabs-obs/blob/163e9a7eaf39200077874ae80d00e66108c106dc/app/components/Chat.vue.ts#L41
+    rectChanged(rect) {
+      return (
+        rect.left !== this.currentPosition.x ||
+        rect.top !== this.currentPosition.y ||
+        rect.width !== this.currentPosition.width ||
+        rect.height !== this.currentPosition.height
+      );
+    },
+    checkResize() {
+      const rect = this.previewWrapper.getBoundingClientRect();
+      if (this.currentPosition == null || this.rectChanged(rect)) {
+        this.currentPosition = { 
+          x: rect.left, 
+          y: rect.top, 
+          width: rect.width, 
+          height: rect.height 
+        };
+        this.ipcRenderer.send("editor-preview-bounds", this.currentPosition);
+        this.renderPreview();
+      }
+    },
+    urlOpts() {
+      var screen = this.$electron.remote.screen;
+      var size = screen.getPrimaryDisplay().bounds;
+
+      var base = {
+        width: size.width,
+        height: size.height,
+        preview: 1,
+        platform: process.platform,
+        screenshot: this.screenshot,
+        _: Math.random()
+      };
+      
+      var mergedOpts = Object.assign(
+        base,
+        this.saver.settings,
+        this.optionDefaults);
+
+      return mergedOpts;
+    },
     onOptionsChange(e) {
       var name = e.target.name;
       var value = e.target.value;
@@ -289,7 +333,7 @@ export default {
       result[name] = value;
 
       this.optionValues = Object.assign({}, result);
-      this.bus.$emit("options-changed", this.optionValues);
+      this.renderPreview();
     },
     deleteOption(opt) {
       let index = this.options.indexOf(opt);
@@ -366,8 +410,11 @@ export default {
       
       exec(cmd, args, function() {});
     },
-    reloadPreview() {
-      this.bus.$emit("options-changed", this.optionValues);
+    renderPreview() {
+      console.log("load", this.saver.getUrl(this.urlOpts(this.saver)));
+      this.ipcRenderer.send("editor-preview-url", {
+        url: this.saver.getUrl(this.urlOpts(this.saver))
+      });
     },
     openConsole() {
       this.currentWindow.toggleDevTools();
