@@ -1,5 +1,6 @@
 $nav_height: 34px;
 $footer_height: 50px;
+$footer_padding: 25px;
 $footer_inner_height: 40px;
 $tab_padding:6px;
 $grid_gap:10px;
@@ -52,8 +53,8 @@ small {
   grid-template-columns: 400px 1fr;
   grid-template-areas: "header header"
     "saver-list saver-preview"
-    "prefs saver-detail"
-    "advanced-prefs saver-detail"
+    "saver-list saver-detail"
+    "saver-list saver-detail"
     "footer footer";
 }
 
@@ -66,19 +67,15 @@ ul.saver-list {
 div.saver-detail {
   grid-area: saver-preview;
   height: $preview_height;
+  margin-left: 10px;
 }
 div.saver-wrap {
   grid-area: saver-detail; 
+  margin: 10px;
 }
-//div.saver-options {
-//  grid-area: saver-options;
-//}
-#preferences {
-  grid-area: prefs;
-}
-#advanced {
-  grid-area: advanced-prefs;
-  margin-bottom: 50px;
+
+#settings {
+  margin-bottom: #{$footer_height + $footer_padding};
 }
 footer.footer {
   grid-area: footer;
@@ -157,8 +154,8 @@ button.add-option {
 }
 
 .saver-list {
-//  height: calc(98vh - #{$nav_height+$tab_padding+$footer_height});
-  height: $preview_height;
+  height: calc(98vh - #{$footer_height});
+//  height: $preview_height;
   margin-bottom: 0px;
   overflow-y: scroll;
   font: small-caption;

@@ -134,6 +134,7 @@ let rendererConfig = {
   plugins: [
     new VueLoaderPlugin(),
     new HtmlWebpackPlugin(htmlPageOptions("prefs", "Preferences")),
+    new HtmlWebpackPlugin(htmlPageOptions("settings", "Settings")),
     new HtmlWebpackPlugin(htmlPageOptions("editor", "Editor")),    
     new HtmlWebpackPlugin(htmlPageOptions("new", "Create Screensaver!")),
     new HtmlWebpackPlugin(htmlPageOptions("about", "About!")),

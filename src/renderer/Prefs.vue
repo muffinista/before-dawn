@@ -24,24 +24,6 @@
       </div>
     </template>
    
-    <div id="preferences">
-      <div class="container-fluid">
-        <template v-if="prefs !== undefined">
-          <prefs-form :prefs="prefs" />
-        </template>
-      </div>
-    </div>
-    <div id="advanced">
-      <div class="container-fluid">
-        <template v-if="prefs !== undefined">
-          <advanced-prefs-form
-            :prefs="prefs"
-            @localSourceChange="localSourceChange"
-          />
-        </template>
-      </div>
-    </div>
-
     <footer class="footer d-flex justify-content-between">
       <div>
         <button
@@ -54,9 +36,9 @@
 
       <div>
         <button
-          class="btn btn-large btn-primary reset-to-defaults"
-          @click="resetToDefaults">
-          Reset to Defaults
+          class="btn btn-large btn-primary"
+          @click="openSettings">
+          Settings
         </button>
         <button
           class="btn btn-large btn-primary save"
@@ -73,7 +55,6 @@
 <script>
 import Vue from "vue";
 import SaverList from "@/components/SaverList";
-import SaverPreview from "@/components/SaverPreview";
 import SaverOptions from "@/components/SaverOptions";
 import SaverSummary from "@/components/SaverSummary";
 import AdvancedPrefsForm from "@/components/AdvancedPrefsForm";
@@ -88,7 +69,7 @@ import SaverListManager from "@/../lib/saver-list";
 export default {
   name: "Prefs",
   components: {
-    SaverList, SaverOptions, SaverPreview, SaverSummary, AdvancedPrefsForm, PrefsForm
+    SaverList, SaverOptions, SaverSummary, AdvancedPrefsForm, PrefsForm
   },
   data() {
     return {
@@ -159,6 +140,9 @@ export default {
     screenshot: function() {
       // the main app will pass us a screenshot URL, here it is
       return decodeURIComponent(this.params.get("screenshot"));
+    },
+    previewWrapper: function() {
+      return document.querySelector(".saver-detail");
     }
   },
   async mounted() {
@@ -203,10 +187,14 @@ export default {
       );
     },
     checkResize() {
-      const el = document.querySelector(".saver-detail");
-      const rect = el.getBoundingClientRect();
+      const rect = this.previewWrapper.getBoundingClientRect();
       if (this.currentPosition == null || this.rectChanged(rect)) {
-        this.currentPosition = { x: rect.left, y: rect.top, width: rect.width, height: rect.height };
+        this.currentPosition = { 
+          x: rect.left, 
+          y: rect.top, 
+          width: rect.width, 
+          height: rect.height 
+        };
         this.ipcRenderer.send("prefs-preview-bounds", this.currentPosition);
       }
     },
@@ -216,7 +204,7 @@ export default {
       });
     },
     urlOpts(s) {
-      var screen = this.$electron.screen;
+      var screen = this.$electron.remote.screen;
       var size = screen.getPrimaryDisplay().bounds;
 
       var base = {
@@ -247,6 +235,9 @@ export default {
       this.ipcRenderer.send("prefs-preview-url", {
         url: this.saverObj.getUrl(this.urlOpts(this.saver))
       });
+    },
+    openSettings() {
+      this.ipcRenderer.send("open-settings");
     },
     resetToDefaults() {
       dialog.showMessageBox(
@@ -373,8 +364,8 @@ export default {
         this.prefs.updatePrefs(this.prefs, (changes) => {
           this.disabled = false;
           this.ipcRenderer.send("prefs-updated", changes);
-          this.ipcRenderer.send("set-autostart", this.prefs.auto_start);
-          this.ipcRenderer.send("set-global-launch-shortcut", this.prefs.launchShortcut);
+          // this.ipcRenderer.send("set-autostart", this.prefs.auto_start);
+          // this.ipcRenderer.send("set-global-launch-shortcut", this.prefs.launchShortcut);
           resolve(changes);
         });
       });

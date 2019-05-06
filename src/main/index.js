@@ -210,13 +210,13 @@ var openPrefsWindow = function() {
   
       prefsWindowHandle = new BrowserWindow({
         show: false,
-        width:800,
-        height:600,
-        minWidth: 800,
-        minHeight: 500,
-        maxWidth: 1200,
-        maxHeight: 1000,
-        resizable:true,
+        width: 910,
+        height: 600,
+        // minWidth: 800,
+        // minHeight: 500,
+        // maxWidth: 1200,
+        // maxHeight: 1000,
+        resizable: true,
         webPreferences: {
           webSecurity: false, //!global.IS_DEV
           nodeIntegration: true,
@@ -238,14 +238,11 @@ var openPrefsWindow = function() {
         }
       });
       prefsWindowHandle.setBrowserView(prefsPreviewViewHandle);
-      prefsPreviewViewHandle.setBounds({ x: 410, y: 10, width: prefPreviewBounds.width, height: prefPreviewBounds.height + 40 });
-      // prefsPreviewViewHandle.setAutoResize({
-      //   width: true,
-      //   height: true,
-      //   horizontal: true,
-      //   vertical: true
-      // });
-      //prefsPreviewViewHandle.webContents.loadURL("https://electronjs.org");
+      prefsPreviewViewHandle.setBounds({
+        x: 410,
+        y: 10,
+        width: prefPreviewBounds.width,
+        height: prefPreviewBounds.height + 40 });
 
       prefsUrl = prefsUrl + "?screenshot=" + encodeURIComponent("file://" + message.url);
       prefsWindowHandle.saverOpts = saverOpts;
@@ -269,6 +266,38 @@ var openPrefsWindow = function() {
   });
 };
 
+var openSettingsWindow = function() {
+  var settingsUrl = getUrl("settings.html");
+  var w = new BrowserWindow({
+    show: false,
+    width:600,
+    height:700,
+    resizable:false,
+    parent: prefsWindowHandle,
+    modal: true,
+    icon: path.join(__dirname, "assets", "iconTemplate.png"),
+    webPreferences: {
+      nodeIntegration: true,
+      webSecurity: false, //!global.IS_DEV
+      preload: global.TRACK_ERRORS ? path.join(__dirname, "assets", "sentry.js") : undefined
+    }
+  });
+
+  w.on("closed", () => {
+    w = null;
+    dock.hideDockIfInactive(app);
+  });
+
+  w.once("ready-to-show", () => {
+    w.show();
+    dock.showDock(app);
+  });
+
+  w.saverOpts = saverOpts;
+
+  log.info(`open ${settingsUrl}`);
+  w.loadURL(settingsUrl);
+};
 
 /**
  * handle new screensaver event. open the window to create a screensaver
@@ -1201,31 +1230,16 @@ ipcMain.on("savers-updated", () => {
   toggleSaversUpdated();
 });
 
+ipcMain.on("open-settings", () => {
+  openSettingsWindow();
+});
+
 ipcMain.on("prefs-preview-url", (_event, arg) => {
-  // prefsPreviewViewHandle.webContents.once("did-stop-loading", function() {
-  //   log.info("preview dom-ready");
-  //   var size = electronScreen.getPrimaryDisplay().bounds;
-  //   var factor = prefPreviewBounds.width / size.width / 2.0;
+  prefsPreviewViewHandle.webContents.once("did-stop-loading", function() {
+    prefsPreviewViewHandle.webContents.insertCSS("body { overflow: hidden; }");
+  });
 
-  //   // eslint-disable-next-line no-console
-  //   console.log(`set zoom factor to ${factor}`);
-  //   // prefsPreviewViewHandle.webContents.setZoomFactor(factor);
-
-  //   // eslint-disable-next-line no-console
-  //   // console.log(`set zoom factor to ${factor}`);
-  //   // prefsPreviewViewHandle.setBounds({
-  //   //   x: 410,
-  //   //   y: 10,
-  //   //   width: 482, //prefPreviewBounds.width + 250,
-  //   //   height: prefPreviewBounds.height + 120
-  //   // });
-
-  //   // eslint-disable-next-line no-console
-  //   console.log(`ok ${prefsPreviewViewHandle.webContents.getZoomFactor()}`);
-  // });
-
-  // eslint-disable-next-line no-console
-  console.log(`switch preview to ${arg.url}`);
+  log.info(`switch preview to ${arg.url}`);
   prefsPreviewViewHandle.webContents.loadURL(arg.url);
 });
 
@@ -1241,6 +1255,7 @@ ipcMain.on("prefs-updated", (event, arg) => {
   prefs.reload();
   updateStateManager();
   checkForPackageUpdates();
+  prefsWindowHandle.send("savers-updated");
 });
 
 ipcMain.on("close-window", (event) => {
