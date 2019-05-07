@@ -10,6 +10,11 @@ $preview_height: 320px;
 @import "~noty/lib/noty.css";
 @import "~noty/lib/themes/mint.css";
 
+div#noty_layout__topLeft {
+  top: 0px;
+  left: 4px;
+}
+
 html {
   height: 100%;
   font-family: system-ui;

@@ -28,7 +28,7 @@
       <div>
         <button
           class="align-middle btn btn-large btn-primary create"
-          @click="createNewScreensaver"
+          v-on:click.stop="createNewScreensaver"
         >
           Create Screensaver
         </button>
@@ -37,13 +37,13 @@
       <div>
         <button
           class="btn btn-large btn-primary"
-          @click="openSettings">
+          v-on:click.stop="openSettings">
           Settings
         </button>
         <button
           class="btn btn-large btn-primary save"
           :disabled="disabled"
-          @click="saveDataClick">
+          v-on:click.stop="saveDataClick">
           Save
         </button>
       </div>
@@ -57,8 +57,6 @@ import Vue from "vue";
 import SaverList from "@/components/SaverList";
 import SaverOptions from "@/components/SaverOptions";
 import SaverSummary from "@/components/SaverSummary";
-import AdvancedPrefsForm from "@/components/AdvancedPrefsForm";
-import PrefsForm from "@/components/PrefsForm";
 import Noty from "noty";
 
 const {dialog} = require("electron").remote;
@@ -69,7 +67,7 @@ import SaverListManager from "@/../lib/saver-list";
 export default {
   name: "Prefs",
   components: {
-    SaverList, SaverOptions, SaverSummary, AdvancedPrefsForm, PrefsForm
+    SaverList, SaverOptions, SaverSummary
   },
   data() {
     return {
@@ -166,7 +164,7 @@ export default {
 
       this.resizeInterval = window.setInterval(() => {
         this.checkResize();
-      }, 100);
+      }, 50);
 
     });
   },
@@ -235,36 +233,6 @@ export default {
     openSettings() {
       this.ipcRenderer.send("open-settings");
     },
-    resetToDefaults() {
-      dialog.showMessageBox(
-        {
-          type: "info",
-          title: "Are you sure?",
-          message: "Are you sure you want to reset to the default settings?",
-          buttons: ["No", "Yes"],
-          defaultId: 0
-        },
-        (result) => {
-          if ( result === 1 ) {
-            this.prefs.defaults = this.$electron.remote.getGlobal("CONFIG_DEFAULTS");
-            this.prefs.reset();
-            this.prefs.write(() => {
-              this.getData();
-
-              new Noty({
-                type: "success",
-                layout: "topRight",
-                timeout: 1000,
-                text: "Settings reset!",
-                animation: {
-                  open: null
-                }
-              }).show();
-            }); // reload
-          }
-        }
-      );
-    },  
     getData() {
       this.manager.list((entries) => {
         this.savers = entries;
@@ -316,7 +284,6 @@ export default {
       this.saver = this.prefs.current;
     },
     createNewScreensaver() {
-      this.saveData(false);
       this.ipcRenderer.send("open-add-screensaver", {
         screenshot: this.screenshot
       });
@@ -359,8 +326,6 @@ export default {
         this.prefs.updatePrefs(this.prefs, (changes) => {
           this.disabled = false;
           this.ipcRenderer.send("prefs-updated", changes);
-          // this.ipcRenderer.send("set-autostart", this.prefs.auto_start);
-          // this.ipcRenderer.send("set-global-launch-shortcut", this.prefs.launchShortcut);
           resolve(changes);
         });
       });
@@ -369,7 +334,7 @@ export default {
       this.saveData().then(() => {
         new Noty({
           type: "success",
-          layout: "topRight",
+          layout: "topLeft",
           timeout: 2000,
           text: "Changes saved!",
           animation: {
@@ -390,16 +355,10 @@ export default {
         (result) => {
           if ( result === 1 ) {
             var appRepo = this.$electron.remote.getGlobal("APP_REPO");
-            this.$electron.shell.openExternal("https://github.com/" + appRepo + "/releases/latest");
+            this.$electron.shell.openExternal(`https://github.com/${appRepo}/releases/latest`);
           }
         }
       );
-    },
-    localSourceChange(ls) {
-      var tmp = {
-        localSource: ls
-      };
-      this.prefs = Object.assign(this.prefs, tmp);
     }
   }
 }; 

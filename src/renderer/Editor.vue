@@ -361,7 +361,7 @@ export default {
 
       new Noty({
         type: "success",
-        layout: "topRight",
+        layout: "topLeft",
         timeout: 2000,
         text: "Changes saved!",
         animation: {

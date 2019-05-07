@@ -144,7 +144,7 @@ export default {
 
               new Noty({
                 type: "success",
-                layout: "topRight",
+                layout: "topLeft",
                 timeout: 1000,
                 text: "Settings reset!",
                 animation: {
@@ -155,12 +155,6 @@ export default {
           }
         }
       );
-    },  
-    createNewScreensaver() {
-      this.saveData(false);
-      this.ipcRenderer.send("open-add-screensaver", {
-        screenshot: this.screenshot
-      });
     },
     closeWindow() {
       this.currentWindow.close();
@@ -183,7 +177,7 @@ export default {
       this.saveData().then(() => {
         new Noty({
           type: "success",
-          layout: "topRight",
+          layout: "topLeft",
           timeout: 2000,
           text: "Changes saved!",
           animation: {
