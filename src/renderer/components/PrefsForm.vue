@@ -1,6 +1,6 @@
 <template>
   <div id="prefs-form">
-    <h1>Preferences</h1>
+    <h1>Settings</h1>
     <form v-on="$listeners" class="grid">
       <div class="times">
         <div class="form-group">

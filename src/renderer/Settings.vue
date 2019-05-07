@@ -18,6 +18,8 @@
           @click="resetToDefaults">
           Reset to Defaults
         </button>
+      </div>
+      <div>
         <button
           class="btn btn-large btn-primary close-window"
           :disabled="disabled"

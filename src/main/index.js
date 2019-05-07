@@ -209,16 +209,17 @@ var openPrefsWindow = function() {
     // take a screenshot of the main screen for use in previews
     grabScreen(primary).then((message) => {
       var prefsUrl = getUrl("prefs.html");
-  
+      // eslint-disable-next-line no-console
+      console.log("ICON", path.join(__dirname, "assets", "iconTemplate.png"));
+
       prefsWindowHandle = new BrowserWindow({
         show: false,
         width: 910,
         height: 600,
-        // minWidth: 800,
-        // minHeight: 500,
-        // maxWidth: 1200,
-        // maxHeight: 1000,
-        resizable: false,
+        minWidth: 910,
+        maxWidth: 910,
+        minHeight: 600,
+        resizable: true,
         webPreferences: {
           webSecurity: false, //!global.IS_DEV
           nodeIntegration: true,
@@ -270,8 +271,10 @@ var openSettingsWindow = function() {
   var w = new BrowserWindow({
     show: false,
     width:600,
-    height:700,
-    resizable:false,
+    height:800,
+    maxWidth: 600,
+    minWidth: 600,
+    resizable: true,
     parent: prefsWindowHandle,
     modal: true,
     icon: path.join(__dirname, "assets", "iconTemplate.png"),
