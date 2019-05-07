@@ -82,9 +82,6 @@ export default {
     };
   },
   computed: {
-    bus: function() {
-      return new Vue();
-    },
     logger() {
       let l = this.$electron.remote.getCurrentWindow().saverOpts.logger;
       if ( l === undefined ) {
@@ -230,7 +227,6 @@ export default {
 
     onSaverPicked(e) {
       this.saver = e.target.value;
-      this.bus.$emit("saver-changed", this.saverObj);
       this.renderIndex += 1;
       this.ipcRenderer.send("prefs-preview-url", {
         url: this.saverObj.getUrl(this.urlOpts(this.saver))
@@ -307,7 +303,6 @@ export default {
           this.getCurrentSaver();
         }
 
-        this.bus.$emit("saver-changed", this.saverObj);
         this.ipcRenderer.send("prefs-preview-url", {
           url: this.saverObj.getUrl(this.urlOpts(this.saver))
         });

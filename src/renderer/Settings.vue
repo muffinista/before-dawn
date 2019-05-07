@@ -61,9 +61,6 @@ export default {
     };
   },
   computed: {
-    bus: function() {
-      return new Vue();
-    },
     logger() {
       let l = this.$electron.remote.getCurrentWindow().saverOpts.logger;
       if ( l === undefined ) {

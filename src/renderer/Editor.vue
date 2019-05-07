@@ -194,9 +194,6 @@ export default {
     };
   },
   computed: {
-    bus: function() {
-      return new Vue();
-    },
     currentWindow: function() {
       return this.$electron.remote.getCurrentWindow();
     },
@@ -264,7 +261,7 @@ export default {
       this.renderPreview();
       this.resizeInterval = window.setInterval(() => {
         this.checkResize();
-      }, 100);
+      }, 50);
     });
   },
   methods: {

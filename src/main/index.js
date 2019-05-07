@@ -218,7 +218,7 @@ var openPrefsWindow = function() {
         // minHeight: 500,
         // maxWidth: 1200,
         // maxHeight: 1000,
-        resizable: true,
+        resizable: false,
         webPreferences: {
           webSecurity: false, //!global.IS_DEV
           nodeIntegration: true,
