@@ -162,12 +162,14 @@ exports.getWindowByTitle = async (app, title) => {
     for ( var i = 0; i < count; i++ ) {
       if ( result === -1 ) {
         await app.client.windowByIndex(i).getTitle().then((res) => {
-          //console.log(i, res, title, res === title);
+          // // eslint-disable-next-line no-console
+          // console.log(i, res, title, res === title);
+
           if ( res === title ) {
             result = i;
             return i;
           }
-        });    
+        });  
       }
     }
 
@@ -200,6 +202,41 @@ exports.waitForWindow = async (app, title, skipAssert) => {
 
   return result;
 };
+
+exports.waitForWindowClosed = async (app, title, skipAssert) => {
+  let result = -1;
+  await exports.sleep(delayStep);
+
+  for ( var totalTime = 0; totalTime < windowCheckDelay; totalTime += delayStep ) {
+    try {
+      result = await exports.getWindowByTitle(app, title);
+    }
+    catch(err) {
+      // // eslint-disable-next-line no-console
+      // console.log(err);
+
+      if ( err.message.indexOf("no such window") !== -1) {
+        result = -1;
+      }
+    }
+
+    if ( result === -1 ) {
+      break;
+    }
+    else {
+      await exports.sleep(delayStep);
+    }
+  }
+
+  if ( skipAssert !== true ) {
+    assert.equal(-1, result, `window ${title} still open`);
+  }
+
+  return result;
+};
+
+
+
 
 exports.waitUntilBooted = async(app) => {
   return exports.waitForWindow(app, "test shim");

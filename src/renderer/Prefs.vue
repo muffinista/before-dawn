@@ -36,10 +36,8 @@
 
       <div>
         <button
-          class="btn btn-large btn-primary"
-          v-on:click.stop="openSettings">
-          Settings
-        </button>
+          class="btn btn-large btn-primary settings"
+          v-on:click.stop="openSettings">Settings</button>
         <button
           class="btn btn-large btn-primary save"
           :disabled="disabled"

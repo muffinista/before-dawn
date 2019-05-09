@@ -140,8 +140,6 @@ export default {
             this.prefs.defaults = this.$electron.remote.getGlobal("CONFIG_DEFAULTS");
             this.prefs.reset();
             this.prefs.write(() => {
-              this.getData();
-
               new Noty({
                 type: "success",
                 layout: "topLeft",
