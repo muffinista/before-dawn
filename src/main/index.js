@@ -215,7 +215,7 @@ var openPrefsWindow = function() {
       prefsWindowHandle = new BrowserWindow({
         show: false,
         width: 910,
-        height: 600,
+        height: 640,
         minWidth: 910,
         maxWidth: 910,
         minHeight: 600,
@@ -841,6 +841,9 @@ var setupIfNeeded = function() {
       pd.updatePackage().then(() => {
         return resolve(true);
       });
+
+      // stop processing here, we know we need to setup
+      return;
     }
 
     var savers = new SaverListManager({
@@ -1283,8 +1286,8 @@ ipcMain.on("editor-preview-bounds", (_event, arg) => {
 //
 // user has updated their preferences, let's reload
 //
-ipcMain.on("prefs-updated", (event, arg) => {
-  log.info("prefs-updated", Object.keys(arg));
+ipcMain.on("prefs-updated", () => {
+  log.info("prefs-updated");
   prefs.reload();
   updateStateManager();
   checkForPackageUpdates();
