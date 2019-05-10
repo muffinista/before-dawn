@@ -77,8 +77,7 @@
           </template>
           
           <h4>Preview</h4>
-          <div class="saver-detail">
-          </div>
+          <div class="saver-detail" />
         </template>
       </div>
     </div>
@@ -170,7 +169,6 @@ const path = require("path");
 const url = require("url");
 const exec = require("child_process").execFile;
 
-import Vue from "vue";
 import SaverForm from "@/components/SaverForm";  
 import SaverOptionInput from "@/components/SaverOptionInput";
 import SaverOptions from "@/components/SaverOptions";
@@ -284,7 +282,7 @@ export default {
           height: rect.height 
         };
         this.ipcRenderer.send("editor-preview-bounds", this.currentPosition);
-        this.renderPreview();
+        //this.renderPreview();
       }
     },
     urlOpts() {
@@ -296,14 +294,16 @@ export default {
         height: size.height,
         preview: 1,
         platform: process.platform,
-        screenshot: this.screenshot,
-        _: Math.random()
+        screenshot: this.screenshot
+        //,
+        //_: Math.random()
       };
       
       var mergedOpts = Object.assign(
         base,
         this.saver.settings,
-        this.optionDefaults);
+        this.optionDefaults,
+        this.optionValues);
 
       return mergedOpts;
     },
@@ -311,8 +311,6 @@ export default {
       var name = e.target.name;
       var value = e.target.value;
       var result = {};
-
-      //console.log("optionsChange", name, value, e);
 
       // rebuild the option value hash so that if a key is
       // renamed it isn't left behind in the data
@@ -408,7 +406,7 @@ export default {
       exec(cmd, args, function() {});
     },
     renderPreview() {
-      console.log("load", this.saver.getUrl(this.urlOpts(this.saver)));
+      //console.log("load", this.saver.getUrl(this.urlOpts(this.saver)));
       this.ipcRenderer.send("editor-preview-url", {
         url: this.saver.getUrl(this.urlOpts(this.saver))
       });

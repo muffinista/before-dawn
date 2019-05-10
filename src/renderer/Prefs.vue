@@ -8,8 +8,7 @@
       @change="onSaverPicked"
     />
     <template v-if="saverIsPicked">
-      <div class="saver-detail">
-      </div>
+      <div class="saver-detail" />
       <div class="saver-wrap">
         <saver-summary :saver="saverObj" />
         <div class="saver-options">
@@ -28,7 +27,7 @@
       <div>
         <button
           class="align-middle btn btn-large btn-primary create"
-          v-on:click.stop="createNewScreensaver"
+          @click.stop="createNewScreensaver"
         >
           Create Screensaver
         </button>
@@ -37,27 +36,29 @@
       <div>
         <button
           class="btn btn-large btn-primary settings"
-          v-on:click.stop="openSettings">Settings</button>
+          @click.stop="openSettings"
+        >
+          Settings
+        </button>
         <button
           class="btn btn-large btn-primary save"
           :disabled="disabled"
-          v-on:click.stop="saveDataClick">
+          @click.stop="saveDataClick"
+        >
           Save
         </button>
       </div>
     </footer>
-
   </div> <!-- #prefs -->
 </template>
 
 <script>
-import Vue from "vue";
+const {dialog} = require("electron").remote;
+
 import SaverList from "@/components/SaverList";
 import SaverOptions from "@/components/SaverOptions";
 import SaverSummary from "@/components/SaverSummary";
 import Noty from "noty";
-
-const {dialog} = require("electron").remote;
 
 import SaverPrefs from "@/../lib/prefs";
 import SaverListManager from "@/../lib/saver-list";
@@ -206,8 +207,9 @@ export default {
         height: size.height,
         preview: 1,
         platform: process.platform,
-        screenshot: this.screenshot,
-        _: Math.random()
+        screenshot: this.screenshot
+        //,
+        //_: Math.random()
       };
 
       if ( typeof(s) === "undefined" ) {

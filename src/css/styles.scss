@@ -72,8 +72,12 @@ ul.saver-list {
 div.saver-detail {
   grid-area: saver-preview;
   height: $preview_height;
+}
+
+#prefs.saver-detail {
   margin-left: 10px;
 }
+
 div.saver-wrap {
   grid-area: saver-detail; 
   margin: 10px;

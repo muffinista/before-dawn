@@ -56,9 +56,19 @@ const globalCSSCode = fs.readFileSync( path.join(__dirname, "assets", "global.cs
 
 
 let prefsWindowHandle = null;
+let editorWindowHandle = null;
+
 let prefsPreviewViewHandle = null;
 let editorPreviewViewHandle = null;
-let editorWindowHandle = null;
+
+let prefPreviewBounds = {
+  width: 320,
+  height: 0
+};
+let editorPreviewBounds = {
+  width: 0,
+  height: 320
+};
 
 var trayMenu;
 
@@ -186,11 +196,6 @@ var openTestShim = function() {
 };
 
 
-let prefPreviewBounds = {
-  width: 320,
-  height: 0
-};
-
 /**
  * Open the preferences window
  * @returns {Promise} Promise that resolves when prefs window is shown
@@ -234,7 +239,7 @@ var openPrefsWindow = function() {
 
       prefsPreviewViewHandle = new BrowserView({
         webPreferences: {
-          zoomFactor: 0.07
+          zoomFactor: prefPreviewBounds.width / size.width
         }
       });
       prefsWindowHandle.setBrowserView(prefsPreviewViewHandle);
@@ -397,17 +402,22 @@ var openEditor = (args) => {
   }
 
   if ( editorPreviewViewHandle == null ) {
+    var primary = electronScreen.getPrimaryDisplay();
+    var size = primary.bounds;
+    var ratio = size.width / size.height;
+    editorPreviewBounds.width = editorPreviewBounds.height * ratio;
+
     editorPreviewViewHandle = new BrowserView({
       webPreferences: {
-        zoomFactor: 0.07
+        zoomFactor: editorPreviewBounds.width / size.width
       }
     });
     editorWindowHandle.setBrowserView(editorPreviewViewHandle);
     editorPreviewViewHandle.setBounds({
       x: 0,
       y: 10,
-      width: 600,
-      height: 480
+      width: editorPreviewBounds.width,
+      height: editorPreviewBounds.height
     });
   }
 
@@ -1005,13 +1015,11 @@ var bootApp = function() {
   electronScreen.on("display-removed", windows.handleDisplayChange);
   electronScreen.on("display-metrics-changed", windows.handleDisplayChange);    
 
-  electron.powerMonitor.on("suspend", () => {
-    log.info("The system is going to sleep, stop screensavers");
-    windows.closeRunningScreensavers();
-  });
-  electron.powerMonitor.on("resume", () => {
-    log.info("The system just woke up, stop screensavers");
-    windows.closeRunningScreensavers();
+  ["suspend", "resume", "lock-screen", "unlock-screen"].forEach((type) => {
+    electron.powerMonitor.on(type, () => {
+      log.info(`system ${type} event, stop screensavers`);
+      windows.closeRunningScreensavers();
+    }); 
   });
 
   stateManager = new StateManager();
@@ -1258,12 +1266,14 @@ ipcMain.on("open-settings", () => {
 });
 
 ipcMain.on("prefs-preview-url", (_event, arg) => {
-  prefsPreviewViewHandle.webContents.once("did-stop-loading", function() {
-    prefsPreviewViewHandle.webContents.insertCSS("body { overflow: hidden; }");
-  });
+  if ( arg.url !== prefsPreviewViewHandle.webContents.getURL() ) {
+    log.info(`switch preview to ${arg.url}`);
 
-  log.info(`switch preview to ${arg.url}`);
-  prefsPreviewViewHandle.webContents.loadURL(arg.url);
+    prefsPreviewViewHandle.webContents.once("did-stop-loading", function() {
+      prefsPreviewViewHandle.webContents.insertCSS("body { overflow: hidden; }");
+    });
+    prefsPreviewViewHandle.webContents.loadURL(arg.url);
+  }
 });
 
 ipcMain.on("prefs-preview-bounds", (_event, arg) => {
@@ -1271,16 +1281,18 @@ ipcMain.on("prefs-preview-bounds", (_event, arg) => {
 });
 
 ipcMain.on("editor-preview-url", (_event, arg) => {
-  editorPreviewViewHandle.webContents.once("did-stop-loading", function() {
-    editorPreviewViewHandle.webContents.insertCSS("body { overflow: hidden; }");
-  });
-
-  log.info(`switch preview to ${arg.url}`);
-  editorPreviewViewHandle.webContents.loadURL(arg.url);
+  if ( arg.url !== editorPreviewViewHandle.webContents.getURL() ) {
+    log.info(`switch preview to ${arg.url}`);
+    editorPreviewViewHandle.webContents.once("did-stop-loading", function() {
+      editorPreviewViewHandle.webContents.insertCSS("body { overflow: hidden; }");
+    });
+    editorPreviewViewHandle.webContents.loadURL(arg.url); 
+  }
 });
 ipcMain.on("editor-preview-bounds", (_event, arg) => {
-  log.info(arg);
-  editorPreviewViewHandle.setBounds(arg);
+  editorPreviewBounds.x = arg.x;
+  editorPreviewBounds.y = arg.y;
+  editorPreviewViewHandle.setBounds(editorPreviewBounds);
 });
 
 //

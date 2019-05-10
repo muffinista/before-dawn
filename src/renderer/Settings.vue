@@ -15,7 +15,8 @@
       <div>
         <button
           class="btn btn-large btn-primary reset-to-defaults"
-          @click="resetToDefaults">
+          @click="resetToDefaults"
+        >
           Reset to Defaults
         </button>
       </div>
@@ -23,13 +24,15 @@
         <button
           class="btn btn-large btn-primary close-window"
           :disabled="disabled"
-          @click="closeWindow">
+          @click="closeWindow"
+        >
           Cancel
         </button>
         <button
           class="btn btn-large btn-primary save"
           :disabled="disabled"
-          @click="saveDataClick">
+          @click="saveDataClick"
+        >
           Save
         </button>
       </div>
@@ -38,13 +41,11 @@
 </template>
 
 <script>
-import Vue from "vue";
+const {dialog} = require("electron").remote;
+
 import AdvancedPrefsForm from "@/components/AdvancedPrefsForm";
 import PrefsForm from "@/components/PrefsForm";
 import Noty from "noty";
-
-const {dialog} = require("electron").remote;
-
 import SaverPrefs from "@/../lib/prefs";
 
 export default {
