@@ -17,7 +17,7 @@
 const electron = require("electron");
 const log = require("electron-log");
 
-const {app, dialog, globalShortcut, BrowserWindow, ipcMain, Menu, Tray} = require("electron");
+const {app, dialog, globalShortcut, BrowserWindow, BrowserView, ipcMain, Menu, Tray} = require("electron");
 
 const fs = require("fs");
 const path = require("path");
@@ -55,7 +55,11 @@ var exitOnQuit = false;
 const globalCSSCode = fs.readFileSync( path.join(__dirname, "assets", "global.css"), "ascii");  
 
 
-var prefsWindowHandle = null;
+let prefsWindowHandle = null;
+let prefsPreviewViewHandle = null;
+let editorPreviewViewHandle = null;
+let editorWindowHandle = null;
+
 var trayMenu;
 
 var electronScreen;
@@ -181,6 +185,12 @@ var openTestShim = function() {
   testWindow.loadURL(shimUrl);
 };
 
+
+let prefPreviewBounds = {
+  width: 320,
+  height: 0
+};
+
 /**
  * Open the preferences window
  * @returns {Promise} Promise that resolves when prefs window is shown
@@ -199,16 +209,17 @@ var openPrefsWindow = function() {
     // take a screenshot of the main screen for use in previews
     grabScreen(primary).then((message) => {
       var prefsUrl = getUrl("prefs.html");
-  
+      // eslint-disable-next-line no-console
+      console.log("ICON", path.join(__dirname, "assets", "iconTemplate.png"));
+
       prefsWindowHandle = new BrowserWindow({
         show: false,
-        width:800,
-        height:600,
-        minWidth: 800,
-        minHeight: 500,
-        maxWidth: 1200,
-        maxHeight: 1000,
-        resizable:true,
+        width: 910,
+        height: 640,
+        minWidth: 910,
+        maxWidth: 910,
+        minHeight: 600,
+        resizable: true,
         webPreferences: {
           webSecurity: false, //!global.IS_DEV
           nodeIntegration: true,
@@ -216,7 +227,23 @@ var openPrefsWindow = function() {
         },
         icon: path.join(__dirname, "assets", "iconTemplate.png")
       });
-  
+
+      var size = primary.bounds;
+      var ratio = size.height / size.width;
+      prefPreviewBounds.height = prefPreviewBounds.width * ratio;
+
+      prefsPreviewViewHandle = new BrowserView({
+        webPreferences: {
+          zoomFactor: 0.07
+        }
+      });
+      prefsWindowHandle.setBrowserView(prefsPreviewViewHandle);
+      prefsPreviewViewHandle.setBounds({
+        x: 410,
+        y: 10,
+        width: prefPreviewBounds.width,
+        height: prefPreviewBounds.height + 40 });
+
       prefsUrl = prefsUrl + "?screenshot=" + encodeURIComponent("file://" + message.url);
       prefsWindowHandle.saverOpts = saverOpts;
       prefsWindowHandle.screenshot = message.url;
@@ -239,6 +266,40 @@ var openPrefsWindow = function() {
   });
 };
 
+var openSettingsWindow = function() {
+  var settingsUrl = getUrl("settings.html");
+  var w = new BrowserWindow({
+    show: false,
+    width:600,
+    height:800,
+    maxWidth: 600,
+    minWidth: 600,
+    resizable: true,
+    parent: prefsWindowHandle,
+    modal: true,
+    icon: path.join(__dirname, "assets", "iconTemplate.png"),
+    webPreferences: {
+      nodeIntegration: true,
+      webSecurity: false, //!global.IS_DEV
+      preload: global.TRACK_ERRORS ? path.join(__dirname, "assets", "sentry.js") : undefined
+    }
+  });
+
+  w.on("closed", () => {
+    w = null;
+    dock.hideDockIfInactive(app);
+  });
+
+  w.once("ready-to-show", () => {
+    w.show();
+    dock.showDock(app);
+  });
+
+  w.saverOpts = saverOpts;
+
+  log.info(`open ${settingsUrl}`);
+  w.loadURL(settingsUrl);
+};
 
 /**
  * handle new screensaver event. open the window to create a screensaver
@@ -324,14 +385,31 @@ var openEditor = (args) => {
   var key = args.src;
   var screenshot = args.screenshot;
 
-  var w = new BrowserWindow({
-    show: false,
-    webPreferences: {
-      nodeIntegration: true,
-      webSecurity: false, //!global.IS_DEV
-      preload: global.TRACK_ERRORS ? path.join(__dirname, "assets", "sentry.js") : undefined
-    },
-  });
+  if ( editorWindowHandle == null ) {
+    editorWindowHandle = new BrowserWindow({
+      show: false,
+      webPreferences: {
+        nodeIntegration: true,
+        webSecurity: false, //!global.IS_DEV
+        preload: global.TRACK_ERRORS ? path.join(__dirname, "assets", "sentry.js") : undefined
+      },
+    });  
+  }
+
+  if ( editorPreviewViewHandle == null ) {
+    editorPreviewViewHandle = new BrowserView({
+      webPreferences: {
+        zoomFactor: 0.07
+      }
+    });
+    editorWindowHandle.setBrowserView(editorPreviewViewHandle);
+    editorPreviewViewHandle.setBounds({
+      x: 0,
+      y: 10,
+      width: 600,
+      height: 480
+    });
+  }
 
   var editorUrl = getUrl("editor.html");
  
@@ -339,20 +417,21 @@ var openEditor = (args) => {
                "src=" + encodeURIComponent(key) +
                "&screenshot=" + encodeURIComponent(screenshot);
 
-  w.saverOpts = saverOpts;
-  w.screenshot = screenshot;
+  editorWindowHandle.saverOpts = saverOpts;
+  editorWindowHandle.screenshot = screenshot;
 
-  w.once("ready-to-show", () => {
-    w.show();
+  editorWindowHandle.once("ready-to-show", () => {
+    editorWindowHandle.show();
     dock.showDock(app);
   });
 
-  w.on("closed", () => {
-    w = null;
+  editorWindowHandle.on("closed", () => {
+    editorWindowHandle = null;
+    editorPreviewViewHandle = null;
     dock.hideDockIfInactive(app);
   });
 
-  w.loadURL(target);  
+  editorWindowHandle.loadURL(target);  
 };
 
 
@@ -762,6 +841,9 @@ var setupIfNeeded = function() {
       pd.updatePackage().then(() => {
         return resolve(true);
       });
+
+      // stop processing here, we know we need to setup
+      return;
     }
 
     var savers = new SaverListManager({
@@ -1171,14 +1253,45 @@ ipcMain.on("savers-updated", () => {
   toggleSaversUpdated();
 });
 
+ipcMain.on("open-settings", () => {
+  openSettingsWindow();
+});
+
+ipcMain.on("prefs-preview-url", (_event, arg) => {
+  prefsPreviewViewHandle.webContents.once("did-stop-loading", function() {
+    prefsPreviewViewHandle.webContents.insertCSS("body { overflow: hidden; }");
+  });
+
+  log.info(`switch preview to ${arg.url}`);
+  prefsPreviewViewHandle.webContents.loadURL(arg.url);
+});
+
+ipcMain.on("prefs-preview-bounds", (_event, arg) => {
+  prefsPreviewViewHandle.setBounds(arg);
+});
+
+ipcMain.on("editor-preview-url", (_event, arg) => {
+  editorPreviewViewHandle.webContents.once("did-stop-loading", function() {
+    editorPreviewViewHandle.webContents.insertCSS("body { overflow: hidden; }");
+  });
+
+  log.info(`switch preview to ${arg.url}`);
+  editorPreviewViewHandle.webContents.loadURL(arg.url);
+});
+ipcMain.on("editor-preview-bounds", (_event, arg) => {
+  log.info(arg);
+  editorPreviewViewHandle.setBounds(arg);
+});
+
 //
 // user has updated their preferences, let's reload
 //
-ipcMain.on("prefs-updated", (event, arg) => {
-  log.info("prefs-updated", Object.keys(arg));
+ipcMain.on("prefs-updated", () => {
+  log.info("prefs-updated");
   prefs.reload();
   updateStateManager();
   checkForPackageUpdates();
+  prefsWindowHandle.webContents.send("savers-updated");
 });
 
 ipcMain.on("close-window", (event) => {

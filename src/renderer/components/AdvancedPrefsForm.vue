@@ -5,12 +5,12 @@
     <form>
       <div class="form-group">
         <label for="repo">Github Repo URL:</label>
-        <div class="input-group">
+        <div class="input-group input-group-sm">
           <div class="input-group-prepend">
             <span class="input-group-text">github.com/</span>
           </div>
           <input type="text" v-model="prefs.sourceRepo"
-                 class="form-control" />
+                 class="form-control form-control-sm" />
         </div>
         <small class="form-text text-muted">
           We will download releases from this repository instead of
@@ -22,12 +22,12 @@
       <div class="form-group">
         <label for="localSource">Local Source:</label>
         <div class="input-group">
-          <input type="text" v-model="prefs.localSource" readonly="readonly" name="localSource" class="form-control" />
+          <input type="text" v-model="prefs.localSource" readonly="readonly" name="localSource" class="form-control form-control-sm" />
           <span class="input-group-btn">
-            <button type="button" class="btn btn-secondary pick" @click.stop="showPathChooser">...</button>
+            <button type="button" class="btn btn-sm btn-secondary pick" @click.stop="showPathChooser">...</button>
           </span>
           <span class="input-group-btn spaced" v-if="prefs.localSource != ''">
-            <button type="button" class="btn btn-secondary clear" @click.stop="clearLocalSource">X</button>
+            <button type="button" class="btn btn-sm btn-secondary clear" @click.stop="clearLocalSource">X</button>
           </span>
         </div>
 
@@ -40,7 +40,7 @@
         <label for="hotkey">Global hotkey:</label>
         <input type="text"
           name="hotkey"
-          readonly="readonly" class="form-control"
+          readonly="readonly" class="form-control form-control-sm"
           v-model="prefs.launchShortcut"
           v-on:keydown="updateHotkey" />
         <small class="form-text text-muted">

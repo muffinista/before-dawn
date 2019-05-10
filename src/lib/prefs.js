@@ -181,6 +181,10 @@ class SaverPrefs {
   }
 
   updatePrefs(data, cb) {
+
+    // eslint-disable-next-line no-console
+    console.log(data);
+
     for ( var k in data ) {
       var v = data[k];
       this[k] = v;

@@ -117,7 +117,7 @@ module.exports = class SaverListManager {
 
     glob = require("glob");
 
-    _self.logger("folders", folders);
+    // _self.logger("folders", folders);
 
     // note: using /**/ here instead of /*/ would
     // also match all subdirectories, which might be desirable

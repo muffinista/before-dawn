@@ -1,173 +1,60 @@
 <template>
   <div id="prefs">
-    <ul
-      role="tablist"
-      class="nav nav-tabs"
-    >
-      <li
-        id="screensavers-tab"
-        role="presentation"
-        class="active nav-item"
-      >
-        <a
-          aria-expanded="true"
-          aria-controls="screensavers"
-          role="tab"
-          data-toggle="tab"
-          class="nav-link active"
-          href="#screensavers"
-          @click="showScreensavers"
-        >
-          Screensavers
-        </a>
-      </li>
-      <li
-        id="preferences-tab"
-        role="presentation"
-        class="nav-item"
-      >
-        <a
-          aria-expanded="false"
-          aria-controls="preferences"
-          role="tab"
-          data-toggle="tab"
-          class="nav-link"
-          href="#preferences"
-          @click="showPreferences"
-        >
-          Preferences
-        </a>
-      </li>
-      <li
-        id="advanced-tab"
-        role="presentation"
-        class="nav-item"
-      >
-        <a
-          aria-expanded="false"
-          aria-controls="advanced"
-          role="tab"
-          data-toggle="tab"
-          class="nav-link"
-          href="#advanced"
-          @click="showAdvanced"
-        >
-          Advanced
-        </a>
-      </li>
-    </ul>
-    <div class="content">
-      <div class="tab-content">
-        <div
-          id="screensavers"
-          class="active tab-pane"
-          aria-labelledby="screensavers-tab"
-          role="tabpanel"
-        >
-          <div class="container-fluid">
-            <div class="row">
-              <div class="savers-grid">
-                <!-- left pane -->
-                <div>
-                  <saver-list
-                    :savers="savers"
-                    :current="saver"
-                    @editSaver="editSaver"
-                    @deleteSaver="deleteSaver"
-                    @change="onSaverPicked"
-                  />
-                </div>
-              
-                <!-- right pane -->
-                <div class="saver-detail">
-                  <template v-if="saverIsPicked">
-                    <saver-preview
-                      v-if="savers[saverIndex] !== undefined"
-                      :key="renderIndex"
-                      :bus="bus"
-                      :saver="saverObj"
-                      :screenshot="screenshot"
-                      :options="options[saver]"
-                    />
-                    <saver-summary :saver="saverObj" />
-                    <saver-options
-                      :saver="saver"
-                      :options="saverOptions"
-                      :values="options[saver]"
-                      @change="onOptionsChange"
-                      @saverOption="updateSaverOption"
-                    />
-                  </template>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div
-          id="preferences"
-          class="tab-pane"
-          aria-labelledby="preferences-tab"
-          role="tabpanel"
-        >
-          <div class="container-fluid">
-            <template v-if="prefs !== undefined">
-              <prefs-form :prefs="prefs" />
-            </template>
-          </div>
-        </div>
-        <div
-          id="advanced"
-          class="tab-pane"
-          aria-labelledby="advanced-tab"
-          role="tabpanel"
-        >
-          <div class="container-fluid">
-            <template v-if="prefs !== undefined">
-              <advanced-prefs-form
-                :prefs="prefs"
-                @localSourceChange="localSourceChange"
-              />
-              <button
-                class="btn btn-large btn-primary reset-to-defaults"
-                @click="resetToDefaults"
-              >
-                Reset to Defaults
-              </button>
-            </template>
-          </div>
+    <saver-list
+      :savers="savers"
+      :current="saver"
+      @editSaver="editSaver"
+      @deleteSaver="deleteSaver"
+      @change="onSaverPicked"
+    />
+    <template v-if="saverIsPicked">
+      <div class="saver-detail">
+      </div>
+      <div class="saver-wrap">
+        <saver-summary :saver="saverObj" />
+        <div class="saver-options">
+          <saver-options
+            :saver="saver"
+            :options="saverOptions"
+            :values="options[saver]"
+            @change="onOptionsChange"
+            @saverOption="updateSaverOption"
+          />
         </div>
       </div>
-    </div> <!-- content -->
+    </template>
+   
     <footer class="footer d-flex justify-content-between">
       <div>
         <button
           class="align-middle btn btn-large btn-primary create"
-          @click="createNewScreensaver"
+          v-on:click.stop="createNewScreensaver"
         >
           Create Screensaver
         </button>
       </div>
+
       <div>
+        <button
+          class="btn btn-large btn-primary settings"
+          v-on:click.stop="openSettings">Settings</button>
         <button
           class="btn btn-large btn-primary save"
           :disabled="disabled"
-          @click="saveDataClick"
-        >
+          v-on:click.stop="saveDataClick">
           Save
         </button>
       </div>
     </footer>
+
   </div> <!-- #prefs -->
 </template>
 
 <script>
 import Vue from "vue";
 import SaverList from "@/components/SaverList";
-import SaverPreview from "@/components/SaverPreview";
 import SaverOptions from "@/components/SaverOptions";
 import SaverSummary from "@/components/SaverSummary";
-import AdvancedPrefsForm from "@/components/AdvancedPrefsForm";
-import PrefsForm from "@/components/PrefsForm";
 import Noty from "noty";
 
 const {dialog} = require("electron").remote;
@@ -178,7 +65,7 @@ import SaverListManager from "@/../lib/saver-list";
 export default {
   name: "Prefs",
   components: {
-    SaverList, SaverOptions, SaverPreview, SaverSummary, AdvancedPrefsForm, PrefsForm
+    SaverList, SaverOptions, SaverSummary
   },
   data() {
     return {
@@ -191,9 +78,6 @@ export default {
     };
   },
   computed: {
-    bus: function() {
-      return new Vue();
-    },
     logger() {
       let l = this.$electron.remote.getCurrentWindow().saverOpts.logger;
       if ( l === undefined ) {
@@ -203,9 +87,6 @@ export default {
     },
     currentWindow: function() {
       return this.$electron.remote.getCurrentWindow();
-    },
-    manager: function() {
-      return this._savers;
     },
     ipcRenderer: function() {
       return this.$electron.ipcRenderer;
@@ -249,21 +130,16 @@ export default {
     screenshot: function() {
       // the main app will pass us a screenshot URL, here it is
       return decodeURIComponent(this.params.get("screenshot"));
+    },
+    previewWrapper: function() {
+      return document.querySelector(".saver-detail");
     }
   },
   async mounted() {
-    let opts = this.$electron.remote.getCurrentWindow().saverOpts;
-
     this.ipcRenderer.on("savers-updated", this.onSaversUpdated);
-    this.prefs = new SaverPrefs({
-      baseDir: opts.base,
-      systemSource: opts.systemDir
-    });
-    this._savers = new SaverListManager({
-      prefs: this.prefs
-    }, this.logger);
+    this.setupPrefs();
 
-    this._savers.setup().then(() => {
+    this.manager.setup().then(() => {
       this.getData();
       this.getCurrentSaver();
 
@@ -272,70 +148,90 @@ export default {
           this.renderUpdateNotice();
         });
       }
+
+      this.$nextTick(() => {
+        this.resizeInterval = window.setInterval(() => {
+          this.checkResize();
+        }, 50);
+      });
+
     });
   },
   beforeDestroy() {
     this.ipcRenderer.removeListener("savers-updated", this.onSaversUpdated);
   },
   methods: {
-    clearTabs() {
-      var els = document.querySelectorAll(".nav-tabs > li > a.nav-link, .tab-content > .tab-pane");
-      for ( var i = 0; i < els.length; i++ ) {
-        els[i].classList.remove("active");
+    setupPrefs() {
+      let opts = this.$electron.remote.getCurrentWindow().saverOpts;
+      this.prefs = new SaverPrefs({
+        baseDir: opts.base,
+        systemSource: opts.systemDir
+      });
+      this.manager = new SaverListManager({
+        prefs: this.prefs
+      }, this.logger);
+    },
+    // https://github.com/stream-labs/streamlabs-obs/blob/163e9a7eaf39200077874ae80d00e66108c106dc/app/components/Chat.vue.ts#L41
+    rectChanged(rect) {
+      return (
+        rect.left !== this.currentPosition.x ||
+        rect.top !== this.currentPosition.y ||
+        rect.width !== this.currentPosition.width ||
+        rect.height !== this.currentPosition.height
+      );
+    },
+    checkResize() {
+      const rect = this.previewWrapper.getBoundingClientRect();
+      if (this.currentPosition == null || this.rectChanged(rect)) {
+        this.currentPosition = { 
+          x: rect.left, 
+          y: rect.top, 
+          width: rect.width, 
+          height: rect.height 
+        };
+        this.ipcRenderer.send("prefs-preview-bounds", this.currentPosition);
       }
     },
-    setActiveTab(n) {
-      this.clearTabs();
-      document.querySelector("#" + n).classList.add("active");
-      document.querySelector("[href='#" + n + "']").classList.add("active");
-    },
-    showPreferences() {
-      this.setActiveTab("preferences");
-    },
-    showScreensavers() {
-      this.setActiveTab("screensavers");
-    },
-    showAdvanced() {
-      this.setActiveTab("advanced");
-    },
     onOptionsChange() {
-      this.bus.$emit("options-changed", this.options[this.saver]);
+      this.ipcRenderer.send("prefs-preview-url", {
+        url: this.saverObj.getUrl(this.urlOpts(this.saver))
+      });
     },
+    urlOpts(s) {
+      var screen = this.$electron.remote.screen;
+      var size = screen.getPrimaryDisplay().bounds;
+
+      var base = {
+        width: size.width,
+        height: size.height,
+        preview: 1,
+        platform: process.platform,
+        screenshot: this.screenshot,
+        _: Math.random()
+      };
+
+      if ( typeof(s) === "undefined" ) {
+        s = this.saver;
+      }
+      
+      var mergedOpts = Object.assign(
+        base,
+        s.settings,
+        this.options[this.saver]);
+
+      return mergedOpts;
+    },
+
     onSaverPicked(e) {
       this.saver = e.target.value;
-      this.bus.$emit("saver-changed", this.saverObj);
       this.renderIndex += 1;
+      this.ipcRenderer.send("prefs-preview-url", {
+        url: this.saverObj.getUrl(this.urlOpts(this.saver))
+      });
     },
-    resetToDefaults() {
-      dialog.showMessageBox(
-        {
-          type: "info",
-          title: "Are you sure?",
-          message: "Are you sure you want to reset to the default settings?",
-          buttons: ["No", "Yes"],
-          defaultId: 0
-        },
-        (result) => {
-          if ( result === 1 ) {
-            this.prefs.defaults = this.$electron.remote.getGlobal("CONFIG_DEFAULTS");
-            this.prefs.reset();
-            this.prefs.write(() => {
-              this.getData();
-
-              new Noty({
-                type: "success",
-                layout: "topRight",
-                timeout: 1000,
-                text: "Settings reset!",
-                animation: {
-                  open: null
-                }
-              }).show();
-            }); // reload
-          }
-        }
-      );
-    },  
+    openSettings() {
+      this.ipcRenderer.send("open-settings");
+    },
     getData() {
       this.manager.list((entries) => {
         this.savers = entries;
@@ -367,17 +263,19 @@ export default {
         // with properties from both the original object and the mixin object:
         this.prefs = Object.assign(this.prefs, tmp);
 
-
         // pick the first screensaver if nothing picked yet
-        if ( this.prefs.current === undefined ) {
+        if ( this.prefs.current === undefined || this.saverObj === undefined ) {
           this.prefs.current = this.savers[0].key;
           this.getCurrentSaver();
         }
 
-        this.bus.$emit("saver-changed", this.saverObj);
+        this.ipcRenderer.send("prefs-preview-url", {
+          url: this.saverObj.getUrl(this.urlOpts(this.saver))
+        });
       });
     },
     onSaversUpdated() {
+      this.setupPrefs();
       this.manager.reset();
       this.getData();
     },
@@ -385,7 +283,6 @@ export default {
       this.saver = this.prefs.current;
     },
     createNewScreensaver() {
-      this.saveData(false);
       this.ipcRenderer.send("open-add-screensaver", {
         screenshot: this.screenshot
       });
@@ -428,8 +325,6 @@ export default {
         this.prefs.updatePrefs(this.prefs, (changes) => {
           this.disabled = false;
           this.ipcRenderer.send("prefs-updated", changes);
-          this.ipcRenderer.send("set-autostart", this.prefs.auto_start);
-          this.ipcRenderer.send("set-global-launch-shortcut", this.prefs.launchShortcut);
           resolve(changes);
         });
       });
@@ -438,7 +333,7 @@ export default {
       this.saveData().then(() => {
         new Noty({
           type: "success",
-          layout: "topRight",
+          layout: "topLeft",
           timeout: 2000,
           text: "Changes saved!",
           animation: {
@@ -459,17 +354,14 @@ export default {
         (result) => {
           if ( result === 1 ) {
             var appRepo = this.$electron.remote.getGlobal("APP_REPO");
-            this.$electron.shell.openExternal("https://github.com/" + appRepo + "/releases/latest");
+            this.$electron.shell.openExternal(`https://github.com/${appRepo}/releases/latest`);
           }
         }
       );
-    },
-    localSourceChange(ls) {
-      var tmp = {
-        localSource: ls
-      };
-      this.prefs = Object.assign(this.prefs, tmp);
     }
   }
 }; 
 </script>
+
+<style>
+</style>

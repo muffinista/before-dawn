@@ -1,5 +1,5 @@
 <template>
-  <li class="list-group-item flex-column entry">
+  <li class="list-group-item flex-column entry" v-on:click="pickSaver(saver)">
     <div class="d-flex w-100 justify-content-between">
       <label>
         <div class="body">
@@ -18,10 +18,10 @@
           <a class="btn btn-outline-secondary btn-sm edit" 
             href="#" role="button" 
             :data-name="saver.name" 
-            v-on:click="onEditClick(saver)">edit</a>
+            v-on:click.stop="onEditClick(saver)">edit</a>
           <a class="btn btn-outline-secondary btn-sm" 
             href="#" role="button" 
-            v-on:click="onDeleteClick(saver)">delete</a>
+            v-on:click.stop="onDeleteClick(saver)">delete</a>
         </div>
       </template>
     </div>
@@ -35,6 +35,9 @@ export default {
   name: "saver-list-item",
   props: ["saver", "checked"],
   methods: {
+    pickSaver(s) {
+      document.querySelector(`input[value='${s.key}']`).click();
+    },
     onEditClick(s) {
       this.$emit("editSaver", s);
     },

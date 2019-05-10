@@ -40,9 +40,8 @@ describe("Editor", function() {
     return helpers.stopApp(app);
 	});
   
-  it("shows settings form", function() {
+  it("edits basic settings", function() {
     return pickEditorWindow().
-      then(() => app.client.click("=Description")).
       then(() => app.client.getValue("#saver-form [name='name']")).
       then((res) => {
         assert.equal("Screensaver One", res);
@@ -66,13 +65,14 @@ describe("Editor", function() {
   it("adds and removes options", function() {
     return pickEditorWindow().
       then(() => app.client.waitUntilTextExists("body", "Options", 60000)).
-      then(() => app.client.click("=Options")).
       then(() => app.client.setValue(".entry[data-index='0'] [name='name']", "My Option")).
       then(() => app.client.setValue(".entry[data-index='0'] [name='description']", "An Option I Guess?")).
+      then(() => app.webContents.executeJavaScript("document.querySelector('button.add-option').scrollIntoView()")).
       then(() => app.client.click("button.add-option")).
       then(() => app.client.setValue(".entry[data-index='1'] [name='name']", "My Second Option")).
       then(() => app.client.setValue(".entry[data-index='1'] [name='description']", "Another Option I Guess?")).
       then(() => app.client.selectByVisibleText(".entry[data-index='1'] select", "yes/no")).
+      then(() => app.webContents.executeJavaScript("document.querySelector('button.add-option').scrollIntoView()")).
       then(() => app.client.click("button.add-option")).
       then(() => app.client.setValue(".entry[data-index='2'] [name='name']", "My Third Option")).
       then(() => app.client.setValue(".entry[data-index='2'] [name='description']", "Here We Go Again")).

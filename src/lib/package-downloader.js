@@ -34,6 +34,8 @@ module.exports = class PackageDownloader {
       attrs.local_zip = this.localZip;
     }
 
+    this.logger("getPackage", attrs);
+
     return new Package(attrs);
   }
 
@@ -42,9 +44,13 @@ module.exports = class PackageDownloader {
     var now = new Date().getTime();
     var diff = now - lastCheckAt;
 
+    this.logger("updatePackage", now, lastCheckAt);
+
     if ( p === undefined ) {
       p = this.getPackage();
     }
+
+    this.logger("updatePackage", p);
 
     if ( p.repo === undefined || p.repo === "" ) {
       return Promise.resolve({downloaded: false});

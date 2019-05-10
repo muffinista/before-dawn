@@ -1,6 +1,6 @@
 <template>
   <div id="prefs-form">
-    <h1>Preferences</h1>
+    <h1>Settings</h1>
     <form v-on="$listeners" class="grid">
       <div class="times">
         <div class="form-group">
@@ -20,7 +20,7 @@
         </div>
         
         <div class="form-group">
-          <label for="sleep">Disable displays after:</label>
+          <label for="sleep">Sleep after:</label>
           <select name="sleep" v-model="prefs.sleep">
             <option value="0">never</option>
             <option value="1">1 minute</option>
