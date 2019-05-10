@@ -1291,7 +1291,7 @@ ipcMain.on("prefs-updated", () => {
   prefs.reload();
   updateStateManager();
   checkForPackageUpdates();
-  prefsWindowHandle.send("savers-updated");
+  prefsWindowHandle.webContents.send("savers-updated");
 });
 
 ipcMain.on("close-window", (event) => {

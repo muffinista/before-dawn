@@ -88,9 +88,6 @@ export default {
     currentWindow: function() {
       return this.$electron.remote.getCurrentWindow();
     },
-    manager: function() {
-      return this._savers;
-    },
     ipcRenderer: function() {
       return this.$electron.ipcRenderer;
     },
@@ -139,18 +136,10 @@ export default {
     }
   },
   async mounted() {
-    let opts = this.$electron.remote.getCurrentWindow().saverOpts;
-
     this.ipcRenderer.on("savers-updated", this.onSaversUpdated);
-    this.prefs = new SaverPrefs({
-      baseDir: opts.base,
-      systemSource: opts.systemDir
-    });
-    this._savers = new SaverListManager({
-      prefs: this.prefs
-    }, this.logger);
+    this.setupPrefs();
 
-    this._savers.setup().then(() => {
+    this.manager.setup().then(() => {
       this.getData();
       this.getCurrentSaver();
 
@@ -160,9 +149,11 @@ export default {
         });
       }
 
-      this.resizeInterval = window.setInterval(() => {
-        this.checkResize();
-      }, 50);
+      this.$nextTick(() => {
+        this.resizeInterval = window.setInterval(() => {
+          this.checkResize();
+        }, 50);
+      });
 
     });
   },
@@ -170,6 +161,16 @@ export default {
     this.ipcRenderer.removeListener("savers-updated", this.onSaversUpdated);
   },
   methods: {
+    setupPrefs() {
+      let opts = this.$electron.remote.getCurrentWindow().saverOpts;
+      this.prefs = new SaverPrefs({
+        baseDir: opts.base,
+        systemSource: opts.systemDir
+      });
+      this.manager = new SaverListManager({
+        prefs: this.prefs
+      }, this.logger);
+    },
     // https://github.com/stream-labs/streamlabs-obs/blob/163e9a7eaf39200077874ae80d00e66108c106dc/app/components/Chat.vue.ts#L41
     rectChanged(rect) {
       return (
@@ -262,9 +263,8 @@ export default {
         // with properties from both the original object and the mixin object:
         this.prefs = Object.assign(this.prefs, tmp);
 
-
         // pick the first screensaver if nothing picked yet
-        if ( this.prefs.current === undefined ) {
+        if ( this.prefs.current === undefined || this.saverObj === undefined ) {
           this.prefs.current = this.savers[0].key;
           this.getCurrentSaver();
         }
@@ -275,6 +275,7 @@ export default {
       });
     },
     onSaversUpdated() {
+      this.setupPrefs();
       this.manager.reset();
       this.getData();
     },
