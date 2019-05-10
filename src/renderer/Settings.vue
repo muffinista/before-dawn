@@ -142,7 +142,7 @@ export default {
             this.prefs.write(() => {
               new Noty({
                 type: "success",
-                layout: "topLeft",
+                layout: "bottomRight",
                 timeout: 1000,
                 text: "Settings reset!",
                 animation: {
@@ -175,7 +175,7 @@ export default {
       this.saveData().then(() => {
         new Noty({
           type: "success",
-          layout: "topLeft",
+          layout: "bottomRight",
           timeout: 2000,
           text: "Changes saved!",
           animation: {
