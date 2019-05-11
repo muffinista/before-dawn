@@ -55,19 +55,23 @@ var exitOnQuit = false;
 const globalCSSCode = fs.readFileSync( path.join(__dirname, "assets", "global.css"), "ascii");  
 
 
-let prefsWindowHandle = null;
-let editorWindowHandle = null;
-
-let prefsPreviewViewHandle = null;
-let editorPreviewViewHandle = null;
-
-let prefPreviewBounds = {
-  width: 320,
-  height: 0
-};
-let editorPreviewBounds = {
-  width: 0,
-  height: 320
+let handles = {
+  prefs: {
+    window: null,
+    preview: null,
+    bounds: {
+      width: 320,
+      height: 0
+    }
+  },
+  editor: {
+    window: null,
+    preview: null,
+    bounds: {
+      width: 0,
+      height: 320
+    }
+  }
 };
 
 var trayMenu;
@@ -201,9 +205,9 @@ var openTestShim = function() {
  * @returns {Promise} Promise that resolves when prefs window is shown
  */
 var openPrefsWindow = function() {
-  if ( prefsWindowHandle !== null && prefsWindowHandle !== undefined ) {
+  if ( handles.prefs.window !== null && handles.prefs.window !== undefined ) {
     return new Promise((resolve) => {
-      prefsWindowHandle.show();
+      handles.prefs.window.show();
       resolve();
     });
   }
@@ -217,11 +221,11 @@ var openPrefsWindow = function() {
       // eslint-disable-next-line no-console
       console.log("ICON", path.join(__dirname, "assets", "iconTemplate.png"));
 
-      prefsWindowHandle = new BrowserWindow({
+      handles.prefs.window = new BrowserWindow({
         show: false,
         width: 910,
         height: 640,
-        minWidth: 910,
+        minWidth: 800,
         maxWidth: 910,
         minHeight: 600,
         resizable: true,
@@ -235,38 +239,38 @@ var openPrefsWindow = function() {
 
       var size = primary.bounds;
       var ratio = size.height / size.width;
-      prefPreviewBounds.height = prefPreviewBounds.width * ratio;
+      handles.prefs.bounds.height = handles.prefs.bounds.width * ratio;
 
-      prefsPreviewViewHandle = new BrowserView({
+      handles.prefs.preview = new BrowserView({
         webPreferences: {
-          zoomFactor: prefPreviewBounds.width / size.width
+          zoomFactor: handles.prefs.bounds.width / size.width
         }
       });
-      prefsWindowHandle.setBrowserView(prefsPreviewViewHandle);
-      prefsPreviewViewHandle.setBounds({
+      handles.prefs.window.setBrowserView(handles.prefs.preview);
+      handles.prefs.preview.setBounds({
         x: 410,
         y: 10,
-        width: prefPreviewBounds.width,
-        height: prefPreviewBounds.height + 40 });
+        width: handles.prefs.bounds.width,
+        height: handles.prefs.bounds.height + 40 });
 
       prefsUrl = prefsUrl + "?screenshot=" + encodeURIComponent("file://" + message.url);
-      prefsWindowHandle.saverOpts = saverOpts;
-      prefsWindowHandle.screenshot = message.url;
+      handles.prefs.window.saverOpts = saverOpts;
+      handles.prefs.window.screenshot = message.url;
         
-      prefsWindowHandle.on("closed", () => {
-        prefsWindowHandle = null;
+      handles.prefs.window.on("closed", () => {
+        handles.prefs.window = null;
         dock.hideDockIfInactive(app);
       });
 
-      prefsWindowHandle.once("ready-to-show", () => {
-        prefsWindowHandle.show();
+      handles.prefs.window.once("ready-to-show", () => {
+        handles.prefs.window.show();
         dock.showDock(app);
       });
   
-      prefsWindowHandle.once("show", resolve);
+      handles.prefs.window.once("show", resolve);
   
       log.info("loading " + prefsUrl);
-      prefsWindowHandle.loadURL(prefsUrl);
+      handles.prefs.window.loadURL(prefsUrl);
     });
   });
 };
@@ -280,7 +284,7 @@ var openSettingsWindow = function() {
     maxWidth: 600,
     minWidth: 600,
     resizable: true,
-    parent: prefsWindowHandle,
+    parent: handles.prefs.window,
     modal: true,
     icon: path.join(__dirname, "assets", "iconTemplate.png"),
     webPreferences: {
@@ -390,8 +394,8 @@ var openEditor = (args) => {
   var key = args.src;
   var screenshot = args.screenshot;
 
-  if ( editorWindowHandle == null ) {
-    editorWindowHandle = new BrowserWindow({
+  if ( handles.prefs.editor == null ) {
+    handles.prefs.editor = new BrowserWindow({
       show: false,
       webPreferences: {
         nodeIntegration: true,
@@ -401,23 +405,23 @@ var openEditor = (args) => {
     });  
   }
 
-  if ( editorPreviewViewHandle == null ) {
+  if ( handles.editor.preview == null ) {
     var primary = electronScreen.getPrimaryDisplay();
     var size = primary.bounds;
     var ratio = size.width / size.height;
-    editorPreviewBounds.width = editorPreviewBounds.height * ratio;
+    handles.editor.bounds.width = handles.editor.bounds.height * ratio;
 
-    editorPreviewViewHandle = new BrowserView({
+    handles.editor.preview = new BrowserView({
       webPreferences: {
-        zoomFactor: editorPreviewBounds.width / size.width
+        zoomFactor: handles.editor.bounds.width / size.width
       }
     });
-    editorWindowHandle.setBrowserView(editorPreviewViewHandle);
-    editorPreviewViewHandle.setBounds({
+    handles.prefs.editor.setBrowserView(handles.editor.preview);
+    handles.editor.preview.setBounds({
       x: 0,
       y: 10,
-      width: editorPreviewBounds.width,
-      height: editorPreviewBounds.height
+      width: handles.editor.bounds.width,
+      height: handles.editor.bounds.height
     });
   }
 
@@ -427,21 +431,21 @@ var openEditor = (args) => {
                "src=" + encodeURIComponent(key) +
                "&screenshot=" + encodeURIComponent(screenshot);
 
-  editorWindowHandle.saverOpts = saverOpts;
-  editorWindowHandle.screenshot = screenshot;
+  handles.prefs.editor.saverOpts = saverOpts;
+  handles.prefs.editor.screenshot = screenshot;
 
-  editorWindowHandle.once("ready-to-show", () => {
-    editorWindowHandle.show();
+  handles.prefs.editor.once("ready-to-show", () => {
+    handles.prefs.editor.show();
     dock.showDock(app);
   });
 
-  editorWindowHandle.on("closed", () => {
-    editorWindowHandle = null;
-    editorPreviewViewHandle = null;
+  handles.prefs.editor.on("closed", () => {
+    handles.prefs.editor = null;
+    handles.editor.preview = null;
     dock.hideDockIfInactive(app);
   });
 
-  editorWindowHandle.loadURL(target);  
+  handles.prefs.editor.loadURL(target);  
 };
 
 
@@ -1149,7 +1153,7 @@ var setupLaunchShortcut = function() {
     log.info(`register launch shortcut: ${prefs.launchShortcut}`);
     const ret = globalShortcut.register(prefs.launchShortcut, () => {
       log.info("shortcut triggered!");
-      if ( prefsWindowHandle && prefsWindowHandle.isFocused() ) {
+      if ( handles.prefs.window && handles.prefs.window.isFocused() ) {
         log.info("no shortcut when prefs active!");
         return;
       }
@@ -1233,14 +1237,14 @@ log.info("use base path", global.basePath);
 
 if ( testMode !== true ) {
   app.on("second-instance", () => {
-    if ( prefsWindowHandle === null && prefsWindowHandle !== undefined ) {
+    if ( handles.prefs.window === null && handles.prefs.window !== undefined ) {
       openPrefsWindow();
     }
     else {
-      if ( prefsWindowHandle.isMinimized() ) {
-        prefsWindowHandle.restore();
+      if ( handles.prefs.window.isMinimized() ) {
+        handles.prefs.window.restore();
       }
-      prefsWindowHandle.focus();
+      handles.prefs.window.focus();
     }
   });
 }
@@ -1252,8 +1256,8 @@ if ( testMode !== true ) {
  */
 let toggleSaversUpdated = (arg) => {
   prefs.reload();  
-  if ( prefsWindowHandle !== null ) {
-    prefsWindowHandle.send("savers-updated", arg);
+  if ( handles.prefs.window !== null ) {
+    handles.prefs.window.send("savers-updated", arg);
   }
 };
 
@@ -1265,34 +1269,22 @@ ipcMain.on("open-settings", () => {
   openSettingsWindow();
 });
 
-ipcMain.on("prefs-preview-url", (_event, arg) => {
-  if ( arg.url !== prefsPreviewViewHandle.webContents.getURL() ) {
-    log.info(`switch preview to ${arg.url}`);
+ipcMain.on("preview-url", (_event, arg) => {
+  const viewHandle = handles[arg.target].preview;
+  if ( arg.url !== viewHandle.webContents.getURL() ) {
+    log.info(`switch ${arg.target} preview to ${arg.url}`);
 
-    prefsPreviewViewHandle.webContents.once("did-stop-loading", function() {
-      prefsPreviewViewHandle.webContents.insertCSS("body { overflow: hidden; }");
+    viewHandle.webContents.once("did-stop-loading", function() {
+      viewHandle.webContents.insertCSS("body { overflow: hidden; }");
     });
-    prefsPreviewViewHandle.webContents.loadURL(arg.url);
+    viewHandle.webContents.loadURL(arg.url);
   }
 });
 
-ipcMain.on("prefs-preview-bounds", (_event, arg) => {
-  prefsPreviewViewHandle.setBounds(arg);
-});
-
-ipcMain.on("editor-preview-url", (_event, arg) => {
-  if ( arg.url !== editorPreviewViewHandle.webContents.getURL() ) {
-    log.info(`switch preview to ${arg.url}`);
-    editorPreviewViewHandle.webContents.once("did-stop-loading", function() {
-      editorPreviewViewHandle.webContents.insertCSS("body { overflow: hidden; }");
-    });
-    editorPreviewViewHandle.webContents.loadURL(arg.url); 
-  }
-});
-ipcMain.on("editor-preview-bounds", (_event, arg) => {
-  editorPreviewBounds.x = arg.x;
-  editorPreviewBounds.y = arg.y;
-  editorPreviewViewHandle.setBounds(editorPreviewBounds);
+ipcMain.on("preview-bounds", (_event, arg) => {
+  const viewHandle = handles[arg.target].preview;
+  const newBounds = Object.assign(handles[arg.target].bounds, arg.bounds);
+  viewHandle.setBounds(newBounds);
 });
 
 //
@@ -1303,7 +1295,7 @@ ipcMain.on("prefs-updated", () => {
   prefs.reload();
   updateStateManager();
   checkForPackageUpdates();
-  prefsWindowHandle.webContents.send("savers-updated");
+  handles.prefs.window.webContents.send("savers-updated");
 });
 
 ipcMain.on("close-window", (event) => {

@@ -190,11 +190,15 @@ export default {
           width: rect.width, 
           height: rect.height 
         };
-        this.ipcRenderer.send("prefs-preview-bounds", this.currentPosition);
+        this.ipcRenderer.send("preview-bounds", {
+          target: "prefs",
+          bounds: this.currentPosition
+        });
       }
     },
     onOptionsChange() {
-      this.ipcRenderer.send("prefs-preview-url", {
+      this.ipcRenderer.send("preview-url", {
+        target: "prefs",
         url: this.saverObj.getUrl(this.urlOpts(this.saver))
       });
     },
@@ -227,7 +231,8 @@ export default {
     onSaverPicked(e) {
       this.saver = e.target.value;
       this.renderIndex += 1;
-      this.ipcRenderer.send("prefs-preview-url", {
+      this.ipcRenderer.send("preview-url", {
+        target: "prefs",
         url: this.saverObj.getUrl(this.urlOpts(this.saver))
       });
     },
@@ -271,7 +276,8 @@ export default {
           this.getCurrentSaver();
         }
 
-        this.ipcRenderer.send("prefs-preview-url", {
+        this.ipcRenderer.send("preview-url", {
+          target: "prefs",
           url: this.saverObj.getUrl(this.urlOpts(this.saver))
         });
       });

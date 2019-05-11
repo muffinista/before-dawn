@@ -278,11 +278,13 @@ export default {
         this.currentPosition = { 
           x: rect.left, 
           y: rect.top, 
-          width: rect.width, 
-          height: rect.height 
+          // width: rect.width, 
+          // height: rect.height 
         };
-        this.ipcRenderer.send("editor-preview-bounds", this.currentPosition);
-        //this.renderPreview();
+        this.ipcRenderer.send("preview-bounds", {
+          target: "editor",
+          bounds: this.currentPosition
+        });
       }
     },
     urlOpts() {
@@ -407,7 +409,8 @@ export default {
     },
     renderPreview() {
       //console.log("load", this.saver.getUrl(this.urlOpts(this.saver)));
-      this.ipcRenderer.send("editor-preview-url", {
+      this.ipcRenderer.send("preview-url", {
+        target: "editor",
         url: this.saver.getUrl(this.urlOpts(this.saver))
       });
     },
