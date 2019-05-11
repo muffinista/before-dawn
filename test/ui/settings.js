@@ -35,7 +35,8 @@ describe("Settings", function() {
               then(() => app.client.waitUntilWindowLoaded() ).
               then(() => app.electron.ipcRenderer.send("open-prefs")).
               then(() => helpers.waitForWindow(app, "Before Dawn: Preferences") ).
-              then(() => app.client.click("button.settings"));
+              then(() => app.client.click("button.settings")).
+              then(() => helpers.waitForWindow(app, "Before Dawn: Settings") );
     });
 
 	afterEach(function() {
@@ -52,7 +53,8 @@ describe("Settings", function() {
         app.client.selectByVisibleText("[name=\"sleep\"]", "15 minutes")
       ).
       then(() => app.client.click("button.save")).
-      then(() => helpers.waitForWindowClosed(app, "Before Dawn: Settings")).
+      then(() => helpers.sleep(100)).
+      // then(() => helpers.waitForWindowClosed(app, "Before Dawn: Settings")).
       then(function() {
         assert.equal(30, currentPrefs().delay);
         assert.equal(15, currentPrefs().sleep);
@@ -69,7 +71,8 @@ describe("Settings", function() {
       then(() => app.client.click("label*=Auto start on login?")).
       then(() => app.client.click("label*=Only run on the primary display?")).
       then(() => app.client.click("button.save")).
-      then(() => helpers.waitForWindowClosed(app, "Before Dawn: Settings")).
+      then(() => helpers.sleep(100)).
+      // then(() => helpers.waitForWindowClosed(app, "Before Dawn: Settings")).
       then(function() {
         assert.equal(!oldConfig.lock, currentPrefs().lock);
         assert.equal(!oldConfig.disableOnBattery, currentPrefs().disableOnBattery);
@@ -84,7 +87,8 @@ describe("Settings", function() {
     return pickPrefsWindow().
       then(() => app.client.waitUntilTextExists("body", "Activate after")).
       then(() => app.client.click("button.save")).
-      then(() => helpers.waitForWindowClosed(app, "Before Dawn: Settings")).
+      then(() => helpers.sleep(100)).
+      // then(() => helpers.waitForWindowClosed(app, "Before Dawn: Settings")).
       then(function() {
         assert.equal(oldConfig.lock, currentPrefs().lock);
         assert.equal(oldConfig.disableOnBattery, currentPrefs().disableOnBattery);
@@ -97,7 +101,8 @@ describe("Settings", function() {
     return pickPrefsWindow().
       then(() => app.client.click("button.pick")).
       then(() => app.client.click("button.save")).
-      then(() => helpers.waitForWindowClosed(app, "Before Dawn: Settings")).
+      then(() => helpers.sleep(100)).
+      // then(() => helpers.waitForWindowClosed(app, "Before Dawn: Settings")).
       then(function() {
         assert.equal("/not/a/real/path", currentPrefs().localSource);
       });
@@ -112,7 +117,8 @@ describe("Settings", function() {
       }).
       then(() => app.client.click("button.clear")).
       then(() => app.client.click("button.save")).
-      then(() => helpers.waitForWindowClosed(app, "Before Dawn: Settings")).
+      then(() => helpers.sleep(100)).
+      // then(() => helpers.waitForWindowClosed(app, "Before Dawn: Settings")).
       then(function() {
         assert.equal("", currentPrefs().localSource);
       });
