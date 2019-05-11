@@ -5,6 +5,7 @@ $footer_inner_height: 40px;
 $tab_padding:6px;
 $grid_gap:10px;
 $preview_height: 320px;
+$small_padding: 10px;
 
 /* purgecss start ignore */
 @import "~noty/lib/noty.css";
@@ -56,7 +57,7 @@ small {
   padding: 0.5rem;
   display: grid;
   grid-template-columns: 400px 1fr;
-  grid-template-rows: 340px 1fr #{$footer_height};
+  grid-template-rows: 320px 1fr #{$footer_height};
   grid-template-areas: "saver-list saver-preview"
     "saver-list saver-detail"
     "saver-list saver-detail"
@@ -80,7 +81,10 @@ div.saver-detail {
 
 div.saver-wrap {
   grid-area: saver-detail; 
-  margin: 10px;
+  margin-left: 10px;
+  height: calc(100vh - #{$preview_height + $footer_height + $small_padding});
+  overflow-y: scroll;
+
 }
 
 #settings {
