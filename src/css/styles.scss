@@ -75,7 +75,7 @@ div.saver-detail {
   height: $preview_height;
 }
 
-#prefs.saver-detail {
+#prefs .saver-detail {
   margin-left: 10px;
 }
 
@@ -84,7 +84,6 @@ div.saver-wrap {
   margin-left: 10px;
   height: calc(100vh - #{$preview_height + $footer_height + $small_padding});
   overflow-y: scroll;
-
 }
 
 #settings {

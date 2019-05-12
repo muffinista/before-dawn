@@ -278,8 +278,8 @@ export default {
         this.currentPosition = { 
           x: rect.left, 
           y: rect.top, 
-          // width: rect.width, 
-          // height: rect.height 
+          width: rect.width, 
+          height: rect.height 
         };
         this.ipcRenderer.send("preview-bounds", {
           target: "editor",

@@ -199,6 +199,15 @@ var openTestShim = function() {
   testWindow.loadURL(shimUrl);
 };
 
+let setBounds = function(target, bounds) {
+  bounds.x = parseInt(bounds.x, 10);
+  bounds.y = parseInt(bounds.y, 10);
+  bounds.width = parseInt(bounds.width, 10);
+  bounds.height = parseInt(bounds.height, 10);
+
+  handles[target].preview.setBounds(bounds);
+};
+
 
 /**
  * Open the preferences window
@@ -218,8 +227,6 @@ var openPrefsWindow = function() {
     // take a screenshot of the main screen for use in previews
     grabScreen(primary).then((message) => {
       var prefsUrl = getUrl("prefs.html");
-      // eslint-disable-next-line no-console
-      console.log("ICON", path.join(__dirname, "assets", "iconTemplate.png"));
 
       handles.prefs.window = new BrowserWindow({
         show: false,
@@ -247,11 +254,14 @@ var openPrefsWindow = function() {
         }
       });
       handles.prefs.window.setBrowserView(handles.prefs.preview);
-      handles.prefs.preview.setBounds({
+
+      let bounds = {
         x: 410,
         y: 10,
         width: handles.prefs.bounds.width,
-        height: handles.prefs.bounds.height + 40 });
+        height: handles.prefs.bounds.height + 40 };
+
+      setBounds("prefs", bounds);
 
       prefsUrl = prefsUrl + "?screenshot=" + encodeURIComponent("file://" + message.url);
       handles.prefs.window.saverOpts = saverOpts;
@@ -259,6 +269,9 @@ var openPrefsWindow = function() {
         
       handles.prefs.window.on("closed", () => {
         handles.prefs.window = null;
+
+        handles.prefs.preview.destroy();
+        handles.prefs.preview = null;
         dock.hideDockIfInactive(app);
       });
 
@@ -394,8 +407,8 @@ var openEditor = (args) => {
   var key = args.src;
   var screenshot = args.screenshot;
 
-  if ( handles.prefs.editor == null ) {
-    handles.prefs.editor = new BrowserWindow({
+  if ( handles.editor.window == null ) {
+    handles.editor.window = new BrowserWindow({
       show: false,
       webPreferences: {
         nodeIntegration: true,
@@ -416,13 +429,16 @@ var openEditor = (args) => {
         zoomFactor: handles.editor.bounds.width / size.width
       }
     });
-    handles.prefs.editor.setBrowserView(handles.editor.preview);
-    handles.editor.preview.setBounds({
-      x: 0,
-      y: 10,
-      width: handles.editor.bounds.width,
-      height: handles.editor.bounds.height
-    });
+    handles.editor.window.setBrowserView(handles.editor.preview);
+    // setBounds("editor", {
+
+    // })
+    // handles.editor.preview.setBounds({
+    //   x: 0,
+    //   y: 10,
+    //   width: handles.editor.bounds.width,
+    //   height: handles.editor.bounds.height
+    // });
   }
 
   var editorUrl = getUrl("editor.html");
@@ -431,21 +447,23 @@ var openEditor = (args) => {
                "src=" + encodeURIComponent(key) +
                "&screenshot=" + encodeURIComponent(screenshot);
 
-  handles.prefs.editor.saverOpts = saverOpts;
-  handles.prefs.editor.screenshot = screenshot;
+  handles.editor.window.saverOpts = saverOpts;
+  handles.editor.window.screenshot = screenshot;
 
-  handles.prefs.editor.once("ready-to-show", () => {
-    handles.prefs.editor.show();
+  handles.editor.window.once("ready-to-show", () => {
+    handles.editor.window.show();
     dock.showDock(app);
   });
 
-  handles.prefs.editor.on("closed", () => {
-    handles.prefs.editor = null;
+  handles.editor.window.on("closed", () => {
+    handles.editor.window = null;
+    handles.editor.preview.destroy();
     handles.editor.preview = null;
+
     dock.hideDockIfInactive(app);
   });
 
-  handles.prefs.editor.loadURL(target);  
+  handles.editor.window.loadURL(target);  
 };
 
 
@@ -1282,9 +1300,7 @@ ipcMain.on("preview-url", (_event, arg) => {
 });
 
 ipcMain.on("preview-bounds", (_event, arg) => {
-  const viewHandle = handles[arg.target].preview;
-  const newBounds = Object.assign(handles[arg.target].bounds, arg.bounds);
-  viewHandle.setBounds(newBounds);
+  setBounds(arg.target, arg.bounds);
 });
 
 //
