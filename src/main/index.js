@@ -55,6 +55,10 @@ var exitOnQuit = false;
 const globalCSSCode = fs.readFileSync( path.join(__dirname, "assets", "global.css"), "ascii");  
 
 
+/**
+ * track some information about windows, previews, bounds for the prefs window
+ * and editor window
+ */
 let handles = {
   prefs: {
     window: null,
@@ -68,8 +72,8 @@ let handles = {
     window: null,
     preview: null,
     bounds: {
-      width: 0,
-      height: 320
+      width: 320,
+      height: 0
     }
   }
 };
@@ -112,7 +116,6 @@ const GRABBER_WINDOW_OPTS = {
   }
 };
 
-const grabberUrl = "file://" + __dirname + "/assets/grabber.html";
 
 
 /**
@@ -122,6 +125,8 @@ const grabberUrl = "file://" + __dirname + "/assets/grabber.html";
  */
 var openGrabberWindow = function() {
   return new Promise((resolve) => {
+    const grabberUrl = "file://" + __dirname + "/assets/grabber.html";
+
     var grabberWindow = new BrowserWindow(GRABBER_WINDOW_OPTS);
     grabberWindow.noTray = true;
     
@@ -199,15 +204,6 @@ var openTestShim = function() {
   testWindow.loadURL(shimUrl);
 };
 
-let setBounds = function(target, bounds) {
-  bounds.x = parseInt(bounds.x, 10);
-  bounds.y = parseInt(bounds.y, 10);
-  bounds.width = parseInt(bounds.width, 10);
-  bounds.height = parseInt(bounds.height, 10);
-
-  handles[target].preview.setBounds(bounds);
-};
-
 
 /**
  * Open the preferences window
@@ -244,25 +240,6 @@ var openPrefsWindow = function() {
         icon: path.join(__dirname, "assets", "iconTemplate.png")
       });
 
-      var size = primary.bounds;
-      var ratio = size.height / size.width;
-      handles.prefs.bounds.height = handles.prefs.bounds.width * ratio;
-
-      handles.prefs.preview = new BrowserView({
-        webPreferences: {
-          zoomFactor: handles.prefs.bounds.width / size.width
-        }
-      });
-      handles.prefs.window.setBrowserView(handles.prefs.preview);
-
-      let bounds = {
-        x: 410,
-        y: 10,
-        width: handles.prefs.bounds.width,
-        height: handles.prefs.bounds.height + 40 };
-
-      setBounds("prefs", bounds);
-
       prefsUrl = prefsUrl + "?screenshot=" + encodeURIComponent("file://" + message.url);
       handles.prefs.window.saverOpts = saverOpts;
       handles.prefs.window.screenshot = message.url;
@@ -270,8 +247,10 @@ var openPrefsWindow = function() {
       handles.prefs.window.on("closed", () => {
         handles.prefs.window = null;
 
-        handles.prefs.preview.destroy();
-        handles.prefs.preview = null;
+        if ( handles.prefs.preview ) {
+          handles.prefs.preview.destroy();
+          handles.prefs.preview = null;  
+        }
         dock.hideDockIfInactive(app);
       });
 
@@ -407,6 +386,12 @@ var openEditor = (args) => {
   var key = args.src;
   var screenshot = args.screenshot;
 
+  var editorUrl = getUrl("editor.html");
+ 
+  var target = editorUrl + "?" +
+               "src=" + encodeURIComponent(key) +
+               "&screenshot=" + encodeURIComponent(screenshot);
+
   if ( handles.editor.window == null ) {
     handles.editor.window = new BrowserWindow({
       show: false,
@@ -417,35 +402,6 @@ var openEditor = (args) => {
       },
     });  
   }
-
-  if ( handles.editor.preview == null ) {
-    var primary = electronScreen.getPrimaryDisplay();
-    var size = primary.bounds;
-    var ratio = size.width / size.height;
-    handles.editor.bounds.width = handles.editor.bounds.height * ratio;
-
-    handles.editor.preview = new BrowserView({
-      webPreferences: {
-        zoomFactor: handles.editor.bounds.width / size.width
-      }
-    });
-    handles.editor.window.setBrowserView(handles.editor.preview);
-    // setBounds("editor", {
-
-    // })
-    // handles.editor.preview.setBounds({
-    //   x: 0,
-    //   y: 10,
-    //   width: handles.editor.bounds.width,
-    //   height: handles.editor.bounds.height
-    // });
-  }
-
-  var editorUrl = getUrl("editor.html");
- 
-  var target = editorUrl + "?" +
-               "src=" + encodeURIComponent(key) +
-               "&screenshot=" + encodeURIComponent(screenshot);
 
   handles.editor.window.saverOpts = saverOpts;
   handles.editor.window.screenshot = screenshot;
@@ -496,7 +452,6 @@ var getWindowOpts = function(s) {
     opts.width = 100;
     opts.height = 100;
   }
-
 
   return opts;
 };
@@ -1225,20 +1180,84 @@ let getTrayMenu = function() {
   return trayMenu;
 };
 
+
+/**
+ * if the user has updated one of their screensavers, we can let
+ * the prefs window know that it needs to reload
+ */
+let toggleSaversUpdated = (arg) => {
+  prefs.reload();  
+  if ( handles.prefs.window !== null ) {
+    handles.prefs.window.send("savers-updated", arg);
+  }
+};
+
+
+/**
+ * 
+ * @param {String} name of the target window.
+ * @param {Object} bounds hash with keys x, y, width, height
+ */
+let setBounds = function(target, bounds) {
+  bounds.x = parseInt(bounds.x, 10);
+  bounds.y = parseInt(bounds.y, 10);
+  bounds.width = parseInt(bounds.width, 10);
+
+  // if we have an aspect ratio, we assume the width is fixed, and
+  // match the height to our expected proportions
+  if ( handles[target].ratio ) {
+    bounds.height = parseInt(bounds.width * handles[target].ratio, 10);
+  }
+
+  handles[target].preview.setBounds(bounds);
+};
+
+/**
+ * set the preview url for a window
+ * 
+ * @param {String} name of the target window.
+ * @param {String} url to load in the preview
+ */
+let setPreviewUrl = function(target, url) {
+  const viewHandle = handles[target].preview;
+  if ( url !== viewHandle.webContents.getURL() ) {
+    log.info(`switch ${target} preview to ${url}`);
+
+    viewHandle.webContents.once("did-stop-loading", function() {
+      viewHandle.webContents.insertCSS("body { overflow: hidden; }");
+    });
+    viewHandle.webContents.loadURL(url);
+  }
+};
+
+/**
+ * setup a preview BrowserView
+ * 
+ * @param {String} name of the target window.
+ */
+let setupPreview = function(target) {
+  if ( ! handles[target].preview ) {
+    var primary = electronScreen.getPrimaryDisplay();
+    var size = primary.bounds;
+    var ratio = size.height / size.width;
+    handles[target].ratio = ratio;
+  
+    handles[target].preview = new BrowserView({
+      webPreferences: {
+        zoomFactor: handles[target].bounds.width / size.width
+      }
+    });
+    handles[target].window.setBrowserView(handles[target].preview);
+  }
+};
+
 // load a few global variables
 require("./bootstrap.js");
 
 log.transports.file.level = "debug";
 log.transports.file.maxSize = 1 * 1024 * 1024;
 
-log.info("Hello from version: " + global.APP_VERSION_BASE);
-
-if (global.IS_DEV) {
-	log.info("Running in development");
-}
-else {
-	log.info("Running in production");
-}
+log.info(`Hello from version: ${global.APP_VERSION_BASE} running in ${global.IS_DEV ? "development" : "production"}`);
 
 // store our root path as a global variable so we can access it from screens
 if ( process.env.BEFORE_DAWN_DIR !== undefined ) {
@@ -1252,7 +1271,6 @@ log.info("use base path", global.basePath);
 /**
  * make sure we're only running a single instance
  */
-
 if ( testMode !== true ) {
   app.on("second-instance", () => {
     if ( handles.prefs.window === null && handles.prefs.window !== undefined ) {
@@ -1268,17 +1286,6 @@ if ( testMode !== true ) {
 }
 
 
-/**
- * if the user has updated one of their screensavers, we can let
- * the prefs window know that it needs to reload
- */
-let toggleSaversUpdated = (arg) => {
-  prefs.reload();  
-  if ( handles.prefs.window !== null ) {
-    handles.prefs.window.send("savers-updated", arg);
-  }
-};
-
 ipcMain.on("savers-updated", () => {
   toggleSaversUpdated();
 });
@@ -1287,19 +1294,16 @@ ipcMain.on("open-settings", () => {
   openSettingsWindow();
 });
 
+// event for switching preview url
 ipcMain.on("preview-url", (_event, arg) => {
-  const viewHandle = handles[arg.target].preview;
-  if ( arg.url !== viewHandle.webContents.getURL() ) {
-    log.info(`switch ${arg.target} preview to ${arg.url}`);
-
-    viewHandle.webContents.once("did-stop-loading", function() {
-      viewHandle.webContents.insertCSS("body { overflow: hidden; }");
-    });
-    viewHandle.webContents.loadURL(arg.url);
-  }
+  setupPreview(arg.target);
+  setPreviewUrl(arg.target, arg.url);
 });
 
+// event for switching preview location and/or url
 ipcMain.on("preview-bounds", (_event, arg) => {
+  setupPreview(arg.target);
+  setPreviewUrl(arg.target, arg.url);
   setBounds(arg.target, arg.bounds);
 });
 
@@ -1312,11 +1316,6 @@ ipcMain.on("prefs-updated", () => {
   updateStateManager();
   checkForPackageUpdates();
   handles.prefs.window.webContents.send("savers-updated");
-});
-
-ipcMain.on("close-window", (event) => {
-  log.info("close-window");
-  event.sender.getOwnerBrowserWindow().close();
 });
 
 //

@@ -8,7 +8,9 @@
       @change="onSaverPicked"
     />
     <template v-if="saverIsPicked">
-      <div class="saver-detail" />
+      <div class="saver-detail">
+        <!-- this is where the preview goes -->
+      </div>
       <div class="saver-wrap">
         <saver-summary :saver="saverObj" />
         <div class="saver-options">
@@ -144,21 +146,22 @@ export default {
       this.getData();
       this.getCurrentSaver();
 
-      if ( this.$electron.remote.getGlobal("NEW_RELEASE_AVAILABLE") ) {
-        this.$nextTick(() => {
-          this.renderUpdateNotice();
-        });
-      }
-
+      this.checkResize();
       this.$nextTick(() => {
         this.resizeInterval = window.setInterval(() => {
           this.checkResize();
         }, 50);
       });
 
+      if ( this.$electron.remote.getGlobal("NEW_RELEASE_AVAILABLE") ) {
+        this.$nextTick(() => {
+          this.renderUpdateNotice();
+        });
+      }
     });
   },
   beforeDestroy() {
+    window.clearInterval(this.resizeInterval);
     this.ipcRenderer.removeListener("savers-updated", this.onSaversUpdated);
   },
   methods: {
@@ -182,6 +185,10 @@ export default {
       );
     },
     checkResize() {
+      if ( ! document.querySelector(".saver-detail") ) {
+        return;
+      }
+
       const rect = this.previewWrapper.getBoundingClientRect();
       if (this.currentPosition == null || this.rectChanged(rect)) {
         this.currentPosition = { 
@@ -192,7 +199,8 @@ export default {
         };
         this.ipcRenderer.send("preview-bounds", {
           target: "prefs",
-          bounds: this.currentPosition
+          bounds: this.currentPosition,
+          url: this.saverObj.getUrl(this.urlOpts(this.saver))
         });
       }
     },
@@ -212,8 +220,6 @@ export default {
         preview: 1,
         platform: process.platform,
         screenshot: this.screenshot
-        //,
-        //_: Math.random()
       };
 
       if ( typeof(s) === "undefined" ) {

@@ -262,6 +262,9 @@ export default {
       }, 50);
     });
   },
+  beforeDestroy() {
+    window.clearInterval(this.resizeInterval);
+  },
   methods: {
     // https://github.com/stream-labs/streamlabs-obs/blob/163e9a7eaf39200077874ae80d00e66108c106dc/app/components/Chat.vue.ts#L41
     rectChanged(rect) {
@@ -283,7 +286,8 @@ export default {
         };
         this.ipcRenderer.send("preview-bounds", {
           target: "editor",
-          bounds: this.currentPosition
+          bounds: this.currentPosition,
+          url: this.saver.getUrl(this.urlOpts(this.saver))
         });
       }
     },
@@ -297,8 +301,6 @@ export default {
         preview: 1,
         platform: process.platform,
         screenshot: this.screenshot
-        //,
-        //_: Math.random()
       };
       
       var mergedOpts = Object.assign(
