@@ -4,7 +4,7 @@ $footer_padding: 25px;
 $footer_inner_height: 40px;
 $tab_padding:6px;
 $grid_gap:10px;
-$preview_height: 320px;
+$preview_height: 290px;
 $small_padding: 10px;
 
 /* purgecss start ignore */
@@ -57,7 +57,7 @@ small {
   padding: 0.5rem;
   display: grid;
   grid-template-columns: 400px 1fr;
-  grid-template-rows: 320px 1fr #{$footer_height};
+  grid-template-rows: #{$preview_height} 1fr #{$footer_height};
   grid-template-areas: "saver-list saver-preview"
     "saver-list saver-detail"
     "saver-list saver-detail"
@@ -77,6 +77,10 @@ div.saver-detail {
 
 #prefs .saver-detail {
   margin-left: 10px;
+}
+
+#editor .saver-detail {
+  max-width: 500px;
 }
 
 div.saver-wrap {
@@ -168,7 +172,6 @@ button.add-option {
 
 .saver-list {
   height: calc(98vh - #{$footer_height});
-//  height: $preview_height;
   margin-bottom: 0px;
   overflow-y: scroll;
   font: small-caption;
@@ -182,7 +185,6 @@ button.add-option {
   }
 }
 .saver-detail {
-//  height: calc(98vh - #{$nav_height+$tab_padding+$footer_height});
   overflow-y: auto;
   padding-left: 5px;
   padding-right: 5px;
