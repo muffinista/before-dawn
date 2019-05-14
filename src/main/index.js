@@ -66,6 +66,10 @@ let handles = {
     bounds: {
       width: 320,
       height: 0
+    },
+    max: {
+      width: 320,
+      height: 320
     }
   },
   editor: {
@@ -74,6 +78,10 @@ let handles = {
     bounds: {
       width: 320,
       height: 0
+    },
+    max: {
+      width: 320,
+      height: 320
     }
   }
 };
@@ -1202,11 +1210,21 @@ let setBounds = function(target, bounds) {
   bounds.x = parseInt(bounds.x, 10);
   bounds.y = parseInt(bounds.y, 10);
   bounds.width = parseInt(bounds.width, 10);
+  bounds.height = parseInt(bounds.height, 10);
 
+  handles[target].max.width = bounds.width;
+  handles[target].max.height = bounds.height;
+  
   // if we have an aspect ratio, we assume the width is fixed, and
   // match the height to our expected proportions
   if ( handles[target].ratio ) {
     bounds.height = parseInt(bounds.width * handles[target].ratio, 10);
+
+    // don't exceed our max dimensions
+    if ( bounds.height > handles[target].max.height ) {
+      bounds.height = handles[target].max.height;
+      bounds.width = parseInt(bounds.width / handles[target].ratio, 10);
+    }
   }
 
   handles[target].preview.setBounds(bounds);
