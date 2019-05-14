@@ -1242,7 +1242,7 @@ let setPreviewUrl = function(target, url) {
     log.info(`switch ${target} preview to ${url}`);
 
     viewHandle.webContents.once("did-stop-loading", function() {
-      viewHandle.webContents.insertCSS("body { overflow: hidden; }");
+      viewHandle.webContents.insertCSS(globalCSSCode);
     });
     viewHandle.webContents.loadURL(url);
   }
