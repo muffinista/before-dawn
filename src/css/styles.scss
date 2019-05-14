@@ -87,7 +87,7 @@ div.saver-wrap {
   grid-area: saver-detail; 
   margin-left: 10px;
   height: calc(100vh - #{$preview_height + $footer_height + $small_padding});
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 #settings {
@@ -178,6 +178,7 @@ button.add-option {
 
   li.list-group-item {
     border: none;
+    padding-left: 0.25rem;
   }
 
   label {
