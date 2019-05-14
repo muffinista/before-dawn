@@ -413,7 +413,8 @@ export default {
       //console.log("load", this.saver.getUrl(this.urlOpts(this.saver)));
       this.ipcRenderer.send("preview-url", {
         target: "editor",
-        url: this.saver.getUrl(this.urlOpts(this.saver))
+        url: this.saver.getUrl(this.urlOpts(this.saver)),
+        force: true
       });
     },
     openConsole() {

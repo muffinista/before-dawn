@@ -1236,9 +1236,9 @@ let setBounds = function(target, bounds) {
  * @param {String} name of the target window.
  * @param {String} url to load in the preview
  */
-let setPreviewUrl = function(target, url) {
+let setPreviewUrl = function(target, url, force) {
   const viewHandle = handles[target].preview;
-  if ( url !== viewHandle.webContents.getURL() ) {
+  if ( force === true || url !== viewHandle.webContents.getURL() ) {
     log.info(`switch ${target} preview to ${url}`);
 
     viewHandle.webContents.once("did-stop-loading", function() {
@@ -1315,7 +1315,7 @@ ipcMain.on("open-settings", () => {
 // event for switching preview url
 ipcMain.on("preview-url", (_event, arg) => {
   setupPreview(arg.target);
-  setPreviewUrl(arg.target, arg.url);
+  setPreviewUrl(arg.target, arg.url, arg.force);
 });
 
 // event for switching preview location and/or url
@@ -1386,7 +1386,7 @@ app.on("before-quit", function() {
 app.on("will-quit", function(e) {
   log.info("will-quit");
   if ( testMode !== true && global.IS_DEV !== true && exitOnQuit !== true ) {
-    log.info(`don't quit yet! testMode: ${testMode} IS_DEV ${global.IS_DEV} exitOnQuit ${exitOnQuit}`);
+    log.info(`don't quit! testMode: ${testMode} IS_DEV ${global.IS_DEV} exitOnQuit ${exitOnQuit}`);
     e.preventDefault();
   }
   else {
