@@ -15,7 +15,6 @@ try {
 }
 catch(e) {
   version = "0.0.0";
-//  console.log("Unable to set version!", e);
 }
 
 global.APP_NAME = "Before Dawn";
