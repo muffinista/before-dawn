@@ -184,11 +184,7 @@ export default {
         rect.height !== this.currentPosition.height
       );
     },
-    checkResize() {
-      if ( ! document.querySelector(".saver-detail") ) {
-        return;
-      }
-
+    updateCurrentPosition() {
       const rect = this.previewWrapper.getBoundingClientRect();
       if (this.currentPosition == null || this.rectChanged(rect)) {
         this.currentPosition = { 
@@ -204,9 +200,17 @@ export default {
         });
       }
     },
+    checkResize() {
+      if ( ! document.querySelector(".saver-detail") ) {
+        return;
+      }
+
+      this.updateCurrentPosition();
+    },
     onOptionsChange() {
       this.ipcRenderer.send("preview-url", {
         target: "prefs",
+        bounds: this.currentPosition,
         url: this.saverObj.getUrl(this.urlOpts(this.saver))
       });
     },
@@ -237,8 +241,10 @@ export default {
     onSaverPicked(e) {
       this.saver = e.target.value;
       this.renderIndex += 1;
+
       this.ipcRenderer.send("preview-url", {
         target: "prefs",
+        bounds: this.currentPosition,
         url: this.saverObj.getUrl(this.urlOpts(this.saver))
       });
     },
@@ -282,10 +288,12 @@ export default {
           this.getCurrentSaver();
         }
 
-        this.ipcRenderer.send("preview-url", {
-          target: "prefs",
-          url: this.saverObj.getUrl(this.urlOpts(this.saver))
-        });
+
+        // this.ipcRenderer.send("preview-url", {
+        //   target: "prefs",
+        //   bounds: this.currentPosition,
+        //   url: this.saverObj.getUrl(this.urlOpts(this.saver))
+        // });
       });
     },
     onSaversUpdated() {

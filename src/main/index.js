@@ -54,6 +54,8 @@ var exitOnQuit = false;
 // load some global CSS we'll inject into running screensavers
 const globalCSSCode = fs.readFileSync( path.join(__dirname, "assets", "global.css"), "ascii");  
 
+const PREVIEW_PADDING = 1.10;
+
 
 /**
  * track some information about windows, previews, bounds for the prefs window
@@ -1214,7 +1216,7 @@ let setBounds = function(target, bounds) {
 
   handles[target].max.width = bounds.width;
   handles[target].max.height = bounds.height;
-  
+
   // if we have an aspect ratio, we assume the width is fixed, and
   // match the height to our expected proportions
   if ( handles[target].ratio ) {
@@ -1253,19 +1255,26 @@ let setPreviewUrl = function(target, url, force) {
  * 
  * @param {String} name of the target window.
  */
-let setupPreview = function(target) {
+let setupPreview = function(target, incomingBounds) {
+  var primary = electronScreen.getPrimaryDisplay();
+  var size = primary.bounds;
+  let zf = incomingBounds.height / (size.height * PREVIEW_PADDING);
+
   if ( ! handles[target].preview ) {
-    var primary = electronScreen.getPrimaryDisplay();
-    var size = primary.bounds;
     var ratio = size.height / size.width;
     handles[target].ratio = ratio;
-  
+
     handles[target].preview = new BrowserView({
       webPreferences: {
-        zoomFactor: handles[target].bounds.width / size.width
+        zoomFactor: zf
       }
     });
     handles[target].window.setBrowserView(handles[target].preview);
+  }
+  else {
+    // // eslint-disable-next-line no-console
+    // console.log(`set zoom factor to ${zf}`);
+    // handles[target].preview.webContents.setZoomFactor(zf);
   }
 };
 
@@ -1312,17 +1321,20 @@ ipcMain.on("open-settings", () => {
   openSettingsWindow();
 });
 
+let updatePreview = function(arg) {
+  setupPreview(arg.target, arg.bounds);
+  setPreviewUrl(arg.target, arg.url, arg.force);
+  setBounds(arg.target, arg.bounds);
+};
+
 // event for switching preview url
 ipcMain.on("preview-url", (_event, arg) => {
-  setupPreview(arg.target);
-  setPreviewUrl(arg.target, arg.url, arg.force);
+  updatePreview(arg);
 });
 
 // event for switching preview location and/or url
 ipcMain.on("preview-bounds", (_event, arg) => {
-  setupPreview(arg.target);
-  setPreviewUrl(arg.target, arg.url);
-  setBounds(arg.target, arg.bounds);
+  updatePreview(arg);
 });
 
 //
