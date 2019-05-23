@@ -54,7 +54,7 @@ var exitOnQuit = false;
 // load some global CSS we'll inject into running screensavers
 const globalCSSCode = fs.readFileSync( path.join(__dirname, "assets", "global.css"), "ascii");  
 
-const PREVIEW_PADDING = 1.10;
+const PREVIEW_PADDING = 1.25;
 
 
 /**
@@ -1241,7 +1241,7 @@ let setBounds = function(target, bounds) {
 let setPreviewUrl = function(target, url, force) {
   const viewHandle = handles[target].preview;
   if ( force === true || url !== viewHandle.webContents.getURL() ) {
-    log.info(`switch ${target} preview to ${url}`);
+    log.info(`switch ${target} preview to ${url} ${force}`);
 
     viewHandle.webContents.once("did-stop-loading", function() {
       viewHandle.webContents.insertCSS(globalCSSCode);
@@ -1270,11 +1270,6 @@ let setupPreview = function(target, incomingBounds) {
       }
     });
     handles[target].window.setBrowserView(handles[target].preview);
-  }
-  else {
-    // // eslint-disable-next-line no-console
-    // console.log(`set zoom factor to ${zf}`);
-    // handles[target].preview.webContents.setZoomFactor(zf);
   }
 };
 
