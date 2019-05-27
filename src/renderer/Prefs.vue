@@ -1,30 +1,35 @@
 <template>
   <div id="prefs">
-    <saver-list
-      :savers="savers"
-      :current="saver"
-      @editSaver="editSaver"
-      @deleteSaver="deleteSaver"
-      @change="onSaverPicked"
-    />
     <template v-if="saverIsPicked">
       <div class="saver-detail">
         <!-- this is where the preview goes -->
       </div>
-      <div class="saver-wrap">
-        <saver-summary :saver="saverObj" />
-        <div class="saver-options">
-          <saver-options
-            :saver="saver"
-            :options="saverOptions"
-            :values="options[saver]"
-            @change="onOptionsChange"
-            @saverOption="updateSaverOption"
-          />
-        </div>
+      <div class="saver-info space-at-top">
+        <saver-summary 
+          :saver="saverObj"
+          @editSaver="editSaver"
+          @deleteSaver="deleteSaver" />
+        <saver-options
+          :saver="saver"
+          :options="saverOptions"
+          :values="options[saver]"
+          @change="onOptionsChange"
+          @saverOption="updateSaverOption"
+        />
       </div>
     </template>
-   
+    <saver-list
+      :savers="savers"
+      :current="saver"
+      @change="onSaverPicked"
+    />
+    <div class="basic-prefs space-at-top">
+      <template v-if="prefs !== undefined">
+        <h1>Settings</h1>
+        <basic-prefs-form :prefs="prefs" />
+      </template>
+    </div>
+
     <footer class="footer d-flex justify-content-between">
       <div>
         <button
@@ -40,7 +45,7 @@
           class="btn btn-large btn-primary settings"
           @click.stop="openSettings"
         >
-          Settings
+          Advanced Settings
         </button>
         <button
           class="btn btn-large btn-primary save"
@@ -57,6 +62,7 @@
 <script>
 const {dialog} = require("electron").remote;
 
+import BasicPrefsForm from "@/components/BasicPrefsForm";
 import SaverList from "@/components/SaverList";
 import SaverOptions from "@/components/SaverOptions";
 import SaverSummary from "@/components/SaverSummary";
@@ -68,7 +74,7 @@ import SaverListManager from "@/../lib/saver-list";
 export default {
   name: "Prefs",
   components: {
-    SaverList, SaverOptions, SaverSummary
+    BasicPrefsForm, SaverList, SaverOptions, SaverSummary
   },
   data() {
     return {
@@ -287,13 +293,6 @@ export default {
           this.prefs.current = this.savers[0].key;
           this.getCurrentSaver();
         }
-
-
-        // this.ipcRenderer.send("preview-url", {
-        //   target: "prefs",
-        //   bounds: this.currentPosition,
-        //   url: this.saverObj.getUrl(this.urlOpts(this.saver))
-        // });
       });
     },
     onSaversUpdated() {
@@ -355,8 +354,8 @@ export default {
       this.saveData().then(() => {
         new Noty({
           type: "success",
-          layout: "bottomRight",
-          timeout: 2000,
+          layout: "topRight",
+          timeout: 1000,
           text: "Changes saved!",
           animation: {
             open: null

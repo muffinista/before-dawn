@@ -1,20 +1,27 @@
 $nav_height: 34px;
-$footer_height: 50px;
+//$footer_height: 50px;
 $footer_padding: 25px;
 $footer_inner_height: 40px;
 $tab_padding:6px;
 $grid_gap:10px;
-$preview_height: 320px;
+//$preview_height: 320px;
 $small_padding: 10px;
+
+:root {
+  --preview-width: 500px;
+  --preview-height: 320px;
+  --footer-height: 50px;
+  --space-at-top: 1.0rem;
+}
 
 /* purgecss start ignore */
 @import "~noty/lib/noty.css";
 @import "~noty/lib/themes/mint.css";
 
-div#noty_layout__bottomRight {
-  right: 0px;
-  bottom: 45px;
-}
+// div#noty_layout__bottomRight {
+//   right: 0px;
+//   bottom: 45px;
+// }
 
 html {
   height: 100%;
@@ -32,7 +39,7 @@ select {
 }
 
 h1 {
-  font-size: 1.8rem;
+  font-size: 1.2rem;
 }
 
 small {
@@ -56,42 +63,61 @@ small {
 #prefs {
   padding: 0.5rem;
   display: grid;
-  grid-template-columns: 400px 1fr;
-  grid-template-rows: #{$preview_height} 1fr #{$footer_height};
-  grid-template-areas: "saver-list saver-preview"
-    "saver-list saver-detail"
-    "saver-list saver-detail"
+  grid-template-columns: var(--preview-width) 1fr;
+  grid-template-rows: var(--preview-height) 1fr var(--footer-height);
+  grid-template-areas: "saver-preview saver-list"
+    "saver-info basic-prefs"
     "footer footer";
 }
 
 #prefs > header {
   grid-area: header;
 }
-ul.saver-list {
+.saver-list-wrapper {
   grid-area: saver-list;
+  height: var(--preview-height);
 }
-div.saver-detail {
-  grid-area: saver-preview;
-  height: $preview_height;
+.saver-list {
+  max-height: calc(var(--preview-height) - 34px);
+  overflow-y: scroll;
+  margin-bottom: 0px;
+  font: small-caption;
+
+  li.list-group-item {
+    border: none;
+    padding-left: 0.25rem;
+    padding-top: 0px;
+    padding-bottom: 0.5rem;
+  }
+
+  label {
+    font-size: 0.9rem;
+  }
 }
 
-#prefs .saver-detail {
-  margin-left: 10px;
+div.saver-detail {
+  grid-area: saver-preview;
+  height: var(--preview-height);
+}
+
+div.basic-prefs {
+  grid-area: basic-prefs;
+  margin-top: 1rem;
+  margin-right: 2rem;
 }
 
 #editor .saver-detail {
   max-width: 500px;
 }
 
-div.saver-wrap {
-  grid-area: saver-detail; 
-  margin-left: 10px;
-  height: calc(100vh - #{$preview_height + $footer_height + $small_padding});
+div.saver-info {
+  grid-area: saver-info; 
+  height: calc(99vh - var(--preview-height) - var(--footer-height) - var(--space-at-top) - #{$small_padding});
   overflow-y: auto;
 }
 
 #settings {
-  margin-bottom: #{$footer_height + $footer_padding};
+  margin-bottom: calc(var(--footer-height) + #{$footer_padding});
 }
 footer.footer {
   grid-area: footer;
@@ -117,41 +143,16 @@ body > #editor #settings > div {
   padding-top: 35px;
 }
 
-// @media (max-height: 600px) {
-//   body > div > .content {
-//     overflow-y: scroll;
-//   }  
-// }
-
 footer.footer {
-  height: $footer_height;
+  height: var(--footer-height);
   background-color: #f5f5f5;
   padding-left: 5px;
   padding-right: 5px;
 }
 
-// body > div > footer > div {
-//   height: $footer_inner_height;
-//   margin-top: #{($footer_height/2 - $footer_inner_height/2) + 1};
-//   margin-right: #{($footer_height/2 - $footer_inner_height/2) + 1};
-// }
-
-
 ul {
   padding-left: 0px;
   list-style-type: none;
-}
-
-ul[role=tablist] {
-  width: 100%;
-  position: fixed;
-  height: $nav_height;
-  margin-bottom: 42px;
-  background: white;
-  z-index: 99999;
-}
-.tab-content {
-  padding-top: $nav_height+$tab_padding;
 }
 
 .hide {
@@ -166,42 +167,36 @@ button.add-option {
   margin-top: 12px;
 }
 
+.space-at-top {
+  margin-top: var(--space-at-top);
+}
+
 .space-at-bottom {
   margin-bottom: 20px;
 }
 
-.saver-list {
-  height: calc(98vh - #{$footer_height});
-  margin-bottom: 0px;
-  overflow-y: scroll;
-  font: small-caption;
-
-  li.list-group-item {
-    border: none;
-    padding-left: 0.25rem;
-  }
-
-  label {
-    font-size: 0.9rem;
-  }
-}
 .saver-detail {
   overflow-y: auto;
   padding-left: 5px;
   padding-right: 5px;
 }
-.saver-description h1 {
-  font-size: 1.2rem;
-}
-iframe, webview {
-  overflow: hidden;
-  border: none;
+// .saver-description h1 {
+//   font-size: 1.2rem;
+// }
+.saver-description .actions {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
 }
 
-iframe.preview, webview.preview {
-  width: 100%;
-  overflow:hidden;
-}
+// iframe, webview {
+//   overflow: hidden;
+//   border: none;
+// }
+
+// iframe.preview, webview.preview {
+//   width: 100%;
+//   overflow:hidden;
+// }
 
 .hint {
   color: #888888;
