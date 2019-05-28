@@ -166,6 +166,15 @@ export default {
       }
     });
   },
+  updated() {
+    if ( !this.didScrollToScreensaver ) {
+      const s = document.querySelector(`input[name='screensaver']:checked`);
+      if ( s !== null ) {
+        s.parentElement.scrollIntoViewIfNeeded();
+        this.didScrollToScreensaver = true;
+      }
+    }
+  },
   beforeDestroy() {
     window.clearInterval(this.resizeInterval);
     this.ipcRenderer.removeListener("savers-updated", this.onSaversUpdated);
@@ -243,11 +252,9 @@ export default {
 
       return mergedOpts;
     },
-
     onSaverPicked(e) {
       this.saver = e.target.value;
       this.renderIndex += 1;
-
       this.ipcRenderer.send("preview-url", {
         target: "prefs",
         bounds: this.currentPosition,

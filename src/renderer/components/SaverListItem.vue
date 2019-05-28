@@ -27,7 +27,6 @@ export default {
   computed: {
     classes() {
       let base = "list-group-item flex-column entry";
-      console.log(this.saver, this.checked);
       if ( this.checked ) {
         return base + " active";
       }
@@ -36,7 +35,7 @@ export default {
   },
   methods: {
     pickSaver(s) {
-      document.querySelector(`input[value='${s.key}']`).click();
+      document.querySelector(`input[name='screensaver'][value='${s.key}']`).click();
     }
   }
 };
