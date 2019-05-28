@@ -50,7 +50,7 @@ describe("Prefs", function() {
   it("allows picking a screensaver", function() {
     return pickPrefsWindow().
       then(() => app.client.waitUntilTextExists("body", "Screensaver One")).
-      then(() => app.client.click("[type=radio][data-name='Screensaver One']")).
+      then(() => app.webContents.executeJavaScript("document.querySelector(\"[type='radio'][data-name='Screensaver One']\").click()")).
       then(() => app.client.getText(".saver-description")).
       then((text) => {
         assert(text.lastIndexOf("A Screensaver") !== -1);
@@ -65,7 +65,7 @@ describe("Prefs", function() {
   it("sets options for screensaver", function() {
     return pickPrefsWindow().
       then(() => app.client.waitUntilTextExists("body", "Screensaver One")).
-        then(() => app.client.click("[type=radio][data-name='Screensaver One']")).
+        then(() => app.webContents.executeJavaScript("document.querySelector(\"[type='radio'][data-name='Screensaver One']\").click()")).
         then(() => app.client.getText("body")).
         then((text) => {
           assert(text.lastIndexOf("Load the specified URL") !== -1);
