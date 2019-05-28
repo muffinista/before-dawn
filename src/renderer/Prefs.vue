@@ -167,13 +167,15 @@ export default {
     });
   },
   updated() {
-    if ( !this.didScrollToScreensaver ) {
-      const s = document.querySelector(`input[name='screensaver']:checked`);
-      if ( s !== null ) {
-        s.parentElement.scrollIntoViewIfNeeded();
-        this.didScrollToScreensaver = true;
+    this.$nextTick(function () {
+      if ( !this.didScrollToScreensaver ) {
+        const s = document.querySelector(`input[name='screensaver']:checked`);
+        if ( s !== null ) {
+          s.parentElement.scrollIntoViewIfNeeded();
+          this.didScrollToScreensaver = true;
+        }
       }
-    }
+    });
   },
   beforeDestroy() {
     window.clearInterval(this.resizeInterval);
