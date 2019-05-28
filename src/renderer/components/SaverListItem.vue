@@ -1,15 +1,15 @@
 <template>
-  <li class="list-group-item flex-column entry" v-on:click="pickSaver(saver)">
+  <li :class="classes" v-on:click="pickSaver(saver)">
     <div class="d-flex w-100 justify-content-between">
       <label>
         <div class="body">
           <input type="radio" 
             name="screensaver" 
-            v-bind:value="saver.key" 
             :data-name="saver.name" 
+            v-bind:value="saver.key" 
             v-on="$listeners" 
             :checked="checked"/>
-          {{saver.name}}
+          <b>{{saver.name}}</b>
           <div class="description">
             <small>{{saver.description}}</small>
           </div>
@@ -24,6 +24,16 @@
 export default {
   name: "saver-list-item",
   props: ["saver", "checked"],
+  computed: {
+    classes() {
+      let base = "list-group-item flex-column entry";
+      console.log(this.saver, this.checked);
+      if ( this.checked ) {
+        return base + " active";
+      }
+      return base;
+    }
+  },
   methods: {
     pickSaver(s) {
       document.querySelector(`input[value='${s.key}']`).click();
@@ -31,3 +41,8 @@ export default {
   }
 };
 </script>
+<style>
+input[name=screensaver] {
+  display: none;
+}
+</style>

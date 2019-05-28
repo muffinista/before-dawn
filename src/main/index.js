@@ -423,7 +423,9 @@ var openEditor = (args) => {
 
   handles.editor.window.on("closed", () => {
     handles.editor.window = null;
-    handles.editor.preview.destroy();
+    if ( handles.editor.preview ) {
+      handles.editor.preview.destroy();
+    }
     handles.editor.preview = null;
 
     dock.hideDockIfInactive(app);

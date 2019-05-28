@@ -76,6 +76,7 @@ small {
 .saver-list-wrapper {
   grid-area: saver-list;
   height: var(--preview-height);
+  padding-left: 0.25rem;
 }
 .saver-list {
   max-height: calc(var(--preview-height) - 34px);
@@ -84,9 +85,8 @@ small {
   font: small-caption;
 
   li.list-group-item {
-    border: none;
     padding-left: 0.25rem;
-    padding-top: 0px;
+    padding-top: 0.5rem;
     padding-bottom: 0.5rem;
   }
 

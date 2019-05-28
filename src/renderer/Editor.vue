@@ -256,7 +256,6 @@ export default {
         });
       }
 
-      this.renderPreview();
       this.resizeInterval = window.setInterval(() => {
         this.checkResize();
       }, 50);
