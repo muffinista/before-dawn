@@ -8,7 +8,8 @@
         <saver-summary 
           :saver="saverObj"
           @editSaver="editSaver"
-          @deleteSaver="deleteSaver" />
+          @deleteSaver="deleteSaver"
+        />
         <saver-options
           :saver="saver"
           :options="saverOptions"
@@ -169,7 +170,7 @@ export default {
   updated() {
     this.$nextTick(function () {
       if ( !this.didScrollToScreensaver ) {
-        const s = document.querySelector(`input[name='screensaver']:checked`);
+        const s = document.querySelector("input[name='screensaver']:checked");
         if ( s !== null ) {
           s.parentElement.scrollIntoViewIfNeeded();
           this.didScrollToScreensaver = true;
