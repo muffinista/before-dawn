@@ -40,8 +40,3 @@ export default {
   }
 };
 </script>
-<style>
-input[name=screensaver] {
-  display: none;
-}
-</style>

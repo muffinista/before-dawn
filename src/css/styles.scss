@@ -1,27 +1,15 @@
-$nav_height: 34px;
-//$footer_height: 50px;
-$footer_padding: 25px;
-$footer_inner_height: 40px;
-$tab_padding:6px;
-$grid_gap:10px;
-//$preview_height: 320px;
-$small_padding: 10px;
-
 :root {
   --preview-width: 500px;
   --preview-height: 320px;
   --footer-height: 50px;
   --space-at-top: 1.0rem;
+  --footer-padding: 25px;
+  --small-padding: 10px;
 }
 
 /* purgecss start ignore */
 @import "~noty/lib/noty.css";
 @import "~noty/lib/themes/mint.css";
-
-// div#noty_layout__bottomRight {
-//   right: 0px;
-//   bottom: 45px;
-// }
 
 html {
   height: 100%;
@@ -95,6 +83,10 @@ small {
   }
 }
 
+#prefs input[name=screensaver] {
+  display: none;
+}
+
 div.saver-detail {
   grid-area: saver-preview;
   height: var(--preview-height);
@@ -112,20 +104,27 @@ div.basic-prefs {
 
 div.saver-info {
   grid-area: saver-info; 
-  height: calc(99vh - var(--preview-height) - var(--footer-height) - var(--space-at-top) - #{$small_padding});
+  height: calc(99vh - var(--preview-height) - var(--footer-height) - var(--space-at-top) - var(--small-padding));
   overflow-y: auto;
+}
+div.saver-info #wrapper {
+  max-width: 98%;
 }
 
 #settings {
-  margin-bottom: calc(var(--footer-height) + #{$footer_padding});
+  margin-bottom: calc(var(--footer-height) + var(--footer-padding));
 }
 footer.footer {
+  height: var(--footer-height);
   grid-area: footer;
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
   align-items: center;
+  background-color: #f5f5f5;
+  padding-left: 5px;
+  padding-right: 5px;
 }
 
 #prefs h1 {
@@ -141,13 +140,6 @@ body > #editor > .content {
 
 body > #editor #settings > div {
   padding-top: 35px;
-}
-
-footer.footer {
-  height: var(--footer-height);
-  background-color: #f5f5f5;
-  padding-left: 5px;
-  padding-right: 5px;
 }
 
 ul {
@@ -180,23 +172,11 @@ button.add-option {
   padding-left: 5px;
   padding-right: 5px;
 }
-// .saver-description h1 {
-//   font-size: 1.2rem;
-// }
+
 .saver-description .actions {
   margin-top: 1rem;
   margin-bottom: 1rem;
 }
-
-// iframe, webview {
-//   overflow: hidden;
-//   border: none;
-// }
-
-// iframe.preview, webview.preview {
-//   width: 100%;
-//   overflow:hidden;
-// }
 
 .hint {
   color: #888888;
