@@ -54,7 +54,7 @@ var exitOnQuit = false;
 // load some global CSS we'll inject into running screensavers
 const globalCSSCode = fs.readFileSync( path.join(__dirname, "assets", "global.css"), "ascii");  
 
-const PREVIEW_PADDING = 1.25;
+const PREVIEW_PADDING = 1.15;
 
 
 /**
@@ -423,7 +423,9 @@ var openEditor = (args) => {
 
   handles.editor.window.on("closed", () => {
     handles.editor.window = null;
-    handles.editor.preview.destroy();
+    if ( handles.editor.preview ) {
+      handles.editor.preview.destroy();
+    }
     handles.editor.preview = null;
 
     dock.hideDockIfInactive(app);

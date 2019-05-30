@@ -54,10 +54,15 @@ describe("Settings", function() {
       ).
       then(() => app.client.click("button.save")).
       then(() => helpers.sleep(100)).
-      // then(() => helpers.waitForWindowClosed(app, "Before Dawn: Settings")).
       then(function() {
         assert.equal(30, currentPrefs().delay);
         assert.equal(15, currentPrefs().sleep);
+      }).
+      // make sure prefs updated on the main window
+      then(() => helpers.waitForWindow(app, "Before Dawn: Preferences") ).
+      then(() => app.client.getValue("[name='delay']")).
+      then((res) => {
+        assert.equal("30", res);
       });
   });
 

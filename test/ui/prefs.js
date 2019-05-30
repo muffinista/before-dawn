@@ -50,7 +50,7 @@ describe("Prefs", function() {
   it("allows picking a screensaver", function() {
     return pickPrefsWindow().
       then(() => app.client.waitUntilTextExists("body", "Screensaver One")).
-      then(() => app.client.click("[type=radio][data-name='Screensaver One']")).
+      then(() => app.webContents.executeJavaScript("document.querySelector(\"[type='radio'][data-name='Screensaver One']\").click()")).
       then(() => app.client.getText(".saver-description")).
       then((text) => {
         assert(text.lastIndexOf("A Screensaver") !== -1);
@@ -65,8 +65,7 @@ describe("Prefs", function() {
   it("sets options for screensaver", function() {
     return pickPrefsWindow().
       then(() => app.client.waitUntilTextExists("body", "Screensaver One")).
-      then(() => app.client.getAttribute("[type=radio]","data-name")).
-        then(() => app.client.click("[type=radio][data-name='Screensaver One']")).
+        then(() => app.webContents.executeJavaScript("document.querySelector(\"[type='radio'][data-name='Screensaver One']\").click()")).
         then(() => app.client.getText("body")).
         then((text) => {
           assert(text.lastIndexOf("Load the specified URL") !== -1);
@@ -84,5 +83,22 @@ describe("Prefs", function() {
           assert.equal("barfoo", options[k].load_url);
           assert(!options[k].sound);
         });
+  });
+
+  it("sets timing options", function() {
+    return pickPrefsWindow().
+      then(() => app.client.waitUntilTextExists("body", "Activate after")).
+      then(() => 
+        app.client.selectByVisibleText("[name=delay]", "30 minutes")
+      ).
+      then(() => 
+        app.client.selectByVisibleText("[name=\"sleep\"]", "15 minutes")
+      ).
+      then(() => app.client.click("button.save")).
+      then(() => helpers.sleep(100)).
+      then(function() {
+        assert.equal(30, currentPrefs().delay);
+        assert.equal(15, currentPrefs().sleep);
+      });
   });
 });
