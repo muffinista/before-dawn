@@ -21,15 +21,11 @@
 
       <div class="form-group">
         <label for="localSource">Local Source:</label>
-        <div class="input-group">
-          <input type="text" v-model="prefs.localSource" readonly="readonly" name="localSource" class="form-control form-control-sm" />
-          <span class="input-group-btn">
-            <button type="button" class="btn btn-sm btn-secondary pick" @click.stop="showPathChooser">...</button>
-          </span>
-          <span class="input-group-btn spaced" v-if="prefs.localSource != ''">
-            <button type="button" class="btn btn-sm btn-secondary clear" @click.stop="clearLocalSource">X</button>
-          </span>
-        </div>
+        <local-folder-input
+          v-on="$listeners"
+          :value="prefs.localSource"
+          handler="localSourceChange"
+          name="localSource"></local-folder-input>
 
         <small class="form-text text-muted">
           We will load screensavers from any directories listed here. Use this to add your own screensavers!
@@ -53,10 +49,13 @@
 </template>
 
 <script>
-const {dialog} = require("electron").remote;
+import LocalFolderInput from "@/components/LocalFolderInput";
+
 export default {
   name: "advanced-prefs-form",
-  components: {},
+  components: {
+    localFolderInput: LocalFolderInput,
+  },
   props: ["prefs"],
   methods: {
     updateHotkey(event) {
@@ -96,29 +95,6 @@ export default {
 
       event.target.value = output;
     },
-    showPathChooser() {
-      dialog.showOpenDialog(
-        {
-          properties: [ "openDirectory", "createDirectory" ]
-        },
-        this.handlePathChoice );
-    },
-    clearLocalSource() {
-      this.$emit("localSourceChange", "");
-      this.prefs.localSource = "";
-      document.querySelector("[name=localSource]").value = this.prefs.localSource;
-    },
-    handlePathChoice(result) {
-      if ( result === undefined ) {
-        return;
-      }
-
-      this.$emit("localSourceChange", result[0]);
-
-      // blah this is weird
-      this.prefs.localSource = result[0];
-      document.querySelector("[name=localSource]").value = this.prefs.localSource;
-    }
   }
 };
 </script>
