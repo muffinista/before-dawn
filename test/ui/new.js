@@ -6,6 +6,8 @@ const path = require("path");
 
 const helpers = require("../helpers.js");
 
+const SaverPrefs = require("../../src/lib/prefs.js");
+
 var saversDir;
 var workingDir;
 let app;
@@ -13,6 +15,10 @@ let app;
 describe("Add New", function() {
   let windowTitle = "Before Dawn: Create Screensaver!";
   let screensaverUrl = "file://" + path.join(__dirname, "../fixtures/screenshot.png");
+
+  let currentPrefs = function() {
+    return new SaverPrefs(workingDir);
+  };
 
   helpers.setupTimeout(this);
 
@@ -28,9 +34,11 @@ describe("Add New", function() {
   });
 
 
+  const fakeDialogOpts = [ { method: "showOpenDialog", value: ["/not/a/real/path"] } ];
   describe("when not setup", function() {
     beforeEach(() => {
       return app.start().
+        then(() => app.fakeDialog.mock(fakeDialogOpts)).
         then(() => {
           helpers.removeLocalSource(workingDir);
         }).
@@ -48,8 +56,28 @@ describe("Add New", function() {
           })).
         then(() => app.client.getText("body")).
         then((res) => {
-          assert(res.lastIndexOf("set a local directory in the preferences window") !== -1);
+          assert(res.lastIndexOf("set a local directory!") !== -1);
         });
+    });
+
+    it("can set local source", function() {
+      return helpers.getWindowByTitle(app, windowTitle).
+        then(() => app.client.waitUntil(() => {
+            return app.client.getText("body").then((res) => {
+              return res.indexOf("set a local directory") !== -1;
+            });
+        })).
+        then(() => app.client.click("button.pick")).
+        then(() => app.client.click("button.save")).
+        then(() => helpers.sleep(100)).
+        then(function() {
+          assert.equal("/not/a/real/path", currentPrefs().localSource);
+        }).
+        then(() => app.client.getText("body")).
+        then((res) => {
+          assert(res.lastIndexOf("Use this form") !== -1);
+        });
+    
     });
   });
 

@@ -186,6 +186,7 @@ export default {
       });
     },
     localSourceChange(ls) {
+      debugger;
       var tmp = {
         localSource: ls
       };

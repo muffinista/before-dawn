@@ -7,9 +7,22 @@
             <p>
               Screensavers in Before Dawn are web pages, so if you can use HTML, 
               CSS, and/or Javascript, you can make your own screensaver. But before 
-              you can do that, you'll need to set a local directory in the preferences 
-              window!
+              you can do that, you'll need to set a local directory!
             </p>
+            <div class="form-group">
+              <label for="localSource">Local Source:</label>
+              <local-folder-input
+                :value="prefs.localSource"
+                handler="localSourceChange"
+                name="localSource"
+                v-on="$listeners"
+                @localSourceChange="localSourceChange"
+              />
+
+              <small class="form-text text-muted">
+                We will load screensavers from any directories listed here. Use this to add your own screensavers!
+              </small>
+            </div>
           </div>
         </template>  
 
@@ -53,6 +66,7 @@
 const path = require("path");
 
 import SaverForm from "@/components/SaverForm";
+import LocalFolderInput from "@/components/LocalFolderInput";
 
 import SaverPrefs from "@/../lib/prefs";
 import SaverListManager from "@/../lib/saver-list";
@@ -60,7 +74,8 @@ import SaverListManager from "@/../lib/saver-list";
 export default {
   name: "NewScreensaver",
   components: {
-    SaverForm
+    SaverForm,
+    LocalFolderInput
   },
   data() {
     return {
@@ -113,6 +128,16 @@ export default {
   methods: {
     closeWindow() {
       this.currentWindow.close();
+    },
+    localSourceChange(ls) {
+      var tmp = {
+        localSource: ls
+      };
+      this.prefs = Object.assign(this.prefs, tmp);
+      this.prefs.updatePrefs(this.prefs, (changes) => {
+        this.disabled = false;
+        this.ipcRenderer.send("prefs-updated", changes);
+      });
     },
     saveData() {
       if ( document.querySelectorAll(":invalid").length > 0 ) {
