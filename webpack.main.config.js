@@ -14,7 +14,7 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 const releaseName = `${packageJSON.productName} ${packageJSON.version}`;
 
 
-const CleanWebpackPlugin = require("clean-webpack-plugin");
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 
 
 //
