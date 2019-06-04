@@ -2,6 +2,7 @@
   <div id="new">
     <div class="content">
       <div class="container-fluid">
+        <h1>New Screensaver</h1>
         <template v-if="!canAdd">
           <div class="need-setup-message">
             <p>

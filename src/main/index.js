@@ -325,8 +325,8 @@ var addNewSaver = function() {
 
     var w = new BrowserWindow({
       show: false,
-      width:450,
-      height:620,
+      width: 450,
+      height: 700,
       resizable:true,
       webPreferences: {
         webSecurity: false, //!global.IS_DEV
