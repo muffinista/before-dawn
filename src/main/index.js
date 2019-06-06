@@ -237,7 +237,7 @@ var openPrefsWindow = function() {
       handles.prefs.window = new BrowserWindow({
         show: false,
         width: 910,
-        height: 640,
+        height: 700,
         minWidth: 800,
         maxWidth: 910,
         minHeight: 600,
