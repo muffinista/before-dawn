@@ -1243,7 +1243,7 @@ let setBounds = function(target, bounds) {
 let setPreviewUrl = function(target, url, force) {
   const viewHandle = handles[target].preview;
   if ( force === true || url !== viewHandle.webContents.getURL() ) {
-    log.info(`switch ${target} preview to ${url} ${force}`);
+    // log.info(`switch ${target} preview to ${url} ${force}`);
 
     viewHandle.webContents.once("did-stop-loading", function() {
       viewHandle.webContents.insertCSS(globalCSSCode);
@@ -1268,10 +1268,17 @@ let setupPreview = function(target, incomingBounds) {
 
     handles[target].preview = new BrowserView({
       webPreferences: {
+        preload: path.join(__dirname, "assets", "preview.js"),
         zoomFactor: zf
       }
     });
     handles[target].window.setBrowserView(handles[target].preview);
+    handles[target].preview.webContents.on("console-message",
+      (event, level, message, line, sourceId) => {
+        // log.info(level, message, line, sourceId);
+        handles[target].window.webContents.send("console-message",
+          event, level, message, line, sourceId);
+      });
   }
 };
 
@@ -1309,6 +1316,19 @@ if ( testMode !== true ) {
   });
 }
 
+ipcMain.on("preview-error", (_event, message, source, lineno) => {
+  let opts = {
+    message: message,
+    source: source,
+    lineno: lineno
+  };
+  if ( handles.editor.window ) {
+    handles.editor.window.webContents.send("preview-error", opts);
+  }
+  else if ( handles.prefs.window ) {
+    handles.prefs.window.webContents.send("preview-error", opts);
+  }
+});
 
 ipcMain.on("savers-updated", () => {
   toggleSaversUpdated();
