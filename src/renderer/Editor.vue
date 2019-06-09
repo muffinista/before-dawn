@@ -235,10 +235,12 @@ export default {
     this.ipcRenderer.on("console-message", (sender, event, level, message, line, sourceId) => {
       // only output messages from the screensaver folder itself
       if ( sourceId.indexOf(this.folderPath) !== -1 ) {
+        // eslint-disable-next-line no-console
         console.log(message);
       }
     });
     this.ipcRenderer.on("preview-error", (sender, event) => {
+      // eslint-disable-next-line no-console
       console.log(`Error on line ${event.lineno}: ${event.message}`);
     });
 
