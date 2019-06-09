@@ -250,6 +250,10 @@ var openPrefsWindow = function() {
         icon: path.join(__dirname, "assets", "iconTemplate.png")
       });
 
+      if ( handles.prefs.window.removeMenu !== undefined ) {
+        handles.prefs.window.removeMenu();
+      }
+
       prefsUrl = prefsUrl + "?screenshot=" + encodeURIComponent("file://" + message.url);
       handles.prefs.window.saverOpts = saverOpts;
       handles.prefs.window.screenshot = message.url;
@@ -370,6 +374,10 @@ var openAboutWindow = function() {
       preload: global.TRACK_ERRORS ? path.join(__dirname, "assets", "sentry.js") : undefined
     }
   });
+
+  if ( w.removeMenu !== undefined ) {
+    w.removeMenu();
+  }
 
   w.on("closed", () => {
     w = null;
