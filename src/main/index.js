@@ -300,6 +300,11 @@ var openSettingsWindow = function() {
     }
   });
 
+  // hide the file menu
+  if ( w.removeMenu !== undefined ) {
+    w.removeMenu();
+  }
+
   w.on("closed", () => {
     w = null;
     dock.hideDockIfInactive(app);
