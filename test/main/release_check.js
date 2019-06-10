@@ -6,7 +6,7 @@ const nock = require("nock");
 const assert = require("assert");
 const helpers = require("../helpers.js");
 
-describe("ReleaseCheck", () => {
+describe("ReleaseCheck", function() {
   let releaseChecker;
   let version = "0.1.1";
   let server = "https://sillynotreal.domain";
