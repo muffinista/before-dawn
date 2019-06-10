@@ -11,9 +11,13 @@ const appPath = require("electron");
 const assert = require("assert");
 
 let windowCheckDelay = 5000;
+let testTimeout = 15000;
+let testRetryCount = 0;
 
 if (process.env.CI) {
   windowCheckDelay = 10000;
+  testTimeout = 60000;
+  testRetryCount = 3;
 }
 
 const delayStep = 10;
@@ -261,10 +265,9 @@ exports.outputLogs = function(app) {
 };
 
 exports.setupTimeout = function (test) {
-  if (process.env.CI) {
-    test.timeout(60000);
-  }
-  else {
-    test.timeout(60000);
-  }
+  test.timeout(testTimeout);
+};
+
+exports.setupRetries = function (test) {
+  test.retries(testRetryCount);
 };

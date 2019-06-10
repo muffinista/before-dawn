@@ -20,6 +20,9 @@ describe("Add New", function() {
     return new SaverPrefs(workingDir);
   };
 
+  // retry all tests in this suite up to 3 times
+  helpers.setupRetries(this);
+
   helpers.setupTimeout(this);
 
   beforeEach(() => {

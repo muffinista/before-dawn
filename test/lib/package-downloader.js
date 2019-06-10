@@ -16,6 +16,7 @@ var sandbox;
 
 describe("PackageDownloader", function() {
   helpers.setupTimeout(this);
+  helpers.setupRetries(this);
 
   var pd;
   var fakePackage;

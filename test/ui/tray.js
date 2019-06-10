@@ -9,6 +9,9 @@ describe("tray", function() {
   
   helpers.setupTimeout(this);
 
+  // retry all tests in this suite up to 3 times
+  helpers.setupRetries(this);
+
   beforeEach(function() {
     workingDir = helpers.getTempDir();
     let saversDir = path.join(workingDir, "savers");

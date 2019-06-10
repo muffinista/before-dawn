@@ -4,6 +4,7 @@ const ReleaseCheck = require("../../src/main/release_check.js");
 const path = require("path");
 const nock = require("nock");
 const assert = require("assert");
+const helpers = require("../helpers.js");
 
 describe("ReleaseCheck", () => {
   let releaseChecker;
@@ -12,6 +13,9 @@ describe("ReleaseCheck", () => {
   let uriPath = `/update/win32/${version}`;
   let url = `${server}${uriPath}`;
   let fixturePath;
+
+  // retry all tests in this suite up to 3 times
+  helpers.setupRetries(this);
 
   beforeEach(() => {
     fixturePath = path.join(__dirname, "../fixtures/releases/updates.json");

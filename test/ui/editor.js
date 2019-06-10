@@ -18,6 +18,9 @@ describe("Editor", function() {
   let pickEditorWindow = () => {
     return helpers.waitForWindow(app, windowTitle);
   };
+
+  // retry all tests in this suite up to 3 times
+  helpers.setupRetries(this);
  
 	beforeEach(() => {
     workingDir = helpers.getTempDir();

@@ -12,7 +12,7 @@ describe("bootstrap", function() {
   let configDest;
   var workingDir;
   let app;
-  
+
   var bootApp = function() {
     app = helpers.application(workingDir, false, zipPath);  
     return app.start().
@@ -20,6 +20,9 @@ describe("bootstrap", function() {
   };
 
   helpers.setupTimeout(this);
+
+  // retry all tests in this suite up to 3 times
+  helpers.setupRetries(this);
 
   beforeEach(() => {
     workingDir = helpers.getTempDir();

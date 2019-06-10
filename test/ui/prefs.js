@@ -11,6 +11,11 @@ const SaverPrefs = require("../../src/lib/prefs.js");
 describe("Prefs", function() { 
 
   helpers.setupTimeout(this);
+
+  // retry all tests in this suite up to 3 times
+  helpers.setupRetries(this);
+
+
   let pickPrefsWindow = function() {
     return helpers.getWindowByTitle(app, "Before Dawn: Preferences");
   };
