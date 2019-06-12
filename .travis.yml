@@ -20,8 +20,8 @@ branches:
     - master
 
 cache: yarn
-#script: yarn test && yarn release
-script: yarn release
+script: yarn test && yarn release
+#script: yarn release
 
 notifications:
   email:
