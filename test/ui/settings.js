@@ -46,7 +46,7 @@ describe("Settings", function() {
     return helpers.stopApp(app);
 	});
 
-  it("set general preferences", function() {
+  xit("set general preferences", function() {
     return pickPrefsWindow().
       then(() => app.client.waitUntilTextExists("body", "Activate after")).
       then(() => 
@@ -124,6 +124,8 @@ describe("Settings", function() {
         let ls = currentPrefs().localSource;
         assert( ls != "" && ls !== undefined);
       }).
+      then(() => app.webContents
+        .executeJavaScript("document.querySelector(\"button.clear\").scrollIntoView()")).
       then(() => app.client.click("button.clear")).
       then(() => app.client.click("button.save")).
       then(() => helpers.sleep(100)).
@@ -139,6 +141,8 @@ describe("Settings", function() {
 
     return pickPrefsWindow().
       then(() => app.fakeDialog.mock(resetDialogOpts)).
+      then(() => app.webContents
+        .executeJavaScript("document.querySelector(\"button.reset-to-defaults\").scrollIntoView()")).
       then(() => app.client.click("button.reset-to-defaults")).
       then(() => app.client.waitUntilTextExists("body", "Settings reset")).
       then(function() {
