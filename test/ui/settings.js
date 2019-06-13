@@ -107,10 +107,11 @@ describe("Settings", function() {
   
   it("allows setting path via dialog", function() {
     return pickPrefsWindow().
+      then(() => app.webContents
+        .executeJavaScript("document.querySelector(\"button.pick\").scrollIntoView()")).
       then(() => app.client.click("button.pick")).
       then(() => app.client.click("button.save")).
       then(() => helpers.sleep(100)).
-      // then(() => helpers.waitForWindowClosed(app, "Before Dawn: Settings")).
       then(function() {
         assert.equal("/not/a/real/path", currentPrefs().localSource);
       });
