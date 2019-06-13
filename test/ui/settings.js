@@ -11,11 +11,13 @@ const SaverPrefs = require("../../src/lib/prefs.js");
 describe("Settings", function() { 
   const fakeDialogOpts = [ { method: "showOpenDialog", value: ["/not/a/real/path"] } ];
 
-  if ( process.env.CI ) {
-    // eslint-disable-next-line no-console
-    console.log("Cowardly skipping test in CI");
-    this.skip();
-    return;
+  before(function() {
+    if ( process.env.CI ) {
+      // eslint-disable-next-line no-console
+      console.log("Cowardly skipping test in CI");
+      this.skip();
+      return;
+    }
   }
 
 
