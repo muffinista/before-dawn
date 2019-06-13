@@ -18,7 +18,7 @@ describe("Settings", function() {
       this.skip();
       return;
     }
-  }
+  });
 
 
   helpers.setupTimeout(this);
