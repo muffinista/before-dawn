@@ -11,6 +11,14 @@ const SaverPrefs = require("../../src/lib/prefs.js");
 describe("Settings", function() { 
   const fakeDialogOpts = [ { method: "showOpenDialog", value: ["/not/a/real/path"] } ];
 
+  if ( process.env.CI ) {
+    // eslint-disable-next-line no-console
+    console.log("Cowardly skipping test in CI");
+    this.skip();
+    return;
+  }
+
+
   helpers.setupTimeout(this);
 
   // retry all tests in this suite up to 3 times
@@ -47,13 +55,6 @@ describe("Settings", function() {
 	});
 
   it("set general preferences", function() {
-    if ( process.env.CI ) {
-      // eslint-disable-next-line no-console
-      console.log("Cowardly skipping test in CI");
-      this.skip();
-      return;
-    }
-
     return pickPrefsWindow().
       then(() => app.client.waitUntilTextExists("body", "Activate after")).
       then(() => 
