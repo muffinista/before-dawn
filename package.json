@@ -118,6 +118,10 @@
     "webpack-node-externals": "^1.7.2",
     "xvfb-maybe": "^0.2.1"
   },
+  "resolutions": {
+    "spectron/electron-chromedriver": "^5.0.0",
+    "spectron/**/electron-chromedriver": "^5.0.0"
+  },
   "build": {
     "files": [
       "output/**/*",
