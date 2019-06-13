@@ -75,6 +75,8 @@ describe("Prefs", function() {
         then((text) => {
           assert(text.lastIndexOf("Load the specified URL") !== -1);
         }).
+        then(() => app.webContents
+          .executeJavaScript("document.querySelector(\"[name='sound']\").scrollIntoView()")).
         then(() => app.client.click("[name='sound'][value='false']")).
         then(() => app.client.setValue("[name='load_url']", "barfoo")).
         then(() => app.client.click("button.save")).
