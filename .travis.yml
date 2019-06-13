@@ -30,4 +30,3 @@ notifications:
 
 env:
   - YARN_GPG=no
-  - CI=true

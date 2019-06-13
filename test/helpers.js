@@ -269,5 +269,7 @@ exports.setupTimeout = function (test) {
 };
 
 exports.setupRetries = function (test) {
+  // eslint-disable-next-line no-console
+  console.log(`set retries to ${testRetryCount}`);
   test.retries(testRetryCount);
 };
