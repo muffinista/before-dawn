@@ -35,8 +35,8 @@ skip_commits:
 test_script:
   - node --version
   - yarn --version
-  # - yarn test
-  - yarn release
+  - yarn test
+#  - yarn release
 
 build: off
 # build_script:
