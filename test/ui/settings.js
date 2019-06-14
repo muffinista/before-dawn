@@ -79,86 +79,86 @@ describe("Settings", function() {
       // });
   });
 
-  it("toggles checkboxes", function() {
-    let oldConfig = currentPrefs();
+  // it("toggles checkboxes", function() {
+  //   let oldConfig = currentPrefs();
 
-    return pickSettingsWindow().
-      then(() => app.client.waitUntilTextExists("body", "Activate after")).
-      then(() => app.client.click("label*=Lock screen after running")).
-      then(() => app.client.click("label*=Disable when on battery?")).
-      then(() => app.client.click("label*=Auto start on login?")).
-      then(() => app.client.click("label*=Only run on the primary display?")).
-      then(() => app.client.click("button.save")).
-      then(() => helpers.sleep(closeWindowDelay)).
-      then(() => {
-        let updatedPrefs = currentPrefs();
-        assert.equal(!oldConfig.lock, updatedPrefs.lock);
-        assert.equal(!oldConfig.disableOnBattery, updatedPrefs.disableOnBattery);
-        assert.equal(!oldConfig.auto_start, updatedPrefs.auto_start);
-        assert.equal(!oldConfig.runOnSingleDisplay, updatedPrefs.runOnSingleDisplay);
-      });
-  });
+  //   return pickSettingsWindow().
+  //     then(() => app.client.waitUntilTextExists("body", "Activate after")).
+  //     then(() => app.client.click("label*=Lock screen after running")).
+  //     then(() => app.client.click("label*=Disable when on battery?")).
+  //     then(() => app.client.click("label*=Auto start on login?")).
+  //     then(() => app.client.click("label*=Only run on the primary display?")).
+  //     then(() => app.client.click("button.save")).
+  //     then(() => helpers.sleep(closeWindowDelay)).
+  //     then(() => {
+  //       let updatedPrefs = currentPrefs();
+  //       assert.equal(!oldConfig.lock, updatedPrefs.lock);
+  //       assert.equal(!oldConfig.disableOnBattery, updatedPrefs.disableOnBattery);
+  //       assert.equal(!oldConfig.auto_start, updatedPrefs.auto_start);
+  //       assert.equal(!oldConfig.runOnSingleDisplay, updatedPrefs.runOnSingleDisplay);
+  //     });
+  // });
 
-  it("leaves checkboxes", function() {
-    let oldConfig = currentPrefs();
+  // it("leaves checkboxes", function() {
+  //   let oldConfig = currentPrefs();
 
-    return pickSettingsWindow().
-      then(() => app.client.waitUntilTextExists("body", "Activate after")).
-      then(() => app.client.click("button.save")).
-      then(() => helpers.sleep(closeWindowDelay)).
-      then(() => {
-        let updatedPrefs = currentPrefs();
-        assert.equal(oldConfig.lock, updatedPrefs.lock);
-        assert.equal(oldConfig.disableOnBattery, updatedPrefs.disableOnBattery);
-        assert.equal(oldConfig.auto_start, updatedPrefs.auto_start);
-        assert.equal(oldConfig.runOnSingleDisplay, updatedPrefs.runOnSingleDisplay);
-      });
-  });
+  //   return pickSettingsWindow().
+  //     then(() => app.client.waitUntilTextExists("body", "Activate after")).
+  //     then(() => app.client.click("button.save")).
+  //     then(() => helpers.sleep(closeWindowDelay)).
+  //     then(() => {
+  //       let updatedPrefs = currentPrefs();
+  //       assert.equal(oldConfig.lock, updatedPrefs.lock);
+  //       assert.equal(oldConfig.disableOnBattery, updatedPrefs.disableOnBattery);
+  //       assert.equal(oldConfig.auto_start, updatedPrefs.auto_start);
+  //       assert.equal(oldConfig.runOnSingleDisplay, updatedPrefs.runOnSingleDisplay);
+  //     });
+  // });
   
-  xit("allows setting path via dialog", function() {
-    return pickSettingsWindow().
-      then(() => app.webContents
-        .executeJavaScript("document.querySelector(\"button.pick\").scrollIntoView()")).
-      then(() => app.client.click("button.pick")).
-      then(() => helpers.sleep(50)).
-      then(() => app.client.click("button.save")).
-      then(() => helpers.sleep(closeWindowDelay)).
-      then(function() {
-        assert.equal("/not/a/real/path", currentPrefs().localSource);
-      });
-  });
+  // xit("allows setting path via dialog", function() {
+  //   return pickSettingsWindow().
+  //     then(() => app.webContents
+  //       .executeJavaScript("document.querySelector(\"button.pick\").scrollIntoView()")).
+  //     then(() => app.client.click("button.pick")).
+  //     then(() => helpers.sleep(50)).
+  //     then(() => app.client.click("button.save")).
+  //     then(() => helpers.sleep(closeWindowDelay)).
+  //     then(function() {
+  //       assert.equal("/not/a/real/path", currentPrefs().localSource);
+  //     });
+  // });
 
-  it("clears localSource", function() {
-    return pickSettingsWindow().
-      then(() => app.client.waitUntilTextExists("body", "Activate after")).
-      then(function() {
-        let ls = currentPrefs().localSource;
-        assert( ls != "" && ls !== undefined);
-      }).
-      then(() => app.webContents
-        .executeJavaScript("document.querySelector(\"button.clear\").scrollIntoView()")).
-      then(() => app.client.click("button.clear")).
-      then(() => helpers.sleep(50)).
-      then(() => app.client.click("button.save")).
-      then(() => helpers.sleep(closeWindowDelay)).
-      then(function() {
-        assert.equal("", currentPrefs().localSource);
-      });
-  });
+  // it("clears localSource", function() {
+  //   return pickSettingsWindow().
+  //     then(() => app.client.waitUntilTextExists("body", "Activate after")).
+  //     then(function() {
+  //       let ls = currentPrefs().localSource;
+  //       assert( ls != "" && ls !== undefined);
+  //     }).
+  //     then(() => app.webContents
+  //       .executeJavaScript("document.querySelector(\"button.clear\").scrollIntoView()")).
+  //     then(() => app.client.click("button.clear")).
+  //     then(() => helpers.sleep(50)).
+  //     then(() => app.client.click("button.save")).
+  //     then(() => helpers.sleep(closeWindowDelay)).
+  //     then(function() {
+  //       assert.equal("", currentPrefs().localSource);
+  //     });
+  // });
 
 
-  xit("resets defaults", function() {
-    const resetDialogOpts = [ { method: "showMessageBox", value: 1 } ];
+  // xit("resets defaults", function() {
+  //   const resetDialogOpts = [ { method: "showMessageBox", value: 1 } ];
 
-    return pickSettingsWindow().
-      then(() => app.fakeDialog.mock(resetDialogOpts)).
-      then(() => app.webContents
-        .executeJavaScript("document.querySelector(\"button.reset-to-defaults\").scrollIntoView()")).
-      then(() => app.client.click("button.reset-to-defaults")).
-      then(() => app.client.waitUntilTextExists("body", "Settings reset")).
-      then(() => helpers.sleep(closeWindowDelay)).
-      then(function() {
-        assert.equal("", currentPrefs().localSource);
-      });
-  });
+  //   return pickSettingsWindow().
+  //     then(() => app.fakeDialog.mock(resetDialogOpts)).
+  //     then(() => app.webContents
+  //       .executeJavaScript("document.querySelector(\"button.reset-to-defaults\").scrollIntoView()")).
+  //     then(() => app.client.click("button.reset-to-defaults")).
+  //     then(() => app.client.waitUntilTextExists("body", "Settings reset")).
+  //     then(() => helpers.sleep(closeWindowDelay)).
+  //     then(function() {
+  //       assert.equal("", currentPrefs().localSource);
+  //     });
+  // });
 });
