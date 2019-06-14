@@ -22,7 +22,7 @@ init:
 install:
   - ps: Install-Product node $env:nodejs_version x64
   - set CI=true
-  - set NODE_ENV=development
+  # - set NODE_ENV=development
   - git reset --hard HEAD
   - yarn
   # - set PATH=%APPDATA%\npm;%PATH%
@@ -33,19 +33,20 @@ matrix:
 skip_commits:
   message: /\[ci\s+skip\]/
 
-test_script:
-  - node --version
-  - yarn --version
-  - yarn test
-#  - yarn release
-
-build: off
-# build_script:
+test: off
+# test_script:
 #   - node --version
-#   - yarn release
+#   - yarn --version
+#   - yarn test
+# #  - yarn release
 
-#only_commits:
-#  message: /build/
+#build: off
+build_script:
+  - node --version
+  - yarn release
+
+only_commits:
+ message: /build/
 
 # deploy:
 #   - provider: GitHub
