@@ -127,11 +127,9 @@ exports.application = function(workingDir, quietMode=false, localZip) {
 exports.stopApp = function(app) {
   console.log("stopApp", app);
   if (app && app.isRunning()) {
-    let result = app.stop();
-    console.log(result);
-    return result;
+    return app.stop();
   }
-ß};
+};
 
 
 exports.setupConfig = function(workingDir) {

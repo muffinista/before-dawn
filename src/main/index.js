@@ -1121,10 +1121,7 @@ var blankScreenIfNeeded = function() {
  * timeout values, etc
  */
 var updateStateManager = function() {
-  log.info("updateStateManager",
-           "idleTime: " + prefs.delay,
-           "blankTime: " + (prefs.delay + prefs.sleep)
-  );
+  log.info(`updateStateManager idleTime: ${prefs.delay} blankTime: ${(prefs.delay + prefs.sleep)}`);
 
   stateManager.setup({
     idleTime: prefs.delay * 60,
