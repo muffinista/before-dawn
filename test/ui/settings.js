@@ -12,14 +12,14 @@ describe("Settings", function() {
   const fakeDialogOpts = [ { method: "showOpenDialog", value: ["/not/a/real/path"] } ];
   const closeWindowDelay = 750;
 
-  before(function() {
-    if ( process.env.CI && process.env.TRAVIS_OS_NAME == "osx") {
-      // eslint-disable-next-line no-console
-      console.log("Cowardly skipping test in OSX CI");
-      this.skip();
-      return;
-    }
-  });
+  // before(function() {
+  //   if ( process.env.CI && process.env.TRAVIS_OS_NAME == "osx") {
+  //     // eslint-disable-next-line no-console
+  //     console.log("Cowardly skipping test in OSX CI");
+  //     this.skip();
+  //     return;
+  //   }
+  // });
 
   helpers.setupTimeout(this);
   helpers.setupRetries(this);
@@ -32,7 +32,7 @@ describe("Settings", function() {
     return new SaverPrefs(workingDir);
   };
 
-  beforeEach(function() {
+  beforeEach(() => {
     workingDir = helpers.getTempDir();
     saversDir = helpers.getTempDir();
     
@@ -50,11 +50,11 @@ describe("Settings", function() {
               then(() => helpers.waitForWindow(app, "Before Dawn: Settings") );
   });
 
-	afterEach(function() {
+	afterEach(() => {
     return helpers.stopApp(app);
 	});
 
-  it("set general preferences", function() {
+  it.only("set general preferences", function() {
     return pickSettingsWindow().
       then(() => app.client.waitUntilTextExists("body", "Activate after")).
       then(() => 
