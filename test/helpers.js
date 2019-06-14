@@ -125,8 +125,6 @@ exports.application = function(workingDir, quietMode=false, localZip) {
 
 
 exports.stopApp = function(app) {
-  // eslint-disable-next-line no-console
-  console.log("stopApp", app);
   if (app && app.isRunning()) {
     return app.stop();
   }
