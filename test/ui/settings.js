@@ -42,7 +42,7 @@ describe("Settings", function() {
 
     app = helpers.application(workingDir, true);
     return app.start().
-              then(() => app.fakeDialog.mock(fakeDialogOpts)).
+              // then(() => app.fakeDialog.mock(fakeDialogOpts)).
               then(() => app.client.waitUntilWindowLoaded() ).
               then(() => app.electron.ipcRenderer.send("open-prefs")).
               then(() => helpers.waitForWindow(app, "Before Dawn: Preferences") ).
@@ -115,7 +115,7 @@ describe("Settings", function() {
       });
   });
   
-  it("allows setting path via dialog", function() {
+  xit("allows setting path via dialog", function() {
     return pickSettingsWindow().
       then(() => app.webContents
         .executeJavaScript("document.querySelector(\"button.pick\").scrollIntoView()")).
@@ -147,7 +147,7 @@ describe("Settings", function() {
   });
 
 
-  it("resets defaults", function() {
+  xit("resets defaults", function() {
     const resetDialogOpts = [ { method: "showMessageBox", value: 1 } ];
 
     return pickSettingsWindow().
