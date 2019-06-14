@@ -111,7 +111,8 @@ exports.application = function(workingDir, quietMode=false, localZip) {
   var a = new Application({
     path: appPath,
     args: [path.join(__dirname, "..", "output/main.js")],
-    env: env
+    env: env,
+    quitTimeout: 5000
   });
 
   fakeDialog.apply(a);
@@ -124,10 +125,13 @@ exports.application = function(workingDir, quietMode=false, localZip) {
 
 
 exports.stopApp = function(app) {
+  console.log("stopApp", app);
   if (app && app.isRunning()) {
-    return app.stop();
+    let result = app.stop();
+    console.log(result);
+    return result;
   }
-};
+ß};
 
 
 exports.setupConfig = function(workingDir) {
