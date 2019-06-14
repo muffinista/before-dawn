@@ -30,6 +30,8 @@ class StateManager {
     this._ignoreReset = false;
     this.keepTicking = true;  
 
+    this._initialOffset = undefined;
+
     this._idleFn = fn;
   }
 
@@ -68,6 +70,7 @@ class StateManager {
    * reset to idle and clear any timers
    */
   reset() {
+    this._initialOffset = 0;
     this.switchState(STATES.STATE_IDLE);
   }
 
@@ -182,7 +185,14 @@ class StateManager {
     var i, nextTime, hadActivity;
 
     if ( this.currentState !== STATES.STATE_NONE && this.currentState !== STATES.STATE_PAUSED ) {
-      i = this._idleFn();
+      if ( this._initialOffset === undefined ) {
+        // get the idle time when we booted. this is a bit of a hack
+        // to work better on CI setups
+        this._initialOffset = this._idleFn();
+      }
+
+
+      i = this._idleFn() + this._initialOffset;
 
       nextTime = this.getNextTime();
 
@@ -197,6 +207,8 @@ class StateManager {
         }
       }
       else if ( i >= nextTime ) {
+        this._initialOffset = 0;
+  
         // eslint-disable-next-line no-console
         console.log(`state change ${i}`);
         if ( this.currentState === STATES.STATE_IDLE) {
