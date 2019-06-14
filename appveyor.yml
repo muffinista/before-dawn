@@ -14,15 +14,13 @@ cache:
 
 environment:
   matrix:
-    - nodejs_version: '8'
-#  GH_TOKEN:
-#    secure: 'hWq+UymjZYRfgJPKsRQ8bBFwkcMHpLglVbYe0FH2w0zdQ6/8Dp3mo/19RFKIpZkU'
+    - nodejs_version: '10'
 
 init:
   - git config --global core.autocrlf input
 
 install:
-  - ps: Install-Product node $env:nodejs_version
+  - ps: Install-Product node $env:nodejs_version x64
   - set CI=true
   - git reset --hard HEAD
   - yarn install
@@ -31,17 +29,18 @@ install:
 matrix:
   fast_finish: true
 
-test: off
-
 skip_commits:
   message: /\[ci\s+skip\]/
 
+test_script:
+  - node --version
+  - yarn test
 build_script:
   - node --version
   - yarn release
 
-only_commits:
-  message: /build/
+#only_commits:
+#  message: /build/
 
 # deploy:
 #   - provider: GitHub
