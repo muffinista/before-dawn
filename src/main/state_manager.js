@@ -197,6 +197,7 @@ class StateManager {
         }
       }
       else if ( i >= nextTime ) {
+        // eslint-disable-next-line no-console
         console.log(`state change ${i}`);
         if ( this.currentState === STATES.STATE_IDLE) {
           this.switchState(STATES.STATE_RUNNING);
