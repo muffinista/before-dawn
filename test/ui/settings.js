@@ -12,17 +12,16 @@ describe("Settings", function() {
   const fakeDialogOpts = [ { method: "showOpenDialog", value: ["/not/a/real/path"] } ];
   const closeWindowDelay = 750;
 
-  // before(function() {
-  //   if ( process.env.CI && process.env.TRAVIS_OS_NAME == "osx") {
-  //     // eslint-disable-next-line no-console
-  //     console.log("Cowardly skipping test in OSX CI");
-  //     this.skip();
-  //     return;
-  //   }
-  // });
+  before(function() {
+    if ( process.env.CI && process.env.TRAVIS_OS_NAME == "osx") {
+      // eslint-disable-next-line no-console
+      console.log("Cowardly skipping test in OSX CI");
+      this.skip();
+      return;
+    }
+  });
 
-  helpers.setupTimeout(this);
-  helpers.setupRetries(this);
+  helpers.setupTest(this);
 
   let pickSettingsWindow = function() {
     return helpers.getWindowByTitle(app, "Before Dawn: Settings");
@@ -54,7 +53,7 @@ describe("Settings", function() {
     return helpers.stopApp(app);
 	});
 
-  it.only("set general preferences", function() {
+  it("set general preferences", function() {
     return pickSettingsWindow().
       then(() => app.client.waitUntilTextExists("body", "Activate after")).
       then(() => 
@@ -146,7 +145,7 @@ describe("Settings", function() {
   });
 
 
-  xit("resets defaults", function() {
+  it("resets defaults", function() {
     const resetDialogOpts = [ { method: "showMessageBox", value: 1 } ];
 
     return pickSettingsWindow().

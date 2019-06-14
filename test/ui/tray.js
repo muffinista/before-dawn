@@ -7,10 +7,10 @@ describe("tray", function() {
   var workingDir;
   let app;
   
-  helpers.setupTimeout(this);
+  helpers.setupTest(this);
 
   // retry all tests in this suite up to 3 times
-  helpers.setupRetries(this);
+
 
   beforeEach(function() {
     workingDir = helpers.getTempDir();

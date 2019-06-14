@@ -265,12 +265,7 @@ exports.outputLogs = function(app) {
   });
 };
 
-exports.setupTimeout = function (test) {
+exports.setupTest = function (test) {
   test.timeout(testTimeout);
-};
-
-exports.setupRetries = function (test) {
-  // eslint-disable-next-line no-console
-  console.log(`set retries to ${testRetryCount}`);
   test.retries(testRetryCount);
 };

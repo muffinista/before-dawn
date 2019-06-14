@@ -21,9 +21,9 @@ describe("Add New", function() {
   };
 
   // retry all tests in this suite up to 3 times
-  helpers.setupRetries(this);
 
-  helpers.setupTimeout(this);
+
+  helpers.setupTest(this);
 
   beforeEach(() => {
     saversDir = helpers.getTempDir();

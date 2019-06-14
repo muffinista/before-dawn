@@ -13,14 +13,14 @@ describe("Editor", function() {
   const windowTitle = "Before Dawn: Editor";
 
   var saverJSON;
-  helpers.setupTimeout(this);
+  helpers.setupTest(this);
 
   let pickEditorWindow = () => {
     return helpers.waitForWindow(app, windowTitle);
   };
 
   // retry all tests in this suite up to 3 times
-  helpers.setupRetries(this);
+
  
 	beforeEach(() => {
     workingDir = helpers.getTempDir();

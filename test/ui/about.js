@@ -9,10 +9,10 @@ let app;
 
 describe("About", function() {
   const windowTitle = "Before Dawn: About!";
-  helpers.setupTimeout(this);
+  helpers.setupTest(this);
 
   // retry all tests in this suite up to 3 times
-  helpers.setupRetries(this);
+
 
   beforeEach(() => {
     workingDir = helpers.getTempDir();

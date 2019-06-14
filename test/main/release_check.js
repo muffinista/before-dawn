@@ -15,7 +15,7 @@ describe("ReleaseCheck", function() {
   let fixturePath;
 
   // retry all tests in this suite up to 3 times
-  helpers.setupRetries(this);
+  helpers.setupTest(this);
 
   beforeEach(() => {
     fixturePath = path.join(__dirname, "../fixtures/releases/updates.json");

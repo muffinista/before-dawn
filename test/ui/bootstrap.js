@@ -19,10 +19,10 @@ describe("bootstrap", function() {
       then(() => helpers.waitUntilBooted(app));
   };
 
-  helpers.setupTimeout(this);
+  helpers.setupTest(this);
 
   // retry all tests in this suite up to 3 times
-  helpers.setupRetries(this);
+
 
   beforeEach(() => {
     workingDir = helpers.getTempDir();

@@ -15,8 +15,8 @@ const sinon = require("sinon");
 var sandbox;
 
 describe("PackageDownloader", function() {
-  helpers.setupTimeout(this);
-  helpers.setupRetries(this);
+  helpers.setupTest(this);
+
 
   var pd;
   var fakePackage;
