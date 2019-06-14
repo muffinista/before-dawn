@@ -22,6 +22,7 @@ init:
 install:
   - ps: Install-Product node $env:nodejs_version x64
   - set CI=true
+  - set NODE_ENV=development
   - git reset --hard HEAD
   - yarn
   # - set PATH=%APPDATA%\npm;%PATH%
