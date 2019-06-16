@@ -1,46 +1,35 @@
 language: node_js
-node_js: "10.11.0"
-
+node_js: 10.11.0
 matrix:
   include:
-    - os: osx
-    - os: linux
-    # - os: windows
-
-#osx_image: xcode9.1
+  - os: osx
+  - os: linux
 osx_image: xcode10.2
-  
 before_install:
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get -qq update ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -y libx11-dev libxss-dev icnsutils graphicsmagick libappindicator1 libxtst-dev ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then cinst -y python2; fi
-
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get -qq update ; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -y libx11-dev libxss-dev
+  icnsutils graphicsmagick libappindicator1 libxtst-dev ; fi
+- if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then cinst -y python2; fi
 branches:
   only:
-    - master
-
+  - master
 cache: yarn
 script: yarn test && yarn release
-
 notifications:
   email:
     on_success: change
     on_failure: change
-
 env:
-  - YARN_GPG=no
-
+- YARN_GPG=no
 before_deploy:
-  # Set up git user name and tag this commit
-  - git config --local user.name "Colin Mitchell"
-  - git config --local user.email "colin@muffinlabs.com"
-  - export TRAVIS_TAG=${TRAVIS_TAG:-$(date +'%Y%m%d%H%M%S')-$(git log --format=%h -1)}
-  - git tag $TRAVIS_TAG
+- git config --local user.name "Colin Mitchell"
+- git config --local user.email "colin@muffinlabs.com"
+- export TRAVIS_TAG=${TRAVIS_TAG:-$(date +'%Y%m%d%H%M%S')-$(git log --format=%h -1)}
+- git tag $TRAVIS_TAG
 deploy:
   provider: releases
-  draft: true
-  overwrite: true
-  skip_cleanup: true
-  # on:
-  #   tags: true
-
+  api_key:
+    secure: y5z88JtfI6Rp/y/m4blriex5Vy6nFG52W5yHVH1u17DQ57LV+XZ87Rc+V1Z64A6FPEVaFxcX5J0R7d/LHMkfTa7FJb95WNSeiDLXPDAEXb1Y1MJ1H3iIWYO1gZWj68RB6lg7NqgEFkyH13Cv58NhIOJEDyTlIUC3l0Ud7pX+FMJyujrCGEz+FSo9wwCJDB9de+Q1L5MvnnuNWs5U0zOsGgNAO9XZ7FmRJX+3pKku04v8hKUz3gzwBaqrkXpN+XC6qO7P2CQljekuUHxEsArRsV2EeT0q4XAPlUhBr7uOa9AS5Wbj+lbVp77al1ObI6DgVPfCjrK/McUdrHMXYD77xiMBHxeYDWAN0SEFfMYGrK7k8c1a2FghwigpD5EA4bwR92dugIlzhnNiDlLfAHF7tcxpEnwA85KakFCG8swTUIwB3hLZvV29YKo2ZxMyXhLCrny5PpbifjwXkiPVed+MlYBM6DzoqPj7OJdrEIUtaGWZsHY1zuzSZw66WI5AQoTis/kPZRJ828B0vi5HOy8MJKr5La0QvAnP++E+OsTJN1s5AOjuxbB0JukpdqJqLtXyz9VaqEsvAk+73nizkrEF9L9rxfPNtFY/exEn/G0yOB8eh6LIt6vlMi9nXoEuhnLKVn+WefSYE8dAVnde7+ECnqlLWp0RWWAmFsFGCBKdV5g=
+  file: dist/**/*
+  on:
+    repo: muffinista/before-dawn
