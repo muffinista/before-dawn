@@ -14,7 +14,6 @@ describe("ReleaseCheck", function() {
   let url = `${server}${uriPath}`;
   let fixturePath;
 
-  // retry all tests in this suite up to 3 times
   helpers.setupTest(this);
 
   beforeEach(() => {

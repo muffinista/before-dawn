@@ -21,9 +21,6 @@ describe("bootstrap", function() {
 
   helpers.setupTest(this);
 
-  // retry all tests in this suite up to 3 times
-
-
   beforeEach(() => {
     workingDir = helpers.getTempDir();
     configDest = path.join(workingDir, "config.json");  

@@ -9,12 +9,7 @@ var saversDir;
 const SaverPrefs = require("../../src/lib/prefs.js");
 
 describe("Prefs", function() { 
-
   helpers.setupTest(this);
-
-  // retry all tests in this suite up to 3 times
-
-
 
   let pickPrefsWindow = function() {
     return helpers.getWindowByTitle(app, "Before Dawn: Preferences");

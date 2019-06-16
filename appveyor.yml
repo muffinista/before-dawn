@@ -31,12 +31,11 @@ matrix:
 skip_commits:
   message: /\[ci\s+skip\]/
 
-test: off
-# test_script:
-#   - node --version
-#   - yarn --version
-#   - yarn test
-# #  - yarn release
+# test: off
+test_script:
+  - node --version
+  - yarn --version
+  - yarn test
 
 #build: off
 build_script:

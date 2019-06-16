@@ -11,9 +11,6 @@ describe("About", function() {
   const windowTitle = "Before Dawn: About!";
   helpers.setupTest(this);
 
-  // retry all tests in this suite up to 3 times
-
-
   beforeEach(() => {
     workingDir = helpers.getTempDir();
     helpers.setupFullConfig(workingDir);
