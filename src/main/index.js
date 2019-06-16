@@ -74,6 +74,9 @@ let handles = {
       height: 320
     }
   },
+  settings: {
+    window: null
+  },
   editor: {
     window: null,
     preview: null,
@@ -282,8 +285,15 @@ var openPrefsWindow = function() {
 };
 
 var openSettingsWindow = function() {
+  if ( handles.settings.window !== null && handles.settings.window !== undefined ) {
+    return new Promise((resolve) => {
+      handles.settings.window.show();
+      resolve();
+    });
+  }
+
   var settingsUrl = getUrl("settings.html");
-  var w = new BrowserWindow({
+  handles.settings.window = new BrowserWindow({
     show: false,
     width:600,
     height:800,
@@ -301,24 +311,24 @@ var openSettingsWindow = function() {
   });
 
   // hide the file menu
-  if ( w.removeMenu !== undefined ) {
-    w.removeMenu();
+  if ( handles.settings.window.removeMenu !== undefined ) {
+    handles.settings.window.removeMenu();
   }
 
-  w.on("closed", () => {
-    w = null;
+  handles.settings.window.on("closed", () => {
+    handles.settings.window = null;
     dock.hideDockIfInactive(app);
   });
 
-  w.once("ready-to-show", () => {
-    w.show();
+  handles.settings.window.once("ready-to-show", () => {
+    handles.settings.window.show();
     dock.showDock(app);
   });
 
-  w.saverOpts = saverOpts;
+  handles.settings.window.saverOpts = saverOpts;
 
   log.info(`open ${settingsUrl}`);
-  w.loadURL(settingsUrl);
+  handles.settings.window.loadURL(settingsUrl);
 };
 
 /**
@@ -1381,6 +1391,18 @@ ipcMain.on("prefs-updated", () => {
 ipcMain.on("open-prefs", () => {
   log.info("open-prefs");
   openPrefsWindow();
+});
+ipcMain.on("close-prefs", () => {
+  log.info("close-prefs");
+  if ( handles.prefs.window ) {
+    handles.prefs.window.close();
+  }
+});
+ipcMain.on("close-settings", () => {
+  log.info("close-prefs");
+  if ( handles.settings.window ) {
+    handles.settings.window.close();
+  }
 });
 
 ipcMain.on("open-about", () => {
