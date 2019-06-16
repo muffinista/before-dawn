@@ -21,8 +21,8 @@ body {
   min-height: 100%;
 }
 
-body, input, button {
-  font: caption;
+input, button {
+  font: small-caption;
 }
 select {
   font: menu;
@@ -31,7 +31,9 @@ select {
 h1 {
   font-size: 1.1rem;
 }
-
+#about h1 {
+  font-size: 2.0rem;
+}
 small {
   font-size: 95%;
 }
