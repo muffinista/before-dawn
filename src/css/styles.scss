@@ -5,6 +5,7 @@
   --space-at-top: 1.0rem;
   --footer-padding: 25px;
   --small-padding: 10px;
+  --font-size: 14px;
 }
 
 /* purgecss start ignore */
@@ -14,6 +15,7 @@
 html {
   height: 100%;
   font-family: system-ui;
+  font-size: var(--font-size);
 }
 body {
   min-height: 100%;
@@ -27,11 +29,11 @@ select {
 }
 
 h1 {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
 }
 
 small {
-  font-size: 90%;
+  font-size: 95%;
 }
 
 .form-check {
