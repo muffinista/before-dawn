@@ -16,7 +16,7 @@
     "postinstall": "electron-builder install-app-deps",
     "pack": "yarn compile && electron-builder --dir",
     "dist": "yarn compile && electron-builder --x64",
-    "test": "yarn compile && xvfb-maybe mocha -b test/**",
+    "test": "yarn compile && xvfb-maybe mocha -b test/lib/* test/main/* test/ui/*",
     "test-lib": "nyc --reporter=html mocha test test/lib/** test/main/**",
     "run-local": "yarn compile && electron output/main.js",
     "grab-screens": "bin/capture-screens.js",

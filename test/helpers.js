@@ -11,7 +11,7 @@ const appPath = require("electron");
 const assert = require("assert");
 
 let windowCheckDelay = 5000;
-let testTimeout = 15000;
+let testTimeout = 25000;
 let testRetryCount = 0;
 
 if (process.env.CI) {
@@ -129,7 +129,6 @@ exports.stopApp = function(app) {
     return app.stop();
   }
 };
-
 
 exports.setupConfig = function(workingDir) {
   var src = path.join(__dirname, "fixtures", "config.json");

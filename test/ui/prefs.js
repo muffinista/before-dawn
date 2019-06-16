@@ -63,7 +63,7 @@ describe("Prefs", function() {
       then(() => app.client.click("button.save")).
       then(() => app.client.waitUntilTextExists("body", "Changes saved!")).
       then(function() {
-        assert(currentPrefs().current.lastIndexOf("/saver-one/") !== -1);
+        assert(currentPrefs().current.lastIndexOf("saver-one") !== -1);
       });
   });
 

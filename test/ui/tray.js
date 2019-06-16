@@ -9,9 +9,6 @@ describe("tray", function() {
   
   helpers.setupTest(this);
 
-  // retry all tests in this suite up to 3 times
-
-
   beforeEach(function() {
     workingDir = helpers.getTempDir();
     let saversDir = path.join(workingDir, "savers");
@@ -32,6 +29,13 @@ describe("tray", function() {
   });
 
   describe("run now", function() {
+    before(function() {
+      if ( process.platform === "win32" ) {
+        console.log("skipping on win32")
+        this.skip();
+      }
+    });
+
     it("opens screensaver", function() {
       return helpers.waitForWindow(app, "test shim").
         then(() => app.client.click("button.RunNow")).

@@ -116,6 +116,7 @@ describe("SaverListManager", function() {
   describe("list", function() {
     it("loads data", function(done) {
       savers.list(function(data) {
+//        console.log(data);
         assert.equal(3, data.length);
         done();
       });

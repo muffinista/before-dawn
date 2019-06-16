@@ -136,7 +136,7 @@ module.exports = class SaverListManager {
         var folder = path.dirname(f);
 
         // exclude skippable folders
-        var doLoad = ! folder.split(path.sep).reverse()[0].match(/^__/) &&
+        var doLoad = ! folder.split(/[/|\\]/).reverse()[0].match(/^__/) &&
                     ! skipFolder(folder);
         
         if ( doLoad ) {
