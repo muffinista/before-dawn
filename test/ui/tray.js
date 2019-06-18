@@ -31,7 +31,8 @@ describe("tray", function() {
   describe("run now", function() {
     before(function() {
       if ( process.platform === "win32" ) {
-        console.log("skipping on win32")
+        // eslint-disable-next-line no-console
+        console.log("skipping on win32");
         this.skip();
       }
     });
@@ -60,6 +61,14 @@ describe("tray", function() {
   });
 
   describe("enable/disable", function() {
+    before(function() {
+      if ( process.platform === "win32" ) {
+        // eslint-disable-next-line no-console
+        console.log("skipping on win32");
+        this.skip();
+      }
+    });
+
     it("toggles app status", function() {
       return helpers.waitForWindow(app, "test shim").
         then(() => app.client.waitUntilTextExists("body", "idle")).
