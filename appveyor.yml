@@ -26,25 +26,22 @@ install:
   - yarn
 
 matrix:
-  fast_finish: true
+  fast_finish: false
 
 skip_commits:
   message: /\[ci\s+skip\]/
+only_commits:
+ message: /build/
 
-# test: off
 test_script:
   - node --version
   - yarn --version
-  - yarn release
   - yarn test
 
-# #build: off
-# build_script:
-#   - node --version
-#   - yarn release
+build_script:
+  - node --version
+  - yarn release
 
-only_commits:
- message: /build/
 
 # deploy:
 #   - provider: GitHub
