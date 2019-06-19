@@ -35,12 +35,13 @@ skip_commits:
 test_script:
   - node --version
   - yarn --version
+  - yarn release
   - yarn test
 
-#build: off
-build_script:
-  - node --version
-  - yarn release
+# #build: off
+# build_script:
+#   - node --version
+#   - yarn release
 
 only_commits:
  message: /build/
