@@ -4,7 +4,7 @@
 
 const path = require("path");
 const fs = require("fs-extra");
-const fsPromises = require('fs').promises;
+const fsPromises = require("fs").promises;
 
 const Application = require("spectron").Application;
 const appPath = require("electron");
@@ -22,7 +22,7 @@ let app = new Application({
   env: env
 });
 
-const SCREENSAVER = 'Emoji Starfield';
+const SCREENSAVER = "Emoji Starfield";
 app.start().
   then(() => app.client.waitUntilWindowLoaded() ).
   then(() => app.electron.ipcRenderer.send("open-prefs")).

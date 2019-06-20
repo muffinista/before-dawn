@@ -35,15 +35,10 @@ can preview and pick screensavers there:
 
 ![preferences window](assets/prefs.png "Preferences Window")
 
-There's a 'Settings' section where you can specify certain options for how the
+There's an 'Advanced Settings' section where you can specify certain options for how the
 application should run.
 
-![preferences window](assets/prefs-settings.png "Preferences Settings")
-
-Finally, there's a section for advanced settings. You can use this area to add a
-local directory for storing your own screensavers.
-
-![preferences window](assets/prefs-advanced.png "Preferences Advanced Options")
+![settings window](assets/settings.png "Preferences Settings")
 
 
 ## Downloads
@@ -104,18 +99,12 @@ There's also a very basic editor mode built into Before Dawn, which will
 generate some basic code for you to work from, and will make it easier to add
 some configurable options to your work.
 
-The editor has a preview section:
+The editor has a simple preview, a form to describe the screensaver, and a
+section where you can add custom options for your screensaver:
 
 ![editor window](assets/editor.png "Editor Window")
 
-And a section to describe the screensaver:
-
-![editor window](assets/editor-description.png "Editor Description Window")
-
-
-And also a section where you can add custom options for your screensaver:
-
-![editor window](assets/editor-options.png "Editor Options Window")
+![editor window](assets/editor-2.png "Editor Window")
 
 
 ## Contributing
