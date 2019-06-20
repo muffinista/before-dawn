@@ -33,11 +33,11 @@ skip_commits:
 only_commits:
  message: /build/
 
-test: off
-# test_script:
-#   - node --version
-#   - yarn --version
-#   - yarn test
+# test: off
+test_script:
+  - node --version
+  - yarn --version
+  - yarn test --exit
 
 build_script:
   - node --version
