@@ -11,7 +11,7 @@ const STATES = {
   STATE_PAUSED: Symbol("paused") // screensaver is paused
 };
 
-const IDLE_CHECK_RATE = 25;
+const IDLE_CHECK_RATE = 250;
 
 class StateManager {
   constructor(fn) {
