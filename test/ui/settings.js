@@ -11,6 +11,7 @@ const SaverPrefs = require("../../src/lib/prefs.js");
 describe("Settings", function() { 
   const fakeDialogOpts = [ { method: "showOpenDialog", value: ["/not/a/real/path"] } ];
   const closeWindowDelay = 750;
+  const TEXT_ON_SCREEN = "Be careful with these!";
 
   before(function() {
     if ( process.env.CI && process.env.TRAVIS_OS_NAME == "osx") {
@@ -53,35 +54,11 @@ describe("Settings", function() {
     return helpers.stopApp(app);
 	});
 
-  it("set general preferences", function() {
-    return pickSettingsWindow().
-      then(() => app.client.waitUntilTextExists("body", "Activate after")).
-      then(() => 
-        app.client.selectByVisibleText("[name=delay]", "30 minutes")
-      ).
-      then(() => 
-        app.client.selectByVisibleText("[name=\"sleep\"]", "15 minutes")
-      ).
-      then(() => app.client.click("button.save")).
-      then(() => helpers.sleep(closeWindowDelay)).
-      then(function() {
-        let updatedPrefs = currentPrefs();
-        assert.equal(30, updatedPrefs.delay);
-        assert.equal(15, updatedPrefs.sleep);
-      }).
-      // make sure prefs updated on the main window
-      then(() => helpers.waitForWindow(app, "Before Dawn: Preferences") ).
-      then(() => app.client.getValue("[name='delay']")).
-      then((res) => {
-        assert.equal("30", res);
-      });
-  });
-
   it("toggles checkboxes", function() {
     let oldConfig = currentPrefs();
 
     return pickSettingsWindow().
-      then(() => app.client.waitUntilTextExists("body", "Activate after")).
+      then(() => app.client.waitUntilTextExists("body", TEXT_ON_SCREEN)).
       then(() => app.client.click("label*=Lock screen after running")).
       then(() => app.client.click("label*=Disable when on battery?")).
       then(() => app.client.click("label*=Auto start on login?")).
@@ -101,7 +78,7 @@ describe("Settings", function() {
     let oldConfig = currentPrefs();
 
     return pickSettingsWindow().
-      then(() => app.client.waitUntilTextExists("body", "Activate after")).
+      then(() => app.client.waitUntilTextExists("body", TEXT_ON_SCREEN)).
       then(() => app.client.click("button.save")).
       then(() => helpers.sleep(closeWindowDelay)).
       then(() => {
@@ -128,7 +105,7 @@ describe("Settings", function() {
 
   it("clears localSource", function() {
     return pickSettingsWindow().
-      then(() => app.client.waitUntilTextExists("body", "Activate after")).
+      then(() => app.client.waitUntilTextExists("body", TEXT_ON_SCREEN)).
       then(function() {
         let ls = currentPrefs().localSource;
         assert( ls != "" && ls !== undefined);
