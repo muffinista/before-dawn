@@ -16,7 +16,7 @@ const DEFAULT_REQUIREMENTS = ["screen"];
 var serialize = function(obj) {
   var str = [];
   for(var p in obj) {
-    if (obj.hasOwnProperty(p)) {
+    if (Object.defineProperty.hasOwnProperty.call(obj, p)) {
       str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
     }
   }
