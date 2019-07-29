@@ -11,7 +11,8 @@ const STATES = {
   STATE_PAUSED: Symbol("paused") // screensaver is paused
 };
 
-const IDLE_CHECK_RATE = 250;
+const IDLE_CHECK_RATE = 5000;
+const ACTIVE_CHECK_RATE = 250;
 
 class StateManager {
   constructor(fn) {
@@ -33,6 +34,11 @@ class StateManager {
     // this._initialOffset = undefined;
 
     this._idleFn = fn;
+
+    this.rates = {
+      idle: IDLE_CHECK_RATE,
+      active: ACTIVE_CHECK_RATE
+    };
   }
 
   set idleFn(x) {
@@ -228,9 +234,14 @@ class StateManager {
 
   scheduleTick() {
     if ( this.keepTicking ) {
+      let rate = this.rates.idle;
+      if ( this.currentState === STATES.STATE_RUNNING ) {
+        rate = this.rates.active;
+      }
+
       setTimeout(() => {
         this.tick();
-      }, IDLE_CHECK_RATE);
+      }, rate);
     }
   }
 
