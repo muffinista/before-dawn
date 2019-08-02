@@ -150,17 +150,13 @@
       video.muted = "muted";
 
       desktopCapturer.getSources(sourceTypes, function(error, sources) {
-        console.log(sources);   
-        if ( sources.length > 1 ) {
-          screen_id = id;
+        let screen = sources.find((s) => { return s.display_id == id; });
+        if ( ! screen ) {
+          screen = sources[0];
         }
-        else {
-          screen_id = sources[0].id;
-        }
+        screen_id = sources[0].id;
 
-        if ( typeof(screen_id) !== "string" || screen_id.indexOf("screen:") === -1 ) {
-          screen_id = "screen:" + id;
-        }
+        log.info(`capture screen ${screen_id}`);
 
         screen_opts.video.mandatory.chromeMediaSourceId = screen_id;
         mutex.synchronize(() => {

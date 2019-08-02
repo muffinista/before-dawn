@@ -130,7 +130,6 @@ const GRABBER_WINDOW_OPTS = {
 };
 
 
-
 /**
  * Open the screengrab window
  * 
@@ -144,6 +143,7 @@ var openGrabberWindow = function() {
     grabberWindow.noTray = true;
     
     grabberWindow.once("ready-to-show", () => {
+      // grabberWindow.webContents.openDevTools();
       resolve(grabberWindow);
     });
 
@@ -524,7 +524,7 @@ var runScreenSaverOnDisplay = function(saver, s) {
     w.isSaver = true;
    
     diff = process.hrtime(tickCount);
-    log.info("got screenshot back, let's do this", s.id, diff[0] * 1e9 + diff[1]);
+    log.info("let's do this", s.id, diff[0] * 1e9 + diff[1]);
     
     try {   
       // Emitted when the window is closed.
