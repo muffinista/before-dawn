@@ -954,8 +954,11 @@ var setupPackageCheck = function() {
     return;
   }
 
-  log.info("Setup package check");
-  setInterval(() => checkForPackageUpdates, RELEASE_CHECK_INTERVAL);
+  log.info("run initial package check");
+  checkForPackageUpdates().then(() => {
+    log.info("Setup recurring package check");
+    setInterval(() => checkForPackageUpdates, RELEASE_CHECK_INTERVAL);
+  });
 };
 
 /**
