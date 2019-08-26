@@ -22,6 +22,7 @@ const {app, dialog, globalShortcut, BrowserWindow, BrowserView, ipcMain, Menu, T
 const fs = require("fs");
 const path = require("path");
 const url = require("url");
+const { promisify } = require("util");
 
 const screenLock = require("./screen.js");
 const power = require("./power.js");
@@ -31,6 +32,7 @@ const idler = require("desktop-idle");
 const StateManager = require("./state_manager.js");
 const SaverPrefs = require("../lib/prefs.js");
 const SaverListManager = require("../lib/saver-list.js");
+const Package = require("../lib/package.js");
 const PackageDownloader = require("../lib/package-downloader.js");
 const ReleaseCheck = require("./release_check.js");
 
@@ -169,7 +171,7 @@ var grabScreen = function(s) {
     }
     else {
       let windowRef;
-      ipcMain.once("screenshot-" + s.id, function(e, message) {
+      ipcMain.once(`screenshot-${s.id}`, function(_e, message) {
         log.info("got screenshot!", message);
 
         // close the screen grabber window
@@ -296,7 +298,7 @@ var openSettingsWindow = function() {
   handles.settings.window = new BrowserWindow({
     show: false,
     width:600,
-    height:800,
+    height:500,
     maxWidth: 600,
     minWidth: 600,
     resizable: true,
@@ -779,6 +781,18 @@ var getSystemDir = function() {
   return path.join(app.getAppPath(), "output");
 };
 
+
+var getAssetDir = function() {
+  if ( process.env.TEST_MODE) {
+    return path.join(__dirname, "data");
+  }
+  if ( global.IS_DEV ) {
+    return path.join(__dirname, "..", "..", "data");
+  }
+  return path.join(app.getAppPath(), "data");
+};
+  
+
 /**
  * return the URL prefix we should use when loading app windows. if
  * running in development mode with hot reload enabled, we'll use an
@@ -839,7 +853,7 @@ var setupMenuAndTray = function() {
  * 
  * @returns {Promise} Promise that resolves with true if setup for first time, false if app was ready
  */
-var setupIfNeeded = function() {
+var setupIfNeeded = async function() {
   log.info("setupIfNeeded");
 
   return new Promise((resolve) => {
@@ -984,10 +998,48 @@ var askAboutApplicationsFolder = function() {
   }
 };
 
+
+var handleLocalPackage = async function() {
+  log.info(`handleLocalPackage ${global.LOCAL_PACKAGE}`);
+  if ( !global.LOCAL_PACKAGE ) {
+    return {downloaded: false};
+  }
+
+  let saverZip = path.join(getAssetDir(), global.LOCAL_PACKAGE);
+  let resultsJSON = path.join(app.getPath("userData"), `${global.LOCAL_PACKAGE}.json`);
+
+  log.info(saverZip, resultsJSON);
+
+  if ( !fs.existsSync(resultsJSON) && fs.existsSync(saverZip) ) {
+    log.info(`load savers from ${saverZip}`);
+    var attrs = {
+      dest: path.join(app.getPath("userData"), "savers"),
+      local_zip: saverZip
+    };
+
+    let p = new Package(attrs);
+    await p.checkLatestRelease(true);
+
+    let results = await p.getReleaseInfo();
+    results.downloaded = true;
+
+    const writeFileAsync = promisify(fs.writeFile);
+    await writeFileAsync(resultsJSON, JSON.stringify(results));
+
+    return results;
+  }
+  else {
+    log.info(`don't load savers from ${saverZip}`);
+    return {
+      downloaded: false
+    };
+  }
+};
+
 /**
  * handle initial startup of app
  */
-var bootApp = function() {
+var bootApp = async function() {
   askAboutApplicationsFolder();
 
   global.NEW_RELEASE_AVAILABLE = false;
@@ -1010,6 +1062,9 @@ var bootApp = function() {
     logger: log.info
   };
 
+//  if ( !global.IS_DEV ) {
+  await handleLocalPackage();
+//  }
 
   log.info("Loading prefs");
   log.info(`baseDir: ${saverOpts.base}`);
@@ -1026,9 +1081,9 @@ var bootApp = function() {
   // monitor
   //
   electronScreen = electron.screen;
-  electronScreen.on("display-added", windows.handleDisplayChange);
-  electronScreen.on("display-removed", windows.handleDisplayChange);
-  electronScreen.on("display-metrics-changed", windows.handleDisplayChange);    
+  ["display-added", "display-removed", "display-metrics-changed"].forEach((type) => {
+    electronScreen.on(type, windows.handleDisplayChange);
+  });
 
   ["suspend", "resume", "lock-screen", "unlock-screen"].forEach((type) => {
     electron.powerMonitor.on(type, () => {
@@ -1041,23 +1096,21 @@ var bootApp = function() {
   stateManager.idleFn = idler.getIdleTime;
 
   updateStateManager();
-  stateManager.startTicking();
-  
+
+  let result = await setupIfNeeded();
+  await openPrefsWindowIfNeeded(result);
+  setupForTesting();
+
   setupMenuAndTray();
-  
-  setupIfNeeded().
-    then((result) => openPrefsWindowIfNeeded(result)).
-    then(() => setupForTesting()).
-    then(() => {
-      setupReleaseCheck();
-      setupPackageCheck();    
-      setupLaunchShortcut();
+  setupReleaseCheck();
+  setupPackageCheck();
+  setupLaunchShortcut();
 
-      // don't show app in dock
-      dock.hideDockIfInactive(app);
+  // don't show app in dock
+  dock.hideDockIfInactive(app);
 
-      log.info("done with setup flow");
-    });
+  // start the idle check
+  stateManager.startTicking();
 };
 
 /**
@@ -1313,12 +1366,25 @@ log.transports.file.maxSize = 1 * 1024 * 1024;
 
 log.info(`Hello from version: ${global.APP_VERSION_BASE} running in ${global.IS_DEV ? "development" : "production"}`);
 
+if ( global.IS_DEV ) {
+  app.setName(global.APP_NAME);
+  app.name = global.APP_NAME;
+  log.info(`set app name to ${app.getName()}`);
+
+  if ( testMode !== true ) {
+    let userDataPath = path.join(app.getPath("appData"), app.getName());
+    log.info(`set userData path to ${userDataPath}`);
+    app.setPath("userData", userDataPath);
+  }
+}
+
 // store our root path as a global variable so we can access it from screens
 if ( process.env.BEFORE_DAWN_DIR !== undefined ) {
   global.basePath = process.env.BEFORE_DAWN_DIR;
 }
 else {
-  global.basePath = path.join(app.getPath("appData"), global.APP_DIR);
+  global.basePath = app.getPath("userData");
+  // global.basePath = path.join(app.getPath("appData"), global.APP_DIR);
 }
 log.info("use base path", global.basePath);
 
@@ -1416,16 +1482,16 @@ ipcMain.on("open-about", () => {
 //
 // handle request to open 'add new saver' window
 //
-ipcMain.on("open-add-screensaver", (event, screenshot) => {
+ipcMain.on("open-add-screensaver", (_event, screenshot) => {
   log.info("open-add-screensaver");
   addNewSaver(screenshot);
 });
 
-ipcMain.on("open-editor", (event, args) => {
+ipcMain.on("open-editor", (_event, args) => {
   openEditor(args);
 });
 
-ipcMain.on("set-autostart", (event, value) => {
+ipcMain.on("set-autostart", (_event, value) => {
   log.info("set-autostart");
   autostarter.toggle(global.APP_NAME, value);
 });

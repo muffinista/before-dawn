@@ -21,7 +21,7 @@ module.exports = class Package {
     this.dest = _attrs.dest;
     this.updated_at = _attrs.updated_at;
     this.downloaded = false;
-    this.url = "https://api.github.com/repos/" + this.repo + "/releases/latest";
+    this.url = `https://api.github.com/repos/${this.repo}/releases/latest`;
 
     this.useLocalFile = false;
 

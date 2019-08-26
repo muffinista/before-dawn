@@ -40,13 +40,8 @@ won't run if your computer is running on battery power.
   when your computer starts?
 
 ### Advanced Options ###
-- *Github Repo URL*  -- Before Dawn queries a Github repository to see
-  if there are any new screensavers to download. By default, it checks
-  [https://github.com/muffinista/before-dawn-screensavers](https://github.com/muffinista/before-dawn-screensavers)
-  but if you want to run your own custom set of screensavers, you can
-  put a different Github repo here.
 - *Local Source* -- If you want to develop your own screensavers, or
-  run a set of screensavers that aren't on Github, you can put a path
+  run a set of screensavers that aren't in the main package, you can put a path
   to a directory here. Before Dawn will check this directory for any
   local screensavers and add them to the list.
 

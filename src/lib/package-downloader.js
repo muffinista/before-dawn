@@ -25,9 +25,9 @@ module.exports = class PackageDownloader {
     var source = this.prefs.sourceRepo;
     var sourceUpdatedAt = this.prefs.sourceUpdatedAt;
     var attrs = {
-      repo:source,
-      updated_at:sourceUpdatedAt,
-      dest:this.prefs.defaultSaversDir
+      repo: source,
+      updated_at: sourceUpdatedAt,
+      dest: this.prefs.defaultSaversDir
     };
 
     if ( this.localZip ) {
