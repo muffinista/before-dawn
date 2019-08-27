@@ -97,7 +97,7 @@ exports.savedConfig = function(p) {
   return JSON.parse(json);
 };
 
-exports.application = function(workingDir, quietMode=false, localZip) {
+exports.application = function(workingDir, quietMode=false, localZip, localZipData) {
   let env = {
     BEFORE_DAWN_DIR: workingDir,
     TEST_MODE: true,
@@ -106,6 +106,9 @@ exports.application = function(workingDir, quietMode=false, localZip) {
 
   if ( localZip !== undefined ) {
     env.LOCAL_PACKAGE = localZip;
+  }
+  if ( localZipData !== undefined ) {
+    env.LOCAL_PACKAGE_DATA = localZipData;
   }
  
   var a = new Application({
@@ -239,13 +242,9 @@ exports.waitForWindowClosed = async (app, title, skipAssert) => {
   return result;
 };
 
-
-
-
 exports.waitUntilBooted = async(app) => {
   return exports.waitForWindow(app, "test shim");
 };
-
 
 exports.outputLogs = function(app) {
   return app.client.getMainProcessLogs().

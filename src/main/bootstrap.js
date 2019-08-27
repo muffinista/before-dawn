@@ -50,6 +50,9 @@ if ( !process.env.LOCAL_PACKAGE && process.env.TEST_MODE === undefined ) {
 if ( process.env.LOCAL_PACKAGE ) {
   global.LOCAL_PACKAGE = process.env.LOCAL_PACKAGE;
 }
+if ( process.env.LOCAL_PACKAGE_DATA ) {
+  global.LOCAL_PACKAGE_DATA = process.env.LOCAL_PACKAGE_DATA;
+}
 
 // note -- this is hardcoded to win32 for now because we actually
 // don't care what platform is running

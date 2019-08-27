@@ -8,13 +8,15 @@ const helpers = require("../helpers.js");
 
 describe("bootstrap", function() {
   const prefsWindowTitle = "Before Dawn: Preferences";
-  const zipPath = path.join(__dirname, "..", "fixtures", "test-savers.zip");
+  const saverZip = path.join(__dirname, "..", "fixtures", "test-savers.zip");
+  const saverData = path.join(__dirname, "..", "fixtures", "test-savers.json");
+
   let configDest;
   var workingDir;
   let app;
 
   var bootApp = function() {
-    app = helpers.application(workingDir, false, zipPath);  
+    app = helpers.application(workingDir, false, saverZip, saverData);  
     return app.start().
       then(() => helpers.waitUntilBooted(app));
   };
@@ -24,7 +26,7 @@ describe("bootstrap", function() {
   beforeEach(() => {
     workingDir = helpers.getTempDir();
     configDest = path.join(workingDir, "config.json");  
-    app = helpers.application(workingDir, false, zipPath);
+    app = helpers.application(workingDir, false, saverZip, saverData);
   });
 
   afterEach(() => {

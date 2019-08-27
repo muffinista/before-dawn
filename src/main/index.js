@@ -1006,12 +1006,12 @@ var askAboutApplicationsFolder = function() {
  */
 var handleLocalPackage = async function() {
   log.info(`handleLocalPackage ${global.LOCAL_PACKAGE}`);
-  if ( !global.LOCAL_PACKAGE ) {
+  if ( !global.LOCAL_PACKAGE || !global.LOCAL_PACKAGE_DATA) {
     return {downloaded: false};
   }
 
   let saverZip = path.join(getAssetDir(), global.LOCAL_PACKAGE);
-  let saverData = path.join(getAssetDir(), process.env.LOCAL_PACKAGE_DATA);
+  let saverData = path.join(getAssetDir(), global.LOCAL_PACKAGE_DATA);
   
   let resultsJSON = path.join(app.getPath("userData"), `${global.LOCAL_PACKAGE}.json`);
 
