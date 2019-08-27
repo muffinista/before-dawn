@@ -27,8 +27,6 @@ const { promisify } = require("util");
 const screenLock = require("./screen.js");
 const power = require("./power.js");
 
-const idler = require("desktop-idle");
-
 const StateManager = require("./state_manager.js");
 const SaverPrefs = require("../lib/prefs.js");
 const SaverListManager = require("../lib/saver-list.js");
@@ -1089,7 +1087,8 @@ var bootApp = async function() {
   });
 
   stateManager = new StateManager();
-  stateManager.idleFn = idler.getIdleTime;
+  stateManager.idleFn = () => electron.powerMonitor.getSystemIdleTime();
+
 
   updateStateManager();
 
