@@ -856,48 +856,48 @@ var setupMenuAndTray = function() {
 var setupIfNeeded = async function() {
   log.info("setupIfNeeded");
 
-  return new Promise((resolve) => {
-    if ( process.env.QUIET_MODE && process.env.QUIET_MODE === "true" ) {
-      log.info("Quiet mode, skip setup checks!");
-      return resolve(false);
-    }
+  let localPackageCheck = await handleLocalPackage();
+  if ( localPackageCheck.downloaded ) {
+    prefs.updateCheckTimestamp = new Date().getTime();
+  }
 
-    // check if we should download savers, set something up, etc
-    if ( process.env.FORCE_SETUP || prefs.needSetup ) {
-      log.info("needSetup!");
-      prefs.setDefaultRepo(global.SAVER_REPO);
-      prefs.ensureDefaults();
-      prefs.writeSync();
+  if ( process.env.QUIET_MODE === "true" ) {
+    log.info("Quiet mode, skip setup checks!");
+    return false;
+  }
 
+  // check if we should download savers, set something up, etc
+  if ( localPackageCheck.downloaded || process.env.FORCE_SETUP || prefs.needSetup ) {
+    log.info("needSetup!");
+    prefs.setDefaultRepo(global.SAVER_REPO);
+    prefs.ensureDefaults();
+    prefs.writeSync();
+
+    if ( ! localPackageCheck.downloaded ) {
       let pd = new PackageDownloader(prefs);
-      if ( global.LOCAL_PACKAGE ) {
-        pd.setLocalFile(global.LOCAL_PACKAGE);
-      }
-
-      pd.updatePackage().then(() => {
-        return resolve(true);
-      });
-
-      // stop processing here, we know we need to setup
-      return;
+      await pd.updatePackage();
     }
 
-    var savers = new SaverListManager({
-      prefs: prefs
-    });
+    // stop processing here, we know we need to setup
+    return true;
+  }
 
-    log.info("checking if " + prefs.current + " is valid");
-    savers.confirmExists(prefs.current).then((exists) => {
-      let results = !exists;
-      if ( ! exists ) {
-        log.info("need to pick a new screensaver");
-      }
-      else {
-        log.info("looks like we are good to go");
-      }
-      return resolve(results);
-    });
+  var savers = new SaverListManager({
+    prefs: prefs
   });
+
+  log.info(`checking if ${prefs.current} is valid`);
+  let exists = await savers.confirmExists(prefs.current);
+
+  let results = !exists;
+  if ( ! exists ) {
+    log.info("need to pick a new screensaver");
+  }
+  else {
+    log.info("looks like we are good to go");
+  }
+
+  return results;
 };
 
 /**
@@ -1062,9 +1062,6 @@ var bootApp = async function() {
     logger: log.info
   };
 
-//  if ( !global.IS_DEV ) {
-  await handleLocalPackage();
-//  }
 
   log.info("Loading prefs");
   log.info(`baseDir: ${saverOpts.base}`);
@@ -1073,7 +1070,6 @@ var bootApp = async function() {
     baseDir: saverOpts.base,
     systemSource: saverOpts.systemDir
   });
-
 
   //
   // setup some event handlers for when screen count changes, mostly
