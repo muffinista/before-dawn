@@ -198,7 +198,7 @@ class StateManager {
       // }
 
 
-//      i = this._idleFn() + this._initialOffset;
+      //      i = this._idleFn() + this._initialOffset;
       i = this._idleFn();
 
       nextTime = this.getNextTime();
