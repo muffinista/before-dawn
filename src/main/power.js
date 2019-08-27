@@ -6,8 +6,9 @@ module.exports.charging = function() {
 
     return osxBattery().then(res => {
       return res.isCharging || res.fullyCharged;
+    }).catch(() => {
+      return false;
     });
-    
   }
   else if ( process.platform === "linux") {
     var linuxBattery = require("linux-battery");
@@ -15,7 +16,9 @@ module.exports.charging = function() {
     // NOTE: this is not actually tested
     return linuxBattery().then(res => {
       return ( res.state !== "discharging" );
-    });    
+    }).catch(() => {
+      return false;
+    });
   } 
   else {
     // this code is modified from https://github.com/gillstrom/battery-level/blob/master/win.js
