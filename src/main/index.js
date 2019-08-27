@@ -856,7 +856,8 @@ var setupIfNeeded = async function() {
 
   let localPackageCheck = await handleLocalPackage();
   if ( localPackageCheck.downloaded ) {
-    prefs.updateCheckTimestamp = new Date().getTime();
+    log.info(`set update to ${new Date(localPackageCheck.published_at)}`);
+    prefs.sourceUpdatedAt = new Date(localPackageCheck.published_at);
   }
 
   if ( process.env.QUIET_MODE === "true" ) {
@@ -872,6 +873,7 @@ var setupIfNeeded = async function() {
     prefs.writeSync();
 
     if ( ! localPackageCheck.downloaded ) {
+      log.info("check for updated download");
       let pd = new PackageDownloader(prefs);
       await pd.updatePackage();
     }
@@ -997,6 +999,9 @@ var askAboutApplicationsFolder = function() {
 };
 
 
+/**
+ * Before Dawn releases will come with a zipfile of screensavers
+ */
 var handleLocalPackage = async function() {
   log.info(`handleLocalPackage ${global.LOCAL_PACKAGE}`);
   if ( !global.LOCAL_PACKAGE ) {
@@ -1004,11 +1009,11 @@ var handleLocalPackage = async function() {
   }
 
   let saverZip = path.join(getAssetDir(), global.LOCAL_PACKAGE);
+  let saverData = path.join(getAssetDir(), process.env.LOCAL_PACKAGE_DATA);
+  
   let resultsJSON = path.join(app.getPath("userData"), `${global.LOCAL_PACKAGE}.json`);
 
-  log.info(saverZip, resultsJSON);
-
-  if ( !fs.existsSync(resultsJSON) && fs.existsSync(saverZip) ) {
+  if ( !fs.existsSync(resultsJSON) && fs.existsSync(saverZip) && fs.existsSync(saverData) ) {
     log.info(`load savers from ${saverZip}`);
     var attrs = {
       dest: path.join(app.getPath("userData"), "savers"),
@@ -1018,7 +1023,7 @@ var handleLocalPackage = async function() {
     let p = new Package(attrs);
     await p.checkLatestRelease(true);
 
-    let results = await p.getReleaseInfo();
+    let results = JSON.parse(fs.readFileSync(saverData));
     results.downloaded = true;
 
     const writeFileAsync = promisify(fs.writeFile);

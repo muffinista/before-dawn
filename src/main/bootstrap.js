@@ -38,6 +38,9 @@ if ( !process.env.LOCAL_PACKAGE && process.env.TEST_MODE === undefined ) {
     packageJSON = require("../../package.json");
     let localSavers = packageJSON.resources.savers;
     process.env.LOCAL_PACKAGE = localSavers;
+
+    let localSaversJSON = packageJSON.resources.data;
+    process.env.LOCAL_PACKAGE_DATA = localSaversJSON;
   }
   catch(e) {
     console.log(e);

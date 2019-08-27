@@ -54,7 +54,7 @@ async function main() {
   console.log("Add commits to release");
   await sentryCli.execute(["releases", "set-commits", "--auto", releaseName], true);
 
-  console.log("Upload sourcemaps")
+  console.log("Upload sourcemaps");
   await sentryCli.execute(["releases", "files", releaseName, "upload-sourcemaps", "output"], true);
 
   console.log("Finalize release");

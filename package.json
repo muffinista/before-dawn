@@ -21,11 +21,12 @@
     "test-lib": "nyc --reporter=html mocha test test/lib/** test/main/**",
     "run-local": "yarn compile && electron output/main.js",
     "grab-screens": "bin/capture-screens.js",
-    "release": "yarn dist",
+    "release": "node bin/download-screensavers.js && yarn dist",
     "publish-release": "node bin/generate-release.js && git push origin master && node bin/sentry-symbols.js"
   },
   "resources": {
-    "savers": "before-dawn-screensavers-0.9.35.zip"
+    "savers": "before-dawn-screensavers-v0.9.35.zip",
+    "data": "before-dawn-screensavers-v0.9.35.json"
   },
   "repository": {
     "type": "git",

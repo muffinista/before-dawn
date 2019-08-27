@@ -1,63 +1,63 @@
 "use strict";
 
-const electron = require("electron")
-const path = require("path")
-const { spawn } = require("child_process")
-const webpack = require("webpack")
-const WebpackDevServer = require("webpack-dev-server")
-const webpackHotMiddleware = require("webpack-hot-middleware")
+const electron = require("electron");
+const path = require("path");
+const { spawn } = require("child_process");
+const webpack = require("webpack");
+const WebpackDevServer = require("webpack-dev-server");
+const webpackHotMiddleware = require("webpack-hot-middleware");
 
-const mainConfig = require("../webpack.main.config")
-const rendererConfig = require("../webpack.renderer.config")
+const mainConfig = require("../webpack.main.config");
+const rendererConfig = require("../webpack.renderer.config");
 
-let electronProcess = null
-let manualRestart = false
-let hotMiddleware
+let electronProcess = null;
+let manualRestart = false;
+let hotMiddleware;
 
 function logStats (proc, data) {
-  let log = ""
+  let log = "";
 
   log += `┏ ${proc} Process ${new Array((19 - proc.length) + 1).join("-")}`;
-  log += "\n\n"
+  log += "\n\n";
 
   if (typeof data === "object") {
     data.toString({
       colors: true,
       chunks: false
     }).split(/\r?\n/).forEach(line => {
-      log += "  " + line + "\n"
-    })
+      log += "  " + line + "\n";
+    });
   } else {
-    log += `  ${data}\n`
+    log += `  ${data}\n`;
   }
 
   log += "\n" + `┗ ${new Array(28 + 1).join("-")}` + "\n";
 
-  console.log(log)
+  console.log(log);
 }
 
 function startRenderer () {
   return new Promise((resolve, reject) => {
-    rendererConfig.entry.renderer = [path.join(__dirname, "dev-client")].concat(rendererConfig.entry.renderer)
+    rendererConfig.entry.renderer = [path.join(__dirname, "dev-client")].concat(rendererConfig.entry.renderer);
 
-    const compiler = webpack(rendererConfig)
+    const compiler = webpack(rendererConfig);
     hotMiddleware = webpackHotMiddleware(compiler, { 
       log: false, 
       heartbeat: 2500 
-    })
+    });
 
     compiler.plugin("compilation", compilation => {
       compilation.plugin("html-webpack-plugin-after-emit", (data, cb) => {
-        hotMiddleware.publish({ action: "reload" })
+        hotMiddleware.publish({ action: "reload" });
         if ( typeof(cb) !== "undefined" ) {
           cb();
         }
-      })
-    })
+      });
+    });
 
     compiler.plugin("done", stats => {
-      logStats("Renderer", stats)
-    })
+      logStats("Renderer", stats);
+    });
 
     const server = new WebpackDevServer(
       compiler,
@@ -65,66 +65,66 @@ function startRenderer () {
         contentBase: path.join(__dirname, "../"),
         quiet: true,
         before (app, ctx) {
-          app.use(hotMiddleware)
+          app.use(hotMiddleware);
           ctx.middleware.waitUntilValid(() => {
-            resolve()
-          })
+            resolve();
+          });
         }
       }
-    )
+    );
 
-    server.listen(9080)
-  })
+    server.listen(9080);
+  });
 }
 
 function startMain () {
   return new Promise((resolve, reject) => {
     //mainConfig.entry.main = [path.join(__dirname, '../src/main/index.js')].concat(mainConfig.entry.main)
 
-    const compiler = webpack(mainConfig)
+    const compiler = webpack(mainConfig);
 
     compiler.plugin("watch-run", (compilation, done) => {
-      logStats("Main", "compiling...")
-      hotMiddleware.publish({ action: "compiling" })
-      done()
-    })
+      logStats("Main", "compiling...");
+      hotMiddleware.publish({ action: "compiling" });
+      done();
+    });
 
     compiler.watch({}, (err, stats) => {
       if (err) {
-        console.log(err)
-        return
+        console.log(err);
+        return;
       }
 
-      logStats("Main", stats)
+      logStats("Main", stats);
 
       if (electronProcess && electronProcess.kill) {
-        manualRestart = true
-        process.kill(electronProcess.pid)
-        electronProcess = null
-        startElectron()
+        manualRestart = true;
+        process.kill(electronProcess.pid);
+        electronProcess = null;
+        startElectron();
 
         setTimeout(() => {
-          manualRestart = false
-        }, 5000)
+          manualRestart = false;
+        }, 5000);
       }
 
-      resolve()
-    })
-  })
+      resolve();
+    });
+  });
 }
 
 function startElectron () {
-  electronProcess = spawn(electron, ["--inspect=5858", path.join(__dirname, "../src/main/index.dev.js")])
+  electronProcess = spawn(electron, ["--inspect=5858", path.join(__dirname, "../src/main/index.dev.js")]);
 
   electronProcess.stdout.on("data", data => {
     process.stdout.write(data.toString());
-  })
+  });
   electronProcess.stderr.on("data", data => {
     process.stdout.write(data.toString());
-  })
+  });
   electronProcess.on("close", () => {
-    if (!manualRestart) {process.exit()}
-  })
+    if (!manualRestart) {process.exit();}
+  });
 }
 
 function init () {
@@ -132,11 +132,11 @@ function init () {
 
   Promise.all([startRenderer(), startMain()])
     .then(() => {
-      startElectron()
+      startElectron();
     })
     .catch(err => {
-      console.error(err)
-    })
+      console.error(err);
+    });
 }
 
 init();

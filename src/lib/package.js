@@ -8,6 +8,10 @@ const mkdirp = require("mkdirp");
 const rimraf = require("rimraf");
 const lockfile = require("proper-lockfile");
 
+const temp = require("temp");
+const os = require("os");
+
+
 /**
  * need source repo url
  * call https://developer.github.com/v3/repos/releases/#get-the-latest-release
@@ -110,20 +114,23 @@ module.exports = class Package {
     }
   }
 
-  async downloadFile(url) {
-    var temp = require("temp");
-    var os = require("os");
-    var tempName = temp.path({dir: os.tmpdir(), suffix: ".zip"});
-    
+  async downloadFile(url, dest) {
+    if ( dest === undefined ) {
+      dest = temp.path({dir: os.tmpdir(), suffix: ".zip"});
+    }
+    console.log(`${url} -> ${dest}`);
+
     const res = await fetch(url, this.defaultHeaders);
     return await new Promise((resolve, reject) => {
-      const fileStream = fs.createWriteStream(tempName);
+      const fileStream = fs.createWriteStream(dest);
       res.body.pipe(fileStream);
       res.body.on("error", (err) => {
+        console.log(err);
         reject(err);
       });
       fileStream.on("finish", function() {
-        resolve(tempName);
+        console.log("done!");
+        resolve(dest);
       });
     });
   }
