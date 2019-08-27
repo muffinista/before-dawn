@@ -86,7 +86,9 @@ let mainConfig = {
     sourceMapFilename: "[name].js.map"
   },
   plugins: [
-    new CleanWebpackPlugin(),
+    new CleanWebpackPlugin({
+      cleanOnceBeforeBuildPatterns: []
+    }),
     new CopyWebpackPlugin([
       {
         from: path.join(__dirname, "package.json"),
