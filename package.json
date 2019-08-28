@@ -25,8 +25,8 @@
     "publish-release": "node bin/generate-release.js && git push origin master && node bin/sentry-symbols.js"
   },
   "resources": {
-    "savers": "before-dawn-screensavers-v0.9.35.zip",
-    "data": "before-dawn-screensavers-v0.9.35.json"
+    "savers": "before-dawn-screensavers-v0.9.36.zip",
+    "data": "before-dawn-screensavers-v0.9.36.json"
   },
   "repository": {
     "type": "git",
@@ -126,6 +126,7 @@
   "build": {
     "files": [
       "output/**/*",
+      "data/**/*",
       "node_modules/**/*",
       "package.json"
     ],

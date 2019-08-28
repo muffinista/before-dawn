@@ -7,8 +7,11 @@ const Package = require("../src/lib/package.js");
 const Octokit = require("@octokit/rest");
 const path = require("path");
 const fs = require("fs");
+const rimraf = require("rimraf");
+const mkdirp = require("mkdirp");
 
 const srcRoot = path.join(__dirname, "..");
+const workingDir = path.join(srcRoot, "data");
 const pjsonPath = path.join(srcRoot, "package.json");
 const pjson = require(pjsonPath);
 
@@ -20,6 +23,11 @@ const octokit = new Octokit(opts);
 
 let owner = "muffinista";
 let repo = "before-dawn-screensavers";
+
+
+console.log("cleaning up working dir", workingDir);
+mkdirp.sync(workingDir);
+rimraf.sync(`${workingDir}/*`);
 
 async function main() {
   let result = await octokit.repos.getLatestRelease({owner, repo});
