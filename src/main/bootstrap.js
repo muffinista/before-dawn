@@ -43,6 +43,7 @@ if ( !process.env.LOCAL_PACKAGE && process.env.TEST_MODE === undefined ) {
     process.env.LOCAL_PACKAGE_DATA = localSaversJSON;
   }
   catch(e) {
+    // eslint-disable-next-line no-console
     console.log(e);
   }
 }
