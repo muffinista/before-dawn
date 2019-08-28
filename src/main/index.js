@@ -298,7 +298,7 @@ var openSettingsWindow = function() {
   handles.settings.window = new BrowserWindow({
     show: false,
     width:600,
-    height:500,
+    height:600,
     maxWidth: 600,
     minWidth: 600,
     resizable: true,
