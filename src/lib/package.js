@@ -118,18 +118,18 @@ module.exports = class Package {
     if ( dest === undefined ) {
       dest = temp.path({dir: os.tmpdir(), suffix: ".zip"});
     }
-    console.log(`${url} -> ${dest}`);
+    // console.log(`${url} -> ${dest}`);
 
     const res = await fetch(url, this.defaultHeaders);
     return await new Promise((resolve, reject) => {
       const fileStream = fs.createWriteStream(dest);
       res.body.pipe(fileStream);
       res.body.on("error", (err) => {
-        console.log(err);
+        // console.log(err);
         reject(err);
       });
       fileStream.on("finish", function() {
-        console.log("done!");
+        // console.log("done!");
         resolve(dest);
       });
     });
