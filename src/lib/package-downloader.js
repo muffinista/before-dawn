@@ -17,10 +17,6 @@ module.exports = class PackageDownloader {
     }
   }
 
-  setLocalFile(f) {
-    this.localZip = f;
-  }
-
   getPackage() {
     var source = this.prefs.sourceRepo;
     var sourceUpdatedAt = this.prefs.sourceUpdatedAt;
@@ -29,10 +25,6 @@ module.exports = class PackageDownloader {
       updated_at: sourceUpdatedAt,
       dest: this.prefs.defaultSaversDir
     };
-
-    if ( this.localZip ) {
-      attrs.local_zip = this.localZip;
-    }
 
     this.logger("getPackage", attrs);
 
