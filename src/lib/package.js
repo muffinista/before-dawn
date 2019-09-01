@@ -216,8 +216,7 @@ module.exports = class Package {
           }
  
         });  
-      });
+      })
     });
-
   }
 };

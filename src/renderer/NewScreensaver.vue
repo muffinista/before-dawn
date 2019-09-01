@@ -130,15 +130,15 @@ export default {
     closeWindow() {
       this.currentWindow.close();
     },
-    localSourceChange(ls) {
+    async localSourceChange(ls) {
       var tmp = {
         localSource: ls
       };
       this.prefs = Object.assign(this.prefs, tmp);
-      this.prefs.updatePrefs(this.prefs, (changes) => {
-        this.disabled = false;
-        this.ipcRenderer.send("prefs-updated", changes);
-      });
+      let changes = await this.prefs.updatePrefs(this.prefs);
+      
+      this.disabled = false;
+      this.ipcRenderer.send("prefs-updated", changes);
     },
     saveData() {
       if ( document.querySelectorAll(":invalid").length > 0 ) {

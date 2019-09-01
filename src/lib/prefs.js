@@ -180,7 +180,7 @@ class SaverPrefs {
     return this._data.options[name] || {};
   }
 
-  updatePrefs(data, cb) {
+  async updatePrefs(data) {
     for ( var k in data ) {
       var v = data[k];
       this[k] = v;
@@ -189,18 +189,16 @@ class SaverPrefs {
     let result = this.changes;
     this.changes = {};
 
-    this.write(() => {
-      cb(result);
-    });
+    await this.write();
+
+    return result;
   }
 
-  write(cb) {
-    let output = JSON.stringify(this._data, null, 2);
-    lockfile.lock(this.configFile, { realpath: false }).then((release) => {
-      fs.writeFile(this.configFile, output, () => {
-        release().then(cb);
-      });
-    });
+  async write() {
+    let release = await lockfile.lock(this.configFile, { realpath: false });
+    await fs.writeJson(this.configFile, this._data, { spaces: 2 });
+
+    release();
   }
   
   writeSync() {

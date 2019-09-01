@@ -123,7 +123,7 @@ describe("Settings", function() {
 
 
   it("resets defaults", function() {
-    const resetDialogOpts = [ { method: "showMessageBox", value: 1 } ];
+    const resetDialogOpts = [ { method: "showMessageBoxSync", value: 1 } ];
 
     return pickSettingsWindow().
       then(() => app.fakeDialog.mock(resetDialogOpts)).

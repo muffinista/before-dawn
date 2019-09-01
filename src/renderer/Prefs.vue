@@ -346,32 +346,37 @@ export default {
     closeWindow() {
       this.currentWindow.close();
     },
-    saveData() {
-      this.disabled = true;
+    async saveData() {
 
       // @todo should this use Object.assign?
       this.prefs.current = this.saver;
       this.prefs.options = this.options;
-      return new Promise((resolve) => {
-        this.prefs.updatePrefs(this.prefs, (changes) => {
-          this.disabled = false;
-          this.ipcRenderer.send("prefs-updated", changes);
-          resolve(changes);
-        });
-      });
+
+      return await this.prefs.updatePrefs(this.prefs);
     },
-    saveDataClick() {
-      this.saveData().then(() => {
-        new Noty({
-          type: "success",
-          layout: "topRight",
-          timeout: 1000,
-          text: "Changes saved!",
-          animation: {
-            open: null
-          }
-        }).show();
-      });
+    async saveDataClick() {
+      let output;
+
+      this.disabled = true;
+      try {
+        let changes = await this.saveData();
+        this.ipcRenderer.send("prefs-updated", changes);
+        output = "Changes saved!";
+      }
+      catch(e) {
+        output = "Something went wrong!";
+      }
+
+      this.disabled = false;
+      new Noty({
+        type: "success",
+        layout: "topRight",
+        timeout: 1000,
+        text: output,
+        animation: {
+          open: null
+        }
+      }).show();
     },
     renderUpdateNotice() {
       dialog.showMessageBox(

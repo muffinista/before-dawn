@@ -110,7 +110,8 @@ export default {
       return this.savers[this.saverIndex];
     },
     params: function() {
-      // parse incoming URL params -- we'll get a link to the current screen images for previews here
+      // parse incoming URL params -- we'll get a link to 
+      // the current screen images for previews here
       return new URLSearchParams(document.location.search);
     },
     screenshot: function() {
@@ -127,63 +128,52 @@ export default {
     });
   },
   methods: {
-    resetToDefaults() {
-      dialog.showMessageBox(
-        {
-          type: "info",
-          title: "Are you sure?",
-          message: "Are you sure you want to reset to the default settings?",
-          buttons: ["No", "Yes"],
-          defaultId: 0
-        },
-        (result) => {
-          if ( result === 1 ) {
-            this.prefs.defaults = this.$electron.remote.getGlobal("CONFIG_DEFAULTS");
-            this.prefs.reset();
-            this.prefs.write(() => {
-              new Noty({
-                type: "success",
-                layout: "bottomRight",
-                timeout: 1000,
-                text: "Settings reset!",
-                animation: {
-                  open: null
-                }
-              }).show();
-            }); // reload
-          }
+    async handleSave(output) {
+      this.disabled = true;
+      try {
+        let changes = await this.prefs.updatePrefs(this.prefs);
+
+        this.ipcRenderer.send("prefs-updated", changes);
+        this.ipcRenderer.send("set-autostart", this.prefs.auto_start);
+        this.ipcRenderer.send("set-global-launch-shortcut", this.prefs.launchShortcut);
+      }
+      catch(e) {
+        output = "Something went wrong!";
+      }
+
+      this.disabled = false;
+
+      new Noty({
+        type: "success",
+        layout: "topRight",
+        timeout: 1000,
+        text: output,
+        animation: {
+          open: null
         }
-      );
+      }).show();
+    },
+    async resetToDefaults() {
+      let result = dialog.showMessageBoxSync({
+        type: "info",
+        title: "Are you sure?",
+        message: "Are you sure you want to reset to the default settings?",
+        buttons: ["No", "Yes"],
+        defaultId: 0
+      });
+
+      if ( result === 1 ) {
+        this.prefs.defaults = this.$electron.remote.getGlobal("CONFIG_DEFAULTS");
+        this.prefs.reset();
+        await this.handleSave("Settings reset");
+      }
     },
     closeWindow() {
       this.currentWindow.close();
     },
-    saveData() {
-      this.disabled = true;
-
-      return new Promise((resolve) => {
-        this.prefs.updatePrefs(this.prefs, (changes) => {
-          this.disabled = false;
-          this.ipcRenderer.send("prefs-updated", changes);
-          this.ipcRenderer.send("set-autostart", this.prefs.auto_start);
-          this.ipcRenderer.send("set-global-launch-shortcut", this.prefs.launchShortcut);
-          resolve(changes);
-          this.closeWindow();
-        });
-      });
-    },
-    saveDataClick() {
-      this.saveData().then(() => {
-        new Noty({
-          type: "success",
-          layout: "bottomRight",
-          timeout: 2000,
-          text: "Changes saved!",
-          animation: {
-            open: null
-          }
-        }).show();
-      });
+    async saveDataClick() {
+      await this.handleSave("Changes saved!");
+      this.closeWindow();
     },
     localSourceChange(ls) {
       var tmp = {

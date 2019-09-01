@@ -286,17 +286,16 @@ describe("SaverPrefs", () => {
       prefs = new SaverPrefs({baseDir: tmpdir});
     });
 
-    it("works", (done) => {
+    it("works", async () => {
       let data = helpers.prefsToJSON(tmpdir);
       assert.notEqual(data.delay, 123);
 
       prefs.delay = 123;
-      prefs.write(() => {
-        data = helpers.prefsToJSON(tmpdir);
-        assert.equal(data.delay, 123);
 
-        done();
-      });
+      await prefs.write();
+
+      data = helpers.prefsToJSON(tmpdir);
+      assert.equal(data.delay, 123);
     });
   });
 
@@ -324,18 +323,17 @@ describe("SaverPrefs", () => {
       prefs = new SaverPrefs({baseDir: tmpdir});
     });
 
-    it("works", (done) => {
+    it("works", async () => {
       let data = helpers.prefsToJSON(tmpdir);
       assert.notEqual(data.delay, 123);
 
-      prefs.updatePrefs({
+      //let results = 
+      await prefs.updatePrefs({
         delay: 123
-      }, () => {
-        data = helpers.prefsToJSON(tmpdir);
-        assert.equal(data.delay, 123);
-
-        done();
       });
+      
+      data = helpers.prefsToJSON(tmpdir);
+      assert.equal(data.delay, 123);
     });
   });
 
