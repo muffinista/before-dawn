@@ -9,7 +9,6 @@ const Package = require("../../src/lib/package.js");
 
 const fs = require("fs-extra");
 const rimraf = require("rimraf");
-const path = require("path");
 
 const sinon = require("sinon");
 
