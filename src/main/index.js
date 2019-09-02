@@ -493,6 +493,74 @@ var getWindowOpts = function(s) {
   return opts;
 };
 
+
+/**
+ * 
+ * @param {String} screenshot URL of screenshot
+ * @param {Saver} saver the screensaver to run
+ * @param {Screen} s the screen to run it on
+ * @param {Object} url_opts any options to pass on the url
+ * @param {number} tickCount hrtime value of when we started
+ */
+var runSaver = function(screenshot, saver, s, url_opts, tickCount) {
+  const windowOpts = getWindowOpts(s);
+  var w = new BrowserWindow(windowOpts);       
+  w.isSaver = true;
+ 
+  let diff = process.hrtime(tickCount);
+  log.info("let's do this", s.id, diff[0] * 1e9 + diff[1]);
+
+
+  try {   
+    // Emitted when the window is closed.
+    w.on("closed", function() {
+      windows.forceWindowClose(w);
+    });
+    
+    // inject our custom JS and CSS into the screensaver window
+    w.webContents.on("did-finish-load", function() {
+      log.info("did-finish-load", s.id);
+      if (!w.isDestroyed()) {
+        w.webContents.insertCSS(globalCSSCode);
+      }
+    });
+
+    // we could do something nice with either of these events
+    w.webContents.on("crashed", log.info);
+    w.webContents.on("unresponsive", log.info);
+
+    
+    w.once("ready-to-show", () => {
+      log.info("ready-to-show", s.id);
+      if ( debugMode !== true && testMode !== true ) {
+        windows.setFullScreen(w);
+      }
+
+      diff = process.hrtime(tickCount);
+      log.info(`rendered in ${diff[0] * 1e9 + diff[1]} nanoseconds`);
+    });
+    
+    if ( typeof(screenshot) !== "undefined" ) {
+      url_opts.screenshot = encodeURIComponent("file://" + screenshot);
+    }
+
+    let url = saver.getUrl(url_opts);
+
+    log.info("Loading " + url, s.id);
+
+    if ( debugMode === true ) {
+      w.webContents.openDevTools();
+    }
+
+    // and load the index.html of the app.
+    w.loadURL(url);
+  }
+  catch (e) {
+    log.info(e);
+    windows.forceWindowClose(w);
+  }
+};
+
 /**
  * run the specified screensaver on the specified screen
  */
@@ -504,13 +572,7 @@ var runScreenSaverOnDisplay = function(saver, s) {
     platform: process.platform
   };
   
-  var windowOpts = getWindowOpts(s);
-
-  var tickCount;
-  var diff;
-  var reqs;
-
-  log.info("runScreenSaverOnDisplay", s.id, windowOpts);
+  log.info("runScreenSaverOnDisplay", s.id);
 
   // don't do anything if we don't actually have a screensaver
   if ( typeof(saver) === "undefined" || saver === null ) {
@@ -518,76 +580,20 @@ var runScreenSaverOnDisplay = function(saver, s) {
     return;
   }
 
-  tickCount = process.hrtime();
-
-  var runSaver = function(message) {
-    var url;
-    var w = new BrowserWindow(windowOpts);       
-    w.isSaver = true;
-   
-    diff = process.hrtime(tickCount);
-    log.info("let's do this", s.id, diff[0] * 1e9 + diff[1]);
-    
-    try {   
-      // Emitted when the window is closed.
-      w.on("closed", function() {
-        windows.forceWindowClose(w);
-      });
-      
-      // inject our custom JS and CSS into the screensaver window
-      w.webContents.on("did-finish-load", function() {
-        log.info("did-finish-load", s.id);
-        if (!w.isDestroyed()) {
-          w.webContents.insertCSS(globalCSSCode);
-        }
-      });
-
-      // we could do something nice with either of these events
-      w.webContents.on("crashed", log.info);
-      w.webContents.on("unresponsive", log.info);
-
-      
-      w.once("ready-to-show", () => {
-        log.info("ready-to-show", s.id);
-        if ( debugMode !== true && testMode !== true ) {
-          windows.setFullScreen(w);
-        }
-
-        diff = process.hrtime(tickCount);
-        log.info(`rendered in ${diff[0] * 1e9 + diff[1]} nanoseconds`);
-      });
-      
-      if ( typeof(message) !== "undefined" ) {
-        url_opts.screenshot = encodeURIComponent("file://" + message.url);
-      }
-
-      url = saver.getUrl(url_opts);
-
-      log.info("Loading " + url, s.id);
-
-      if ( debugMode === true ) {
-        w.webContents.openDevTools();
-      }
-
-      // and load the index.html of the app.
-      w.loadURL(url);
-    }
-    catch (e) {
-      log.info(e);
-      windows.forceWindowClose(w);
-    }
-  };
+  let tickCount = process.hrtime();
 
   //
   // if this screensaver uses a screengrab, get it. 
   // otherwise just boot it
   //
-  reqs = saver.getRequirements();
+  const reqs = saver.getRequirements();
   if ( reqs.findIndex((x) => { return x === "screen"; }) > -1 ) {
-    grabScreen(s).then(runSaver);
+    grabScreen(s).then((message) => {
+      runSaver(message.url, saver, s, url_opts, tickCount);
+    });
   }
   else {
-    runSaver();
+    runSaver(undefined, saver, s, url_opts, tickCount);
   }
 };
 
