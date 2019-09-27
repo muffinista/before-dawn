@@ -15,9 +15,9 @@ module.exports.charging = function() {
     
     // NOTE: this is not actually tested
     return linuxBattery().then(res => {
-      return ( res.state !== "discharging" );
+      return ( !res.state || res.state !== "discharging" );
     }).catch(() => {
-      return false;
+      return true;
     });
   } 
   else {
