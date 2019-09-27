@@ -1113,6 +1113,9 @@ var bootApp = async function() {
   setupPackageCheck();
   setupLaunchShortcut();
 
+  screenLock.setLogger(log.info);
+  screenLock.setDir(getSystemDir());
+
   // don't show app in dock
   dock.hideDockIfInactive(app);
 

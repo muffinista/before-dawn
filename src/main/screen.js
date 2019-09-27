@@ -2,7 +2,18 @@
 
 const exec = require("child_process").execFile;
 const path = require("path");
-const logger = () => {};
+let logger = () => {};
+let workingDir = __dirname;
+
+var setDir = function(d) {
+  // eslint-disable-next-line no-console
+  console.log("!!!!!", d);
+  workingDir = d;
+};
+
+var setLogger = function(l) {
+  logger = l;
+};
 
 /**
  * lock the screen when the saver deactivates. currently this only works on OSX and Windows
@@ -21,8 +32,11 @@ var doLockScreen = function() {
     args = ["user32.dll,LockWorkStation"];
   }
   else {
-    return;
+    cmd = path.join(workingDir, "bin", "lock-screen.sh");
+    args = [];
   }
+
+  logger(cmd, args);
 
   exec(cmd, args, function(error, stdout, stderr) {
     if (error !== null) {
@@ -49,12 +63,16 @@ var doSleep = function() {
     // this uses a 3rd party library -- nircmd -- to turn off the monitor
     // http://www.nirsoft.net/utils/nircmd.html
     // NOTE: this doesn't work in development mode right now because the path is wrong
-    cmd = path.join(__dirname, "bin", "nircmd.exe");
+    cmd = path.join(workingDir, "bin", "nircmd.exe");
     args = ["monitor", "off"];
   }
   else {
-    return;
+    // in linux, we use the same command to lock/skeep
+    cmd = path.join(workingDir, "bin", "lock-screen.sh");
+    args = [];
   }
+
+  logger(cmd, args);
 
   exec(cmd, args, function(error, stdout, stderr) {
     if (error !== null) {
@@ -65,5 +83,7 @@ var doSleep = function() {
   });
 };
 
+exports.setLogger = setLogger;
+exports.setDir = setDir;
 exports.doLockScreen = doLockScreen;
 exports.doSleep = doSleep;
