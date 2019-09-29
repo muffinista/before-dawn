@@ -6,8 +6,6 @@ let logger = () => {};
 let workingDir = __dirname;
 
 var setDir = function(d) {
-  // eslint-disable-next-line no-console
-  console.log("!!!!!", d);
   workingDir = d;
 };
 
