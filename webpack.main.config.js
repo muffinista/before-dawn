@@ -15,6 +15,7 @@ const releaseName = `${packageJSON.productName} ${packageJSON.version}`;
 
 
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+const ChmodWebpackPlugin = require("chmod-webpack-plugin");
 
 
 //
@@ -105,10 +106,17 @@ let mainConfig = {
     new CopyWebpackPlugin([
       {
         from: path.join(__dirname, "src", "bin"),
-        to: path.join(outputDir, "bin"),
-        ignore: [".*"]
+        to: path.join(outputDir, "bin")
       }
     ]),
+    new ChmodWebpackPlugin([
+      {path: path.join(outputDir, "bin", "lock-screen.sh")}
+      ],
+      {
+        verbose: true,
+        mode:    770,
+      }
+    ),
     new CopyWebpackPlugin([
       {
         from: path.join(__dirname, "src", "main", "system-savers"),
