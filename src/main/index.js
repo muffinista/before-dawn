@@ -780,11 +780,11 @@ var getSystemDir = function() {
     return process.env.BEFORE_DAWN_SYSTEM_DIR;
   }
 
+  if ( process.env.TEST_MODE ) {
+    return path.join(__dirname, "..", "output");
+  }
   if ( global.IS_DEV ) {
     return path.join(__dirname, "..", "..", "output");
-  }
-  else if ( process.env.TEST_MODE) {
-    return __dirname;
   }
 
   return path.join(app.getAppPath(), "output");
