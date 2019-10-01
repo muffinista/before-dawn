@@ -6,6 +6,7 @@ let logger = () => {};
 let workingDir = __dirname;
 
 var setDir = function(d) {
+  logger(`setDir: ${d}`);
   workingDir = d;
 };
 
