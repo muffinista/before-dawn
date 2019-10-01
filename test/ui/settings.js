@@ -50,7 +50,11 @@ describe("Settings", function() {
               then(() => helpers.waitForWindow(app, "Before Dawn: Settings") );
   });
 
-	afterEach(() => {
+	afterEach(function() {
+    if (this.currentTest.state === "failed") {
+      helpers.outputLogs(app);
+    }
+
     return helpers.stopApp(app);
 	});
 

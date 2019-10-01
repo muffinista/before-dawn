@@ -23,7 +23,11 @@ describe("About", function() {
               then(() => helpers.waitForWindow(app, windowTitle) );
   });
 
-	afterEach(() => {
+	afterEach(function() {
+    if (this.currentTest.state === "failed") {
+      helpers.outputLogs(app);
+    }
+
     return helpers.stopApp(app);
 	});
 

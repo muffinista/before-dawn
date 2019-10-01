@@ -12,13 +12,15 @@
             </p>
             <div class="form-group">
               <label for="localSource">Local Source:</label>
-              <local-folder-input
-                :value="prefs.localSource"
-                handler="localSourceChange"
-                name="localSource"
-                v-on="$listeners"
-                @localSourceChange="localSourceChange"
-              />
+              <template v-if="prefs !== undefined">
+                <local-folder-input
+                  :value="prefs.localSource"
+                  handler="localSourceChange"
+                  name="localSource"
+                  v-on="$listeners"
+                  @localSourceChange="localSourceChange"
+                />
+              </template>
 
               <small class="form-text text-muted">
                 We will load screensavers from any directories listed here. Use this to add your own screensavers!
@@ -156,6 +158,8 @@ export default {
       // eslint-disable-next-line no-console
       console.log(opts);
 
+      debugger;
+
       var src = path.join(systemPath, "__template");
       var data = this.manager.create(src, this.saver);
       this.ipcRenderer.send("savers-updated");
@@ -163,7 +167,7 @@ export default {
         src: data.dest,
         screenshot: this.screenshot
       });
-      this.currentWindow.close();
+      //this.currentWindow.close();
     }
   },
 };

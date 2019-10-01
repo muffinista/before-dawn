@@ -29,9 +29,13 @@ describe("bootstrap", function() {
     app = helpers.application(workingDir, false, saverZip, saverData);
   });
 
-  afterEach(() => {
+	afterEach(function() {
+    if (this.currentTest.state === "failed") {
+      helpers.outputLogs(app);
+    }
+
     return helpers.stopApp(app);
-  });
+	});
 
 
   describe("without config", () => {

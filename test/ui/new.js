@@ -29,7 +29,11 @@ describe("Add New", function() {
     app = helpers.application(workingDir, true);
   });
 
-  afterEach(() => {
+  afterEach(function() {
+    if (this.currentTest.state === "failed") {
+      helpers.outputLogs(app);
+    }
+
     return helpers.stopApp(app);
   });
 

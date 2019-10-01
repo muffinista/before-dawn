@@ -24,9 +24,13 @@ describe("tray", function() {
       then(() => helpers.waitUntilBooted(app, true));
   });
 
-  afterEach(function() {
+	afterEach(function() {
+    if (this.currentTest.state === "failed") {
+      helpers.outputLogs(app);
+    }
+
     return helpers.stopApp(app);
-  });
+	});
 
   describe("run now", function() {
     before(function() {

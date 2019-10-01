@@ -36,10 +36,14 @@ describe("Editor", function() {
       then(() => helpers.waitForWindow(app, windowTitle) );
     });
 
-	afterEach(() => {
+  afterEach(function() {
+    if (this.currentTest.state === "failed") {
+      helpers.outputLogs(app);
+    }
+
     return helpers.stopApp(app);
-	});
-  
+  });
+    
   it("edits basic settings", function() {
     return pickEditorWindow().
       then(() => app.client.getValue("#saver-form [name='name']")).
