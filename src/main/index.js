@@ -930,7 +930,8 @@ var openPrefsWindowIfNeeded = function(status) {
  * setup our periodic release check
  */
 var setupReleaseCheck = function() {
-  if ( global.CHECK_FOR_RELEASE !== true ) {
+  if ( ! global.RELEASE_CHECK_URL ) {
+    log.info("no release server set, so no release checks");
     return;
   }
 
@@ -975,10 +976,6 @@ var checkForPackageUpdates = function() {
  * setup our recurring screensaver package check
  */
 var setupPackageCheck = function() {
-  if ( global.CHECK_FOR_RELEASE !== true ) {
-    return;
-  }
-
   log.info("run initial package check");
   checkForPackageUpdates().then(() => {
     log.info("Setup recurring package check");

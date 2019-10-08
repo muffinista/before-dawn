@@ -2,13 +2,14 @@
 const { init } = require("@sentry/electron");
 
 global.IS_DEV = require("electron-is-dev");
-global.CHECK_FOR_RELEASE = !global.IS_DEV;
 
 var version = undefined;
-var packageJSON;
+let packageJSON = {};
 
 try {
   packageJSON = require("../../package.json");
+  // console.log("packageJSON", packageJSON);
+
   version = packageJSON.version;
 
   if ( ! process.env.BEFORE_DAWN_RELEASE_NAME ) {
@@ -31,11 +32,15 @@ global.HELP_URL = "https://muffinista.github.io/before-dawn/";
 global.ISSUES_URL = "https://github.com/muffinista/before-dawn/issues";
 global.APP_CREDITS = "by Colin Mitchell // muffinlabs.com";
 
-global.RELEASE_SERVER = "https://before-dawn.now.sh";
+if ( packageJSON.release_server && ! global.IS_DEV ) {
+  global.RELEASE_SERVER = packageJSON.release_server;
+  global.RELEASE_CHECK_URL = `${global.RELEASE_SERVER}/update/${process.platform}/${global.APP_VERSION_BASE}`;
+  global.PACKAGE_DOWNLOAD_URL = `https://github.com/${global.APP_REPO}/releases/latest`;
+}
+
 
 if ( !process.env.LOCAL_PACKAGE && process.env.TEST_MODE === undefined ) {
   try {
-    packageJSON = require("../../package.json");
     let localSavers = packageJSON.resources.savers;
     process.env.LOCAL_PACKAGE = localSavers;
 
@@ -55,9 +60,6 @@ if ( process.env.LOCAL_PACKAGE_DATA ) {
   global.LOCAL_PACKAGE_DATA = process.env.LOCAL_PACKAGE_DATA;
 }
 
-// note -- this is hardcoded to win32 for now because we actually
-// don't care what platform is running
-global.RELEASE_CHECK_URL = `${global.RELEASE_SERVER}/update/win32/${global.APP_VERSION_BASE}`;
 
 global.CONFIG_DEFAULTS = {
   options: {},

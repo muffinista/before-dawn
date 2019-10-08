@@ -247,7 +247,7 @@ var trayMenuTemplate = function() {
     {
       label: "Update Available!",
       click: function() { 
-        require("electron").shell.openExternal("https://github.com/" + global.APP_REPO + "/releases/latest");
+        require("electron").shell.openExternal(global.PACKAGE_DOWNLOAD_URL);
       },
       visible: (global.NEW_RELEASE_AVAILABLE === true)
     },
