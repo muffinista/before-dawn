@@ -14,7 +14,7 @@ cache:
 
 environment:
   matrix:
-    - nodejs_version: '12'
+    - nodejs_version: '12.4.0'
 
 init:
   - git config --global core.autocrlf input
