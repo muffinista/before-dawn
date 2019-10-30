@@ -88,13 +88,6 @@ export default {
     };
   },
   computed: {
-    logger() {
-      let l = this.$electron.remote.getCurrentWindow().saverOpts.logger;
-      if ( l === undefined ) {
-        l = function() {};
-      }
-      return l;
-    },
     currentWindow: function() {
       return this.$electron.remote.getCurrentWindow();
     },
@@ -146,6 +139,14 @@ export default {
     }
   },
   async mounted() {
+    const screen = this.$electron.remote.screen;
+    this.size = screen.getPrimaryDisplay().bounds;
+
+    this.logger = this.$electron.remote.getCurrentWindow().saverOpts.logger;
+    if ( this.logger === undefined ) {
+      this.logger = function() {};
+    }
+
     this.ipcRenderer.on("savers-updated", this.onSaversUpdated);
     this.setupPrefs();
 
@@ -233,12 +234,9 @@ export default {
       });
     },
     urlOpts(s) {
-      var screen = this.$electron.remote.screen;
-      var size = screen.getPrimaryDisplay().bounds;
-
       var base = {
-        width: size.width,
-        height: size.height,
+        width: this.size.width,
+        height: this.size.height,
         preview: 1,
         platform: process.platform,
         screenshot: this.screenshot
@@ -398,6 +396,3 @@ export default {
   }
 }; 
 </script>
-
-<style>
-</style>

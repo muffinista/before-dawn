@@ -1069,10 +1069,12 @@ var bootApp = async function() {
   // can bootstrap access to data/etc
   saverOpts = {
     base: global.basePath,
-    systemDir: path.join(getSystemDir(), "system-savers"),
-    logger: log.info
+    systemDir: path.join(getSystemDir(), "system-savers")
   };
 
+  if ( global.IS_DEV ) {
+    saverOpts.logger = log.info;
+  }
 
   log.info("Loading prefs");
   log.info(`baseDir: ${saverOpts.base}`);

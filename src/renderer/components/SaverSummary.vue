@@ -60,6 +60,7 @@
         this.$emit("editSaver", s);
       },
       onDeleteClick(s) {
+        // @todo move to main
         dialog.showMessageBox(
           {
             type: "info",
