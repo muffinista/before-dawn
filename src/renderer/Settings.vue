@@ -64,13 +64,6 @@ export default {
     };
   },
   computed: {
-    logger() {
-      let l = this.$electron.remote.getCurrentWindow().saverOpts.logger;
-      if ( l === undefined ) {
-        l = function() {};
-      }
-      return l;
-    },
     currentWindow: function() {
       return this.$electron.remote.getCurrentWindow();
     },

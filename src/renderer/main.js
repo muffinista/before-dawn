@@ -1,6 +1,5 @@
 import Vue from "vue";
 import VueElectron from "vue-electron";
-import VueObserveVisibility from "vue-observe-visibility";
 import BootstrapVue from "bootstrap-vue";
 
 import Prefs from "./Prefs";
@@ -21,7 +20,6 @@ Vue.config.productionTip = false;
 
 Vue.use(VueElectron);
 Vue.use(BootstrapVue);
-Vue.use(VueObserveVisibility);
 
 var actions = {
   "prefs": { components: { Prefs }, template: "<Prefs/>" },
