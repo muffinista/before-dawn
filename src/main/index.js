@@ -1379,12 +1379,11 @@ log.transports.file.maxSize = 1 * 1024 * 1024;
 log.info(`Hello from version: ${global.APP_VERSION_BASE} running in ${global.IS_DEV ? "development" : "production"}`);
 
 if ( global.IS_DEV ) {
-  app.setName(global.APP_NAME);
   app.name = global.APP_NAME;
-  log.info(`set app name to ${app.getName()}`);
+  log.info(`set app name to ${app.name}`);
 
   if ( testMode !== true ) {
-    let userDataPath = path.join(app.getPath("appData"), app.getName());
+    let userDataPath = path.join(app.getPath("appData"), app.name);
     log.info(`set userData path to ${userDataPath}`);
     app.setPath("userData", userDataPath);
   }
