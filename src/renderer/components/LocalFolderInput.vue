@@ -13,7 +13,6 @@
 </template>
 
 <script>
-  const {dialog} = require("electron").remote;
   export default {
     name: "local-folder-input",
     props: ["name", "value", "handler"],
@@ -22,6 +21,8 @@
     },
     methods: {
       showPathChooser() {
+        const {dialog} = require("electron").remote;
+
         dialog.showOpenDialog(
           {
             properties: [ "openDirectory", "createDirectory" ]

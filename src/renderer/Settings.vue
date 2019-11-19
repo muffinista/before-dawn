@@ -41,8 +41,6 @@
 </template>
 
 <script>
-const {dialog} = require("electron").remote;
-
 import AdvancedPrefsForm from "@/components/AdvancedPrefsForm";
 import PrefsForm from "@/components/PrefsForm";
 import Noty from "noty";
@@ -147,6 +145,7 @@ export default {
       }).show();
     },
     async resetToDefaults() {
+      const {dialog} = require("electron").remote;                         
       let result = dialog.showMessageBoxSync({
         type: "info",
         title: "Are you sure?",

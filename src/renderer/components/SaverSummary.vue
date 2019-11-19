@@ -23,7 +23,6 @@
 </template>
 
 <script>
-  const {dialog} = require("electron").remote;
   export default {
     name: "saver-summary",
     props: ["saver"],
@@ -60,6 +59,8 @@
         this.$emit("editSaver", s);
       },
       onDeleteClick(s) {
+        const {dialog} = require("electron").remote;
+
         // @todo move to main
         dialog.showMessageBox(
           {

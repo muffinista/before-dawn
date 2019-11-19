@@ -61,7 +61,6 @@
 </template>
 
 <script>
-const {dialog} = require("electron").remote;
 
 import BasicPrefsForm from "@/components/BasicPrefsForm";
 import SaverList from "@/components/SaverList";
@@ -377,7 +376,9 @@ export default {
       }).show();
     },
     renderUpdateNotice() {
-      dialog.showMessageBox(
+       const {dialog} = require("electron").remote;
+                                   
+       dialog.showMessageBox(
         {
           type: "info",
           title: "Update Available!",
