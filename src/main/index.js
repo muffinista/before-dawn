@@ -255,8 +255,6 @@ var openPrefsWindow = function() {
       }
 
       prefsUrl = prefsUrl + "?screenshot=" + encodeURIComponent("file://" + message.url);
-      handles.prefs.window.saverOpts = saverOpts;
-      handles.prefs.window.screenshot = message.url;
       
       handles.prefs.window.on("closed", () => {
         handles.prefs.window = null;
@@ -322,8 +320,6 @@ var openSettingsWindow = function() {
     dock.showDock(app);
   });
 
-  handles.settings.window.saverOpts = saverOpts;
-
   log.info(`open ${settingsUrl}`);
   handles.settings.window.loadURL(settingsUrl);
 };
@@ -352,7 +348,6 @@ var addNewSaver = function() {
       icon: path.join(__dirname, "assets", "iconTemplate.png")
     });
 
-    w.saverOpts = saverOpts;
     w.screenshot = message.url;
 
     w.on("closed", () => {
@@ -433,7 +428,6 @@ var openEditor = (args) => {
     });  
   }
 
-  handles.editor.window.saverOpts = saverOpts;
   handles.editor.window.screenshot = screenshot;
 
   handles.editor.window.once("ready-to-show", () => {
@@ -1419,6 +1413,10 @@ if ( testMode !== true ) {
     }
   });
 }
+
+ipcMain.handle("get-saver-opts", () => {
+  return saverOpts;
+});
 
 ipcMain.on("preview-error", (_event, message, source, lineno) => {
   let opts = {

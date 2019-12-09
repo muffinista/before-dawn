@@ -111,7 +111,7 @@ export default {
     }
   },
   async mounted() {
-    let opts = this.$electron.remote.getCurrentWindow().saverOpts;
+    let opts = await this.ipcRenderer.invoke("get-saver-opts");
 
     this.prefs = new SaverPrefs({
       baseDir: opts.base,
