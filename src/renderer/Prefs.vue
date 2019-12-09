@@ -384,14 +384,12 @@ export default {
           message: "There's a new update available! Would you like to download it?",
           buttons: ["No", "Yes"],
           defaultId: 0
-        },
-        (result) => {
-          if ( result === 1 ) {
+        }).then(result => {
+          if ( result.response === 1 ) {
             var appRepo = this.$electron.remote.getGlobal("APP_REPO");
             this.$electron.shell.openExternal(`https://github.com/${appRepo}/releases/latest`);
           }
-        }
-      );
+        });
     }
   }
 }; 

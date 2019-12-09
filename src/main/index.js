@@ -988,7 +988,7 @@ var askAboutApplicationsFolder = function() {
   if ( !app.isInApplicationsFolder() ) {
     const {dialog} = require("electron");
 
-    const chosen = dialog.showMessageBox({
+    const chosen = dialog.showMessageBoxSync({
       type: "question",
       buttons: ["Move to Applications", "Do Not Move"],
       message: "Move to Applications folder?",

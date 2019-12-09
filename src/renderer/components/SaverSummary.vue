@@ -70,13 +70,11 @@
             detail: "Deleting screensaver " + s.name,
             buttons: ["No", "Yes"],
             defaultId: 0
-          },
-          (result) => {
-            if ( result === 1 ) {
+          }).then(result => {
+            if ( result.response === 1 ) {
               this.$emit("deleteSaver", s);
             }
-          }
-        ); 
+          }); 
       }
     }
   };

@@ -25,13 +25,15 @@
 
         dialog.showOpenDialog(
           {
+            title: 'Pick a screensaver directory',
+            message: 'Pick a folder to store your custom screensavers',
             properties: [ "openDirectory", "createDirectory" ]
           }).then(result => {
             this.handlePathChoice(result);
           });
       },
       handlePathChoice(result) {
-        if ( result === undefined ) {
+        if ( result === undefined || result.canceled ) {
           return;
         }
 
