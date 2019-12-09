@@ -26,18 +26,20 @@
         dialog.showOpenDialog(
           {
             properties: [ "openDirectory", "createDirectory" ]
-          },
-          this.handlePathChoice );
+          }).then(result => {
+            this.handlePathChoice(result);
+          });
       },
       handlePathChoice(result) {
         if ( result === undefined ) {
           return;
         }
 
-        this.$emit(this.handler, result[0]);
+        const choice = result.filePaths[0];
+        this.$emit(this.handler, choice);
 
         // blah this is weird
-        document.querySelector(`[name=${this.name}]`).value = result[0];
+        document.querySelector(`[name=${this.name}]`).value = choice;
       },
       clearLocalSource() {
         this.$emit(this.handler, "");

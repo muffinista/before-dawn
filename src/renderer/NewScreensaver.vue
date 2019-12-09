@@ -117,8 +117,8 @@ export default {
         this.prefs.localSource !== "";
     }
   },
-  mounted() {
-    let opts = this.$electron.remote.getCurrentWindow().saverOpts;
+  async mounted() {
+    let opts = await this.ipcRenderer.invoke("get-saver-opts");
     this.prefs = new SaverPrefs({
       baseDir: opts.base,
       systemSource: opts.systemDir
@@ -138,7 +138,6 @@ export default {
       };
       this.prefs = Object.assign(this.prefs, tmp);
       let changes = await this.prefs.updatePrefs(this.prefs);
-      
       this.disabled = false;
       this.ipcRenderer.send("prefs-updated", changes);
     },
@@ -157,8 +156,6 @@ export default {
 
       // eslint-disable-next-line no-console
       console.log(opts);
-
-      debugger;
 
       var src = path.join(systemPath, "__template");
       var data = this.manager.create(src, this.saver);
