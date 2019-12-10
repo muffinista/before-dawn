@@ -2,7 +2,7 @@ const tmp = require("tmp");
 const path = require("path");
 const fs = require("fs-extra");
 const Application = require("spectron").Application;
-import fakeDialog from "spectron-dialog-addon";
+const fakeDialog = require('spectron-dialog-addon').default;
 
 const chai = require("chai");
 const chaiAsPromised = require("chai-as-promised");
