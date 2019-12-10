@@ -161,7 +161,7 @@ var buildMenuTemplate = function(a) {
 
 
   if (process.platform == "darwin") {
-    var name = app.getName();
+    var name = app.name;
     base.unshift({
       label: name,
       submenu: [

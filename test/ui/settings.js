@@ -9,7 +9,7 @@ var saversDir;
 const SaverPrefs = require("../../src/lib/prefs.js");
 
 describe("Settings", function() { 
-  const fakeDialogOpts = [ { method: "showOpenDialog", value: ["/not/a/real/path"] } ];
+  const fakeDialogOpts = [ { method: "showOpenDialog", value: { filePaths: ["/not/a/real/path"] } } ];
   const closeWindowDelay = 750;
   const TEXT_ON_SCREEN = "Be careful with these!";
 

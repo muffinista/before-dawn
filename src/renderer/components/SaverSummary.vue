@@ -23,7 +23,6 @@
 </template>
 
 <script>
-  const {dialog} = require("electron").remote;
   export default {
     name: "saver-summary",
     props: ["saver"],
@@ -60,6 +59,8 @@
         this.$emit("editSaver", s);
       },
       onDeleteClick(s) {
+        const {dialog} = require("electron").remote;
+
         // @todo move to main
         dialog.showMessageBox(
           {
@@ -69,13 +70,11 @@
             detail: "Deleting screensaver " + s.name,
             buttons: ["No", "Yes"],
             defaultId: 0
-          },
-          (result) => {
-            if ( result === 1 ) {
+          }).then(result => {
+            if ( result.response === 1 ) {
               this.$emit("deleteSaver", s);
             }
-          }
-        ); 
+          }); 
       }
     }
   };

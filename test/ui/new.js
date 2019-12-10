@@ -38,7 +38,7 @@ describe("Add New", function() {
   });
 
 
-  const fakeDialogOpts = [ { method: "showOpenDialog", value: ["/not/a/real/path"] } ];
+  const fakeDialogOpts = [ { method: "showOpenDialog", value: { filePaths: ["/not/a/real/path"] } } ];
   describe("when not setup", function() {
     beforeEach(() => {
       return app.start().

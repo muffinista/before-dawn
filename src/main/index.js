@@ -17,31 +17,26 @@
 const electron = require("electron");
 const log = require("electron-log");
 
-const {app, dialog, globalShortcut, BrowserWindow, BrowserView, ipcMain, Menu, Tray} = require("electron");
+const {app, globalShortcut, BrowserWindow, BrowserView, ipcMain, Menu, Tray} = require("electron");
 
 const fs = require("fs");
 const path = require("path");
 const url = require("url");
-const { promisify } = require("util");
 
 const screenLock = require("./screen.js");
 const power = require("./power.js");
 
-const idler = require("desktop-idle");
 
 const StateManager = require("./state_manager.js");
 const SaverPrefs = require("../lib/prefs.js");
 const SaverListManager = require("../lib/saver-list.js");
 const Package = require("../lib/package.js");
-const PackageDownloader = require("../lib/package-downloader.js");
-const ReleaseCheck = require("./release_check.js");
 
 var releaseChecker;
 
 const menusAndTrays = require("./menus.js");
 const dock = require("./dock.js");
 const windows = require("./windows.js");
-const autostarter = require("./autostarter.js");
 
 
 // NOTE -- this needs to be global, otherwise the app icon gets
@@ -260,9 +255,7 @@ var openPrefsWindow = function() {
       }
 
       prefsUrl = prefsUrl + "?screenshot=" + encodeURIComponent("file://" + message.url);
-      handles.prefs.window.saverOpts = saverOpts;
-      handles.prefs.window.screenshot = message.url;
-        
+      
       handles.prefs.window.on("closed", () => {
         handles.prefs.window = null;
 
@@ -277,9 +270,9 @@ var openPrefsWindow = function() {
         handles.prefs.window.show();
         dock.showDock(app);
       });
-  
+      
       handles.prefs.window.once("show", resolve);
-  
+      
       log.info("loading " + prefsUrl);
       handles.prefs.window.loadURL(prefsUrl);
     });
@@ -327,8 +320,6 @@ var openSettingsWindow = function() {
     dock.showDock(app);
   });
 
-  handles.settings.window.saverOpts = saverOpts;
-
   log.info(`open ${settingsUrl}`);
   handles.settings.window.loadURL(settingsUrl);
 };
@@ -357,7 +348,6 @@ var addNewSaver = function() {
       icon: path.join(__dirname, "assets", "iconTemplate.png")
     });
 
-    w.saverOpts = saverOpts;
     w.screenshot = message.url;
 
     w.on("closed", () => {
@@ -422,7 +412,7 @@ var openEditor = (args) => {
   var screenshot = args.screenshot;
 
   var editorUrl = getUrl("editor.html");
- 
+  
   var target = editorUrl + "?" +
                "src=" + encodeURIComponent(key) +
                "&screenshot=" + encodeURIComponent(screenshot);
@@ -438,7 +428,6 @@ var openEditor = (args) => {
     });  
   }
 
-  handles.editor.window.saverOpts = saverOpts;
   handles.editor.window.screenshot = screenshot;
 
   handles.editor.window.once("ready-to-show", () => {
@@ -506,7 +495,7 @@ var runSaver = function(screenshot, saver, s, url_opts, tickCount) {
   const windowOpts = getWindowOpts(s);
   var w = new BrowserWindow(windowOpts);       
   w.isSaver = true;
- 
+  
   let diff = process.hrtime(tickCount);
   log.info("let's do this", s.id, diff[0] * 1e9 + diff[1]);
 
@@ -688,7 +677,7 @@ var runScreenSaver = function() {
   }
 
   setupPromise.
-    then((saverKey, settings) => savers.loadFromFile(saverKey, settings)).
+          then((saverKey, settings) => savers.loadFromFile(saverKey, settings)).
     catch((err) => {
       log.info("================ loading saver failed?");
       log.info(err);
@@ -697,7 +686,7 @@ var runScreenSaver = function() {
     then((saver) => {
       var displays = [];
       var blanks = [];
-        
+      
       // make sure we have something to display
       if ( typeof(saver) === "undefined" ) {
         log.info("No screensaver defined!");
@@ -800,7 +789,7 @@ var getAssetDir = function() {
   }
   return path.join(app.getAppPath(), "data");
 };
-  
+
 
 /**
  * return the URL prefix we should use when loading app windows. if
@@ -885,6 +874,7 @@ var setupIfNeeded = async function() {
 
     if ( ! localPackageCheck.downloaded ) {
       log.info("check for updated download");
+      const PackageDownloader = require("../lib/package-downloader.js");
       let pd = new PackageDownloader(prefs);
       await pd.updatePackage();
     }
@@ -935,6 +925,8 @@ var setupReleaseCheck = function() {
     return;
   }
 
+  const ReleaseCheck = require("./release_check.js");
+  
   releaseChecker = new ReleaseCheck();
 
   releaseChecker.setFeed(global.RELEASE_CHECK_URL);
@@ -965,6 +957,7 @@ var setupReleaseCheck = function() {
  */
 var checkForPackageUpdates = function() {  
   log.info("checkForPackageUpdates");
+  const PackageDownloader = require("../lib/package-downloader.js");
   let pd = new PackageDownloader(prefs);
   return pd.updatePackage().then((result) => {
     log.info(result);
@@ -993,7 +986,9 @@ var askAboutApplicationsFolder = function() {
   }
 
   if ( !app.isInApplicationsFolder() ) {
-    const chosen = dialog.showMessageBox({
+    const {dialog} = require("electron");
+
+    const chosen = dialog.showMessageBoxSync({
       type: "question",
       buttons: ["Move to Applications", "Do Not Move"],
       message: "Move to Applications folder?",
@@ -1033,6 +1028,8 @@ var handleLocalPackage = async function() {
 
     let results = JSON.parse(fs.readFileSync(saverData));
     results.downloaded = true;
+
+    const { promisify } = require("util");
 
     const writeFileAsync = promisify(fs.writeFile);
     await writeFileAsync(resultsJSON, JSON.stringify(results));
@@ -1101,6 +1098,7 @@ var bootApp = async function() {
     }); 
   });
 
+  const idler = require("desktop-idle");
   stateManager = new StateManager();
   stateManager.idleFn = idler.getIdleTime;
 
@@ -1362,11 +1360,11 @@ let setupPreview = function(target, incomingBounds) {
     });
     handles[target].window.setBrowserView(handles[target].preview);
     handles[target].preview.webContents.on("console-message",
-      (event, level, message, line, sourceId) => {
-        // log.info(level, message, line, sourceId);
-        handles[target].window.webContents.send("console-message",
-          event, level, message, line, sourceId);
-      });
+                                           (event, level, message, line, sourceId) => {
+                                             // log.info(level, message, line, sourceId);
+                                             handles[target].window.webContents.send("console-message",
+                                                                                     event, level, message, line, sourceId);
+                                           });
   }
 };
 
@@ -1379,12 +1377,11 @@ log.transports.file.maxSize = 1 * 1024 * 1024;
 log.info(`Hello from version: ${global.APP_VERSION_BASE} running in ${global.IS_DEV ? "development" : "production"}`);
 
 if ( global.IS_DEV ) {
-  app.setName(global.APP_NAME);
   app.name = global.APP_NAME;
-  log.info(`set app name to ${app.getName()}`);
+  log.info(`set app name to ${app.name}`);
 
   if ( testMode !== true ) {
-    let userDataPath = path.join(app.getPath("appData"), app.getName());
+    let userDataPath = path.join(app.getPath("appData"), app.name);
     log.info(`set userData path to ${userDataPath}`);
     app.setPath("userData", userDataPath);
   }
@@ -1416,6 +1413,10 @@ if ( testMode !== true ) {
     }
   });
 }
+
+ipcMain.handle("get-saver-opts", () => {
+  return saverOpts;
+});
 
 ipcMain.on("preview-error", (_event, message, source, lineno) => {
   let opts = {
@@ -1505,6 +1506,7 @@ ipcMain.on("open-editor", (_event, args) => {
 
 ipcMain.on("set-autostart", (_event, value) => {
   log.info("set-autostart");
+  const autostarter = require("./autostarter.js");
   autostarter.toggle(global.APP_NAME, value);
 });
 

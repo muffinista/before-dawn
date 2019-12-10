@@ -244,7 +244,7 @@ export default {
       console.log(`Error on line ${event.lineno}: ${event.message}`);
     });
 
-    let opts = this.$electron.remote.getCurrentWindow().saverOpts;
+    let opts = await this.ipcRenderer.invoke("get-saver-opts");
     this._prefs = new SaverPrefs({
       baseDir: opts.base,
       systemSource: opts.systemDir

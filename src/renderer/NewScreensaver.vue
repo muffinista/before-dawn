@@ -117,11 +117,11 @@ export default {
         this.prefs.localSource !== "";
     }
   },
-  mounted() {
-    let opts = this.$electron.remote.getCurrentWindow().saverOpts;
+  async mounted() {
+    this.opts = await this.ipcRenderer.invoke("get-saver-opts");
     this.prefs = new SaverPrefs({
-      baseDir: opts.base,
-      systemSource: opts.systemDir
+      baseDir: this.opts.base,
+      systemSource: this.opts.systemDir
     });
 
     this._savers = new SaverListManager({
@@ -138,7 +138,6 @@ export default {
       };
       this.prefs = Object.assign(this.prefs, tmp);
       let changes = await this.prefs.updatePrefs(this.prefs);
-      
       this.disabled = false;
       this.ipcRenderer.send("prefs-updated", changes);
     },
@@ -152,13 +151,7 @@ export default {
 
       this.disabled = true;
 
-      let opts = this.$electron.remote.getCurrentWindow().saverOpts;
-      let systemPath = opts.systemDir;
-
-      // eslint-disable-next-line no-console
-      console.log(opts);
-
-      debugger;
+      let systemPath = this.opts.systemDir;
 
       var src = path.join(systemPath, "__template");
       var data = this.manager.create(src, this.saver);
@@ -167,7 +160,7 @@ export default {
         src: data.dest,
         screenshot: this.screenshot
       });
-      //this.currentWindow.close();
+      this.currentWindow.close();
     }
   },
 };

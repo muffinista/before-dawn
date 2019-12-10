@@ -61,8 +61,6 @@
 </template>
 
 <script>
-const {dialog} = require("electron").remote;
-
 import BasicPrefsForm from "@/components/BasicPrefsForm";
 import SaverList from "@/components/SaverList";
 import SaverOptions from "@/components/SaverOptions";
@@ -142,13 +140,13 @@ export default {
     const screen = this.$electron.remote.screen;
     this.size = screen.getPrimaryDisplay().bounds;
 
-    this.logger = this.$electron.remote.getCurrentWindow().saverOpts.logger;
+    //this.logger = this.$electron.remote.getCurrentWindow().saverOpts.logger;
     if ( this.logger === undefined ) {
       this.logger = function() {};
     }
 
     this.ipcRenderer.on("savers-updated", this.onSaversUpdated);
-    this.setupPrefs();
+    await this.setupPrefs();
 
     this.manager.setup().then(() => {
       this.getData();
@@ -184,8 +182,8 @@ export default {
     this.ipcRenderer.removeListener("savers-updated", this.onSaversUpdated);
   },
   methods: {
-    setupPrefs() {
-      let opts = this.$electron.remote.getCurrentWindow().saverOpts;
+    async setupPrefs() {
+      let opts = await this.ipcRenderer.invoke("get-saver-opts");
       this.prefs = new SaverPrefs({
         baseDir: opts.base,
         systemSource: opts.systemDir
@@ -303,8 +301,8 @@ export default {
         }
       });
     },
-    onSaversUpdated() {
-      this.setupPrefs();
+    async onSaversUpdated() {
+      await this.setupPrefs();
       this.manager.reset();
       this.getData();
     },
@@ -377,21 +375,21 @@ export default {
       }).show();
     },
     renderUpdateNotice() {
-      dialog.showMessageBox(
+       const {dialog} = require("electron").remote;
+                                   
+       dialog.showMessageBox(
         {
           type: "info",
           title: "Update Available!",
           message: "There's a new update available! Would you like to download it?",
           buttons: ["No", "Yes"],
           defaultId: 0
-        },
-        (result) => {
-          if ( result === 1 ) {
+        }).then(result => {
+          if ( result.response === 1 ) {
             var appRepo = this.$electron.remote.getGlobal("APP_REPO");
             this.$electron.shell.openExternal(`https://github.com/${appRepo}/releases/latest`);
           }
-        }
-      );
+        });
     }
   }
 }; 

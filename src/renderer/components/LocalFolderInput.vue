@@ -13,7 +13,6 @@
 </template>
 
 <script>
-  const {dialog} = require("electron").remote;
   export default {
     name: "local-folder-input",
     props: ["name", "value", "handler"],
@@ -22,21 +21,27 @@
     },
     methods: {
       showPathChooser() {
+        const {dialog} = require("electron").remote;
+
         dialog.showOpenDialog(
           {
+            title: 'Pick a screensaver directory',
+            message: 'Pick a folder to store your custom screensavers',
             properties: [ "openDirectory", "createDirectory" ]
-          },
-          this.handlePathChoice );
+          }).then(result => {
+            this.handlePathChoice(result);
+          });
       },
       handlePathChoice(result) {
-        if ( result === undefined ) {
+        if ( result === undefined || result.canceled ) {
           return;
         }
 
-        this.$emit(this.handler, result[0]);
+        const choice = result.filePaths[0];
+        this.$emit(this.handler, choice);
 
         // blah this is weird
-        document.querySelector(`[name=${this.name}]`).value = result[0];
+        document.querySelector(`[name=${this.name}]`).value = choice;
       },
       clearLocalSource() {
         this.$emit(this.handler, "");
