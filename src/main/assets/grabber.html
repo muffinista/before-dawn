@@ -7,7 +7,7 @@
 <body>
   you should never see me
 </body>
-  
+
 <script>
  // const log = require('electron-log');
  const ipcRenderer = require('electron').ipcRenderer;
@@ -181,6 +181,13 @@
                             cleanup(video, canvas, photo);
                           });
        });
+     }).fail((ex) => {
+       if ( typeof(window.Sentry) !== "undefined" ) {
+         window.Sentry.captureException(ex);
+       }
+
+       getUserMediaError(ex);
+       cleanup(video, canvas, photo);
      });
    });
  }; // captureScreen
