@@ -61,12 +61,8 @@ module.exports = class SaverListManager {
       // check for/create our main directory
       // and our savers directory (which is a subdir
       // of the main dir)
-      mkdirp(saversDir, function(err, made) {
-        if ( err ) {
-          _self.logger("err!", err);
-          return reject(err);
-        }
-  
+      mkdirp(saversDir).then((made) => {
+ 
         // check if we just created the folder,
         // if there's no config yet,
         // or if the savers folder was empty
@@ -77,6 +73,9 @@ module.exports = class SaverListManager {
         results.setup = true;
   
         resolve(results);
+      }, (err) => {
+          _self.logger("err!", err);
+          return reject(err);
       });
     });
   }

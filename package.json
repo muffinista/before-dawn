@@ -47,7 +47,7 @@
     "fs-extra": "^8.1.0",
     "glob": "^7.1.4",
     "linux-battery": "^3.0.1",
-    "mkdirp": "^0.5.1",
+    "mkdirp": "^1.0.0",
     "node-fetch": "^2.6.0",
     "osx-battery": "gillstrom/osx-battery.git",
     "proper-lockfile": "^4.1.1",

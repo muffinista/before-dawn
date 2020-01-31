@@ -17,7 +17,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const PurgecssPlugin = require("purgecss-webpack-plugin");
 const VueLoaderPlugin = require("vue-loader/lib/plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const SentryWebpackPlugin = require('@sentry/webpack-plugin');
+const SentryWebpackPlugin = require("@sentry/webpack-plugin");
 
 const devMode = (process.env.NODE_ENV !== "production");
 const releaseName = `${packageJSON.productName} ${packageJSON.version}`;
@@ -172,10 +172,10 @@ let rendererConfig = {
       chunkFilename: "[id].css"
     }),
     new SentryWebpackPlugin({
-      include: 'src',
-      ignoreFile: '.sentrycliignore',
-      ignore: ['node_modules', 'webpack.config.js', 'webpack.main.config.js', 'webpack.renderer.config.js'],
-      configFile: 'sentry.properties'
+      include: "src",
+      ignoreFile: ".sentrycliignore",
+      ignore: ["node_modules", "webpack.config.js", "webpack.main.config.js", "webpack.renderer.config.js"],
+      configFile: "sentry.properties"
     })
   ],
   // optimization: {

@@ -173,13 +173,12 @@ module.exports = class Package {
               fullPath = path.join(self.dest, path.join(...parts));
               if (/\/$/.test(entry.fileName)) {
                 // directory file names end with '/' 
-                mkdirp(fullPath, function(err) {
-                  if (err) {
-                    release().then(() => {
-                      return reject(err);
-                    });
-                  }
+                mkdirp(fullPath).then(() => {
                   zipfile.readEntry();
+                }).catch((err) => {
+                  release().then(() => {
+                    return reject(err);
+                  });
                 });
               }
               else {
@@ -192,16 +191,14 @@ module.exports = class Package {
                   }
                   
                   // ensure parent directory exists 
-                  mkdirp(path.dirname(fullPath), function(err) {
-                    if (err) {
-                      release().then(() => {
-                        return reject(err);
-                      });
-                    }
-    
+                  mkdirp(path.dirname(fullPath)).then(() => {
                     readStream.pipe(fs.createWriteStream(fullPath));
                     readStream.on("end", function() {
                       zipfile.readEntry();
+                    });
+                  }).catch((err) => {
+                    release().then(() => {
+                      return reject(err);
                     });
                   });
                 });

@@ -16,7 +16,7 @@ const releaseName = `${packageJSON.productName} ${packageJSON.version}`;
 
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const ChmodWebpackPlugin = require("chmod-webpack-plugin");
-const SentryWebpackPlugin = require('@sentry/webpack-plugin');
+const SentryWebpackPlugin = require("@sentry/webpack-plugin");
 
 //
 // get a list of node dependencies, and then
@@ -132,10 +132,10 @@ let mainConfig = {
     ]),
     new webpack.NoEmitOnErrorsPlugin(),
     new SentryWebpackPlugin({
-      include: 'src',
-      ignoreFile: '.sentrycliignore',
-      ignore: ['node_modules', 'webpack.config.js', 'webpack.main.config.js', 'webpack.renderer.config.js'],
-      configFile: 'sentry.properties'
+      include: "src",
+      ignoreFile: ".sentrycliignore",
+      ignore: ["node_modules", "webpack.config.js", "webpack.main.config.js", "webpack.renderer.config.js"],
+      configFile: "sentry.properties"
     })
   ],
   resolve: {
