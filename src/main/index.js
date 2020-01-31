@@ -1222,34 +1222,40 @@ var setupLaunchShortcut = function() {
   globalShortcut.unregisterAll();
   if ( prefs.launchShortcut !== undefined && prefs.launchShortcut !== "" ) {
     log.info(`register launch shortcut: ${prefs.launchShortcut}`);
-    const ret = globalShortcut.register(prefs.launchShortcut, () => {
-      log.info("shortcut triggered!");
-      if ( handles.prefs.window && handles.prefs.window.isFocused() ) {
-        log.info("no shortcut when prefs active!");
-        return;
-      }
+    try {
+      const ret = globalShortcut.register(prefs.launchShortcut, () => {
+        log.info("shortcut triggered!");
+        if ( handles.prefs.window && handles.prefs.window.isFocused() ) {
+          log.info("no shortcut when prefs active!");
+          return;
+        }
 
-      try {
-        // turn off idle checks for a couple seconds while loading savers
-        stateManager.ignoreReset(true);
-        setStateToRunning();
-      }
-      catch (e) {
-        log.info(e);
-        stateManager.ignoreReset(false);
-      }
-      finally {
-        setTimeout(function() {
+        try {
+          // turn off idle checks for a couple seconds while loading savers
+          stateManager.ignoreReset(true);
+          setStateToRunning();
+        }
+        catch (e) {
+          log.info(e);
           stateManager.ignoreReset(false);
-        }, 2500);
+        }
+        finally {
+          setTimeout(function() {
+            stateManager.ignoreReset(false);
+          }, 2500);
+        }
+      });
+      
+      if ( ! ret ) {
+        log.info("shortcut registration failed");
       }
-    });
 
-    if ( ! ret ) {
-      log.info("shortcut registration failed");
+      log.info(`registered? ${globalShortcut.isRegistered(prefs.launchShortcut)}`);
     }
-
-    log.info(`registered? ${globalShortcut.isRegistered(prefs.launchShortcut)}`);
+    catch(e) {
+      log.info("shortcut registration threw an error?");
+      log.info(e);
+    }
   }
 };
 
