@@ -117,8 +117,8 @@ const GRABBER_WINDOW_OPTS = {
   show:false,
   width:100,
   height:100,
-  x: 6000,
-  y: 2000,
+  x: 60, //00,
+  y: 20, //00,
   webPreferences: {
     nodeIntegration: true,
     webSecurity: false, //!global.IS_DEV
@@ -134,13 +134,15 @@ const GRABBER_WINDOW_OPTS = {
  */
 var openGrabberWindow = function() {
   return new Promise((resolve) => {
+    log.info("openGrabberWindow");
     const grabberUrl = "file://" + __dirname + "/assets/grabber.html";
 
     var grabberWindow = new BrowserWindow(GRABBER_WINDOW_OPTS);
     grabberWindow.noTray = true;
     
     grabberWindow.once("ready-to-show", () => {
-      // grabberWindow.webContents.openDevTools();
+      log.info("grabber open");
+      grabberWindow.webContents.openDevTools();
       resolve(grabberWindow);
     });
 
@@ -154,6 +156,7 @@ var openGrabberWindow = function() {
  * @returns {Promise} Promise that resolves with object containing URL of screenshot
  */
 var grabScreen = function(s) {
+  log.info("grab screen");
   return new Promise((resolve) => {
     // bypass screen capture in test mode
     // this is a hack and if i can find a better
@@ -185,6 +188,7 @@ var grabScreen = function(s) {
 
       openGrabberWindow().then((w) => {
         windowRef = w;
+        log.info("send request");
         windowRef.webContents.send("request-screenshot", { 
           id: s.id, 
           width: s.bounds.width, 
@@ -1087,7 +1091,7 @@ var bootApp = async function() {
   // monitor
   //
   electronScreen = electron.screen;
-  ["display-added", "display-removed", "display-metrics-changed"].forEach((type) => {
+  ["display-added", "display-removed"].forEach((type) => {
     electronScreen.on(type, windows.handleDisplayChange);
   });
 

@@ -9,51 +9,15 @@
 </body>
 
 <script>
- // const log = require('electron-log');
- const ipcRenderer = require('electron').ipcRenderer;
- const desktopCapturer = require('electron').desktopCapturer;
+ const { ipcRenderer, desktopCapturer } = require('electron')
  const temp = require("temp");
  const os = require("os");
  const fs = require('fs');
+ const fsPromises = fs.promises;
+ const asyncMutex = require('async-mutex').Mutex;
 
- // https://blog.jcoglan.com/2016/07/12/mutexes-and-javascript/
- var Mutex = function() {
-   this._busy  = false;
-   this._queue = [];
- };
-
- Mutex.prototype._dequeue = function() {
-   this._busy = true;
-   var next = this._queue.shift();
-
-   if (next)
-     this._execute(next);
-   else
-     this._busy = false;
- };
-
- Mutex.prototype.synchronize = function(task) {
-   var self = this;
-
-   return new Promise(function(resolve, reject) {
-     self._queue.push([task, resolve, reject]);
-     if (!self._busy) self._dequeue();
-   });
- };
-
- Mutex.prototype._execute = function(record) {
-   var task    = record[0],
-       resolve = record[1],
-       reject  = record[2],
-       self    = this;
-
-   task().then(resolve, reject).then(function() {
-     self._dequeue();
-   });
- };
-
- const mutex = new Mutex();
-
+ const mutex = new asyncMutex();
+ 
  var findOrCreate = function(type, screen_id) {
    var el, id;
    id = type + screen_id;
@@ -75,7 +39,7 @@
  };
  
 
- var screenToFile = function(video, canvas, photo, s, cb) {
+ var screenToFile = async function(video, canvas, photo, s, cb) {
    var tempName = temp.path({dir: os.tmpdir(), suffix:'.png'});
    var width = video.videoWidth;
    var height = video.videoHeight;
@@ -96,9 +60,9 @@
 
 
    var buffer = Buffer.from(data.split(",")[1], 'base64');
-   fs.writeFile(tempName, buffer, () => {
-     cb(tempName);
-   });          
+   await fsPromises.writeFile(tempName, buffer);
+
+   return tempName;
  }; // screenToFile
 
  var cleanup = function(video, canvas, photo, s) {
@@ -124,78 +88,60 @@
    photo.remove();
  };
 
- var captureScreen = function(id, width, height) {
-   return new Promise((resolve, reject) => {
-     var video = findOrCreate('video', id);
-     var canvas = findOrCreate('canvas', id);
-     var photo = findOrCreate('photo', id);
-     var screen_id;
+ var captureScreen = async function(id, width, height) {
+   var video = findOrCreate('video', id);
+   var canvas = findOrCreate('canvas', id);
+   var photo = findOrCreate('photo', id);
+   var screen_id;
 
-     var screen_opts = {
-       audio: false,
-       video: {
-         mandatory: {
-           // fun fact -- you need to use max here
-           // @see https://groups.google.com/a/chromium.org/forum/#!topic/chromium-apps/TP_rsnYVQWg
-           maxWidth: width,
-           maxHeight: height,
-           chromeMediaSource: 'desktop'
-         }
+   var screen_opts = {
+     audio: false,
+     video: {
+       mandatory: {
+         // fun fact -- you need to use max here
+         // @see https://groups.google.com/a/chromium.org/forum/#!topic/chromium-apps/TP_rsnYVQWg
+         maxWidth: width,
+         maxHeight: height,
+         chromeMediaSource: 'desktop'
        }
-     };
+     }
+   };
 
-     // adding muted helps with some security errors
-     // @see https://stackoverflow.com/questions/49930680/how-to-handle-uncaught-in-promise-domexception-play-failed-because-the-use
-     video.muted = "muted";
+   // adding muted helps with some security errors
+   // @see https://stackoverflow.com/questions/49930680/
+   // how-to-handle-uncaught-in-promise-domexception-play-failed-because-the-use
+   video.muted = "muted";
 
-     desktopCapturer.getSources({
-       types: ["screen"],
-       thumbnailSize: { width: 0, height: 0 }
-     }).then((sources) => {
-       let screen = sources.find((s) => { return s.display_id == id; });
-       if ( ! screen ) {
-         screen = sources[0];
-       }
-       screen_id = sources[0].id;
-
-       // log.info(`capture screen ${screen_id}`);
-
-       screen_opts.video.mandatory.chromeMediaSourceId = screen_id;
-       mutex.synchronize(() => {
-         return navigator.mediaDevices.getUserMedia(screen_opts).
-                          then((mediaStream) => {
-                            video.srcObject = mediaStream;
-                            video.play().then(() => {
-                              screenToFile(video, canvas, photo, mediaStream, (result) => {
-                                cleanup(video, canvas, photo, mediaStream);
-                                resolve(result);
-                              });
-                            });
-                          }).
-                          catch((ex) => {
-                            if ( typeof(window.Sentry) !== "undefined" ) {
-                              window.Sentry.captureException(ex);
-                            }
-
-                            getUserMediaError(ex);
-                            cleanup(video, canvas, photo);
-                          });
-       });
-     }).fail((ex) => {
-       if ( typeof(window.Sentry) !== "undefined" ) {
-         window.Sentry.captureException(ex);
-       }
-
-       getUserMediaError(ex);
-       cleanup(video, canvas, photo);
-     });
+   const sources = await desktopCapturer.getSources({
+     types: ["screen"],
+     thumbnailSize: { width: 0, height: 0 }
    });
+   let screen = sources.find((s) => { return s.display_id == id; });
+   if ( ! screen ) {
+     screen = sources[0];
+   }
+   screen_id = sources[0].id;
+
+
+   screen_opts.video.mandatory.chromeMediaSourceId = screen_id;
+   const mediaStream = await navigator.mediaDevices.getUserMedia(screen_opts);
+   video.srcObject = mediaStream;
+   await video.play();
+   
+   const result = await screenToFile(video, canvas, photo, mediaStream);
+   cleanup(video, canvas, photo, mediaStream);
+   return result;
  }; // captureScreen
 
- ipcRenderer.on("request-screenshot", (event, opts) => {
-   return captureScreen(opts.id, opts.width, opts.height).then((result) => {
+ ipcRenderer.on("request-screenshot", async (event, opts) => {
+   const release = await mutex.acquire();
+   try {
+     const result = await captureScreen(opts.id, opts.width, opts.height);
      ipcRenderer.send('screenshot-' + opts.id, {url:result});
-   });
+   }
+   finally {
+     release();
+   }
  });
 </script>
 </html>
