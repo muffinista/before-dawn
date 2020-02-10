@@ -25,7 +25,7 @@ let app = new Application({
 const SCREENSAVER = "Emoji Starfield";
 app.start().
   then(() => app.client.waitUntilWindowLoaded() ).
-  then(() => app.electron.ipcRenderer.send("open-prefs")).
+  then(() => app.electron.ipcRenderer.send("open-window", "prefs")).
   then(() => helpers.waitForWindow(app, "Before Dawn: Preferences") ).
   then(() => app.webContents
   .executeJavaScript(`document.querySelector("[data-name='${SCREENSAVER}']").scrollIntoView()`)).
@@ -40,7 +40,7 @@ app.start().
   then(() => helpers.waitForWindow(app, "Before Dawn: Settings") ).
   then(() => app.browserWindow.capturePage()).
   then((imageBuffer) => fsPromises.writeFile(path.join(__dirname, "..", "assets", "settings.png"), imageBuffer)).
-  then(() => app.electron.ipcRenderer.send("close-settings")).
+  then(() => app.electron.ipcRenderer.send("close-window", "settings")).
   then(() => helpers.waitForWindow(app, "Before Dawn: Preferences") ).
   then(() => app.client.click("button.create")).
   then(() => helpers.waitForWindow(app, "Before Dawn: Create Screensaver!") ).

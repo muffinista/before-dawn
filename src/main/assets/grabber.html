@@ -9,7 +9,7 @@
 </body>
 
 <script>
- const { ipcRenderer, desktopCapturer } = require('electron')
+ const { ipcRenderer, desktopCapturer } = require('electron');
  const temp = require("temp");
  const os = require("os");
  const fs = require('fs');
@@ -57,7 +57,6 @@
    context.clearRect(0, 0, canvas.width, canvas.height);
    
    photo.setAttribute('src', data);
-
 
    var buffer = Buffer.from(data.split(",")[1], 'base64');
    await fsPromises.writeFile(tempName, buffer);

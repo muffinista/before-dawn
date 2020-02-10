@@ -60,7 +60,6 @@ if ( process.env.LOCAL_PACKAGE_DATA ) {
   global.LOCAL_PACKAGE_DATA = process.env.LOCAL_PACKAGE_DATA;
 }
 
-
 global.CONFIG_DEFAULTS = {
   options: {},
   delay: 15,

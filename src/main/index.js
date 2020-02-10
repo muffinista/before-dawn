@@ -1,10 +1,14 @@
 "use strict";
 
+process.traceDeprecation = true;
+process.traceProcessWarnings = true;
+
+
 /***
 
    Welcome to....
 
-    ____        __                  ____                       
+   ____        __                  ____                       
    | __ )  ___ / _| ___  _ __ ___  |  _ \  __ ___      ___ __  
    |  _ \ / _ \ |_ / _ \| '__/ _ \ | | | |/ _` \ \ /\ / / '_ \ 
    | |_) |  __/  _| (_) | | |  __/ | |_| | (_| |\ V  V /| | | |
@@ -17,7 +21,15 @@
 const electron = require("electron");
 const log = require("electron-log");
 
-const {app, globalShortcut, BrowserWindow, BrowserView, ipcMain, Menu, Tray} = require("electron");
+const {app,
+  globalShortcut,
+  BrowserWindow,
+  BrowserView,
+  ipcMain,
+  Menu,
+  Tray,
+  dialog,
+  shell} = require("electron");
 
 const fs = require("fs");
 const path = require("path");
@@ -29,6 +41,7 @@ const power = require("./power.js");
 
 const StateManager = require("./state_manager.js");
 const SaverPrefs = require("../lib/prefs.js");
+const SaverFactory = require("../lib/saver-factory.js");
 const SaverListManager = require("../lib/saver-list.js");
 const Package = require("../lib/package.js");
 
@@ -54,6 +67,7 @@ const globalCSSCode = fs.readFileSync( path.join(__dirname, "assets", "global.cs
 const PREVIEW_PADDING = 1.15;
 
 
+
 /**
  * track some information about windows, previews, bounds for the prefs window
  * and editor window
@@ -72,6 +86,9 @@ let handles = {
     }
   },
   settings: {
+    window: null
+  },
+  addNew: {
     window: null
   },
   editor: {
@@ -113,19 +130,6 @@ if (! singleLock ) {
 }
 
 
-const GRABBER_WINDOW_OPTS = {
-  show:false,
-  width:100,
-  height:100,
-  x: 60, //00,
-  y: 20, //00,
-  webPreferences: {
-    nodeIntegration: true,
-    webSecurity: false, //!global.IS_DEV
-    preload: global.TRACK_ERRORS ? path.join(__dirname, "assets", "sentry.js") : undefined
-  }
-};
-
 
 /**
  * Open the screengrab window
@@ -137,12 +141,23 @@ var openGrabberWindow = function() {
     log.info("openGrabberWindow");
     const grabberUrl = "file://" + __dirname + "/assets/grabber.html";
 
-    var grabberWindow = new BrowserWindow(GRABBER_WINDOW_OPTS);
+    var grabberWindow = new BrowserWindow({
+      show: false,
+      width: 100,
+      height: 100,
+      x: 6000,
+      y: 2000,
+      webPreferences: {
+        nodeIntegration: true,
+        webSecurity: false, //!global.IS_DEV
+        preload: global.TRACK_ERRORS ? path.join(__dirname, "assets", "sentry.js") : undefined
+      }
+    });
     grabberWindow.noTray = true;
     
     grabberWindow.once("ready-to-show", () => {
       log.info("grabber open");
-      grabberWindow.webContents.openDevTools();
+      //grabberWindow.webContents.openDevTools();
       resolve(grabberWindow);
     });
 
@@ -339,7 +354,7 @@ var addNewSaver = function() {
   grabScreen(primary).then((message) => {
     newUrl = newUrl + "?screenshot=" + encodeURIComponent("file://" + message.url);
 
-    var w = new BrowserWindow({
+    handles.addNew.window = new BrowserWindow({
       show: false,
       width: 450,
       height: 700,
@@ -352,19 +367,19 @@ var addNewSaver = function() {
       icon: path.join(__dirname, "assets", "iconTemplate.png")
     });
 
-    w.screenshot = message.url;
+    handles.addNew.window.screenshot = message.url;
 
-    w.on("closed", () => {
-      w = null;
+    handles.addNew.window.on("closed", () => {
+      handles.addNew.window = null;
       dock.hideDockIfInactive(app);
     });
 
-    w.once("ready-to-show", () => {
-      w.show();
+    handles.addNew.window.once("ready-to-show", () => {
+      handles.addNew.window.show();
       dock.showDock(app);
     });
 
-    w.loadURL(newUrl);
+    handles.addNew.window.loadURL(newUrl);
   });
 };
 
@@ -537,7 +552,8 @@ var runSaver = function(screenshot, saver, s, url_opts, tickCount) {
       url_opts.screenshot = encodeURIComponent("file://" + screenshot);
     }
 
-    let url = saver.getUrl(url_opts);
+    const urlParams = new URLSearchParams(url_opts);
+    let url = `${saver.url}?${urlParams.toString()}`;
 
     log.info("Loading " + url, s.id);
 
@@ -579,7 +595,7 @@ var runScreenSaverOnDisplay = function(saver, s) {
   // if this screensaver uses a screengrab, get it. 
   // otherwise just boot it
   //
-  const reqs = saver.getRequirements();
+  const reqs = saver.requirements;
   if ( reqs.findIndex((x) => { return x === "screen"; }) > -1 ) {
     grabScreen(s).then((message) => {
       runSaver(message.url, saver, s, url_opts, tickCount);
@@ -1073,9 +1089,10 @@ var bootApp = async function() {
     systemDir: path.join(getSystemDir(), "system-savers")
   };
 
-  if ( global.IS_DEV ) {
-    saverOpts.logger = log.info;
-  }
+  // // @TODO this throws a deprecation
+  // if ( global.IS_DEV ) {
+  //   saverOpts.logger = log.info;
+  // }
 
   log.info("Loading prefs");
   log.info(`baseDir: ${saverOpts.base}`);
@@ -1364,17 +1381,10 @@ let setupPreview = function(target, incomingBounds) {
 
     handles[target].preview = new BrowserView({
       webPreferences: {
-        preload: path.join(__dirname, "assets", "preview.js"),
         zoomFactor: zf
       }
     });
     handles[target].window.setBrowserView(handles[target].preview);
-    handles[target].preview.webContents.on("console-message",
-                                           (event, level, message, line, sourceId) => {
-                                             // log.info(level, message, line, sourceId);
-                                             handles[target].window.webContents.send("console-message",
-                                                                                     event, level, message, line, sourceId);
-                                           });
   }
 };
 
@@ -1407,25 +1417,82 @@ else {
 }
 log.info("use base path", global.basePath);
 
-/**
- * make sure we're only running a single instance
- */
-if ( testMode !== true ) {
-  app.on("second-instance", () => {
-    if ( handles.prefs.window === null && handles.prefs.window !== undefined ) {
-      openPrefsWindow();
-    }
-    else {
-      if ( handles.prefs.window.isMinimized() ) {
-        handles.prefs.window.restore();
-      }
-      handles.prefs.window.focus();
-    }
-  });
-}
+
+
+const windowMethods = {
+  editor: openEditor,
+  settings: openSettingsWindow,
+  prefs: openPrefsWindow,
+  about: openAboutWindow,
+  "add-new": addNewSaver
+};
+
+ipcMain.on("open-window", (_event, key, args) => {
+  windowMethods[key](args);
+});
+
+ipcMain.on("close-window", (event, key) => {
+  if ( handles[key].window ) {
+    handles[key].window.close();
+  }
+});
 
 ipcMain.handle("get-saver-opts", () => {
+  log.info("get-saver-opts");
   return saverOpts;
+});
+
+ipcMain.handle("get-globals", () => {
+  return {
+    APP_VERSION: global.APP_VERSION,
+    APP_REPO: global.APP_REPO,
+    CONFIG_DEFAULTS: global.CONFIG_DEFAULTS,
+    NEW_RELEASE_AVAILABLE: global.NEW_RELEASE_AVAILABLE
+  };
+});
+
+ipcMain.handle("list-savers", async () => {
+  log.info("list-savers");
+  let savers = new SaverListManager({
+    prefs: prefs
+  });
+
+  const entries = await savers.list();
+  return entries;
+});
+
+ipcMain.handle("load-saver", async (_event, key) => {
+  log.info("load-saver", key);
+  let savers = new SaverListManager({
+    prefs: prefs
+  });
+  return await savers.loadFromFile(key);
+});
+
+ipcMain.handle("delete-saver", async(_event, attrs) => {
+  console.log("delete-saver");
+  let savers = new SaverListManager({
+    prefs: prefs
+  });
+  await savers.delete(attrs);
+});
+
+
+ipcMain.handle("create-screensaver", async(_event, attrs) => {
+  const factory = new SaverFactory();
+
+  let systemPath = getSystemDir();
+
+  const src = path.join(systemPath, "system-savers", "__template");
+  const dest = prefs.localSource;
+  const data = factory.create(src, dest, attrs);
+
+  return data;
+});
+
+ipcMain.handle("get-primary-display-bounds", () => {
+  const bounds = electronScreen.getPrimaryDisplay().bounds;
+  return bounds;
 });
 
 ipcMain.on("preview-error", (_event, message, source, lineno) => {
@@ -1442,28 +1509,22 @@ ipcMain.on("preview-error", (_event, message, source, lineno) => {
   }
 });
 
+ipcMain.on("launch-url", (_event, url) => {
+  const { shell } = require("electron");
+  shell.openExternal(url);
+});
+
 ipcMain.on("savers-updated", () => {
+  log.info("savers-updated");
   toggleSaversUpdated();
 });
 
-ipcMain.on("open-settings", () => {
-  openSettingsWindow();
-});
-
-let updatePreview = function(arg) {
+// event for switching preview url
+// event for switching preview location and/or url
+ipcMain.on("update-preview", (_event, arg) => {
   setupPreview(arg.target, arg.bounds);
   setPreviewUrl(arg.target, arg.url, arg.force);
   setBounds(arg.target, arg.bounds);
-};
-
-// event for switching preview url
-ipcMain.on("preview-url", (_event, arg) => {
-  updatePreview(arg);
-});
-
-// event for switching preview location and/or url
-ipcMain.on("preview-bounds", (_event, arg) => {
-  updatePreview(arg);
 });
 
 //
@@ -1474,44 +1535,10 @@ ipcMain.on("prefs-updated", () => {
   prefs.reload();
   updateStateManager();
   checkForPackageUpdates();
-  handles.prefs.window.webContents.send("savers-updated");
-});
 
-//
-// handle request to open the prefs window
-//
-ipcMain.on("open-prefs", () => {
-  log.info("open-prefs");
-  openPrefsWindow();
-});
-ipcMain.on("close-prefs", () => {
-  log.info("close-prefs");
-  if ( handles.prefs.window ) {
-    handles.prefs.window.close();
-  }
-});
-ipcMain.on("close-settings", () => {
-  log.info("close-prefs");
-  if ( handles.settings.window ) {
-    handles.settings.window.close();
-  }
-});
-
-ipcMain.on("open-about", () => {
-  log.info("open-about");
-  openAboutWindow();
-});
-
-//
-// handle request to open 'add new saver' window
-//
-ipcMain.on("open-add-screensaver", (_event, screenshot) => {
-  log.info("open-add-screensaver");
-  addNewSaver(screenshot);
-});
-
-ipcMain.on("open-editor", (_event, args) => {
-  openEditor(args);
+  // this was causing a double load of data basically, which
+  // might be fine but seems like an issue, so skipping for now
+  // handles.prefs.window.webContents.send("savers-updated");
 });
 
 ipcMain.on("set-autostart", (_event, value) => {
@@ -1525,10 +1552,78 @@ ipcMain.on("set-global-launch-shortcut", () => {
   setupLaunchShortcut();
 });
 
+ipcMain.on("display-update-dialog", async () => {
+  const result = await dialog.showMessageBox({
+    type: "info",
+    title: "Update Available!",
+    message: "There's a new update available! Would you like to download it?",
+    buttons: ["No", "Yes"],
+    defaultId: 0
+  });
+
+  if ( result.response === 1 ) {
+    const appRepo = global.APP_REPO;
+    shell.openExternal(`https://github.com/${appRepo}/releases/latest`);
+  }
+});
+
+ipcMain.handle("reset-to-defaults-dialog", async () => {
+  const result = await dialog.showMessageBox({
+    type: "info",
+    title: "Are you sure?",
+    message: "Are you sure you want to reset to the default settings?",
+    buttons: ["No", "Yes"],
+    defaultId: 0
+  });
+  return result;
+});
+
+ipcMain.handle("delete-screensaver-dialog", async (_event, saver) => {
+  const result = await dialog.showMessageBox(
+    {
+      type: "info",
+      title: "Are you sure?",
+      message: "Are you sure you want to delete this screensaver?",
+      detail: `Deleting screensaver ${saver.name}`,
+      buttons: ["No", "Yes"],
+      defaultId: 0
+    }); 
+
+  return result;
+});
+
+ipcMain.handle("show-open-dialog", async () => {
+  const result = await dialog.showOpenDialog(
+    {
+      title: "Pick a screensaver directory",
+      message: "Pick a folder to store your custom screensavers",
+      properties: [ "openDirectory", "createDirectory" ]
+    });
+  return result;
+});
+
+
 ipcMain.on("quit-app", () => {
   log.info("quit-app");
   quitApp();
 });
+
+/**
+ * make sure we're only running a single instance
+ */
+if ( testMode !== true ) {
+  app.on("second-instance", () => {
+    if ( handles.prefs.window === null && handles.prefs.window !== undefined ) {
+      openPrefsWindow();
+    }
+    else {
+      if ( handles.prefs.window.isMinimized() ) {
+        handles.prefs.window.restore();
+      }
+      handles.prefs.window.focus();
+    }
+  });
+}
 
 // seems like we need to catch this event to keep OSX from exiting app after screensaver runs?
 app.on("window-all-closed", function() {

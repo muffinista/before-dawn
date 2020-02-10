@@ -89,12 +89,9 @@
           here.
         </small>
         <template v-if="saver !== undefined">
-          <!-- NOTE: passing the attrs here because its really all
-              we need for this form and makes saving the data later a
-              lot easier -->
           <saver-form
             v-if="isLoaded"
-            :saver="saver.attrs"
+            :saver="saver"
           />
         </template>
       </div>
@@ -174,8 +171,9 @@ import SaverOptionInput from "@/components/SaverOptionInput";
 import SaverOptions from "@/components/SaverOptions";
 import Noty from "noty";
 
-import SaverPrefs from "@/../lib/prefs";
-import SaverListManager from "@/../lib/saver-list";
+import Saver from "@/../lib/saver";
+
+const { ipcRenderer } = require("electron");
 
 export default {
   name: "Editor",
@@ -192,12 +190,6 @@ export default {
     };
   },
   computed: {
-    currentWindow: function() {
-      return this.$electron.remote.getCurrentWindow();
-    },
-    ipcRenderer: function() {
-      return this.$electron.ipcRenderer;
-    },
     isLoaded: function() {
       return typeof(this.saver) !== "undefined";
     },
@@ -232,46 +224,36 @@ export default {
       return;
     }
 
-    this.ipcRenderer.on("console-message", (sender, event, level, message, line, sourceId) => {
+    this.size = await ipcRenderer.invoke("get-primary-display-bounds");
+
+    ipcRenderer.on("console-message", (sender, event, level, message, line, sourceId) => {
       // only output messages from the screensaver folder itself
       if ( sourceId.indexOf(this.folderPath) !== -1 ) {
         // eslint-disable-next-line no-console
         console.log(message);
       }
     });
-    this.ipcRenderer.on("preview-error", (sender, event) => {
+    ipcRenderer.on("preview-error", (sender, event) => {
       // eslint-disable-next-line no-console
       console.log(`Error on line ${event.lineno}: ${event.message}`);
     });
 
-    let opts = await this.ipcRenderer.invoke("get-saver-opts");
-    this._prefs = new SaverPrefs({
-      baseDir: opts.base,
-      systemSource: opts.systemDir
-    });
+    this.saver = await ipcRenderer.invoke("load-saver", this.src);
+    this.options = this.saver.options;
+    this.lastIndex = this.saver.options.length;
 
-    this._savers = new SaverListManager({
-      prefs: this._prefs
-    });
+    // make sure folder actually exists
+    if ( fs.existsSync(this.folderPath) ) {
+      fs.watch(this.folderPath, (eventType, filename) => {
+        if (filename) {
+          this.renderPreview();
+        }
+      });
+    }
 
-    this._savers.loadFromFile(this.src).then((result) => {
-      this.saver = result;
-      this.options = result.options;
-      this.lastIndex = result.options.length;
-
-      // make sure folder actually exists
-      if ( fs.existsSync(this.folderPath) ) {
-        fs.watch(this.folderPath, (eventType, filename) => {
-          if (filename) {
-            this.renderPreview();
-          }
-        });
-      }
-
-      this.resizeInterval = window.setInterval(() => {
-        this.checkResize();
-      }, 50);
-    });
+    this.resizeInterval = window.setInterval(() => {
+      this.checkResize();
+    }, 50);
   },
   beforeDestroy() {
     window.clearInterval(this.resizeInterval);
@@ -295,20 +277,17 @@ export default {
           width: rect.width, 
           height: rect.height 
         };
-        this.ipcRenderer.send("preview-bounds", {
+        ipcRenderer.send("update-preview", {
           target: "editor",
           bounds: this.currentPosition,
-          url: this.saver.getUrl(this.urlOpts(this.saver))
+          url: this.getUrl()
         });
       }
     },
     urlOpts() {
-      var screen = this.$electron.remote.screen;
-      var size = screen.getPrimaryDisplay().bounds;
-
       var base = {
-        width: size.width,
-        height: size.height,
+        width: this.size.width,
+        height: this.size.height,
         preview: 1,
         platform: process.platform,
         screenshot: this.screenshot
@@ -363,14 +342,17 @@ export default {
       this.lastIndex = this.lastIndex + 1;
     },   
     closeWindow() {
-      this.currentWindow.close();
+      ipcRenderer.send("close-window", "editor");
     },
     saveData() {
       this.disabled = true;
 
-      this.saver.attrs.options = this.options;
-      this.saver.write(this.saver.attrs, this.saver.key);
-      this.ipcRenderer.send("savers-updated", this.saver.key);
+      this.saver.options = this.options;
+
+      // @todo use ipc to update saver?
+      const s = new Saver(this.saver);
+      s.write(this.saver, this.src);
+      ipcRenderer.send("savers-updated", this.src);
 
       new Noty({
         type: "success",
@@ -420,12 +402,15 @@ export default {
       
       exec(cmd, args, function() {});
     },
+    getUrl() {
+      const urlParams = new URLSearchParams(this.urlOpts(this.saver));
+      return `${this.saver.url}?${urlParams.toString()}`;
+    },
     renderPreview() {
-      //console.log("load", this.saver.getUrl(this.urlOpts(this.saver)));
-      this.ipcRenderer.send("preview-url", {
+      ipcRenderer.send("update-preview", {
         target: "editor",
         bounds: this.currentPosition,
-        url: this.saver.getUrl(this.urlOpts(this.saver)),
+        url: this.getUrl(),
         force: true
       });
     },

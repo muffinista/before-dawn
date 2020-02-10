@@ -114,62 +114,50 @@ describe("SaverListManager", function() {
   });
   
   describe("list", function() {
-    it("loads data", function(done) {
-      savers.list(function(data) {
-//        console.log(data);
-        assert.equal(3, data.length);
-        done();
-      });
+    it("loads data", async function() {
+      const data = await savers.list();
+      assert.equal(3, data.length);
     });
 
-    it("handles bad data", (done) => {
+    it("handles bad data", async () => {
       helpers.addSaver(saversDir, "invalid", "invalid.json");
-      savers.list(function(data) {
-        assert.equal(3, data.length);
-        done();
-      });
+      const data = await savers.list();
+      assert.equal(3, data.length);
     });
 
-    it("uses cache", (done) => {
+    it("uses cache", async () => {
       let cache = [0, 1, 2, 3, 4, 5];
       savers.loadedScreensavers = cache;
-      savers.list((data) => {
-        assert.deepEqual(cache, data);
-        done();
-      });
+      const data = await savers.list();
+      assert.deepEqual(cache, data);
     });
 
-    it("forces reset", (done) => {
+    it("forces reset", async () => {
       let cache = [0, 1, 2, 3, 4, 5];
       savers.loadedScreensavers = cache;
-      savers.list((data) => {
-        assert.notDeepEqual(cache, data);
-        assert.equal(3, data.length);
-        done();
-      }, true);
+      const data = await savers.list(true);
+
+      assert.notDeepEqual(cache, data);
+      assert.equal(3, data.length);
     });
   });
 
   describe("reset", function() {
-    it("resets cache", function(done) {
-      savers.list(function() {
-        assert.equal(3, savers.loadedScreensavers.length);
-        savers.reset();
-        assert.equal(0, savers.loadedScreensavers.length);
-
-        done();
-      });
+    it("resets cache", async function() {
+      await savers.list();
+      assert.equal(3, savers.loadedScreensavers.length);
+      savers.reset();
+      assert.equal(0, savers.loadedScreensavers.length);
     });
   });
 
   describe("random", function() {
-    it("returns something", function(done) {
-      savers.list(function(data) {
-        assert.equal(3, data.length);
-        let foo = savers.random();
-        assert(foo.key !== undefined);
-        done();
-      });
+    it("returns something", async function() {
+      const data = await savers.list();
+
+      assert.equal(3, data.length);
+      let foo = savers.random();
+      assert(foo.key !== undefined);
     });
   });
 
@@ -191,64 +179,34 @@ describe("SaverListManager", function() {
     });
   });
 
-  describe("create", function() {
-    it("works", function(done) {
-
-      // this should be the path to our __template in the main app
-      var src = path.join(__dirname, "..", "..", "src", "main", "system-savers", "__template");
-      savers.create(src,
-                                  {
-                                    name:"New Screensaver"
-                                  });
-      
-      savers.list(function(data) {
-        assert.equal(4, data.length);
-        done();
-      });
-    });
-
-    it("throws exception", function(done) {
-      assert.throws(
-        () => {
-          savers.create({
-            name:"New Screensaver"
-          });
-        },
-        Error);
-      done();
-    });
-  });
-
   describe("getByKey", function() {
-    it("returns saver", function(done) {
-      savers.list(function(data) {
-        var key = data[2].key;
-        var s = savers.getByKey(key);
-        assert.equal("Screensaver One", s.name);
-        done();
-      });
+    it("returns saver", async function() {
+      const data = await savers.list();
+      var key = data[2].key;
+      var s = savers.getByKey(key);
+      assert.equal("Screensaver One", s.name);
     });
   });
 
   describe("delete", () => {
-    it("can delete if editable", function(done) {
-      savers.list(function(data) {
-        let s = data.find(s => s.editable);
-        savers.delete(s, (result) => {
-          assert(result);
-          done();
-        });
-      });
+    it("can delete if editable", async function() {
+      const data = await savers.list();
+
+      let s = data.find(s => s.editable);
+      const result = await savers.delete(s);
+      assert(result);
     });
 
-    it("doesn't delete if not editable", function(done) {
-      savers.list(function(data) {
-        let s = data.find(s => !s.editable);
-        savers.delete(s, (result) => {
-          assert(!result);
-          done();
-        });
-      });
+    it("doesn't delete if not editable", async function() {
+      const data = await savers.list();
+
+      let s = data.find(s => !s.editable);
+      try {
+        await savers.delete(s);
+      }
+      catch(e) {
+        assert(true);
+      }
     });
   });
 });

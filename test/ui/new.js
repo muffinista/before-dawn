@@ -47,7 +47,7 @@ describe("Add New", function() {
           helpers.removeLocalSource(workingDir);
         }).
         then(() => app.client.waitUntilWindowLoaded() ).
-        then(() => app.electron.ipcRenderer.send("open-add-screensaver", screensaverUrl)).
+        then(() => app.electron.ipcRenderer.send("open-window", "add-new", screensaverUrl)).
         then(() => helpers.waitForWindow(app, windowTitle) );
     });
 
@@ -94,7 +94,7 @@ describe("Add New", function() {
           app.client.electron.ipcRenderer.send("prefs-updated");
         }).
         then(() => app.client.waitUntilWindowLoaded() ).
-        then(() => app.electron.ipcRenderer.send("open-add-screensaver", screensaverUrl)).
+        then(() => app.electron.ipcRenderer.send("open-window", "add-new", screensaverUrl)).
         then(() => helpers.waitForWindow(app, windowTitle) );
       });     
 

@@ -19,7 +19,7 @@ describe("About", function() {
 
     return app.start().
               then(() => helpers.waitUntilBooted(app) ).
-              then(() => app.electron.ipcRenderer.send("open-about")).
+              then(() => app.electron.ipcRenderer.send("open-window", "about")).
               then(() => helpers.waitForWindow(app, windowTitle) );
   });
 

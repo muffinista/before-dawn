@@ -3,7 +3,9 @@
     <div class="container-fluid">
       <h1>Before Dawn</h1>
       <h2>// screensaver fun //</h2>
-      <h3>{{ version }}</h3>
+      <template v-if="isLoaded">
+        <h3>{{ version }}</h3>
+      </template>
 
       <p>
         An open-source screensaver project.<br>
@@ -102,20 +104,31 @@
 </template>
 
 <script>
+const { ipcRenderer } = require("electron");
+
 export default {
   name: "About",
   components: {},
+  data() {
+    return {
+      globals: undefined
+    };
+  },
   computed: {
+    isLoaded: function() {
+      return ( typeof(this.globals) !== "undefined" );
+    },
     version: function() {
-      return this.$electron.remote.getGlobal("APP_VERSION");
+      return this.globals.APP_VERSION;
     }
   },
-  mounted() {
+  async mounted() {
+    this.globals = await ipcRenderer.invoke("get-globals");
   },
   methods: {
     open(evt) {
       evt.preventDefault();
-      this.$electron.shell.openExternal(event.target.href);
+      ipcRenderer.send("launch-url", event.target.href);
     }
   },
 };

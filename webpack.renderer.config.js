@@ -33,7 +33,7 @@ var htmlPageOptions = function(id, title) {
       removeAttributeQuotes: true,
       removeComments: true
     },
-    nodeModules: devMode ? path.resolve(__dirname, "node_modules") : false
+    nodeModules: false // devMode ? path.resolve(__dirname, "node_modules") : false
   };
 };
 
@@ -153,9 +153,6 @@ let rendererConfig = {
       ]),
       whitelistPatterns: [/nav/, /nav-tabs/, /nav-link/, /nav-item/, /tablist/, /tabindex/, /tooltip/, /button-group/, /btn/, /noty/]
     }),
-    // new PurgecssPlugin({
-    //   paths: glob.sync(`${path.join(__dirname, "./src")}/**/*`,  { nodir: true }),
-    // }),
     new CopyWebpackPlugin(
       [
         {
@@ -199,7 +196,10 @@ let rendererConfig = {
   mode: (process.env.NODE_ENV === "production" ? "production" : "development"),
   resolve: {
     alias: {
+      // handy alias for the root path of render files
       "@": path.join(__dirname, "src/renderer"),
+
+      // vue template compiler
       "vue$": "vue/dist/vue.esm.js"
     },
     extensions: [".js", ".vue", ".json", ".css", ".node"]
