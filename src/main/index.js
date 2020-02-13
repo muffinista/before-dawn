@@ -1064,12 +1064,198 @@ var handleLocalPackage = async function() {
   }
 };
 
+
+/**
+ * setup assorted IPC listeners
+ */
+let setupIPC = function() {
+  ipcMain.on("open-window", (_event, key, args) => {
+    windowMethods[key](args);
+  });
+  
+  ipcMain.on("close-window", (event, key) => {
+    if ( handles[key].window ) {
+      handles[key].window.close();
+    }
+  });
+  
+  ipcMain.handle("get-saver-opts", () => {
+    log.info("get-saver-opts");
+    return saverOpts;
+  });
+  
+  ipcMain.handle("get-globals", () => {
+    return {
+      APP_VERSION: global.APP_VERSION,
+      APP_REPO: global.APP_REPO,
+      CONFIG_DEFAULTS: global.CONFIG_DEFAULTS,
+      NEW_RELEASE_AVAILABLE: global.NEW_RELEASE_AVAILABLE
+    };
+  });
+  
+  ipcMain.handle("list-savers", async () => {
+    log.info("list-savers");
+    let savers = new SaverListManager({
+      prefs: prefs
+    });
+  
+    const entries = await savers.list();
+    return entries;
+  });
+  
+  ipcMain.handle("load-saver", async (_event, key) => {
+    log.info("load-saver", key);
+    let savers = new SaverListManager({
+      prefs: prefs
+    });
+    return await savers.loadFromFile(key);
+  });
+  
+  ipcMain.handle("delete-saver", async(_event, attrs) => {
+    console.log("delete-saver");
+    let savers = new SaverListManager({
+      prefs: prefs
+    });
+    await savers.delete(attrs);
+  });
+  
+  
+  ipcMain.handle("create-screensaver", async(_event, attrs) => {
+    const factory = new SaverFactory();
+  
+    let systemPath = getSystemDir();
+  
+    const src = path.join(systemPath, "system-savers", "__template");
+    const dest = prefs.localSource;
+    const data = factory.create(src, dest, attrs);
+  
+    return data;
+  });
+  
+  ipcMain.handle("get-primary-display-bounds", () => {
+    const bounds = electronScreen.getPrimaryDisplay().bounds;
+    return bounds;
+  });
+  
+  ipcMain.on("preview-error", (_event, message, source, lineno) => {
+    let opts = {
+      message: message,
+      source: source,
+      lineno: lineno
+    };
+    if ( handles.editor.window ) {
+      handles.editor.window.webContents.send("preview-error", opts);
+    }
+    else if ( handles.prefs.window ) {
+      handles.prefs.window.webContents.send("preview-error", opts);
+    }
+  });
+  
+  ipcMain.on("launch-url", (_event, url) => {
+    const { shell } = require("electron");
+    shell.openExternal(url);
+  });
+  
+  ipcMain.on("savers-updated", () => {
+    log.info("savers-updated");
+    toggleSaversUpdated();
+  });
+  
+  // event for switching preview url
+  // event for switching preview location and/or url
+  ipcMain.on("update-preview", (_event, arg) => {
+    setupPreview(arg.target, arg.bounds);
+    setPreviewUrl(arg.target, arg.url, arg.force);
+    setBounds(arg.target, arg.bounds);
+  });
+  
+  //
+  // user has updated their preferences, let's reload
+  //
+  ipcMain.on("prefs-updated", () => {
+    log.info("prefs-updated");
+    prefs.reload();
+    updateStateManager();
+    checkForPackageUpdates();
+  
+    // this was causing a double load of data basically, which
+    // might be fine but seems like an issue, so skipping for now
+    // handles.prefs.window.webContents.send("savers-updated");
+  });
+  
+  ipcMain.on("set-autostart", (_event, value) => {
+    log.info("set-autostart");
+    const autostarter = require("./autostarter.js");
+    autostarter.toggle(global.APP_NAME, value);
+  });
+  
+  ipcMain.on("set-global-launch-shortcut", () => {
+    log.info("set-global-launch-shortcut");
+    setupLaunchShortcut();
+  });
+  
+  ipcMain.on("display-update-dialog", async () => {
+    const result = await dialog.showMessageBox({
+      type: "info",
+      title: "Update Available!",
+      message: "There's a new update available! Would you like to download it?",
+      buttons: ["No", "Yes"],
+      defaultId: 0
+    });
+  
+    if ( result.response === 1 ) {
+      const appRepo = global.APP_REPO;
+      shell.openExternal(`https://github.com/${appRepo}/releases/latest`);
+    }
+  });
+  
+  ipcMain.handle("reset-to-defaults-dialog", async () => {
+    const result = await dialog.showMessageBox({
+      type: "info",
+      title: "Are you sure?",
+      message: "Are you sure you want to reset to the default settings?",
+      buttons: ["No", "Yes"],
+      defaultId: 0
+    });
+    return result;
+  });
+  
+  ipcMain.handle("delete-screensaver-dialog", async (_event, saver) => {
+    const result = await dialog.showMessageBox(
+      {
+        type: "info",
+        title: "Are you sure?",
+        message: "Are you sure you want to delete this screensaver?",
+        detail: `Deleting screensaver ${saver.name}`,
+        buttons: ["No", "Yes"],
+        defaultId: 0
+      }); 
+  
+    return result;
+  });
+  
+  ipcMain.handle("show-open-dialog", async () => {
+    const result = await dialog.showOpenDialog(
+      {
+        title: "Pick a screensaver directory",
+        message: "Pick a folder to store your custom screensavers",
+        properties: [ "openDirectory", "createDirectory" ]
+      });
+    return result;
+  });
+  
+  
+  ipcMain.on("quit-app", () => {
+    log.info("quit-app");
+    quitApp();
+  });
+};
+
 /**
  * handle initial startup of app
  */
 var bootApp = async function() {
   askAboutApplicationsFolder();
-
   global.NEW_RELEASE_AVAILABLE = false;
 
   // ensure proper data in about panel when available
@@ -1088,11 +1274,6 @@ var bootApp = async function() {
     base: global.basePath,
     systemDir: path.join(getSystemDir(), "system-savers")
   };
-
-  // // @TODO this throws a deprecation
-  // if ( global.IS_DEV ) {
-  //   saverOpts.logger = log.info;
-  // }
 
   log.info("Loading prefs");
   log.info(`baseDir: ${saverOpts.base}`);
@@ -1118,6 +1299,8 @@ var bootApp = async function() {
       windows.closeRunningScreensavers();
     }); 
   });
+
+  setupIPC();
 
   const idler = require("desktop-idle");
   stateManager = new StateManager();
@@ -1427,186 +1610,6 @@ const windowMethods = {
   "add-new": addNewSaver
 };
 
-ipcMain.on("open-window", (_event, key, args) => {
-  windowMethods[key](args);
-});
-
-ipcMain.on("close-window", (event, key) => {
-  if ( handles[key].window ) {
-    handles[key].window.close();
-  }
-});
-
-ipcMain.handle("get-saver-opts", () => {
-  log.info("get-saver-opts");
-  return saverOpts;
-});
-
-ipcMain.handle("get-globals", () => {
-  return {
-    APP_VERSION: global.APP_VERSION,
-    APP_REPO: global.APP_REPO,
-    CONFIG_DEFAULTS: global.CONFIG_DEFAULTS,
-    NEW_RELEASE_AVAILABLE: global.NEW_RELEASE_AVAILABLE
-  };
-});
-
-ipcMain.handle("list-savers", async () => {
-  log.info("list-savers");
-  let savers = new SaverListManager({
-    prefs: prefs
-  });
-
-  const entries = await savers.list();
-  return entries;
-});
-
-ipcMain.handle("load-saver", async (_event, key) => {
-  log.info("load-saver", key);
-  let savers = new SaverListManager({
-    prefs: prefs
-  });
-  return await savers.loadFromFile(key);
-});
-
-ipcMain.handle("delete-saver", async(_event, attrs) => {
-  console.log("delete-saver");
-  let savers = new SaverListManager({
-    prefs: prefs
-  });
-  await savers.delete(attrs);
-});
-
-
-ipcMain.handle("create-screensaver", async(_event, attrs) => {
-  const factory = new SaverFactory();
-
-  let systemPath = getSystemDir();
-
-  const src = path.join(systemPath, "system-savers", "__template");
-  const dest = prefs.localSource;
-  const data = factory.create(src, dest, attrs);
-
-  return data;
-});
-
-ipcMain.handle("get-primary-display-bounds", () => {
-  const bounds = electronScreen.getPrimaryDisplay().bounds;
-  return bounds;
-});
-
-ipcMain.on("preview-error", (_event, message, source, lineno) => {
-  let opts = {
-    message: message,
-    source: source,
-    lineno: lineno
-  };
-  if ( handles.editor.window ) {
-    handles.editor.window.webContents.send("preview-error", opts);
-  }
-  else if ( handles.prefs.window ) {
-    handles.prefs.window.webContents.send("preview-error", opts);
-  }
-});
-
-ipcMain.on("launch-url", (_event, url) => {
-  const { shell } = require("electron");
-  shell.openExternal(url);
-});
-
-ipcMain.on("savers-updated", () => {
-  log.info("savers-updated");
-  toggleSaversUpdated();
-});
-
-// event for switching preview url
-// event for switching preview location and/or url
-ipcMain.on("update-preview", (_event, arg) => {
-  setupPreview(arg.target, arg.bounds);
-  setPreviewUrl(arg.target, arg.url, arg.force);
-  setBounds(arg.target, arg.bounds);
-});
-
-//
-// user has updated their preferences, let's reload
-//
-ipcMain.on("prefs-updated", () => {
-  log.info("prefs-updated");
-  prefs.reload();
-  updateStateManager();
-  checkForPackageUpdates();
-
-  // this was causing a double load of data basically, which
-  // might be fine but seems like an issue, so skipping for now
-  // handles.prefs.window.webContents.send("savers-updated");
-});
-
-ipcMain.on("set-autostart", (_event, value) => {
-  log.info("set-autostart");
-  const autostarter = require("./autostarter.js");
-  autostarter.toggle(global.APP_NAME, value);
-});
-
-ipcMain.on("set-global-launch-shortcut", () => {
-  log.info("set-global-launch-shortcut");
-  setupLaunchShortcut();
-});
-
-ipcMain.on("display-update-dialog", async () => {
-  const result = await dialog.showMessageBox({
-    type: "info",
-    title: "Update Available!",
-    message: "There's a new update available! Would you like to download it?",
-    buttons: ["No", "Yes"],
-    defaultId: 0
-  });
-
-  if ( result.response === 1 ) {
-    const appRepo = global.APP_REPO;
-    shell.openExternal(`https://github.com/${appRepo}/releases/latest`);
-  }
-});
-
-ipcMain.handle("reset-to-defaults-dialog", async () => {
-  const result = await dialog.showMessageBox({
-    type: "info",
-    title: "Are you sure?",
-    message: "Are you sure you want to reset to the default settings?",
-    buttons: ["No", "Yes"],
-    defaultId: 0
-  });
-  return result;
-});
-
-ipcMain.handle("delete-screensaver-dialog", async (_event, saver) => {
-  const result = await dialog.showMessageBox(
-    {
-      type: "info",
-      title: "Are you sure?",
-      message: "Are you sure you want to delete this screensaver?",
-      detail: `Deleting screensaver ${saver.name}`,
-      buttons: ["No", "Yes"],
-      defaultId: 0
-    }); 
-
-  return result;
-});
-
-ipcMain.handle("show-open-dialog", async () => {
-  const result = await dialog.showOpenDialog(
-    {
-      title: "Pick a screensaver directory",
-      message: "Pick a folder to store your custom screensavers",
-      properties: [ "openDirectory", "createDirectory" ]
-    });
-  return result;
-});
-
-
-ipcMain.on("quit-app", () => {
-  log.info("quit-app");
-  quitApp();
-});
 
 /**
  * make sure we're only running a single instance
