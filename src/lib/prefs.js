@@ -181,10 +181,13 @@ class SaverPrefs {
   }
 
   async updatePrefs(data) {
+    console.log("UPDATE PREFS", data);
     for ( var k in data ) {
       var v = data[k];
       this[k] = v;
     }
+
+    console.log(this.changes);
 
     let result = this.changes;
     this.changes = {};
@@ -196,6 +199,7 @@ class SaverPrefs {
 
   async write() {
     let release = await lockfile.lock(this.configFile, { realpath: false });
+    console.log("WRITE", this._data);
     await fs.writeJson(this.configFile, this._data, { spaces: 2 });
 
     release();

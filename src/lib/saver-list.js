@@ -5,8 +5,6 @@ const path = require("path");
 const mkdirp = require("mkdirp");
 const rimraf = require("rimraf");
 
-const Saver = require("./saver.js");
-
 const CONFIG_FILE_NAME = "config.json";
 
 
@@ -96,13 +94,13 @@ module.exports = class SaverListManager {
    * search for all screensavers we can find on the filesystem. if cb is specified,
    * call it with data when done. if reload == true, don't use cached data.
    */
-  list(cb, force) {
+  async list(force) {
     let _self = this;
     var folders = this.prefs.sources;
     var glob, pattern, savers;
     
     var promises = [];
-
+    
     // exclude system screensavers from the cache check
     // @todo get rid of this
     var systemScreensaverCount = 1;
@@ -110,13 +108,10 @@ module.exports = class SaverListManager {
     // use cached data if available
     if ( this.loadedScreensavers.length > systemScreensaverCount &&
         ( typeof(force) === "undefined" || force === false ) ) {
-      cb(this.loadedScreensavers);
-      return;
+      return this.loadedScreensavers;
     }
 
     glob = require("glob");
-
-    // _self.logger("folders", folders);
 
     // note: using /**/ here instead of /*/ would
     // also match all subdirectories, which might be desirable
@@ -148,15 +143,16 @@ module.exports = class SaverListManager {
     // @see https://davidwalsh.name/promises-results
     promises = promises.map(p => p.catch(() => undefined));
 
-    Promise.all(promises).then(function(data) {
-      // remove any undefined screensavers
-      _self.loadedScreensavers = data.
-        filter(s => s !== undefined).
-        sort((a, b) => { 
-          return a.name.toLowerCase().localeCompare(b.name.toLowerCase()); 
-        });
-      cb(_self.loadedScreensavers);
-    });
+    const data = await Promise.all(promises);
+
+    // remove any undefined screensavers
+    _self.loadedScreensavers = data.
+      filter(s => s !== undefined).
+      sort((a, b) => { 
+        return a.name.toLowerCase().localeCompare(b.name.toLowerCase()); 
+      });
+
+    return _self.loadedScreensavers;
   }
 
 
@@ -172,12 +168,9 @@ module.exports = class SaverListManager {
     return tmp[idx];
   }
 
-  confirmExists(key) {
-    return new Promise((resolve) => {
-      this.list(() => {
-        resolve(this.getByKey(key) !== undefined);
-      });
-    });
+  async confirmExists(key) {
+    await this.list();
+    return this.getByKey(key) !== undefined;
   }
 
   /**
@@ -251,77 +244,56 @@ module.exports = class SaverListManager {
       contents.settings = settings;
     }
 
-    
-    return new Saver(contents);
-  }
-
-
-  /**
-   * generate a screensaver template
-   */
-  create(src, opts) {
-    var destDir = this.prefs.localSource;
-
-    var contents = fs.readdirSync(src);
-    var defaults = {
-      "source": "index.html",
-      "options": []
-    };
-
-    if ( destDir === "" ) {
-      throw new Error("No local directory specified!");
+    // set a URL
+    if ( typeof(contents.url) === "undefined" && 
+      contents.path !== undefined  && 
+      contents.source !== undefined) {
+      contents.url = `file://${[contents.path, contents.source].join("/")}`;
     }
 
-    opts = Object.assign({}, defaults, opts);
-    opts.key = opts.name.toLowerCase().
-                    replace(/[^a-z0-9]+/gi, "-").
-                    replace(/-$/, "").
-                    replace(/^-/, "");
+    if ( typeof(contents.published) === "undefined" ) {
+      contents.published = true;
+    }
 
-    var dest = path.join(destDir, opts.key);
-    fs.mkdirpSync(dest);
+    contents.valid = typeof(contents.name) !== "undefined" &&
+      typeof(contents.description) !== "undefined" &&
+      contents.published === true;
 
-    contents.forEach(function(content) {
-      fs.copySync(path.join(src, content), path.join(dest, content));
-    });
-
-    //
-    // generate JSON file
-    //
-    var configDest = path.join(dest, "saver.json");
-    var content = fs.readFileSync( configDest );
-    contents = Object.assign({}, JSON.parse(content), opts);
-
-    fs.writeFileSync(configDest, JSON.stringify(contents, null, 2));
-
-    // add dest in case someone needs it
-    // but don't persist that data because that would be icky
-    opts.dest = path.join(dest, "saver.json");
-    
-    return opts;
+    return contents;
   }
-
 
   /**
    * delete a screensaver -- this removes the directory that contains all files
    * for the screensaver.
    */
-  delete(s, cb) {
+  delete(s) {
     var k = s.key;
     var p = path.dirname(k);
     let _self = this;
 
-    var cbWrapped = function(result) {
-      _self.reload().then(() => cb(result));
-    };
+    return new Promise(function (resolve, reject) {
+      if ( typeof(s) !== "undefined" && s.editable === true ) {
+        rimraf(p, () => { 
+          _self.reload();
+          resolve(true);
+        });
+      }
+      else {
+        reject(false);
+      }
+    });
+
+    // var cbWrapped = function(result) {
+    //   _self.reload().then(() => cb(result));
+    // };
     
-    // make sure we're deleting a screensaver that exists and is
-    // actually editable
-    if ( typeof(s) !== "undefined" && s.editable === true ) {
-      rimraf(p, () => { cbWrapped(true); });
-    }
-    else {
-      cb(false);
-    }
+    // // make sure we're deleting a screensaver that exists and is
+    // // actually editable
+    // if ( typeof(s) !== "undefined" && s.editable === true ) {
+    //   rimraf(p, () => { cbWrapped(true); });
+    // }
+    // else {
+    //   cb(false);
+    // }
   }
 };

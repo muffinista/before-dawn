@@ -46,6 +46,8 @@ import PrefsForm from "@/components/PrefsForm";
 import Noty from "noty";
 import SaverPrefs from "@/../lib/prefs";
 
+const { ipcRenderer } = require("electron");
+
 export default {
   name: "Settings",
   components: {
@@ -58,16 +60,11 @@ export default {
       options: {},
       saver: undefined,
       disabled: false,
-      renderIndex: 0
+      renderIndex: 0,
+      globals: undefined
     };
   },
   computed: {
-    currentWindow: function() {
-      return this.$electron.remote.getCurrentWindow();
-    },
-    ipcRenderer: function() {
-      return this.$electron.ipcRenderer;
-    },
     isLoaded: function() {
       return ( typeof(this.savers) !== "undefined" &&
                this.savers.length > 0);
@@ -111,7 +108,9 @@ export default {
     }
   },
   async mounted() {
-    let opts = await this.ipcRenderer.invoke("get-saver-opts");
+    this.globals = await ipcRenderer.invoke("get-globals");
+
+    let opts = await ipcRenderer.invoke("get-saver-opts");
 
     this.prefs = new SaverPrefs({
       baseDir: opts.base,
@@ -124,9 +123,9 @@ export default {
       try {
         let changes = await this.prefs.updatePrefs(this.prefs);
 
-        this.ipcRenderer.send("prefs-updated", changes);
-        this.ipcRenderer.send("set-autostart", this.prefs.auto_start);
-        this.ipcRenderer.send("set-global-launch-shortcut", this.prefs.launchShortcut);
+        ipcRenderer.send("prefs-updated", changes);
+        ipcRenderer.send("set-autostart", this.prefs.auto_start);
+        ipcRenderer.send("set-global-launch-shortcut", this.prefs.launchShortcut);
       }
       catch(e) {
         output = "Something went wrong!";
@@ -145,23 +144,15 @@ export default {
       }).show();
     },
     async resetToDefaults() {
-      const {dialog} = require("electron").remote;                         
-      let result = dialog.showMessageBoxSync({
-        type: "info",
-        title: "Are you sure?",
-        message: "Are you sure you want to reset to the default settings?",
-        buttons: ["No", "Yes"],
-        defaultId: 0
-      });
-
+      const result = await ipcRenderer.invoke("reset-to-defaults-dialog");
       if ( result === 1 ) {
-        this.prefs.defaults = this.$electron.remote.getGlobal("CONFIG_DEFAULTS");
+        this.prefs.defaults = this.globals.CONFIG_DEFAULTS;
         this.prefs.reset();
         await this.handleSave("Settings reset");
       }
     },
     closeWindow() {
-      this.currentWindow.close();
+      ipcRenderer.send("close-window", "settings");
     },
     async saveDataClick() {
       await this.handleSave("Changes saved!");

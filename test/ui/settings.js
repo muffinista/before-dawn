@@ -44,7 +44,7 @@ describe("Settings", function() {
     return app.start().
               then(() => app.fakeDialog.mock(fakeDialogOpts)).
               then(() => app.client.waitUntilWindowLoaded() ).
-              then(() => app.electron.ipcRenderer.send("open-prefs")).
+              then(() => app.electron.ipcRenderer.send("open-window", "prefs")).
               then(() => helpers.waitForWindow(app, "Before Dawn: Preferences") ).
               then(() => app.client.click("button.settings")).
               then(() => helpers.waitForWindow(app, "Before Dawn: Settings") );
@@ -127,7 +127,7 @@ describe("Settings", function() {
 
 
   it("resets defaults", function() {
-    const resetDialogOpts = [ { method: "showMessageBoxSync", value: 1 } ];
+    const resetDialogOpts = [ { method: "showMessageBox", value: 1 } ];
 
     return pickSettingsWindow().
       then(() => app.fakeDialog.mock(resetDialogOpts)).

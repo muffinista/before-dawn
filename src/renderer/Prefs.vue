@@ -68,7 +68,10 @@ import SaverSummary from "@/components/SaverSummary";
 import Noty from "noty";
 
 import SaverPrefs from "@/../lib/prefs";
-import SaverListManager from "@/../lib/saver-list";
+import Saver from "@/../lib/saver";
+
+const { ipcRenderer } = require("electron");
+const log = require("electron-log");
 
 export default {
   name: "Prefs",
@@ -82,22 +85,17 @@ export default {
       options: {},
       saver: undefined,
       disabled: false,
-      renderIndex: 0
+      renderIndex: 0,
+      globals: undefined
     };
   },
   computed: {
-    currentWindow: function() {
-      return this.$electron.remote.getCurrentWindow();
-    },
-    ipcRenderer: function() {
-      return this.$electron.ipcRenderer;
-    },
     isLoaded: function() {
       return ( typeof(this.savers) !== "undefined" &&
                this.savers.length > 0);
     },
     saverIsPicked() {
-      return this.saverIndex >= 0;
+      return this.savers && this.saverIndex >= 0;
     },
     saverIndex: function() {
       return this.savers.findIndex((s) => s.key === this.saver);
@@ -125,7 +123,8 @@ export default {
       return this.savers[this.saverIndex];
     },
     params: function() {
-      // parse incoming URL params -- we'll get a link to the current screen images for previews here
+      // parse incoming URL params -- we'll get a link to the 
+      // current screen images for previews here
       return new URLSearchParams(document.location.search);
     },
     screenshot: function() {
@@ -134,37 +133,35 @@ export default {
     },
     previewWrapper: function() {
       return document.querySelector(".saver-detail");
+    },
+    previewUrl: function() {
+      const urlParams = new URLSearchParams(this.urlOpts(this.saver));
+      return `${this.saverObj.url}?${urlParams.toString()}`;
     }
   },
   async mounted() {
-    const screen = this.$electron.remote.screen;
-    this.size = screen.getPrimaryDisplay().bounds;
+    this.size = await ipcRenderer.invoke("get-primary-display-bounds");
+    this.logger = log.info; //function() {};
 
-    //this.logger = this.$electron.remote.getCurrentWindow().saverOpts.logger;
-    if ( this.logger === undefined ) {
-      this.logger = function() {};
-    }
-
-    this.ipcRenderer.on("savers-updated", this.onSaversUpdated);
+    ipcRenderer.on("savers-updated", this.onSaversUpdated);
     await this.setupPrefs();
+    await this.getData();
 
-    this.manager.setup().then(() => {
-      this.getData();
-      this.getCurrentSaver();
+    this.getCurrentSaver();
+    this.checkResize();
 
-      this.checkResize();
-      this.$nextTick(() => {
-        this.resizeInterval = window.setInterval(() => {
-          this.checkResize();
-        }, 50);
-      });
-
-      if ( this.$electron.remote.getGlobal("NEW_RELEASE_AVAILABLE") ) {
-        this.$nextTick(() => {
-          this.renderUpdateNotice();
-        });
-      }
+    this.$nextTick(() => {
+      this.resizeInterval = window.setInterval(() => {
+        this.checkResize();
+      }, 50);
     });
+
+    this.globals = await ipcRenderer.invoke("get-globals");
+    if ( this.globals.NEW_RELEASE_AVAILABLE ) {
+      this.$nextTick(() => {
+        this.renderUpdateNotice();
+      });
+    }
   },
   updated() {
     this.$nextTick(function () {
@@ -179,20 +176,20 @@ export default {
   },
   beforeDestroy() {
     window.clearInterval(this.resizeInterval);
-    this.ipcRenderer.removeListener("savers-updated", this.onSaversUpdated);
+    ipcRenderer.removeListener("savers-updated", this.onSaversUpdated);
   },
   methods: {
     async setupPrefs() {
-      let opts = await this.ipcRenderer.invoke("get-saver-opts");
+      console.log("setupPrefs");
+      let opts = await ipcRenderer.invoke("get-saver-opts");
       this.prefs = new SaverPrefs({
         baseDir: opts.base,
         systemSource: opts.systemDir
       });
-      this.manager = new SaverListManager({
-        prefs: this.prefs
-      }, this.logger);
+      this.saver = this.prefs.current;
     },
-    // https://github.com/stream-labs/streamlabs-obs/blob/163e9a7eaf39200077874ae80d00e66108c106dc/app/components/Chat.vue.ts#L41
+    // https://github.com/stream-labs/streamlabs-obs/blob/
+    // 163e9a7eaf39200077874ae80d00e66108c106dc/app/components/Chat.vue.ts#L41
     rectChanged(rect) {
       return (
         rect.left !== this.currentPosition.x ||
@@ -210,10 +207,10 @@ export default {
           width: rect.width, 
           height: rect.height 
         };
-        this.ipcRenderer.send("preview-bounds", {
+        ipcRenderer.send("update-preview", {
           target: "prefs",
           bounds: this.currentPosition,
-          url: this.saverObj.getUrl(this.urlOpts(this.saver))
+          url: this.previewUrl
         });
       }
     },
@@ -225,10 +222,10 @@ export default {
       this.updateCurrentPosition();
     },
     onOptionsChange() {
-      this.ipcRenderer.send("preview-url", {
+      ipcRenderer.send("update-preview", {
         target: "prefs",
         bounds: this.currentPosition,
-        url: this.saverObj.getUrl(this.urlOpts(this.saver))
+        url: this.previewUrl
       });
     },
     urlOpts(s) {
@@ -254,63 +251,66 @@ export default {
     onSaverPicked(e) {
       this.saver = e.target.value;
       this.renderIndex += 1;
-      this.ipcRenderer.send("preview-url", {
+      ipcRenderer.send("update-preview", {
         target: "prefs",
         bounds: this.currentPosition,
-        url: this.saverObj.getUrl(this.urlOpts(this.saver))
+        url: this.previewUrl
       });
     },
     openSettings() {
-      this.ipcRenderer.send("open-settings");
+      ipcRenderer.send("open-window", "settings");
     },
-    getData() {
-      this.manager.list((entries) => {
-        this.savers = entries;
-        var tmp = this.prefs.toHash();
-        if ( tmp.options === undefined ) {
-          tmp.options = {};
-        }
-
-        if ( this.savers.length <= 0 ) {
-          return;
-        }
-        
-        // ensure default settings in the config for all savers
-        for(var i = 0, l = this.savers.length; i < l; i++ ) {
-          var s = this.savers[i];
-
-          if ( tmp.options[s.key] === undefined ) {
-            tmp.options[s.key] = {};
-          }
-
-          tmp.options[s.key] = s.settings;
-        }
-
-        this.options = Object.assign({}, this.options, tmp.options);
-
-        // https://vuejs.org/v2/guide/reactivity.html
-        // However, new properties added to the object will not
-        // trigger changes. In such cases, create a fresh object
-        // with properties from both the original object and the mixin object:
-        this.prefs = Object.assign(this.prefs, tmp);
-
-        // pick the first screensaver if nothing picked yet
-        if ( this.prefs.current === undefined || this.saverObj === undefined ) {
-          this.prefs.current = this.savers[0].key;
-          this.getCurrentSaver();
-        }
+    async getData() {
+      const tmpList = await ipcRenderer.invoke("list-savers");
+      // @todo shouldn't need Saver object here
+      this.savers = tmpList.map((data) => {
+        return new Saver(data);
       });
+
+      var tmp = this.prefs.toHash();
+      if ( tmp.options === undefined ) {
+        tmp.options = {};
+      }
+
+      if ( this.savers.length <= 0 ) {
+        return;
+      }
+        
+      // ensure default settings in the config for all savers
+      for(var i = 0, l = this.savers.length; i < l; i++ ) {
+        var s = this.savers[i];
+
+        if ( tmp.options[s.key] === undefined ) {
+          tmp.options[s.key] = {};
+        }
+
+        tmp.options[s.key] = s.settings;
+      }
+
+      this.options = Object.assign({}, this.options, tmp.options);
+
+      // https://vuejs.org/v2/guide/reactivity.html
+      // However, new properties added to the object will not
+      // trigger changes. In such cases, create a fresh object
+      // with properties from both the original object and the mixin object:
+      this.prefs = Object.assign(this.prefs, tmp);
+
+      // pick the first screensaver if nothing picked yet
+      if ( this.prefs.current === undefined || this.saverObj === undefined ) {
+        this.prefs.current = this.savers[0].key;
+        this.getCurrentSaver();
+      }
     },
     async onSaversUpdated() {
       await this.setupPrefs();
-      this.manager.reset();
-      this.getData();
+      // await ipcRenderer.invoke("reset");
+      await this.getData();
     },
     getCurrentSaver() {
       this.saver = this.prefs.current;
     },
     createNewScreensaver() {
-      this.ipcRenderer.send("open-add-screensaver", {
+      ipcRenderer.send("open-window", "add-new", {
         screenshot: this.screenshot
       });
     },
@@ -319,16 +319,15 @@ export default {
         src: s.src,
         screenshot: this.screenshot
       };
-      this.ipcRenderer.send("open-editor", opts);
+      ipcRenderer.send("open-window", "editor", opts);
     },
-    deleteSaver(s) {
+    async deleteSaver(s) {
       var index = this.savers.indexOf(s);
       this.savers.splice(index, 1);
 
-      this.manager.delete(s, () => {
-        this.ipcRenderer.send("savers-updated", s.key);
-      });
-
+      // @todo pick a default screensaver 
+      await ipcRenderer.invoke("delete-saver", s);
+      await this.getData();
     },
     updateSaverOption(saver, name, value) {
       var tmp = this.options;
@@ -339,11 +338,7 @@ export default {
     
       this.options = Object.assign({}, this.options, update);
     },
-    closeWindow() {
-      this.currentWindow.close();
-    },
     async saveData() {
-
       // @todo should this use Object.assign?
       this.prefs.current = this.saver;
       this.prefs.options = this.options;
@@ -356,7 +351,7 @@ export default {
       this.disabled = true;
       try {
         let changes = await this.saveData();
-        this.ipcRenderer.send("prefs-updated", changes);
+        ipcRenderer.send("prefs-updated", changes);
         output = "Changes saved!";
       }
       catch(e) {
@@ -375,21 +370,7 @@ export default {
       }).show();
     },
     renderUpdateNotice() {
-       const {dialog} = require("electron").remote;
-                                   
-       dialog.showMessageBox(
-        {
-          type: "info",
-          title: "Update Available!",
-          message: "There's a new update available! Would you like to download it?",
-          buttons: ["No", "Yes"],
-          defaultId: 0
-        }).then(result => {
-          if ( result.response === 1 ) {
-            var appRepo = this.$electron.remote.getGlobal("APP_REPO");
-            this.$electron.shell.openExternal(`https://github.com/${appRepo}/releases/latest`);
-          }
-        });
+      ipcRenderer.send("display-update-dialog");
     }
   }
 }; 

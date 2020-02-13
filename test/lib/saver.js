@@ -93,47 +93,15 @@ describe("Saver", function() {
     });
   });
 
-  describe("getUrl", function() {
-    it("handles no opts", function() {
-      var s = loadSaver({url:"index.html"});
-      assert.equal("index.html?New%20Option%20I%20Guess=50&New%20Option=75", s.getUrl());
-    });
-
-    it("handles opts", function() {
-      var s = loadSaver({url:"index.html"});
-      assert.equal("index.html?New%20Option%20I%20Guess=50&New%20Option=75&foo=bar", s.getUrl({foo: "bar"}));
-    });
-
-    it("handles urls with queries", function() {
-      var s = loadSaver({url:"index.html?baz=boo"});
-      assert.equal("index.html?baz=boo&New%20Option%20I%20Guess=50&New%20Option=75&foo=bar", s.getUrl({foo: "bar"}));
-    });
-  });
-  
-  describe("getRequirements", function() {
+  describe("requirements", function() {
     it("defaults to empty", function() {
       var s = loadSaver();
-      assert.deepEqual([], s.getRequirements());
+      assert.deepEqual([], s.requirements);
     });
 
     it("reads from incoming params", function() {
       var s = loadSaver({requirements:["stuff"]});
-      assert.deepEqual(["stuff"], s.getRequirements());
-    });
-  });
-
-  describe("getPreviewUrl", function() {
-    it("returns a preview url", function() {
-      var s = loadSaver({url:"index.html"});
-      assert.equal("index.html?New%20Option%20I%20Guess=50&New%20Option=75", s.getPreviewUrl());
-    });
-    it("uses custom url", function() {
-      var s = loadSaver({url:"preview.html"});
-      assert.equal("preview.html?New%20Option%20I%20Guess=50&New%20Option=75", s.getPreviewUrl());
-    });
-    it("uses custom url with opts", function() {
-      var s = loadSaver({url:"preview.html?bar=baz"});
-      assert.equal("preview.html?bar=baz&New%20Option%20I%20Guess=50&New%20Option=75", s.getPreviewUrl());
+      assert.deepEqual(["stuff"], s.requirements);
     });
   });
   
@@ -313,32 +281,7 @@ describe("Saver", function() {
     });
   });
 
-  describe("getPreviewUrl", function() {
-    it("uses previewUrl if provided", function() {
-      var s = new Saver({
-        name:"name",
-        description:"description",
-        previewUrl:"http://google.com/",
-        path:""
-      });
-
-      assert.equal("http://google.com/?foo=bar", s.getPreviewUrl({foo:"bar"}));
-    });
-
-    it("uses url if no previewUrl", function() {
-      var s = new Saver({
-        name:"name",
-        description:"description",
-        url:"http://yahoo.com/",
-        path:""
-      });
-
-      assert.equal("http://yahoo.com/?foo=bar", s.getPreviewUrl({foo:"bar"}));
-      
-    });
-  });
-
-  describe("getUrl", function() {
+  describe("url", function() {
     it("uses url", function() {
       var s = new Saver({
         name:"name",
@@ -347,7 +290,7 @@ describe("Saver", function() {
         path:""
       });
 
-      assert.equal("http://yahoo.com/?foo=bar", s.getUrl({foo:"bar"}));
+      assert.equal("http://yahoo.com/", s.url);
     });
   });
 });

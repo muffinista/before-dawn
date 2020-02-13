@@ -66,13 +66,12 @@
 </template>
 
 <script>
-const path = require("path");
-
 import SaverForm from "@/components/SaverForm";
 import LocalFolderInput from "@/components/LocalFolderInput";
 
 import SaverPrefs from "@/../lib/prefs";
-import SaverListManager from "@/../lib/saver-list";
+
+const { ipcRenderer } = require("electron");
 
 export default {
   name: "NewScreensaver",
@@ -93,17 +92,9 @@ export default {
     isLoaded: function() {
       return typeof(this.prefs) !== "undefined";
     },
-    currentWindow: function() {
-      return this.$electron.remote.getCurrentWindow();
-    },
-    manager: function() {
-      return this._savers;
-    },
-    ipcRenderer: function() {
-      return this.$electron.ipcRenderer;
-    },
     params: function() {
-      // parse incoming URL params -- we'll get a link to the current screen images for previews here
+      // parse incoming URL params -- we'll get a link 
+      // to the current screen images for previews here
       return new URLSearchParams(document.location.search);
     },
     screenshot: function() {
@@ -118,14 +109,10 @@ export default {
     }
   },
   async mounted() {
-    this.opts = await this.ipcRenderer.invoke("get-saver-opts");
+    this.opts = await ipcRenderer.invoke("get-saver-opts");
     this.prefs = new SaverPrefs({
       baseDir: this.opts.base,
       systemSource: this.opts.systemDir
-    });
-
-    this._savers = new SaverListManager({
-      prefs: this.prefs
     });
   },
   methods: {
@@ -139,9 +126,9 @@ export default {
       this.prefs = Object.assign(this.prefs, tmp);
       let changes = await this.prefs.updatePrefs(this.prefs);
       this.disabled = false;
-      this.ipcRenderer.send("prefs-updated", changes);
+      ipcRenderer.send("prefs-updated", changes);
     },
-    saveData() {
+    async saveData() {
       if ( document.querySelectorAll(":invalid").length > 0 ) {
         var form = document.querySelector("form");
         form.classList.add("submit-attempt");
@@ -150,17 +137,17 @@ export default {
       }
 
       this.disabled = true;
+      const data = await ipcRenderer.invoke("create-screensaver", this.saver);
 
-      let systemPath = this.opts.systemDir;
-
-      var src = path.join(systemPath, "__template");
-      var data = this.manager.create(src, this.saver);
-      this.ipcRenderer.send("savers-updated");
-      this.ipcRenderer.send("open-editor", {
+      // let systemPath = this.opts.systemDir;
+      // var src = path.join(systemPath, "__template");
+      // var data = this.manager.create(src, this.saver);
+      ipcRenderer.send("savers-updated");
+      ipcRenderer.send("open-window", "editor", {
         src: data.dest,
         screenshot: this.screenshot
       });
-      this.currentWindow.close();
+      ipcRenderer.send("close-window", "addNew");
     }
   },
 };
