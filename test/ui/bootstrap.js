@@ -15,10 +15,10 @@ describe("bootstrap", function() {
   var workingDir;
   let app;
 
-  var bootApp = function() {
+  var bootApp = async function() {
     app = helpers.application(workingDir, false, saverZip, saverData);  
-    return app.start().
-      then(() => helpers.waitUntilBooted(app));
+    await app.start();
+    await helpers.waitUntilBooted(app);
   };
 
   helpers.setupTest(this);
@@ -29,25 +29,25 @@ describe("bootstrap", function() {
     app = helpers.application(workingDir, false, saverZip, saverData);
   });
 
-	afterEach(function() {
+	afterEach(async function() {
     if (this.currentTest.state === "failed") {
       helpers.outputLogs(app);
     }
 
-    return helpers.stopApp(app);
+    await helpers.stopApp(app);
 	});
 
 
   describe("without config", () => {
-    beforeEach(() => {
-     assert(!fs.existsSync(configDest));
-      return app.start().
-        then(() => helpers.waitUntilBooted(app));
+    beforeEach(async () => {
+      assert(!fs.existsSync(configDest));
+      await app.start();
+      await helpers.waitUntilBooted(app);
     });
 
-    it("creates config file and shows prefs", function() {
-      return helpers.waitForWindow(app, prefsWindowTitle).
-        then(() => { assert(fs.existsSync(configDest)); });
+    it("creates config file and shows prefs", async function() {
+      await helpers.waitForWindow(app, prefsWindowTitle);
+      assert(fs.existsSync(configDest));
     });
   });
 
@@ -59,51 +59,48 @@ describe("bootstrap", function() {
     });
 
     describe("and a valid screenaver", () => {
-      beforeEach(() => {
+      beforeEach(async () => {
         let saversDir = path.join(workingDir, "savers");
         let saverJSONFile = helpers.addSaver(saversDir, "saver");
         helpers.setConfigValue(workingDir, "saver", saverJSONFile);
-        return bootApp();
+        await bootApp();
       });
 
-      it("does not show prefs", function() {
-        return helpers.waitForWindow(app, prefsWindowTitle, true).
-          then((res) => {
-            assert.equal(-1, res);
-          });
+      it("does not show prefs", async function() {
+        const res = await helpers.waitForWindow(app, prefsWindowTitle, true);
+        assert.equal(-1, res);
       });
     });
 
     describe("and an invalid screenaver", () => {
-      beforeEach(() => {
+      beforeEach(async () => {
         let saversDir = path.join(workingDir, "savers");
         helpers.addSaver(saversDir, "saver");
         helpers.setConfigValue(workingDir, "saver", "i-dont-exist");
-        return bootApp();
+        await bootApp();
       });
 
-      it("shows prefs", function() {
-        return helpers.waitForWindow(app, prefsWindowTitle);
+      it("shows prefs", async function() {
+        await helpers.waitForWindow(app, prefsWindowTitle);
       });
     });
   });
 
 
   describe("with invalid config", () => {
-    beforeEach(() => {
+    beforeEach(async () => {
       helpers.specifyConfig(workingDir, "bad-config");
-      return bootApp();
+      await bootApp();
     });
     
-    it("re-creates config file", function(done) {
+    it("re-creates config file", function() {
       assert(fs.existsSync(configDest));
       let data = JSON.parse(fs.readFileSync(configDest));
       assert.equal("muffinista/before-dawn-screensavers", data.sourceRepo);
-      done();
     });  
 
-    it("shows prefs", function() {
-      return helpers.waitForWindow(app, prefsWindowTitle);
+    it("shows prefs", async function() {
+      await helpers.waitForWindow(app, prefsWindowTitle);
     });
   });  
 
