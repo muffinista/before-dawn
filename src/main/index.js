@@ -174,13 +174,15 @@ var openGrabberWindow = function() {
 var grabScreen = function(s) {
   log.info("grab screen");
   return new Promise((resolve) => {
+    //
     // bypass screen capture in test mode
-    // this is a hack and if i can find a better
-    // way to do it (listening for the prefs window, etc),
-    // i'll do that instead
-    if ( testMode === true ) {
+    // or if the user has blocked screen access
+    //
+    if (
+      (process.platform === "darwin" && systemPreferences.getMediaAccessStatus("screen") !== "granted" ) ||
+      testMode === true ) {
       resolve({
-        url: "file://" + __dirname + "/../test/fixtures/screenshot.png"
+          url: path.join(__dirname, "assets", "color-bars.png")
       });
     }
     else {
@@ -1022,6 +1024,9 @@ var askAboutApplicationsFolder = function() {
   }
 };
 
+/**
+ * check for permissions to access certain systems on OSX
+ */
 var askAboutMediaAccess = async function() {
   if (process.platform !== "darwin" ) {
     return;
