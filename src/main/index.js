@@ -29,7 +29,8 @@ const {app,
   Menu,
   Tray,
   dialog,
-  shell} = require("electron");
+  shell,
+  systemPreferences} = require("electron");
 
 const fs = require("fs");
 const path = require("path");
@@ -1021,6 +1022,25 @@ var askAboutApplicationsFolder = function() {
   }
 };
 
+var askAboutMediaAccess = async function() {
+  if (process.platform !== "darwin" ) {
+    return;
+  }
+
+  ["microphone", "camera", "screen"].forEach(async (type) => {
+    // https://www.electronjs.org/docs/api/system-preferences#systempreferencesaskformediaaccessmediatype-macos
+    log.info(`access to ${type}: ${systemPreferences.getMediaAccessStatus(type)}`);
+
+    // re: screen -- This permission can only be granted manually in the System
+    // Preferences. Therefore systemPreferences.askForMediaAccess() cannot be
+    // extended in the same way.
+
+    if ( systemPreferences.getMediaAccessStatus(type) !== "granted" && type !== "screen" ) {
+      await systemPreferences.askForMediaAccess(type);
+    }
+  });
+};
+
 
 /**
  * Before Dawn releases will come with a zipfile of screensavers
@@ -1256,6 +1276,8 @@ let setupIPC = function() {
  */
 var bootApp = async function() {
   askAboutApplicationsFolder();
+  await askAboutMediaAccess();
+
   global.NEW_RELEASE_AVAILABLE = false;
 
   // ensure proper data in about panel when available
