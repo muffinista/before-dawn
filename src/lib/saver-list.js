@@ -4,6 +4,7 @@ const fs = require("fs-extra");
 const path = require("path");
 const mkdirp = require("mkdirp");
 const rimraf = require("rimraf");
+const glob = require("glob");
 
 const CONFIG_FILE_NAME = "config.json";
 
@@ -97,7 +98,7 @@ module.exports = class SaverListManager {
   async list(force) {
     let _self = this;
     var folders = this.prefs.sources;
-    var glob, pattern, savers;
+    var pattern, savers;
     
     var promises = [];
     
@@ -110,8 +111,6 @@ module.exports = class SaverListManager {
         ( typeof(force) === "undefined" || force === false ) ) {
       return this.loadedScreensavers;
     }
-
-    glob = require("glob");
 
     // note: using /**/ here instead of /*/ would
     // also match all subdirectories, which might be desirable

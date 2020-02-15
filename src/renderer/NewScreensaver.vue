@@ -117,7 +117,7 @@ export default {
   },
   methods: {
     closeWindow() {
-      this.currentWindow.close();
+      ipcRenderer.send("close-window", "addNew");
     },
     async localSourceChange(ls) {
       var tmp = {

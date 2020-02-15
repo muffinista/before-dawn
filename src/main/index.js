@@ -111,6 +111,7 @@ var trayMenu;
 var electronScreen;
 
 let prefs = undefined;
+let savers = undefined;
 let stateManager = undefined;
 let saverOpts = {};
 
@@ -673,9 +674,9 @@ var setStateToRunning = function() {
  * run the user's chosen screensaver on any available screens
  */
 var runScreenSaver = function() {
-  let savers = new SaverListManager({
-    prefs: prefs
-  });
+  // let savers = new SaverListManager({
+  //   prefs: prefs
+  // });
 
   let setupPromise;
 
@@ -905,10 +906,9 @@ var setupIfNeeded = async function() {
     // stop processing here, we know we need to setup
     return true;
   }
-
-  var savers = new SaverListManager({
-    prefs: prefs
-  });
+  // var savers = new SaverListManager({
+  //   prefs: prefs
+  // });
 
   log.info(`checking if ${prefs.current} is valid`);
   let exists = await savers.confirmExists(prefs.current);
@@ -1120,9 +1120,9 @@ let setupIPC = function() {
   
   ipcMain.handle("list-savers", async () => {
     log.info("list-savers");
-    let savers = new SaverListManager({
-      prefs: prefs
-    });
+    // let savers = new SaverListManager({
+    //   prefs: prefs
+    // });
   
     const entries = await savers.list();
     return entries;
@@ -1130,18 +1130,19 @@ let setupIPC = function() {
   
   ipcMain.handle("load-saver", async (_event, key) => {
     log.info("load-saver", key);
-    let savers = new SaverListManager({
-      prefs: prefs
-    });
+    // let savers = new SaverListManager({
+    //   prefs: prefs
+    // });
     return await savers.loadFromFile(key);
   });
   
   ipcMain.handle("delete-saver", async(_event, attrs) => {
     console.log("delete-saver");
-    let savers = new SaverListManager({
-      prefs: prefs
-    });
+    // let savers = new SaverListManager({
+    //   prefs: prefs
+    // });
     await savers.delete(attrs);
+    toggleSaversUpdated();
   });
   
   
@@ -1154,6 +1155,8 @@ let setupIPC = function() {
     const dest = prefs.localSource;
     const data = factory.create(src, dest, attrs);
   
+    savers.reset();
+
     return data;
   });
   
@@ -1200,6 +1203,7 @@ let setupIPC = function() {
   ipcMain.on("prefs-updated", () => {
     log.info("prefs-updated");
     prefs.reload();
+    savers.reset();
     updateStateManager();
     checkForPackageUpdates();
   
@@ -1308,6 +1312,9 @@ var bootApp = async function() {
   prefs = new SaverPrefs({
     baseDir: saverOpts.base,
     systemSource: saverOpts.systemDir
+  });
+  savers = new SaverListManager({
+    prefs: prefs
   });
 
   //
@@ -1522,6 +1529,8 @@ let getTrayMenu = function() {
  */
 let toggleSaversUpdated = (arg) => {
   prefs.reload();  
+  savers.reset();
+
   if ( handles.prefs.window !== null ) {
     handles.prefs.window.send("savers-updated", arg);
   }
@@ -1566,7 +1575,7 @@ let setBounds = function(target, bounds) {
 let setPreviewUrl = function(target, url, force) {
   const viewHandle = handles[target].preview;
   if ( force === true || url !== viewHandle.webContents.getURL() ) {
-    // log.info(`switch ${target} preview to ${url} ${force}`);
+    log.info(`switch ${target} preview to ${url} ${force}`);
 
     viewHandle.webContents.once("did-stop-loading", function() {
       viewHandle.webContents.insertCSS(globalCSSCode);
@@ -1581,9 +1590,16 @@ let setPreviewUrl = function(target, url, force) {
  * @param {String} name of the target window.
  */
 let setupPreview = function(target, incomingBounds) {
-  var primary = electronScreen.getPrimaryDisplay();
-  var size = primary.bounds;
-  let zf = incomingBounds.height / (size.height * PREVIEW_PADDING);
+  const primary = electronScreen.getPrimaryDisplay();
+  const size = primary.bounds;
+  let zf;
+  if ( !incomingBounds ) {
+    zf = 0.25;
+  }
+  else {
+    zf = incomingBounds.height / (size.height * PREVIEW_PADDING);
+  }
+  console.log(zf);
 
   if ( ! handles[target].preview ) {
     var ratio = size.height / size.width;
