@@ -250,11 +250,15 @@ export default {
     },
     onSaverPicked(e) {
       this.saver = e.target.value;
+      this.updateSaverPreview();
+    },
+    updateSaverPreview(force) {
       this.renderIndex += 1;
       ipcRenderer.send("update-preview", {
         target: "prefs",
         bounds: this.currentPosition,
-        url: this.previewUrl
+        url: this.previewUrl,
+        force: force
       });
     },
     openSettings() {
@@ -322,6 +326,9 @@ export default {
       ipcRenderer.send("open-window", "editor", opts);
     },
     async deleteSaver(s) {
+      this.saver = this.savers[0].key;
+      this.updateSaverPreview(true);
+
       var index = this.savers.indexOf(s);
       this.savers.splice(index, 1);
 

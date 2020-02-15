@@ -134,7 +134,12 @@
     ],
     "appId": "Before Dawn",
     "mac": {
-      "category": "public.app-category.entertainment"
+      "category": "public.app-category.entertainment",
+      "extendInfo": {
+        "LSUIElement": 1,
+        "NSMicrophoneUsageDescription": "Some screensavers detect sound to provide interactivity. You can decline this permission if you do not want that",
+        "NSCameraUsageDescription": "Some screensavers can use a camera to provide interactivity. You can decline this permission if you do not want that"
+      }
     },
     "nsis": {
       "installerIcon": "build/icon.ico",

@@ -124,5 +124,5 @@ module.exports = class Saver {
     }
     fs.writeFileSync(configDest, this.toJSON(attrs));
   }
-}
+};
 

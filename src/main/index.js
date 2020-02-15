@@ -29,7 +29,8 @@ const {app,
   Menu,
   Tray,
   dialog,
-  shell} = require("electron");
+  shell,
+  systemPreferences} = require("electron");
 
 const fs = require("fs");
 const path = require("path");
@@ -110,6 +111,7 @@ var trayMenu;
 var electronScreen;
 
 let prefs = undefined;
+let savers = undefined;
 let stateManager = undefined;
 let saverOpts = {};
 
@@ -173,13 +175,15 @@ var openGrabberWindow = function() {
 var grabScreen = function(s) {
   log.info("grab screen");
   return new Promise((resolve) => {
+    //
     // bypass screen capture in test mode
-    // this is a hack and if i can find a better
-    // way to do it (listening for the prefs window, etc),
-    // i'll do that instead
-    if ( testMode === true ) {
+    // or if the user has blocked screen access
+    //
+    if (
+      (process.platform === "darwin" && systemPreferences.getMediaAccessStatus("screen") !== "granted" ) ||
+      testMode === true ) {
       resolve({
-        url: "file://" + __dirname + "/../test/fixtures/screenshot.png"
+          url: path.join(__dirname, "assets", "color-bars.png")
       });
     }
     else {
@@ -670,9 +674,9 @@ var setStateToRunning = function() {
  * run the user's chosen screensaver on any available screens
  */
 var runScreenSaver = function() {
-  let savers = new SaverListManager({
-    prefs: prefs
-  });
+  // let savers = new SaverListManager({
+  //   prefs: prefs
+  // });
 
   let setupPromise;
 
@@ -902,10 +906,9 @@ var setupIfNeeded = async function() {
     // stop processing here, we know we need to setup
     return true;
   }
-
-  var savers = new SaverListManager({
-    prefs: prefs
-  });
+  // var savers = new SaverListManager({
+  //   prefs: prefs
+  // });
 
   log.info(`checking if ${prefs.current} is valid`);
   let exists = await savers.confirmExists(prefs.current);
@@ -1021,6 +1024,28 @@ var askAboutApplicationsFolder = function() {
   }
 };
 
+/**
+ * check for permissions to access certain systems on OSX
+ */
+var askAboutMediaAccess = async function() {
+  if (process.platform !== "darwin" ) {
+    return;
+  }
+
+  ["microphone", "camera", "screen"].forEach(async (type) => {
+    // https://www.electronjs.org/docs/api/system-preferences#systempreferencesaskformediaaccessmediatype-macos
+    log.info(`access to ${type}: ${systemPreferences.getMediaAccessStatus(type)}`);
+
+    // re: screen -- This permission can only be granted manually in the System
+    // Preferences. Therefore systemPreferences.askForMediaAccess() cannot be
+    // extended in the same way.
+
+    if ( systemPreferences.getMediaAccessStatus(type) !== "granted" && type !== "screen" ) {
+      await systemPreferences.askForMediaAccess(type);
+    }
+  });
+};
+
 
 /**
  * Before Dawn releases will come with a zipfile of screensavers
@@ -1095,9 +1120,9 @@ let setupIPC = function() {
   
   ipcMain.handle("list-savers", async () => {
     log.info("list-savers");
-    let savers = new SaverListManager({
-      prefs: prefs
-    });
+    // let savers = new SaverListManager({
+    //   prefs: prefs
+    // });
   
     const entries = await savers.list();
     return entries;
@@ -1105,18 +1130,19 @@ let setupIPC = function() {
   
   ipcMain.handle("load-saver", async (_event, key) => {
     log.info("load-saver", key);
-    let savers = new SaverListManager({
-      prefs: prefs
-    });
+    // let savers = new SaverListManager({
+    //   prefs: prefs
+    // });
     return await savers.loadFromFile(key);
   });
   
   ipcMain.handle("delete-saver", async(_event, attrs) => {
     console.log("delete-saver");
-    let savers = new SaverListManager({
-      prefs: prefs
-    });
+    // let savers = new SaverListManager({
+    //   prefs: prefs
+    // });
     await savers.delete(attrs);
+    toggleSaversUpdated();
   });
   
   
@@ -1129,6 +1155,8 @@ let setupIPC = function() {
     const dest = prefs.localSource;
     const data = factory.create(src, dest, attrs);
   
+    savers.reset();
+
     return data;
   });
   
@@ -1175,6 +1203,7 @@ let setupIPC = function() {
   ipcMain.on("prefs-updated", () => {
     log.info("prefs-updated");
     prefs.reload();
+    savers.reset();
     updateStateManager();
     checkForPackageUpdates();
   
@@ -1256,6 +1285,8 @@ let setupIPC = function() {
  */
 var bootApp = async function() {
   askAboutApplicationsFolder();
+  await askAboutMediaAccess();
+
   global.NEW_RELEASE_AVAILABLE = false;
 
   // ensure proper data in about panel when available
@@ -1281,6 +1312,9 @@ var bootApp = async function() {
   prefs = new SaverPrefs({
     baseDir: saverOpts.base,
     systemSource: saverOpts.systemDir
+  });
+  savers = new SaverListManager({
+    prefs: prefs
   });
 
   //
@@ -1495,6 +1529,8 @@ let getTrayMenu = function() {
  */
 let toggleSaversUpdated = (arg) => {
   prefs.reload();  
+  savers.reset();
+
   if ( handles.prefs.window !== null ) {
     handles.prefs.window.send("savers-updated", arg);
   }
@@ -1539,7 +1575,7 @@ let setBounds = function(target, bounds) {
 let setPreviewUrl = function(target, url, force) {
   const viewHandle = handles[target].preview;
   if ( force === true || url !== viewHandle.webContents.getURL() ) {
-    // log.info(`switch ${target} preview to ${url} ${force}`);
+    log.info(`switch ${target} preview to ${url} ${force}`);
 
     viewHandle.webContents.once("did-stop-loading", function() {
       viewHandle.webContents.insertCSS(globalCSSCode);
@@ -1554,9 +1590,16 @@ let setPreviewUrl = function(target, url, force) {
  * @param {String} name of the target window.
  */
 let setupPreview = function(target, incomingBounds) {
-  var primary = electronScreen.getPrimaryDisplay();
-  var size = primary.bounds;
-  let zf = incomingBounds.height / (size.height * PREVIEW_PADDING);
+  const primary = electronScreen.getPrimaryDisplay();
+  const size = primary.bounds;
+  let zf;
+  if ( !incomingBounds ) {
+    zf = 0.25;
+  }
+  else {
+    zf = incomingBounds.height / (size.height * PREVIEW_PADDING);
+  }
+  console.log(zf);
 
   if ( ! handles[target].preview ) {
     var ratio = size.height / size.width;
