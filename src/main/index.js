@@ -1137,12 +1137,9 @@ let setupIPC = function() {
   });
   
   ipcMain.handle("delete-saver", async(_event, attrs) => {
-    console.log("delete-saver");
-    // let savers = new SaverListManager({
-    //   prefs: prefs
-    // });
+    log.info("delete-saver");
     await savers.delete(attrs);
-    toggleSaversUpdated();
+    prefs.reload();  
   });
   
   

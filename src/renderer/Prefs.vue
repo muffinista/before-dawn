@@ -180,7 +180,6 @@ export default {
   },
   methods: {
     async setupPrefs() {
-      console.log("setupPrefs");
       let opts = await ipcRenderer.invoke("get-saver-opts");
       this.prefs = new SaverPrefs({
         baseDir: opts.base,
@@ -326,13 +325,14 @@ export default {
       ipcRenderer.send("open-window", "editor", opts);
     },
     async deleteSaver(s) {
-      this.saver = this.savers[0].key;
+      const index = this.savers.indexOf(s);
+      const newIndex = Math.max(index-1, 0);
+
+      this.saver = this.savers[newIndex].key;
       this.updateSaverPreview(true);
 
-      var index = this.savers.indexOf(s);
       this.savers.splice(index, 1);
 
-      // @todo pick a default screensaver 
       await ipcRenderer.invoke("delete-saver", s);
       await this.getData();
     },
