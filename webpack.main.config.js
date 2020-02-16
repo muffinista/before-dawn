@@ -80,6 +80,10 @@ let mainConfig = {
     __dirname: false,
     __filename: false
   },
+  optimization: {
+    noEmitOnErrors: true,
+    nodeEnv: (process.env.NODE_ENV === "production" ? "production" : "development")
+  },
   output: {
     filename: "[name].js",
     libraryTarget: "commonjs2",
@@ -94,19 +98,20 @@ let mainConfig = {
       {
         from: path.join(__dirname, "package.json"),
         to: path.join(outputDir)
-      }
-    ]),
-    new CopyWebpackPlugin([
+      },
       {
         from: path.join(__dirname, "src", "main", "assets"),
         to: path.join(outputDir, "assets"),
         ignore: [".*"]
-      }
-    ]),
-    new CopyWebpackPlugin([
+      },
       {
         from: path.join(__dirname, "src", "bin"),
         to: path.join(outputDir, "bin")
+      },
+      {
+        from: path.join(__dirname, "src", "main", "system-savers"),
+        to: path.join(outputDir, "system-savers"),
+        ignore: [".*"]
       }
     ]),
     new ChmodWebpackPlugin([
@@ -117,26 +122,7 @@ let mainConfig = {
         mode:    770,
       }
     ),
-    new CopyWebpackPlugin([
-      {
-        from: path.join(__dirname, "src", "main", "system-savers"),
-        to: path.join(outputDir, "system-savers"),
-        ignore: [".*"]
-      }
-    ]),
-    new CopyWebpackPlugin([
-      {
-        from: path.join(__dirname, "src", "shim.html"),
-        to: path.join(outputDir)
-      }
-    ]),
     new webpack.NoEmitOnErrorsPlugin(),
-    new SentryWebpackPlugin({
-      include: "src",
-      ignoreFile: ".sentrycliignore",
-      ignore: ["node_modules", "webpack.config.js", "webpack.main.config.js", "webpack.renderer.config.js"],
-      configFile: "sentry.properties"
-    })
   ],
   resolve: {
     extensions: [".js", ".json", ".node"]
@@ -145,18 +131,7 @@ let mainConfig = {
 };
 
 /**
- * Adjust mainConfig for development settings
- */
-if (process.env.NODE_ENV !== "production") {
-  mainConfig.plugins.push(
-    new webpack.DefinePlugin({
-      "__static": `"${path.join(__dirname, "../static").replace(/\\/g, "\\\\")}"`
-    })
-  );
-}
-
-/**
- * Adjust mainConfig for production settings
+ * Adjust mainConfig for development/production settings
  */
 if (process.env.NODE_ENV === "production") {
   mainConfig.devtool = "source-map";
@@ -165,7 +140,25 @@ if (process.env.NODE_ENV === "production") {
     new webpack.DefinePlugin({
       "process.env.NODE_ENV": JSON.stringify("production"),
       "process.env.BEFORE_DAWN_RELEASE_NAME": JSON.stringify(releaseName)
+    }),
+    new SentryWebpackPlugin({
+      include: "src",
+      ignoreFile: ".sentrycliignore",
+      ignore: ["node_modules", "webpack.config.js", "webpack.main.config.js", "webpack.renderer.config.js"],
+      configFile: "sentry.properties"
     })
+  );
+} else {
+  mainConfig.plugins.push(
+    new webpack.DefinePlugin({
+      "__static": `"${path.join(__dirname, "../static").replace(/\\/g, "\\\\")}"`
+    }),
+    new CopyWebpackPlugin([
+    {
+      from: path.join(__dirname, "src", "shim.html"),
+      to: path.join(outputDir)
+    }
+    ]),
   );
 }
 

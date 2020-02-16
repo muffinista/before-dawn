@@ -1519,7 +1519,6 @@ let getTrayMenu = function() {
   return trayMenu;
 };
 
-
 /**
  * if the user has updated one of their screensavers, we can let
  * the prefs window know that it needs to reload
