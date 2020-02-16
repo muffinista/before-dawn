@@ -24,10 +24,10 @@ const releaseName = `${packageJSON.productName} ${packageJSON.version}`;
 
 var htmlPageOptions = function(id, title) {
   return {
-    filename: id + ".html",
+    filename: `${id}.html`,
     template: path.resolve(__dirname, "src/index.ejs"),
     id: id,
-    title: productName + ": " + title,
+    title: `${productName}: ${title}`,
     minify: {
       collapseWhitespace: true,
       removeAttributeQuotes: true,
@@ -74,15 +74,6 @@ let rendererConfig = {
           }
         }
       },
-      // this will apply to both plain `.css` files
-      // AND `<style>` blocks in `.vue` files
-      // {
-      //   test: /\.css$/,
-      //   use: [
-      //     "vue-style-loader",
-      //     "css-loader"
-      //   ]
-      // },
       {
         //test: /\.(scss)$/,
         test: /\.(sa|sc|c)ss$/,
@@ -139,19 +130,24 @@ let rendererConfig = {
     new HtmlWebpackPlugin(htmlPageOptions("editor", "Editor")),    
     new HtmlWebpackPlugin(htmlPageOptions("new", "Create Screensaver!")),
     new HtmlWebpackPlugin(htmlPageOptions("about", "About!")),
-    new CopyWebpackPlugin([
-      {
-        from: path.join(__dirname, "src", "shim.html"),
-        to: path.join(outputDir)
-      }
-    ]),
     new PurgecssPlugin({
       paths: glob.sync([
         path.join(__dirname, "./src/index.ejs"),
         path.join(__dirname, "./src/**/*.vue"),
         path.join(__dirname, "./src/**/*.js")
       ]),
-      whitelistPatterns: [/nav/, /nav-tabs/, /nav-link/, /nav-item/, /tablist/, /tabindex/, /tooltip/, /button-group/, /btn/, /noty/]
+      whitelistPatterns: [
+        /nav/,
+        /nav-tabs/,
+        /nav-link/,
+        /nav-item/,
+        /tablist/,
+        /tabindex/,
+        /tooltip/,
+        /button-group/,
+        /btn/,
+        /noty/
+      ]
     }),
     new CopyWebpackPlugin(
       [
@@ -159,34 +155,27 @@ let rendererConfig = {
           from: path.join(__dirname, "src", "renderer", "assets"),
           to: path.join(outputDir, "assets"),
           ignore: [".*"]
+        },
+        {
+          from: path.join(__dirname, "src", "main", "system-savers"),
+          to: path.join(outputDir, "system-savers"),
+          ignore: [".*"]
+        },
+        {
+          from: path.join(__dirname, "src", "shim.html"),
+          to: path.join(outputDir)
         }
       ]
     ),
-    new webpack.HotModuleReplacementPlugin(),
-    new webpack.NoEmitOnErrorsPlugin(),
     new MiniCssExtractPlugin({
       filename: "[name].css",
       chunkFilename: "[id].css"
-    }),
-    new SentryWebpackPlugin({
-      include: "src",
-      ignoreFile: ".sentrycliignore",
-      ignore: ["node_modules", "webpack.config.js", "webpack.main.config.js", "webpack.renderer.config.js"],
-      configFile: "sentry.properties"
     })
   ],
-  // optimization: {
-  //   splitChunks: {
-  //     cacheGroups: {
-  //       styles: {
-  //         name: 'styles',
-  //         test: /\.css$/,
-  //         chunks: 'all',
-  //         enforce: true
-  //       }
-  //     }
-  //   }
-  // },
+  optimization: {
+    noEmitOnErrors: true,
+    nodeEnv: (process.env.NODE_ENV === "production" ? "production" : "development")
+  },
   output: {
     filename: "[name].js",
     libraryTarget: "commonjs2",
@@ -221,7 +210,17 @@ if (process.env.NODE_ENV === "production") {
     }),
     new webpack.LoaderOptionsPlugin({
       minimize: true
+    }),
+    new SentryWebpackPlugin({
+      include: "src",
+      ignoreFile: ".sentrycliignore",
+      ignore: ["node_modules", "webpack.config.js", "webpack.main.config.js", "webpack.renderer.config.js"],
+      configFile: "sentry.properties"
     })
+  );
+} else {
+  rendererConfig.plugins.push(
+    new webpack.HotModuleReplacementPlugin()
   );
 }
 
