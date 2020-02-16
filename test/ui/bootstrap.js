@@ -23,6 +23,14 @@ describe("bootstrap", function() {
 
   helpers.setupTest(this);
 
+  before(function() {
+    if ( process.env.CI) {
+      // eslint-disable-next-line no-console
+      console.log("Cowardly skipping test in CI");
+      this.skip();
+    }
+  });
+
   beforeEach(() => {
     workingDir = helpers.getTempDir();
     configDest = path.join(workingDir, "config.json");  
@@ -59,15 +67,6 @@ describe("bootstrap", function() {
     });
 
     describe("and a valid screenaver", () => {
-      before(function() {
-        if ( process.env.CI) {
-          // eslint-disable-next-line no-console
-          console.log("Cowardly skipping test in CI");
-          this.skip();
-          return;
-        }
-      });
-    
       beforeEach(async () => {
         let saversDir = path.join(workingDir, "savers");
         let saverJSONFile = helpers.addSaver(saversDir, "saver");
