@@ -160,6 +160,10 @@ let rendererConfig = {
           from: path.join(__dirname, "src", "main", "system-savers"),
           to: path.join(outputDir, "system-savers"),
           ignore: [".*"]
+        },
+        {
+          from: path.join(__dirname, "src", "shim.html"),
+          to: path.join(outputDir)
         }
       ]
     ),
@@ -216,12 +220,6 @@ if (process.env.NODE_ENV === "production") {
   );
 } else {
   rendererConfig.plugins.push(
-    new CopyWebpackPlugin([
-    {
-      from: path.join(__dirname, "src", "shim.html"),
-      to: path.join(outputDir)
-    }
-    ]),
     new webpack.HotModuleReplacementPlugin()
   );
 }

@@ -112,6 +112,10 @@ let mainConfig = {
         from: path.join(__dirname, "src", "main", "system-savers"),
         to: path.join(outputDir, "system-savers"),
         ignore: [".*"]
+      },
+      {
+        from: path.join(__dirname, "src", "shim.html"),
+        to: path.join(outputDir)
       }
     ]),
     new ChmodWebpackPlugin([
@@ -152,13 +156,7 @@ if (process.env.NODE_ENV === "production") {
   mainConfig.plugins.push(
     new webpack.DefinePlugin({
       "__static": `"${path.join(__dirname, "../static").replace(/\\/g, "\\\\")}"`
-    }),
-    new CopyWebpackPlugin([
-    {
-      from: path.join(__dirname, "src", "shim.html"),
-      to: path.join(outputDir)
-    }
-    ]),
+    })
   );
 }
 
