@@ -7,6 +7,11 @@
   resolved "https://registry.yarnpkg.com/7zip-bin/-/7zip-bin-5.0.3.tgz#bc5b5532ecafd923a61f2fb097e3b108c0106a3f"
   integrity sha512-GLyWIFBbGvpKPGo55JyRZAo4lVbnBiD52cKlw/0Vt+wnmKvWJkpZvsjVoaIolyBXDeAQKSicRtqFNPem9w0WYA==
 
+"@arkweid/lefthook@^0.7.1":
+  version "0.7.1"
+  resolved "https://registry.yarnpkg.com/@arkweid/lefthook/-/lefthook-0.7.1.tgz#a4125ece540b4adacd6b01859147b6d03f7cd56a"
+  integrity sha512-K0GbkvGllAo/NOFABMIbsPYEtVGo4EiGjxrYbkQ9kDkBLV9oaCUQAq+K0dYTE1PljN6sL2nLiF0fLE3Xfur0RQ==
+
 "@babel/code-frame@^7.0.0", "@babel/code-frame@^7.5.5":
   version "7.5.5"
   resolved "https://registry.yarnpkg.com/@babel/code-frame/-/code-frame-7.5.5.tgz#bc0782f6d69f7b7d49531219699b988f669a8f9d"
