@@ -52,6 +52,7 @@ const menusAndTrays = require("./menus.js");
 const dock = require("./dock.js");
 const windows = require("./windows.js");
 
+const cursor = require("hide-cursor");
 
 // NOTE -- this needs to be global, otherwise the app icon gets
 // garbage collected and won't show up in the system tray
@@ -733,6 +734,8 @@ var runScreenSaver = function() {
         // turn off idle checks for a couple seconds while loading savers
         stateManager.ignoreReset(true);
 
+        cursor.hide();
+
         for ( i in displays ) {
           runScreenSaverOnDisplay(saver, displays[i]);
         } // for
@@ -746,6 +749,7 @@ var runScreenSaver = function() {
         log.info("running screensaver failed");
         log.info(e);
         stateManager.ignoreReset(false);
+        cursor.show();
       }
       finally {
         setTimeout(function() {
@@ -780,6 +784,7 @@ var stopScreenSaver = function(fromBlank) {
   }
 
   windows.closeRunningScreensavers();
+  cursor.show();
 };
 
 
