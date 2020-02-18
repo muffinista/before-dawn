@@ -29,7 +29,7 @@ var activeWindowHandle = function(w) {
  * when the display count changes, close any running windows
  */
 var handleDisplayChange = function() {
-  main.log.info("display change, let's close running screensavers");
+  // main.log.info("display change, let's close running screensavers");
   closeRunningScreensavers();
 };
 
@@ -37,11 +37,9 @@ var handleDisplayChange = function() {
  * close any running screensavers
  */
 var closeRunningScreensavers = function() {
-  main.log.info("closeRunningScreensavers");
-//  if ( debugMode !== true ) {
-    attemptToStopScreensavers();
-    setTimeout(forcefullyCloseScreensavers, 2500);
-//  }
+  // main.log.info("closeRunningScreensavers");
+  attemptToStopScreensavers();
+  setTimeout(forcefullyCloseScreensavers, 2500);
 };
 
 /**
