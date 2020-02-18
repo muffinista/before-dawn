@@ -15,7 +15,6 @@ const releaseName = `${packageJSON.productName} ${packageJSON.version}`;
 
 
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
-const ChmodWebpackPlugin = require("chmod-webpack-plugin");
 const SentryWebpackPlugin = require("@sentry/webpack-plugin");
 
 //
@@ -105,10 +104,6 @@ let mainConfig = {
         ignore: [".*"]
       },
       {
-        from: path.join(__dirname, "src", "bin"),
-        to: path.join(outputDir, "bin")
-      },
-      {
         from: path.join(__dirname, "src", "main", "system-savers"),
         to: path.join(outputDir, "system-savers"),
         ignore: [".*"]
@@ -118,14 +113,6 @@ let mainConfig = {
         to: path.join(outputDir)
       }
     ]),
-    new ChmodWebpackPlugin([
-      {path: path.join(outputDir, "bin", "lock-screen.sh")}
-      ],
-      {
-        verbose: true,
-        mode:    770,
-      }
-    ),
     new webpack.NoEmitOnErrorsPlugin(),
   ],
   resolve: {
