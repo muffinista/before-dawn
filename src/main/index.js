@@ -65,6 +65,7 @@ var exitOnQuit = false;
 
 // load some global CSS we'll inject into running screensavers
 const globalCSSCode = fs.readFileSync( path.join(__dirname, "assets", "global.css"), "ascii");  
+const globalCSSPreviewCode = globalCSSCode.split(/\n/).filter((l) => l.indexOf("cursor: none") === -1).join("\n");
 
 const PREVIEW_PADDING = 1.15;
 
@@ -1576,7 +1577,7 @@ let setPreviewUrl = function(target, url, force) {
     log.info(`switch ${target} preview to ${url} ${force}`);
 
     viewHandle.webContents.once("did-stop-loading", function() {
-      viewHandle.webContents.insertCSS(globalCSSCode);
+      viewHandle.webContents.insertCSS(globalCSSPreviewCode);
     });
     viewHandle.webContents.loadURL(url);
   }
