@@ -37,9 +37,9 @@ describe("Editor", function() {
     });
 
   afterEach(function() {
-    if (this.currentTest.state === "failed") {
-      helpers.outputLogs(app);
-    }
+    // if (this.currentTest.state === "failed") {
+    //   helpers.outputLogs(app);
+    // }
 
     return helpers.stopApp(app);
   });
