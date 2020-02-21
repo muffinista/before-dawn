@@ -528,6 +528,7 @@ var runSaver = function(screenshot, saver, s, url_opts, tickCount) {
   try {   
     // Emitted when the window is closed.
     w.on("closed", function() {
+      cursor.show();
       windows.forceWindowClose(w);
     });
     
