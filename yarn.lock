@@ -4041,10 +4041,10 @@ detect-file@^1.0.0:
   resolved "https://registry.yarnpkg.com/detect-file/-/detect-file-1.0.0.tgz#f0d66d03672a825cb1b73bdb3fe62310c8e552b7"
   integrity sha1-8NZtA2cqglyxtzvbP+YjEMjlUrc=
 
-detect-fullscreen@^0.0.5:
-  version "0.0.5"
-  resolved "https://registry.yarnpkg.com/detect-fullscreen/-/detect-fullscreen-0.0.5.tgz#53781e66fcb8de49f9dbb29905d75bc5b00745bf"
-  integrity sha512-RFhCDrDvpPFD34aODI4fAbCE5UYuanhARxVGa9Ae7nNy1Zki8IF9A/JsGlGuRhtKL1IkKdjgHTqCQ4QpspzQaw==
+detect-fullscreen@^0.0.6:
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/detect-fullscreen/-/detect-fullscreen-0.0.6.tgz#744baf69c024a5d23fd9613b8efaa9749cda8030"
+  integrity sha512-gwhbuosdPvXD+Ry//wlGT/nNJNpoAWXdkSUhmxXStw3jUblUjnOmHthcdQnm14IOyWzKZiYV4rvQ+cCUobHHGg==
   dependencies:
     bindings "^1.5.0"
     nan "^2.14.0"

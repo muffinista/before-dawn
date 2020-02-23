@@ -147,6 +147,7 @@ var openGrabberWindow = function() {
 
     var grabberWindow = new BrowserWindow({
       show: false,
+      skipTaskbar: true,
       width: 100,
       height: 100,
       x: 6000,
@@ -482,7 +483,8 @@ var openEditor = (args) => {
 var getWindowOpts = function(s) {
   var opts = {
     backgroundColor: "#000000",
-    autoHideMenuBar: true,
+    // autoHideMenuBar: true,
+    // skipTaskbar: true,
     alwaysOnTop: true,
     x: s.bounds.x,
     y: s.bounds.y,
@@ -1599,7 +1601,6 @@ let setupPreview = function(target, incomingBounds) {
   else {
     zf = incomingBounds.height / (size.height * PREVIEW_PADDING);
   }
-  console.log(zf);
 
   if ( ! handles[target].preview ) {
     var ratio = size.height / size.width;
