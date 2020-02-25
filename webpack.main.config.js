@@ -131,13 +131,19 @@ if (process.env.NODE_ENV === "production") {
     new webpack.DefinePlugin({
       "process.env.NODE_ENV": JSON.stringify("production"),
       "process.env.BEFORE_DAWN_RELEASE_NAME": JSON.stringify(releaseName)
-    }),
-    new SentryWebpackPlugin({
-      include: "src",
-      ignoreFile: ".sentrycliignore",
-      ignore: ["node_modules", "webpack.config.js", "webpack.main.config.js", "webpack.renderer.config.js"]
     })
   );
+
+  if ( process.env.SENTRY_AUTH_TOKEN ) {
+    mainConfig.plugins.push(
+      new SentryWebpackPlugin({
+        include: "src",
+        ignoreFile: ".sentrycliignore",
+        ignore: ["node_modules", "webpack.config.js", "webpack.main.config.js", "webpack.renderer.config.js"]
+      })
+    );
+  }
+
 } else {
   mainConfig.plugins.push(
     new webpack.DefinePlugin({

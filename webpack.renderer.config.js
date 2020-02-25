@@ -210,14 +210,18 @@ if (process.env.NODE_ENV === "production") {
     }),
     new webpack.LoaderOptionsPlugin({
       minimize: true
-    }),
-    new SentryWebpackPlugin({
-      include: "src",
-      ignoreFile: ".sentrycliignore",
-      ignore: ["node_modules", "webpack.config.js", "webpack.main.config.js", "webpack.renderer.config.js"],
-      configFile: "sentry.properties"
     })
   );
+
+  if ( process.env.SENTRY_AUTH_TOKEN ) {
+    rendererConfig.plugins.push(
+      new SentryWebpackPlugin({
+        include: "src",
+        ignoreFile: ".sentrycliignore",
+        ignore: ["node_modules", "webpack.config.js", "webpack.main.config.js", "webpack.renderer.config.js"]
+      })
+    );
+  }
 } else {
   rendererConfig.plugins.push(
     new webpack.HotModuleReplacementPlugin()
