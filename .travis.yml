@@ -17,8 +17,8 @@ branches:
   - master
 cache: yarn
 script:
-- yarn test
-- yarn release
+- yarn test-lib && yarn release
+- yarn test-ui
 notifications:
   email:
     on_success: change
