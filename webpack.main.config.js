@@ -135,8 +135,7 @@ if (process.env.NODE_ENV === "production") {
     new SentryWebpackPlugin({
       include: "src",
       ignoreFile: ".sentrycliignore",
-      ignore: ["node_modules", "webpack.config.js", "webpack.main.config.js", "webpack.renderer.config.js"],
-      configFile: "sentry.properties"
+      ignore: ["node_modules", "webpack.config.js", "webpack.main.config.js", "webpack.renderer.config.js"]
     })
   );
 } else {
