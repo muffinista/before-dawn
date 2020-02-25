@@ -4,7 +4,7 @@
 require("dotenv").config();
 
 const Package = require("../src/lib/package.js");
-const Octokit = require("@octokit/rest");
+const { Octokit } = require("@octokit/rest");
 const path = require("path");
 const fs = require("fs");
 const rimraf = require("rimraf");

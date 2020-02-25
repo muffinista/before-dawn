@@ -4,7 +4,7 @@
 require("dotenv").config();
 
 const SentryCli = require("@sentry/cli");
-const Octokit = require("@octokit/rest");
+const { Octokit } = require("@octokit/rest");
 const path = require("path");
 const pjson = require(path.join(__dirname, "..", "package.json"));
 
