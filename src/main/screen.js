@@ -2,5 +2,5 @@
 
 const gotoSleep = require("@muffinista/goto-sleep");
 
-exports.doLockScreen = gotoSleep.lockScreen;
+exports.doLockScreen = gotoSleep.lockSystem;
 exports.doSleep = gotoSleep.gotoSleep;
