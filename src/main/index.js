@@ -1290,6 +1290,8 @@ let setupIPC = function() {
  * handle initial startup of app
  */
 var bootApp = async function() {
+  electronScreen = electron.screen;
+
   askAboutApplicationsFolder();
   await askAboutMediaAccess();
 
@@ -1328,7 +1330,6 @@ var bootApp = async function() {
   // to ensure that we wake up if the user plugs in or removes a
   // monitor
   //
-  electronScreen = electron.screen;
   ["display-added", "display-removed"].forEach((type) => {
     electronScreen.on(type, windows.handleDisplayChange);
   });
