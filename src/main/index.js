@@ -498,6 +498,7 @@ var getWindowOpts = function(s) {
   // so we default it to false there
   if (process.platform !== "darwin" ) {
     opts.fullscreen = true;
+    opts.frame = false;
   }
 
   if ( testMode === true ) {
