@@ -531,7 +531,9 @@ var runSaver = function(screenshot, saver, s, url_opts, tickCount) {
   try {   
     // Emitted when the window is closed.
     w.on("closed", function() {
-      cursor.show();
+      if (process.platform !== "win32" ) {
+        cursor.show();
+      }
       windows.forceWindowClose(w);
     });
     
@@ -570,7 +572,6 @@ var runSaver = function(screenshot, saver, s, url_opts, tickCount) {
     if ( debugMode === true ) {
       w.webContents.openDevTools();
     }
-
     // and load the index.html of the app.
     w.loadURL(url);
   }
@@ -739,8 +740,10 @@ var runScreenSaver = function() {
         // turn off idle checks for a couple seconds while loading savers
         stateManager.ignoreReset(true);
 
-        cursor.hide();
-
+        if (process.platform !== "win32" ) {
+          cursor.hide();
+        }
+  
         for ( i in displays ) {
           runScreenSaverOnDisplay(saver, displays[i]);
         } // for
@@ -754,7 +757,9 @@ var runScreenSaver = function() {
         log.info("running screensaver failed");
         log.info(e);
         stateManager.ignoreReset(false);
-        cursor.show();
+        if (process.platform !== "win32" ) {
+          cursor.show();
+        } 
       }
       finally {
         setTimeout(function() {
@@ -789,7 +794,9 @@ var stopScreenSaver = function(fromBlank) {
   }
 
   windows.closeRunningScreensavers();
-  cursor.show();
+  if (process.platform !== "win32" ) {
+    cursor.show();
+  }
 };
 
 
