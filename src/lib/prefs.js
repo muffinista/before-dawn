@@ -189,17 +189,18 @@ class SaverPrefs {
     let result = this.changes;
     this.changes = {};
 
-    await this.write();
+    this.writeSync();
+    // await this.write();
 
     return result;
   }
 
-  async write() {
-    let release = await lockfile.lock(this.configFile, { realpath: false });
-    await fs.writeJson(this.configFile, this._data, { spaces: 2 });
+  // async write() {
+  //   let release = await lockfile.lock(this.configFile, { realpath: false });
+  //   await fs.writeJson(this.configFile, this._data, { spaces: 2 });
 
-    release();
-  }
+  //   release();
+  // }
   
   writeSync() {
     let output = JSON.stringify(this._data, null, 2);
