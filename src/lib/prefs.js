@@ -5,6 +5,7 @@ const path = require("path");
 const mkdirp = require("mkdirp");
 
 const lockfile = require("proper-lockfile");
+const Store = require("electron-store");
 
 const CONFIG_FILE_NAME = "config.json";
 
@@ -26,6 +27,8 @@ const PROPERTIES = [
 
 class SaverPrefs {
   constructor(paths, _defaults) {
+    this.store = new Store();
+
     if ( typeof(paths) === "string" ) {
       this.baseDir = paths;
     }
