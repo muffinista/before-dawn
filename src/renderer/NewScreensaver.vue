@@ -1,7 +1,7 @@
 <template>
   <div id="new">
     <div class="content">
-      <div class="container-fluid">
+      <div class="container-fluid" :key="renderIndex">
         <h1>New Screensaver</h1>
         <template v-if="!canAdd">
           <div class="need-setup-message">
@@ -85,7 +85,8 @@ export default {
         requirements: ["screen"]
       },
       disabled: false,
-      prefs: undefined
+      prefs: undefined,
+      renderIndex: 0
     };
   },
   computed: {
@@ -102,18 +103,15 @@ export default {
       return decodeURIComponent(this.params.get("screenshot"));
     },
     canAdd: function() {
-      return this.isLoaded &&
-        this.prefs !== undefined &&
+      return this.prefs !== undefined &&
         this.prefs.localSource !== undefined &&
         this.prefs.localSource !== "";
     }
   },
   async mounted() {
     this.opts = await ipcRenderer.invoke("get-saver-opts");
-    this.prefs = new SaverPrefs({
-      baseDir: this.opts.base,
-      systemSource: this.opts.systemDir
-    });
+    this.prefsObj = new SaverPrefs(this.opts.base, this.opts.systemDir);
+    this.prefs = this.prefsObj.store.store;
   },
   methods: {
     closeWindow() {
@@ -125,8 +123,11 @@ export default {
       };
       this.prefs = Object.assign(this.prefs, tmp);
       let changes = await this.prefs.updatePrefs(this.prefs);
+
+      this.renderIndex += 1;
       this.disabled = false;
       ipcRenderer.send("prefs-updated", changes);
+
     },
     async saveData() {
       if ( document.querySelectorAll(":invalid").length > 0 ) {
@@ -139,9 +140,6 @@ export default {
       this.disabled = true;
       const data = await ipcRenderer.invoke("create-screensaver", this.saver);
 
-      // let systemPath = this.opts.systemDir;
-      // var src = path.join(systemPath, "__template");
-      // var data = this.manager.create(src, this.saver);
       ipcRenderer.send("savers-updated");
       ipcRenderer.send("open-window", "editor", {
         src: data.dest,

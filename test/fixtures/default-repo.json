@@ -8,6 +8,6 @@
   "delay": 10,
   "lock": false,
   "localSource": "/home/tester/my screensavers",
-  "disable_on_battery": true,
+  "disableOnBattery": true,
   "sleep": 10
 }

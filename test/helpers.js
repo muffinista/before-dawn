@@ -2,7 +2,7 @@ const tmp = require("tmp");
 const path = require("path");
 const fs = require("fs-extra");
 const Application = require("spectron").Application;
-const fakeDialog = require('spectron-dialog-addon').default;
+const fakeDialog = require("spectron-dialog-addon").default;
 
 const chai = require("chai");
 const chaiAsPromised = require("chai-as-promised");
@@ -29,10 +29,12 @@ if ( global.before ) {
   });  
 }
 
-exports.specifyConfig = (tmpdir, name) => {
+exports.specifyConfig = (dest, name) => {
+  // console.log(`${path.join(__dirname, "fixtures/" + name + ".json")} -> ${dest}`);
   fs.copySync(
     path.join(__dirname, "fixtures/" + name + ".json"),
-    path.join(tmpdir, "config.json")
+    dest
+    // path.join(tmpdir, "config.json")
   );
 };
 
@@ -100,6 +102,7 @@ exports.savedConfig = function(p) {
 exports.application = function(workingDir, quietMode=false, localZip, localZipData) {
   let env = {
     BEFORE_DAWN_DIR: workingDir,
+    CONFIG_DIR: workingDir,
     TEST_MODE: true,
     QUIET_MODE: quietMode
   };
@@ -111,13 +114,14 @@ exports.application = function(workingDir, quietMode=false, localZip, localZipDa
     env.LOCAL_PACKAGE_DATA = localZipData;
   }
  
+  console.log(`boot from ${appPath}`);
   var a = new Application({
     path: appPath,
     args: [path.join(__dirname, "..", "output/main.js")],
     env: env,
     quitTimeout: 5000
   });
-
+console.log(a);
   fakeDialog.apply(a);
   a.fakeDialog = fakeDialog;
   

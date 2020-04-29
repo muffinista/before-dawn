@@ -66,7 +66,7 @@ global.CONFIG_DEFAULTS = {
   sleep: 15,
   auto_start: false,
   sourceRepo: global.SAVER_REPO,
-  run_on_single_display: true
+  runOnSingleDisplay: true
 };
 
 

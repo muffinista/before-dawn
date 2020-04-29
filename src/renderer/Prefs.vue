@@ -181,11 +181,9 @@ export default {
   methods: {
     async setupPrefs() {
       let opts = await ipcRenderer.invoke("get-saver-opts");
-      this.prefs = new SaverPrefs({
-        baseDir: opts.base,
-        systemSource: opts.systemDir
-      });
-      this.saver = this.prefs.current;
+      this.prefsObj = new SaverPrefs(opts.base, opts.systemDir);
+      this.prefs = this.prefsObj.store.store;
+      this.saver = this.prefs.saver;
     },
     // https://github.com/stream-labs/streamlabs-obs/blob/
     // 163e9a7eaf39200077874ae80d00e66108c106dc/app/components/Chat.vue.ts#L41
@@ -270,10 +268,7 @@ export default {
         return new Saver(data);
       });
 
-      var tmp = this.prefs.toHash();
-      if ( tmp.options === undefined ) {
-        tmp.options = {};
-      }
+      var tmp = {};
 
       if ( this.savers.length <= 0 ) {
         return;
@@ -283,19 +278,21 @@ export default {
       for(var i = 0, l = this.savers.length; i < l; i++ ) {
         var s = this.savers[i];
 
-        if ( tmp.options[s.key] === undefined ) {
-          tmp.options[s.key] = {};
-        }
+//        tmp[s.key] = this.prefs.getOptions(s.key);
+        // if ( tmp[s.key] === undefined ) {
+        //   tmp.options[s.key] = {};
+        // }
 
-        tmp.options[s.key] = s.settings;
+        tmp[s.key] = s.settings;
       }
 
-      this.options = Object.assign({}, this.options, tmp.options);
+      this.options = Object.assign({}, this.options, tmp);
 
       // https://vuejs.org/v2/guide/reactivity.html
       // However, new properties added to the object will not
       // trigger changes. In such cases, create a fresh object
       // with properties from both the original object and the mixin object:
+      console.log("HERE");
       this.prefs = Object.assign(this.prefs, tmp);
 
       // pick the first screensaver if nothing picked yet
@@ -310,7 +307,7 @@ export default {
       await this.getData();
     },
     getCurrentSaver() {
-      this.saver = this.prefs.current;
+      this.saver = this.prefs.saver;
     },
     createNewScreensaver() {
       ipcRenderer.send("open-window", "add-new", {
@@ -347,10 +344,10 @@ export default {
     },
     async saveData() {
       // @todo should this use Object.assign?
-      this.prefs.current = this.saver;
+      this.prefs.saver = this.saver;
       this.prefs.options = this.options;
 
-      return await this.prefs.updatePrefs(this.prefs);
+      return await this.prefsObj.updatePrefs(this.prefs);
     },
     async saveDataClick() {
       let output;

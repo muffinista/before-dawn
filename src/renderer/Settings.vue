@@ -112,16 +112,16 @@ export default {
 
     let opts = await ipcRenderer.invoke("get-saver-opts");
 
-    this.prefs = new SaverPrefs({
-      baseDir: opts.base,
-      systemSource: opts.systemDir
-    });
+    this.prefsObj = new SaverPrefs(opts.base, opts.systemDir);
+    this.prefs = this.prefsObj.store.store;
+
   },
   methods: {
     async handleSave(output) {
       this.disabled = true;
       try {
-        let changes = await this.prefs.updatePrefs(this.prefs);
+        console.log("PREFS", this.prefs);
+        let changes = await this.prefsObj.updatePrefs(this.prefs);
 
         ipcRenderer.send("prefs-updated", changes);
         ipcRenderer.send("set-autostart", this.prefs.auto_start);
@@ -146,8 +146,10 @@ export default {
     async resetToDefaults() {
       const result = await ipcRenderer.invoke("reset-to-defaults-dialog");
       if ( result === 1 ) {
-        this.prefs.defaults = this.globals.CONFIG_DEFAULTS;
-        this.prefs.reset();
+        this.prefsObj.defaults = this.globals.CONFIG_DEFAULTS;
+        this.prefsObj.reset();
+        this.prefs = this.prefsObj.store.store;
+
         await this.handleSave("Settings reset");
       }
     },

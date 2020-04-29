@@ -6,7 +6,7 @@ const path = require("path");
 
 const helpers = require("../helpers.js");
 
-const SaverPrefs = require("../../src/lib/prefs.js");
+// const SaverPrefs = require("../../src/lib/prefs.js");
 
 var saversDir;
 var workingDir;
@@ -17,7 +17,8 @@ describe("Add New", function() {
   let screensaverUrl = "file://" + path.join(__dirname, "../fixtures/screenshot.png");
 
   let currentPrefs = function() {
-    return new SaverPrefs(workingDir);
+    return JSON.parse(fs.readFileSync(`${workingDir}/config.json`));
+    // return new SaverPrefs(workingDir);
   };
 
   helpers.setupTest(this);
@@ -25,7 +26,6 @@ describe("Add New", function() {
   beforeEach(() => {
     saversDir = helpers.getTempDir();
     workingDir = helpers.getTempDir();
-
     app = helpers.application(workingDir, true);
   });
 
@@ -43,9 +43,6 @@ describe("Add New", function() {
     beforeEach(() => {
       return app.start().
         then(() => app.fakeDialog.mock(fakeDialogOpts)).
-        then(() => {
-          helpers.removeLocalSource(workingDir);
-        }).
         then(() => app.client.waitUntilWindowLoaded() ).
         then(() => app.electron.ipcRenderer.send("open-window", "add-new", screensaverUrl)).
         then(() => helpers.waitForWindow(app, windowTitle) );

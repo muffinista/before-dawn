@@ -903,7 +903,6 @@ var setupIfNeeded = async function() {
     log.info("needSetup!");
     prefs.setDefaultRepo(global.SAVER_REPO);
     prefs.ensureDefaults();
-    prefs.writeSync();
 
     if ( ! localPackageCheck.downloaded ) {
       log.info("check for updated download");
@@ -1129,19 +1128,12 @@ let setupIPC = function() {
   
   ipcMain.handle("list-savers", async () => {
     log.info("list-savers");
-    // let savers = new SaverListManager({
-    //   prefs: prefs
-    // });
-  
     const entries = await savers.list();
     return entries;
   });
   
   ipcMain.handle("load-saver", async (_event, key) => {
     log.info("load-saver", key);
-    // let savers = new SaverListManager({
-    //   prefs: prefs
-    // });
     return await savers.loadFromFile(key);
   });
   
@@ -1317,10 +1309,7 @@ var bootApp = async function() {
   log.info("Loading prefs");
   log.info(`baseDir: ${saverOpts.base}`);
   log.info(`systemSource: ${saverOpts.systemDir}`);
-  prefs = new SaverPrefs({
-    baseDir: saverOpts.base,
-    systemSource: saverOpts.systemDir
-  });
+  prefs = new SaverPrefs(saverOpts.base, saverOpts.systemDir);
   savers = new SaverListManager({
     prefs: prefs
   });
@@ -1351,6 +1340,7 @@ var bootApp = async function() {
 
   let result = await setupIfNeeded();
   await openPrefsWindowIfNeeded(result);
+
   setupForTesting();
 
   setupMenuAndTray();
