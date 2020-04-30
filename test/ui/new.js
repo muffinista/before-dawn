@@ -87,8 +87,8 @@ describe("Add New", function() {
       return app.start().
         then(() => {
           helpers.addLocalSource(workingDir, saversDir);
-          // tell app to reload config
-          app.client.electron.ipcRenderer.send("prefs-updated");
+          // // tell app to reload config
+          // app.client.electron.ipcRenderer.send("prefs-updated");
         }).
         then(() => app.client.waitUntilWindowLoaded() ).
         then(() => app.electron.ipcRenderer.send("open-window", "add-new", screensaverUrl)).

@@ -1,7 +1,10 @@
 <template>
   <div id="new">
     <div class="content">
-      <div class="container-fluid" :key="renderIndex">
+      <div
+        :key="renderIndex"
+        class="container-fluid"
+      >
         <h1>New Screensaver</h1>
         <template v-if="!canAdd">
           <div class="need-setup-message">
@@ -69,8 +72,6 @@
 import SaverForm from "@/components/SaverForm";
 import LocalFolderInput from "@/components/LocalFolderInput";
 
-import SaverPrefs from "@/../lib/prefs";
-
 const { ipcRenderer } = require("electron");
 
 export default {
@@ -110,24 +111,21 @@ export default {
   },
   async mounted() {
     this.opts = await ipcRenderer.invoke("get-saver-opts");
-    this.prefsObj = new SaverPrefs(this.opts.base, this.opts.systemDir);
-    this.prefs = this.prefsObj.store.store;
+    this.prefs = await ipcRenderer.invoke("get-prefs");
   },
   methods: {
     closeWindow() {
       ipcRenderer.send("close-window", "addNew");
     },
-    async localSourceChange(ls) {
+    localSourceChange(ls) {
       var tmp = {
         localSource: ls
       };
       this.prefs = Object.assign(this.prefs, tmp);
-      let changes = await this.prefs.updatePrefs(this.prefs);
-
       this.renderIndex += 1;
       this.disabled = false;
-      ipcRenderer.send("prefs-updated", changes);
 
+      ipcRenderer.invoke("update-local-source", ls);
     },
     async saveData() {
       if ( document.querySelectorAll(":invalid").length > 0 ) {

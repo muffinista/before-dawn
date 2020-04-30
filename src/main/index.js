@@ -24,7 +24,6 @@ const log = require("electron-log");
 const {app,
   globalShortcut,
   BrowserWindow,
-  BrowserView,
   ipcMain,
   Menu,
   Tray,
@@ -65,9 +64,9 @@ var exitOnQuit = false;
 
 // load some global CSS we'll inject into running screensavers
 const globalCSSCode = fs.readFileSync( path.join(__dirname, "assets", "global.css"), "ascii");  
-const globalCSSPreviewCode = globalCSSCode.split(/\n/).filter((l) => l.indexOf("cursor: none") === -1).join("\n");
+// const globalCSSPreviewCode = globalCSSCode.split(/\n/).filter((l) => l.indexOf("cursor: none") === -1).join("\n");
 
-const PREVIEW_PADDING = 1.15;
+// const PREVIEW_PADDING = 1.15;
 
 
 
@@ -78,7 +77,6 @@ const PREVIEW_PADDING = 1.15;
 let handles = {
   prefs: {
     window: null,
-    preview: null,
     bounds: {
       width: 320,
       height: 0
@@ -96,7 +94,6 @@ let handles = {
   },
   editor: {
     window: null,
-    preview: null,
     bounds: {
       width: 320,
       height: 0
@@ -691,7 +688,7 @@ var runScreenSaver = function() {
   // check if the user is running the random screensaver. if so, pick one!
   let randomPath = path.join(workingPath, "system-savers", "random", "saver.json");
   log.info("random: " + randomPath);
-  if ( prefs.current === randomPath ) {
+  if ( prefs.saver === randomPath ) {
     setupPromise = new Promise((resolve) => {
       savers.list(() => {
         // @todo s can be undefined
@@ -702,7 +699,7 @@ var runScreenSaver = function() {
     });
   }
   else {
-    setupPromise = Promise.resolve(prefs.current, prefs.getOptions(prefs.current));
+    setupPromise = Promise.resolve(prefs.saver, prefs.getOptions(prefs.saver));
   }
 
   setupPromise.
@@ -902,7 +899,6 @@ var setupIfNeeded = async function() {
   if ( localPackageCheck.downloaded || process.env.FORCE_SETUP || prefs.needSetup ) {
     log.info("needSetup!");
     prefs.setDefaultRepo(global.SAVER_REPO);
-    prefs.ensureDefaults();
 
     if ( ! localPackageCheck.downloaded ) {
       log.info("check for updated download");
@@ -918,8 +914,8 @@ var setupIfNeeded = async function() {
   //   prefs: prefs
   // });
 
-  log.info(`checking if ${prefs.current} is valid`);
-  let exists = await savers.confirmExists(prefs.current);
+  log.info(`checking if ${prefs.saver} is valid`);
+  let exists = await savers.confirmExists(prefs.saver);
 
   let results = !exists;
   if ( ! exists ) {
@@ -1117,6 +1113,11 @@ let setupIPC = function() {
     return saverOpts;
   });
   
+  ipcMain.handle("get-prefs", () => {
+    log.info("get-prefs");
+    return prefs.data;
+  });
+  
   ipcMain.handle("get-globals", () => {
     return {
       APP_VERSION: global.APP_VERSION,
@@ -1138,11 +1139,42 @@ let setupIPC = function() {
   });
   
   ipcMain.handle("delete-saver", async(_event, attrs) => {
-    log.info("delete-saver");
+    log.info("delete-saver", attrs);
     await savers.delete(attrs);
-    prefs.reload();  
+    savers.reset();
+    prefs.reload();
   });
-  
+
+  ipcMain.handle("update-prefs", async(_event, attrs) => {
+    log.info("update-prefs", attrs);
+    prefs.store.set(attrs);
+
+    savers.reset();
+    updateStateManager();
+    checkForPackageUpdates();
+  });
+
+  ipcMain.handle("get-defaults", async() => {
+    log.info("get-defaults");
+    return prefs.defaults;
+  });
+
+  // ipcMain.handle("reset-to-defaults", async() => {
+  //   log.info("reset-to-defaults");
+  //   prefs.reset();
+  //   prefs.store.set(global.CONFIG_DEFAULTS);
+
+  //   savers.reset();
+  //   updateStateManager();
+  //   checkForPackageUpdates();
+  // });
+
+  ipcMain.handle("update-local-source", async(_event, ls) => {
+    log.info("update-local-source", ls);
+    prefs.store.set("localSource", ls);
+
+    savers.reset();
+  });
   
   ipcMain.handle("create-screensaver", async(_event, attrs) => {
     const factory = new SaverFactory();
@@ -1186,29 +1218,21 @@ let setupIPC = function() {
     log.info("savers-updated");
     toggleSaversUpdated();
   });
-  
-  // event for switching preview url
-  // event for switching preview location and/or url
-  ipcMain.on("update-preview", (_event, arg) => {
-    setupPreview(arg.target, arg.bounds);
-    setPreviewUrl(arg.target, arg.url, arg.force);
-    setBounds(arg.target, arg.bounds);
-  });
-  
+    
   //
   // user has updated their preferences, let's reload
   //
-  ipcMain.on("prefs-updated", () => {
-    log.info("prefs-updated");
-    prefs.reload();
-    savers.reset();
-    updateStateManager();
-    checkForPackageUpdates();
+  // ipcMain.on("prefs-updated", () => {
+  //   log.info("prefs-updated");
+  //   prefs.reload();
+  //   savers.reset();
+  //   updateStateManager();
+  //   checkForPackageUpdates();
   
-    // this was causing a double load of data basically, which
-    // might be fine but seems like an issue, so skipping for now
-    // handles.prefs.window.webContents.send("savers-updated");
-  });
+  //   // this was causing a double load of data basically, which
+  //   // might be fine but seems like an issue, so skipping for now
+  //   // handles.prefs.window.webContents.send("savers-updated");
+  // });
   
   ipcMain.on("set-autostart", (_event, value) => {
     log.info("set-autostart");
@@ -1244,7 +1268,7 @@ let setupIPC = function() {
       buttons: ["No", "Yes"],
       defaultId: 0
     });
-    return result;
+    return result.response;
   });
   
   ipcMain.handle("delete-screensaver-dialog", async (_event, saver) => {
@@ -1258,7 +1282,7 @@ let setupIPC = function() {
         defaultId: 0
       }); 
   
-    return result;
+    return result.response;
   });
   
   ipcMain.handle("show-open-dialog", async () => {
@@ -1526,83 +1550,6 @@ let toggleSaversUpdated = (arg) => {
 
   if ( handles.prefs.window !== null ) {
     handles.prefs.window.send("savers-updated", arg);
-  }
-};
-
-
-/**
- * 
- * @param {String} name of the target window.
- * @param {Object} bounds hash with keys x, y, width, height
- */
-let setBounds = function(target, bounds) {
-  bounds.x = parseInt(bounds.x, 10);
-  bounds.y = parseInt(bounds.y, 10);
-  bounds.width = parseInt(bounds.width, 10);
-  bounds.height = parseInt(bounds.height, 10);
-
-  handles[target].max.width = bounds.width;
-  handles[target].max.height = bounds.height;
-
-  // if we have an aspect ratio, we assume the width is fixed, and
-  // match the height to our expected proportions
-  if ( handles[target].ratio ) {
-    bounds.height = parseInt(bounds.width * handles[target].ratio, 10);
-
-    // don't exceed our max dimensions
-    if ( bounds.height > handles[target].max.height ) {
-      bounds.height = handles[target].max.height;
-      bounds.width = parseInt(bounds.width / handles[target].ratio, 10);
-    }
-  }
-
-  handles[target].preview.setBounds(bounds);
-};
-
-/**
- * set the preview url for a window
- * 
- * @param {String} name of the target window.
- * @param {String} url to load in the preview
- */
-let setPreviewUrl = function(target, url, force) {
-  const viewHandle = handles[target].preview;
-  if ( force === true || url !== viewHandle.webContents.getURL() ) {
-    log.info(`switch ${target} preview to ${url} ${force}`);
-
-    viewHandle.webContents.once("did-stop-loading", function() {
-      viewHandle.webContents.insertCSS(globalCSSPreviewCode);
-    });
-    viewHandle.webContents.loadURL(url);
-  }
-};
-
-/**
- * setup a preview BrowserView
- * 
- * @param {String} name of the target window.
- */
-let setupPreview = function(target, incomingBounds) {
-  const primary = electronScreen.getPrimaryDisplay();
-  const size = primary.bounds;
-  let zf;
-  if ( !incomingBounds ) {
-    zf = 0.25;
-  }
-  else {
-    zf = incomingBounds.height / (size.height * PREVIEW_PADDING);
-  }
-
-  if ( ! handles[target].preview ) {
-    var ratio = size.height / size.width;
-    handles[target].ratio = ratio;
-
-    handles[target].preview = new BrowserView({
-      webPreferences: {
-        zoomFactor: zf
-      }
-    });
-    handles[target].window.setBrowserView(handles[target].preview);
   }
 };
 

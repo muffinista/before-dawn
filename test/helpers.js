@@ -30,11 +30,9 @@ if ( global.before ) {
 }
 
 exports.specifyConfig = (dest, name) => {
-  // console.log(`${path.join(__dirname, "fixtures/" + name + ".json")} -> ${dest}`);
   fs.copySync(
     path.join(__dirname, "fixtures/" + name + ".json"),
     dest
-    // path.join(tmpdir, "config.json")
   );
 };
 
@@ -114,14 +112,14 @@ exports.application = function(workingDir, quietMode=false, localZip, localZipDa
     env.LOCAL_PACKAGE_DATA = localZipData;
   }
  
-  console.log(`boot from ${appPath}`);
+  // console.log(`boot from ${appPath}`);
   var a = new Application({
     path: appPath,
     args: [path.join(__dirname, "..", "output/main.js")],
     env: env,
     quitTimeout: 5000
   });
-console.log(a);
+// console.log(a);
   fakeDialog.apply(a);
   a.fakeDialog = fakeDialog;
   

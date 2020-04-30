@@ -62,7 +62,7 @@ describe("Prefs", function() {
       then(() => app.client.click("button.save")).
       then(() => app.client.waitUntilTextExists("body", "Changes saved!")).
       then(function() {
-        assert(currentPrefs().current.lastIndexOf("saver-one") !== -1);
+        assert(currentPrefs().saver.lastIndexOf("saver-one") !== -1);
       });
   });
 
@@ -98,7 +98,7 @@ describe("Prefs", function() {
         app.client.selectByVisibleText("[name=delay]", "30 minutes")
       ).
       then(() => 
-        app.client.selectByVisibleText("[name=\"sleep\"]", "15 minutes")
+        app.client.selectByVisibleText("[name=sleep]", "15 minutes")
       ).
       then(() => app.client.click("button.save")).
       then(() => helpers.sleep(100)).

@@ -70,7 +70,7 @@ export default {
     },
     async onDeleteClick(s) {
       const result = await ipcRenderer.invoke("delete-screensaver-dialog", s);
-      if ( result.response === 1 ) {
+      if ( result === 1 ) {
         this.$emit("deleteSaver", s);
       }
     }

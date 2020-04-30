@@ -1,6 +1,9 @@
 :root {
+  --preview-wrapper-width: 500px;
+  --preview-wrapper-height: 320px;
   --preview-width: 500px;
   --preview-height: 320px;
+  --preview-scale: 1.0;
   --footer-height: 50px;
   --space-at-top: 1.0rem;
   --footer-padding: 25px;
@@ -55,8 +58,8 @@ small {
 #prefs {
   padding: 0.5rem;
   display: grid;
-  grid-template-columns: var(--preview-width) 1fr;
-  grid-template-rows: var(--preview-height) 1fr var(--footer-height);
+  grid-template-columns: var(--preview-wrapper-width) 1fr;
+  grid-template-rows: var(--preview-wrapper-height) 1fr var(--footer-height);
   grid-template-areas: "saver-preview saver-list"
     "saver-info basic-prefs"
     "footer footer";
@@ -67,11 +70,11 @@ small {
 }
 .saver-list-wrapper {
   grid-area: saver-list;
-  height: var(--preview-height);
+  height: var(--preview-wrapper-height);
   padding-left: 0.25rem;
 }
 .saver-list {
-  max-height: calc(var(--preview-height) - 34px);
+  max-height: calc(var(--preview-wrapper-height) - 34px);
   overflow-y: scroll;
   margin-bottom: 0px;
   font: small-caption;
@@ -93,7 +96,21 @@ small {
 
 div.saver-detail {
   grid-area: saver-preview;
+  height: var(--preview-wrapper-height);
+  overflow: hidden;
+}
+
+.saver-preview {
+  width: var(--preview-width);
   height: var(--preview-height);
+  transform: scale(var(--preview-scale));
+  transform-origin: 0 0;
+  overflow: hidden;
+  border: 0;
+}
+.saver-preview::-webkit-scrollbar {
+  width: 0px;
+ height: 0px;
 }
 
 div.basic-prefs {
@@ -108,7 +125,7 @@ div.basic-prefs {
 
 div.saver-info {
   grid-area: saver-info; 
-  height: calc(99vh - var(--preview-height) - var(--footer-height) - var(--space-at-top) - var(--small-padding));
+  height: calc(99vh - var(--preview-wrapper-height) - var(--footer-height) - var(--space-at-top) - var(--small-padding));
   overflow-y: auto;
 }
 div.saver-info #wrapper {
@@ -172,8 +189,7 @@ button.add-option {
 }
 
 .saver-detail {
-  overflow-y: auto;
-  padding-left: 5px;
+  padding-left: 0px;
   padding-right: 5px;
 }
 

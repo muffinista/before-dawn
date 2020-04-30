@@ -5,16 +5,19 @@ const path = require("path");
 
 describe("tray", function() {
   var workingDir;
+  let configDest;
   let app;
   
   helpers.setupTest(this);
 
   beforeEach(function() {
     workingDir = helpers.getTempDir();
+    configDest = path.join(workingDir, "config.json");  
+
     let saversDir = path.join(workingDir, "savers");
     let saverJSONFile = helpers.addSaver(saversDir, "saver");
 
-    helpers.specifyConfig(workingDir, "config");
+    helpers.specifyConfig(configDest, "config");
     helpers.setConfigValue(workingDir, "sourceRepo", "foo/bar");
     helpers.setConfigValue(workingDir, "sourceUpdatedAt", new Date(0));
     helpers.setConfigValue(workingDir, "saver", saverJSONFile);

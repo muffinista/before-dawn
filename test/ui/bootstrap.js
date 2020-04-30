@@ -61,7 +61,8 @@ describe("bootstrap", function() {
 
   describe("with up to date config", () => {
     beforeEach(() => {
-      helpers.specifyConfig(workingDir, "config");
+      helpers.specifyConfig(configDest, "config");
+      helpers.setConfigValue(workingDir, "firstLoad", false);
       helpers.setConfigValue(workingDir, "sourceRepo", "foo/bar");
       helpers.setConfigValue(workingDir, "sourceUpdatedAt", new Date(0));
     });
@@ -97,7 +98,7 @@ describe("bootstrap", function() {
 
   describe("with invalid config", () => {
     beforeEach(async () => {
-      helpers.specifyConfig(workingDir, "bad-config");
+      helpers.specifyConfig(configDest, "bad-config");
       await bootApp();
     });
     

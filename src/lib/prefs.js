@@ -6,11 +6,11 @@ const Conf = require("conf");
 const DEFAULTS = {
   saver: {
     type: "string",
-    default: undefined
+    default: ""
   },
   sourceRepo: {
     type: "string",
-    default: undefined
+    default: ""
   },
   delay: {
     type: "number",
@@ -38,22 +38,22 @@ const DEFAULTS = {
   },
   localSource: {
     type: "string",
-    default: undefined
-  },
-  sourceUpdatedAt: {
-    //type: "date-time",
-    default: undefined
+    default: ""
   },
   options: {
     default: {}
   },
+  sourceUpdatedAt: {
+    // type: "string",
+    default: "1970-01-01T00:00:00.000Z"
+  },
   updateCheckTimestamp: {
-    //type: "date-time",
-    default: undefined
+    // type: "string",
+    default: "1970-01-01T00:00:00.000Z"
   },
   launchShortcut: {
     type: "string",
-    default: undefined
+    default: ""
   },
 };
 
@@ -85,23 +85,32 @@ class SaverPrefs {
 
   get data() {
     let result = {};
+    let self = this;
     Object.keys(DEFAULTS).forEach(function(name) {
-      result[name] = this.store.get(name);
+      result[name] = self.store.get(name);
+    });
+    return result;
+  }
+
+  get defaults() {
+    let result = {};
+    Object.keys(DEFAULTS).forEach(function(name) {
+      result[name] = DEFAULTS[name].default;
     });
     return result;
   }
 
   reload() {
     this.store = new Conf(this.confOpts);
-
     this.firstLoad = this.store.get("firstLoad", true);
-    if ( this.firstLoad ) {
+    if ( this.firstLoad === true ) {
       this.store.set("firstLoad", false);
     }
   }
 
   reset() {
-    this.store.reset();
+    this.store.clear();
+    this.store._write({});
   }
 
   get needSetup() {
@@ -189,11 +198,7 @@ class SaverPrefs {
 
   setDefaultRepo(r) {
     this.sourceRepo = r;
-    this.store.delete("sourceUpdatedAt");
-  }
-
-  ensureDefaults() {
-
+    this.store.set("sourceUpdatedAt", new Date(0));
   }
 }
 
@@ -201,7 +206,13 @@ Object.keys(DEFAULTS).forEach(function(name) {
   Object.defineProperty(SaverPrefs.prototype, name, {
     get() {
       // console.log(`GET ${name}`);
-      return this.store.get(name);
+      const result = this.store.get(name);
+
+      if ( name === "sourceUpdatedAt" || name === "updateCheckTimestamp" ) {
+        return new Date(result);
+      }
+
+      return result;
     },
     set(newval) {
       // console.log(`SET ${name} -> ${newval}`);
@@ -209,6 +220,9 @@ Object.keys(DEFAULTS).forEach(function(name) {
         this.store.delete(name);
       }
       else {
+        if ( typeof(newval) === "object" && ( name === "sourceUpdatedAt" || name === "updateCheckTimestamp" )) {
+          newval = newval.toISOString();
+        }
         this.store.set(name, newval);
       }
     }

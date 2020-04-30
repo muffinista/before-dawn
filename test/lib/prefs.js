@@ -179,39 +179,6 @@ describe("SaverPrefs", () => {
     });
   });
 
-  // // toHash
-  // describe("toHash", () => {
-  //   beforeEach(() => {
-  //     prefs = new SaverPrefs(tmpdir);
-  //     helpers.specifyConfig(prefs.configFile, "config");
-  //   });
-
-  //   it("works", () => {
-  //     let data = prefs.toHash();
-  //     assert.equal("before-dawn-screensavers/emoji/saver.json", data.saver);
-  //     assert.equal(10, data.delay);
-  //   });
-  // });
-
-  // // ensureDefaults
-  // describe("ensureDefaults", () => {
-  //   beforeEach(() => {
-  //     prefs = new SaverPrefs(tmpdir);
-  //   });
-
-  //   it("works", () => {
-  //     prefs.delay = undefined;
-  //     prefs.sleep = undefined;
-
-  //     // @todo this doesn't actually do anything because
-  //     // of the way the getters work now
-
-  //     prefs.ensureDefaults();
-  //     assert.equal(5, prefs.delay);
-  //     assert.equal(10, prefs.sleep);
-  //   });
-  // });
-
   // sources
   describe("sources", () => {
     let systemDir;
@@ -295,63 +262,6 @@ describe("SaverPrefs", () => {
     });
   });
 
-  // // write
-  // describe("write", () => {
-  //   beforeEach(() => {
-  //     prefs = new SaverPrefs(tmpdir);
-  //   });
-
-  //   it("works", async () => {
-  //     let data = helpers.prefsToJSON(tmpdir);
-  //     assert.notEqual(data.delay, 123);
-
-  //     prefs.delay = 123;
-
-  //     await prefs.write();
-
-  //     data = helpers.prefsToJSON(tmpdir);
-  //     assert.equal(data.delay, 123);
-  //   });
-  // });
-
-  // // writeSync
-  // describe("writeSync", () => {
-  //   beforeEach(() => {
-  //     prefs = new SaverPrefs(tmpdir);
-  //   });
-
-  //   it("works", () => {
-  //     let data = helpers.prefsToJSON(tmpdir);
-  //     assert.notEqual(data.delay, 123);
-
-  //     prefs.delay = 123;
-  //     prefs.writeSync();
-      
-  //     data = helpers.prefsToJSON(tmpdir);
-  //     assert.equal(data.delay, 123);
-  //   });
-  // });
-
-  // updatePrefs
-  describe("updatePrefs", () => {
-    beforeEach(() => {
-      prefs = new SaverPrefs(tmpdir);
-    });
-
-    // it("works", async () => {
-    //   let data = helpers.prefsToJSON(tmpdir);
-    //   assert.notEqual(data.delay, 123);
-
-    //   //let results = 
-    //   await prefs.updatePrefs({
-    //     delay: 123
-    //   });
-      
-    //   data = helpers.prefsToJSON(tmpdir);
-    //   assert.equal(data.delay, 123);
-    // });
-  });
-
   // setDefaultRepo
   describe("setDefaultRepo", () => {
     beforeEach(() => {
@@ -363,12 +273,8 @@ describe("SaverPrefs", () => {
       assert.equal(true, prefs.sourceUpdatedAt !== undefined);
       prefs.setDefaultRepo("foo/bar");
 
-
-      assert.equal(true, prefs.sourceUpdatedAt === undefined);
+      assert.deepEqual(new Date(0), prefs.sourceUpdatedAt);
       assert.equal(prefs.sourceRepo, "foo/bar");
     });
   });
-
-  // getters/setters
-
 });
