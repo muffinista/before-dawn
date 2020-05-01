@@ -616,8 +616,13 @@ var runScreenSaverOnDisplay = function(saver, s) {
  * blank out the given screen
  */
 var blankScreen = function(s) {
-  var windowOpts = getWindowOpts(s);
-  var w = new BrowserWindow(windowOpts);     
+  if ( process.env.TEST_MODE ) {
+    log.info("refusing to blank screen in test mode");
+    return;
+  }
+
+  let windowOpts = getWindowOpts(s);
+  let w = new BrowserWindow(windowOpts);     
   w.isSaver = true;
 
   windows.setFullScreen(w);
@@ -706,7 +711,7 @@ var runScreenSaver = function() {
           then((saverKey, settings) => savers.loadFromFile(saverKey, settings)).
     catch((err) => {
       log.info("================ loading saver failed?");
-      log.info(err);
+      log.info(err.message);
       return undefined;
     }).
     then((saver) => {

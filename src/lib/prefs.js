@@ -3,59 +3,7 @@
 const path = require("path");
 const Conf = require("conf");
 
-const DEFAULTS = {
-  saver: {
-    type: "string",
-    default: ""
-  },
-  sourceRepo: {
-    type: "string",
-    default: ""
-  },
-  delay: {
-    type: "number",
-    default: 5
-  },
-  sleep: {
-    type: "number",
-    default: 10
-  },
-  lock: {
-    type: "boolean",
-    default: false
-  },
-  disableOnBattery: {
-    type: "boolean",
-    default: true
-  },
-  auto_start: {
-    type: "boolean",
-    default: false
-  },
-  runOnSingleDisplay: {
-    type: "boolean",
-    default: false
-  },
-  localSource: {
-    type: "string",
-    default: ""
-  },
-  options: {
-    default: {}
-  },
-  sourceUpdatedAt: {
-    // type: "string",
-    default: "1970-01-01T00:00:00.000Z"
-  },
-  updateCheckTimestamp: {
-    // type: "string",
-    default: "1970-01-01T00:00:00.000Z"
-  },
-  launchShortcut: {
-    type: "string",
-    default: ""
-  },
-};
+const DEFAULTS = require("./prefs-schema.json");
 
 class SaverPrefs {
   constructor(baseDir, systemSource=undefined) {

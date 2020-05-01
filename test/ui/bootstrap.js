@@ -61,10 +61,11 @@ describe("bootstrap", function() {
 
   describe("with up to date config", () => {
     beforeEach(() => {
-      helpers.specifyConfig(configDest, "config");
-      helpers.setConfigValue(workingDir, "firstLoad", false);
-      helpers.setConfigValue(workingDir, "sourceRepo", "foo/bar");
-      helpers.setConfigValue(workingDir, "sourceUpdatedAt", new Date(0));
+      helpers.setupConfig(workingDir, "config", {
+        "firstLoad": false,
+        "sourceRepo": "foo/bar",
+        "sourceUpdatedAt": new Date(0)
+      });
     });
 
     describe("and a valid screenaver", () => {
@@ -111,6 +112,5 @@ describe("bootstrap", function() {
     it("shows prefs", async function() {
       await helpers.waitForWindow(app, prefsWindowTitle);
     });
-  });  
-
+  });
 });
