@@ -19,132 +19,149 @@ describe("SaverPrefs", () => {
 
   describe("without config", () => {
     beforeEach(() => {
-      prefs = new SaverPrefs({baseDir: tmpdir});
+      prefs = new SaverPrefs(tmpdir);
     });
 
     it("should load", () => {
-      assert(prefs.needSetup);
+      assert.equal(true, prefs.needSetup);
     });
 
     it("should set noSource", () => {
-      assert(prefs.noSource);
+      assert.equal(true, prefs.noSource);
     });
   });
 
   describe("with config", () => {
-    it("recovers from corrupt config", () => {
-      helpers.specifyConfig(tmpdir, "bad-config");
-      prefs = new SaverPrefs({baseDir: tmpdir});
+    // it("recovers from corrupt config", () => {
+    //   helpers.specifyConfig(prefs.configFile, "bad-config");
+    //   prefs = new SaverPrefs(tmpdir);
 
-      assert(prefs.firstLoad);
-      let configDest = path.join(tmpdir, "config.json");
-      assert(fs.existsSync(configDest));
-    });
+    //   assert.equal(true, prefs.firstLoad);
+    //   let configDest = path.join(tmpdir, "config.json");
+    //   assert.equal(true, fs.existsSync(configDest));
+    // });
 
-    it("works with existing config", () => {
-      helpers.specifyConfig(tmpdir, "config");
-      prefs = new SaverPrefs({baseDir: tmpdir});
+    // it("works with existing config", () => {
+    //   helpers.specifyConfig(prefs.configFile, "config");
+    //   prefs = new SaverPrefs(tmpdir);
 
-      assert(!prefs.firstLoad);
-      let configDest = path.join(tmpdir, "config.json");
-      assert(fs.existsSync(configDest));
-    });
+    //   assert.equal(true, !prefs.firstLoad);
+    //   let configDest = path.join(tmpdir, "config.json");
+    //   assert.equal(true, fs.existsSync(configDest));
+    // });
   });
 
   // reload
   describe("reload", () => {
     beforeEach(() => {
-      helpers.specifyConfig(tmpdir, "config");
-      prefs = new SaverPrefs({baseDir: tmpdir});
+      prefs = new SaverPrefs(tmpdir);
     });
   
     it("works with existing config", () => {
-      helpers.specifyConfig(tmpdir, "config");
-      prefs = new SaverPrefs({baseDir: tmpdir});
+      prefs.saver = "foo/bar/baz.json";
+      assert.equal("foo/bar/baz.json", prefs.saver);
 
-      assert.equal("before-dawn-screensavers/emoji/saver.json", prefs.current);
-      let configDest = path.join(tmpdir, "config.json");
-      assert(fs.existsSync(configDest));
-
-
-      helpers.specifyConfig(tmpdir, "config-2");
       prefs.reload();
-      assert.equal("before-dawn-screensavers/blur/saver.json", prefs.current);
-      assert(fs.existsSync(configDest));
+      assert.equal("foo/bar/baz.json", prefs.saver);
+    });
+
+    it("persists", () => {
+      prefs.saver = "foo/bar/baz.json";
+
+      prefs = new SaverPrefs(tmpdir);
+      prefs.reload();
+      assert.equal("foo/bar/baz.json", prefs.saver);
+
     });
   });
 
   describe("needSetup", function() {
     it("is false with config", () => {
-      helpers.specifyConfig(tmpdir, "config");
-      prefs = new SaverPrefs({baseDir: tmpdir});
-  
-      assert(!prefs.needSetup);
+      prefs = new SaverPrefs(tmpdir);
+      assert.equal(true, prefs.needSetup);
+
+      prefs.localSource = "local/dir";
+      prefs.saver = "foo/bar/baz";
+
+      prefs = new SaverPrefs(tmpdir);
+      
+      assert.equal(false, prefs.needSetup);  
     });
 
     it("is true with noSource", () => {
-      prefs = new SaverPrefs({baseDir: tmpdir});
-      assert(prefs.noSource);
-      assert(prefs.needSetup);
+      prefs = new SaverPrefs(tmpdir);
+      prefs.sourceRepo = "";
+      prefs.localSource = "";
+      assert.equal(true, prefs.noSource);
+      assert.equal(true, prefs.needSetup);
     });
 
-    it("is true if current is undefined", () => {
-      helpers.specifyConfig(tmpdir, "config");
-      prefs = new SaverPrefs({baseDir: tmpdir});
+    it("is true if saver is undefined", () => {
+      prefs = new SaverPrefs(tmpdir);
+      assert.equal(true, prefs.needSetup);
 
-      assert(!prefs.needSetup);
+      prefs.localSource = "local/dir";
+      prefs.saver = "foo/bar/baz";
 
-      prefs.current = undefined;
-      assert(prefs.needSetup);
+      prefs = new SaverPrefs(tmpdir);
+      assert.equal(true, !prefs.needSetup);
+
+      prefs.saver = undefined;
+      assert.equal(true, prefs.needSetup);
     });
 
-    it("is true if current is blank", () => {
-      helpers.specifyConfig(tmpdir, "config");
-      prefs = new SaverPrefs({baseDir: tmpdir});
-  
-      assert(!prefs.needSetup);
-      prefs.current = "";
-      assert(prefs.needSetup);
+    it("is true if saver is blank", () => {
+      prefs = new SaverPrefs(tmpdir);
+      assert.equal(true, prefs.needSetup);
+
+      prefs.localSource = "local/dir";
+      prefs.saver = "foo/bar/baz";
+
+      prefs = new SaverPrefs(tmpdir);
+      assert.equal(true, !prefs.needSetup);
+
+      prefs.saver = "";
+      assert.equal(true, prefs.needSetup);
     });
   });
 
   // no source
   describe("noSource", () => {
-    describe("without config", () => {
-      it("is true", () => {
-        prefs = new SaverPrefs({baseDir: tmpdir});
-        assert(prefs.noSource);
-      });
-    });
+    // describe("without config", () => {
+    //   it("is true", () => {
+    //     prefs = new SaverPrefs(tmpdir);
+    //     assert.equal(true, prefs.noSource);
+    //   });
+    // });
 
     describe("with config", () => {
       beforeEach(() => {
-        helpers.specifyConfig(tmpdir, "config");
-        prefs = new SaverPrefs({baseDir: tmpdir});
+        prefs = new SaverPrefs(tmpdir);
+        helpers.specifyConfig(prefs.configFile, "config");
       });
 
       it("is true if no source repo and no local source", () => {
-        prefs.sourceRepo = undefined;
-        prefs.localSource = undefined;
-        assert(prefs.noSource);
+        prefs.store.delete("sourceRepo");
+        prefs.store.delete("localSource");
+        assert.equal(true, prefs.noSource);
 
         prefs.sourceRepo = "";
         prefs.localSource = "";
-        assert(prefs.noSource);
+        assert.equal(true, prefs.noSource);
       });
 
       it("is false if source repo", () => {
         prefs.sourceRepo = "foo";
-        prefs.localSource = undefined;
+        prefs.localSource = "";
 
-        assert(!prefs.noSource);
+        assert.equal(true, !prefs.noSource);
       });
 
       it("is false if local source", () => {
-        prefs.sourceRepo = undefined;
+        prefs.store.delete("sourceRepo");
         prefs.localSource = "foo";
 
-        assert(!prefs.noSource);
+        assert.equal(true, !prefs.noSource);
       });
     });
   });
@@ -153,7 +170,7 @@ describe("SaverPrefs", () => {
   // defaultSaversDir
   describe("defaultSaversDir", () => {
     beforeEach(() => {
-      prefs = new SaverPrefs({baseDir: tmpdir});
+      prefs = new SaverPrefs(tmpdir);
     });
 
     it("is the working directory", () => {
@@ -162,45 +179,12 @@ describe("SaverPrefs", () => {
     });
   });
 
-  // toHash
-  describe("toHash", () => {
-    beforeEach(() => {
-      helpers.specifyConfig(tmpdir, "config");
-      prefs = new SaverPrefs({baseDir: tmpdir});
-    });
-
-    it("works", () => {
-      let data = prefs.toHash();
-      assert.equal("before-dawn-screensavers/emoji/saver.json", data.saver);
-      assert.equal(10, data.delay);
-    });
-  });
-
-  // ensureDefaults
-  describe("ensureDefaults", () => {
-    beforeEach(() => {
-      prefs = new SaverPrefs({baseDir: tmpdir});
-    });
-
-    it("works", () => {
-      prefs.delay = undefined;
-      prefs.sleep = undefined;
-
-      // @todo this doesn't actually do anything because
-      // of the way the getters work now
-
-      prefs.ensureDefaults();
-      assert.equal(5, prefs.delay);
-      assert.equal(10, prefs.sleep);
-    });
-  });
-
   // sources
   describe("sources", () => {
     let systemDir;
     beforeEach(() => {
-      helpers.specifyConfig(tmpdir, "config");
-      prefs = new SaverPrefs({baseDir: tmpdir});
+      prefs = new SaverPrefs(tmpdir);
+      helpers.specifyConfig(prefs.configFile, "config");
       systemDir = path.join(tmpdir, "system-savers");
     });
 
@@ -218,8 +202,8 @@ describe("SaverPrefs", () => {
       let result = prefs.sources;
       let dest = path.join(tmpdir, "savers");
 
-      assert.deepEqual(
-        [ dest, systemDir ], result);
+      assert.equal(true, result.lastIndexOf(dest) !== -1);
+      assert.equal(true, result.lastIndexOf(systemDir) !== -1);
     });
 
     it("includes both repo and localsource", () => {
@@ -238,16 +222,14 @@ describe("SaverPrefs", () => {
     it("includes system", () => {
       fs.mkdirSync(systemDir);
       let result = prefs.sources;
-
-      assert.deepEqual(
-        [ systemDir ], result);
+      assert.equal(true, result.lastIndexOf(systemDir) !== -1);
     });
   });
 
   // systemSource
   describe("sources", () => {
     beforeEach(() => {
-      prefs = new SaverPrefs({baseDir: tmpdir});
+      prefs = new SaverPrefs(tmpdir);
     });
 
     it("works", () => {
@@ -259,8 +241,8 @@ describe("SaverPrefs", () => {
   // getOptions
   describe("getOptions", () => {
     beforeEach(() => {
-      helpers.specifyConfig(tmpdir, "config-with-options");
-      prefs = new SaverPrefs({baseDir: tmpdir});
+      prefs = new SaverPrefs(tmpdir);
+      helpers.specifyConfig(prefs.configFile, "config-with-options");
     });
 
     it("works without key", () => {
@@ -274,86 +256,25 @@ describe("SaverPrefs", () => {
     });
 
     it("returns empty hash when key is undefined", () => {
-      prefs.current = undefined;
+      prefs.store.delete("saver");
       let opts = prefs.getOptions();
       assert.deepEqual({}, opts);
-    });
-  });
-
-  // // write
-  // describe("write", () => {
-  //   beforeEach(() => {
-  //     prefs = new SaverPrefs({baseDir: tmpdir});
-  //   });
-
-  //   it("works", async () => {
-  //     let data = helpers.prefsToJSON(tmpdir);
-  //     assert.notEqual(data.delay, 123);
-
-  //     prefs.delay = 123;
-
-  //     await prefs.write();
-
-  //     data = helpers.prefsToJSON(tmpdir);
-  //     assert.equal(data.delay, 123);
-  //   });
-  // });
-
-  // writeSync
-  describe("writeSync", () => {
-    beforeEach(() => {
-      prefs = new SaverPrefs({baseDir: tmpdir});
-    });
-
-    it("works", () => {
-      let data = helpers.prefsToJSON(tmpdir);
-      assert.notEqual(data.delay, 123);
-
-      prefs.delay = 123;
-      prefs.writeSync();
-      
-      data = helpers.prefsToJSON(tmpdir);
-      assert.equal(data.delay, 123);
-    });
-  });
-
-  // updatePrefs
-  describe("updatePrefs", () => {
-    beforeEach(() => {
-      prefs = new SaverPrefs({baseDir: tmpdir});
-    });
-
-    it("works", async () => {
-      let data = helpers.prefsToJSON(tmpdir);
-      assert.notEqual(data.delay, 123);
-
-      //let results = 
-      await prefs.updatePrefs({
-        delay: 123
-      });
-      
-      data = helpers.prefsToJSON(tmpdir);
-      assert.equal(data.delay, 123);
     });
   });
 
   // setDefaultRepo
   describe("setDefaultRepo", () => {
     beforeEach(() => {
-      helpers.specifyConfig(tmpdir, "default-repo");
-      prefs = new SaverPrefs({baseDir: tmpdir});
+      prefs = new SaverPrefs(tmpdir);
+      helpers.specifyConfig(prefs.configFile, "default-repo");
     });
 
     it("works", () => {
-      assert(prefs.sourceUpdatedAt !== undefined);
+      assert.equal(true, prefs.sourceUpdatedAt !== undefined);
       prefs.setDefaultRepo("foo/bar");
 
-
-      assert(prefs.sourceUpdatedAt === undefined);
+      assert.deepEqual(new Date(0), prefs.sourceUpdatedAt);
       assert.equal(prefs.sourceRepo, "foo/bar");
     });
   });
-
-  // getters/setters
-
 });

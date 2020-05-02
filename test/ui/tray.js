@@ -1,25 +1,27 @@
 "use strict";
 
 const helpers = require("../helpers.js");
-const path = require("path");
 
 describe("tray", function() {
   var workingDir;
+  let saversDir;
   let app;
-  
+
   helpers.setupTest(this);
 
   beforeEach(function() {
     workingDir = helpers.getTempDir();
-    let saversDir = path.join(workingDir, "savers");
+    saversDir = helpers.getTempDir();
     let saverJSONFile = helpers.addSaver(saversDir, "saver");
 
-    helpers.specifyConfig(workingDir, "config");
-    helpers.setConfigValue(workingDir, "sourceRepo", "foo/bar");
-    helpers.setConfigValue(workingDir, "sourceUpdatedAt", new Date(0));
-    helpers.setConfigValue(workingDir, "saver", saverJSONFile);
+    helpers.setupConfig(workingDir, "config", {
+      "firstLoad": false,
+      "sourceRepo": "",
+      "localSource": saversDir,
+      "saver": saverJSONFile 
+    });
 
-    app = helpers.application(workingDir);  
+    app = helpers.application(workingDir);
     return app.start().
       then(() => helpers.waitUntilBooted(app, true));
   });

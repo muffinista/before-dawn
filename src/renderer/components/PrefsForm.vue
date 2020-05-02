@@ -15,7 +15,7 @@
 
         <div class="form-check">
           <label class="form-check-label">
-            <input type="checkbox" id="disable_on_battery" class="form-check-input" v-model="prefs.disableOnBattery" />
+            <input type="checkbox" id="disableOnBattery" class="form-check-input" v-model="prefs.disableOnBattery" />
             Disable when on battery?
           </label>
           <small class="form-text text-muted">

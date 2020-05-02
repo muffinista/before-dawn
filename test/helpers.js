@@ -2,7 +2,8 @@ const tmp = require("tmp");
 const path = require("path");
 const fs = require("fs-extra");
 const Application = require("spectron").Application;
-const fakeDialog = require('spectron-dialog-addon').default;
+const fakeDialog = require("spectron-dialog-addon").default;
+const Conf = require("conf");
 
 const chai = require("chai");
 const chaiAsPromised = require("chai-as-promised");
@@ -29,12 +30,27 @@ if ( global.before ) {
   });  
 }
 
-exports.specifyConfig = (tmpdir, name) => {
+exports.specifyConfig = (dest, name) => {
   fs.copySync(
     path.join(__dirname, "fixtures/" + name + ".json"),
-    path.join(tmpdir, "config.json")
+    dest
   );
 };
+
+
+exports.setupConfig = (workingDir, name="config", attrs={}) => {
+  const dest = path.join(workingDir, "config.json");
+  fs.copySync(
+    path.join(__dirname, "fixtures/" + name + ".json"),
+    dest
+  );
+
+  if ( attrs !== {} ) {
+    let store = new Conf({cwd: workingDir});
+    store.set(attrs);
+  }
+};
+
 
 exports.setConfigValue = (workingDir, name, value) => {
   let f = path.join(workingDir, "config.json");
@@ -100,6 +116,7 @@ exports.savedConfig = function(p) {
 exports.application = function(workingDir, quietMode=false, localZip, localZipData) {
   let env = {
     BEFORE_DAWN_DIR: workingDir,
+    CONFIG_DIR: workingDir,
     TEST_MODE: true,
     QUIET_MODE: quietMode
   };
@@ -111,13 +128,14 @@ exports.application = function(workingDir, quietMode=false, localZip, localZipDa
     env.LOCAL_PACKAGE_DATA = localZipData;
   }
  
+  // console.log(`boot from ${appPath}`);
   var a = new Application({
     path: appPath,
     args: [path.join(__dirname, "..", "output/main.js")],
     env: env,
     quitTimeout: 5000
   });
-
+// console.log(a);
   fakeDialog.apply(a);
   a.fakeDialog = fakeDialog;
   
@@ -133,20 +151,15 @@ exports.stopApp = function(app) {
   }
 };
 
-exports.setupConfig = function(workingDir) {
-  var src = path.join(__dirname, "fixtures", "config.json");
-  var dest = path.join(workingDir, "config.json");
-  fs.copySync(src, dest);
-};
-
 exports.setupFullConfig = function(workingDir) {
-  exports.setupConfig(workingDir);
-
-  exports.setConfigValue(workingDir, "sourceRepo", "foo/bar");
-  exports.setConfigValue(workingDir, "sourceUpdatedAt", new Date(0));
-  let saversDir = path.join(workingDir, "savers");
+  let saversDir = exports.getTempDir();
   let saverJSONFile = exports.addSaver(saversDir, "saver");
-  exports.setConfigValue(workingDir, "saver", saverJSONFile);
+
+  exports.setupConfig(workingDir, "config", {
+    "sourceRepo": "foo/bar",
+    "sourceUpdatedAt": new Date(0),
+    "saver": saverJSONFile 
+  });
 };
 
 exports.addLocalSource = function(workingDir, saversDir) {

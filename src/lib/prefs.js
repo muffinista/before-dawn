@@ -1,86 +1,71 @@
 "use strict";
 
-const fs = require("fs-extra");
 const path = require("path");
-const mkdirp = require("mkdirp");
+const Conf = require("conf");
 
-const lockfile = require("proper-lockfile");
-
-const CONFIG_FILE_NAME = "config.json";
-
-const PROPERTIES = [
-  ["current", "saver", "string", undefined],
-  ["sourceRepo", "sourceRepo", "string", undefined],
-  ["delay", "delay", "integer", 5],
-  ["sleep", "sleep", "integer", 10],
-  ["lock", "lock", "boolean", false],
-  ["disableOnBattery", "disable_on_battery", "boolean", true],
-  ["auto_start", "auto_start", "boolean", false],
-  ["runOnSingleDisplay", "run_on_single_display", "boolean", false],
-  ["localSource", "localSource", "string", ""],
-  ["sourceUpdatedAt", "sourceUpdatedAt", "date", undefined],
-  ["options", "options", "hash", {}],
-  ["updateCheckTimestamp", "sourceCheckTimestamp", "integer", 0],
-  ["launchShortcut", "launchShortcut", "string", undefined],
-];
+const DEFAULTS = require("./prefs-schema.json");
 
 class SaverPrefs {
-  constructor(paths, _defaults) {
-    if ( typeof(paths) === "string" ) {
-      this.baseDir = paths;
+  constructor(baseDir, systemSource=undefined) {
+    this.baseDir = baseDir;
+
+    if ( systemSource !== undefined ) {
+      this.systemSource = systemSource;
     }
     else {
-      this.baseDir = paths.baseDir;
-      this.systemSource = paths.systemSource;
-    }
-
-    if ( this.systemSource === undefined ) {
       this.systemSource = path.join(this.baseDir, "system-savers");
     }
 
-    this.configFile = path.join(this.baseDir, CONFIG_FILE_NAME);
-    this.defaults = _defaults;
+    this.confOpts = {
+      schema: DEFAULTS,
+      cwd: this.baseDir
+    };
+    if ( process.env.CONFIG_DIR ) {
+      this.confOpts.cwd = process.env.CONFIG_DIR;
+    }
 
-    mkdirp.sync(this.baseDir);
     this.reload();
   }
 
-  set defaults(_defaults) {
-    this._defaults = _defaults;
+  get configFile() {
+    return this.store.path;
   }
 
-  loadData() {
-    this._data = JSON.parse(fs.readFileSync(this.configFile));
+  get data() {
+    let result = {};
+    let self = this;
+    Object.keys(DEFAULTS).forEach(function(name) {
+      result[name] = self.store.get(name);
+    });
+    return result;
+  }
+
+  get defaults() {
+    let result = {};
+    Object.keys(DEFAULTS).forEach(function(name) {
+      result[name] = DEFAULTS[name].default;
+    });
+    return result;
   }
 
   reload() {
-    this.firstLoad = false;
-    this._data = {};
-
-    try {
-      this.loadData();
+    this.store = new Conf(this.confOpts);
+    this.firstLoad = this.store.get("firstLoad", true);
+    if ( this.firstLoad === true ) {
+      this.store.set("firstLoad", false);
     }
-    catch(e) {
-      this.ensureDefaults();
-      this.writeSync();
-      this.loadData();
-      this.firstLoad = true;
-    } 
   }
 
   reset() {
-    this.firstLoad = true;
-    this._data = {};
-    this.ensureDefaults();
-    this.writeSync();
-    this.loadData();
+    this.store.clear();
+    this.store._write({});
   }
 
   get needSetup() {
     return this.firstLoad === true || 
       this.noSource === true || 
-      this.current === undefined ||
-      this.current === "";
+      this.saver === undefined ||
+      this.saver === "";
   }
 
   get noSource() {
@@ -91,33 +76,6 @@ class SaverPrefs {
   get defaultSaversDir() {
     return path.join(this.baseDir, "savers");
   }
-
-  toHash() {
-    let result = {};
-    for ( var i = 0; i < PROPERTIES.length; i++ ) {
-      // eslint-disable-next-line no-unused-vars
-      let name, key, type, value;
-      [name, key, type, value] = PROPERTIES[i];
-
-      result[key] = this[name];
-    }
-
-    return result;
-  }
-  
-  /**
-   * setup some reasonable defaults
-   */
-  ensureDefaults() {
-    if ( typeof(this._defaults) !== undefined ) {
-      for ( var k in this._defaults ) {
-        if ( this._data[k] === undefined ) {
-          this.setConfig(k, this._defaults[k]);
-        }
-      }
-    }
-  }
-
 
   /**
    * get a list of folders we should check for screensavers
@@ -138,13 +96,11 @@ class SaverPrefs {
     }
 
     // if there's a local source, use that
-    if ( local !== "" && fs.existsSync(local)) {
+    if ( local !== "" ) {
       folders = folders.concat( local );
     }
-
     
     folders = folders.concat( system );
-
     return folders;
   }
 
@@ -156,110 +112,69 @@ class SaverPrefs {
     this._systemSource = val;
   }
 
-  /**
-   * set config var k to value v
-   */
-  setConfig(k, v) {
-    this._data[k] = v;
-  }
 
-
+  //
+  // get options for the specified screensaver
+  //
   getOptions(name) {
     if ( typeof(name) === "undefined" ) {
-      name = this.current;
+      name = this.saver;
     }
 
-    if ( name === "undefined" ) {
+    const opts = this.store.get("options", {});
+    const result = opts[name];
+
+    if ( result === undefined ) {
       return {};
     }
 
-    if ( this._data.options === undefined ) {
-      this._data.options = {};
-    }
-
-    return this._data.options[name] || {};
+    return result;
   }
 
   async updatePrefs(data) {
     for ( var k in data ) {
       var v = data[k];
-      this[k] = v;
+      //this[k] = v;
+      this.store.set(k, v);
     }
 
     let result = this.changes;
     this.changes = {};
 
-    this.writeSync();
-    // await this.write();
-
     return result;
-  }
-
-  // async write() {
-  //   let release = await lockfile.lock(this.configFile, { realpath: false });
-  //   await fs.writeJson(this.configFile, this._data, { spaces: 2 });
-
-  //   release();
-  // }
-  
-  writeSync() {
-    let output = JSON.stringify(this._data, null, 2);
-    let release = lockfile.lockSync(this.configFile, { realpath: false });
-
-    fs.writeFileSync(this.configFile, output);
-    release();
   }
 
   setDefaultRepo(r) {
     this.sourceRepo = r;
-    this.sourceUpdatedAt = undefined;
+    this.store.set("sourceUpdatedAt", new Date(0));
   }
 }
 
-
-for ( var i = 0; i < PROPERTIES.length; i++ ) {
-  let name, key, type, value;
-  [name, key, type, value] = PROPERTIES[i];
-
+Object.keys(DEFAULTS).forEach(function(name) {
   Object.defineProperty(SaverPrefs.prototype, name, {
     get() {
-      let v = this._data[key];
-      // don't assign default value unless it's explicitly missing
-      // ie, don't overwrite "false"!
-      if ( v === undefined || v === null ) {
-        v = value;
+      // console.log(`GET ${name}`);
+      const result = this.store.get(name);
+
+      if ( name === "sourceUpdatedAt" || name === "updateCheckTimestamp" ) {
+        return new Date(result);
       }
 
-      if ( type == "integer" ) {
-        return parseInt(v, 10);
-      }
-      if ( type == "boolean" ) {
-        return (/true/i).test(v);
-      }
-      if ( type === "date" ) {
-        let tmp = new Date(v);
-        if ( isNaN(tmp.getTime()) ) {
-          v = undefined;
-        }
-        else {
-          v = tmp;
-        }
-      }
-      return v;
+      return result;
     },
     set(newval) {
-      if ( this.changes === undefined ) {
-        this.changes = {};
+      // console.log(`SET ${name} -> ${newval}`);
+      if ( newval === undefined ) {
+        this.store.delete(name);
       }
-
-      if ( this.changes[key] === undefined && this._data[key] !== newval ) {
-        this.changes[key] = newval;
+      else {
+        if ( typeof(newval) === "object" && ( name === "sourceUpdatedAt" || name === "updateCheckTimestamp" )) {
+          newval = newval.toISOString();
+        }
+        this.store.set(name, newval);
       }
-
-      this.setConfig(key, newval);
     }
   });
-}
-
+});
 
 module.exports = SaverPrefs;

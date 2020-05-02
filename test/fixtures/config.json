@@ -9,8 +9,8 @@
   "delay": 10,
   "lock": false,
   "localSource": "/home/tester/my screensavers",
-  "disable_on_battery": false,
-  "run_on_single_display": true,
+  "disableOnBattery": false,
+  "runOnSingleDisplay": true,
   "auto_start": true,
   "sleep": 10
 }

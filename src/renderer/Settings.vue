@@ -44,7 +44,6 @@
 import AdvancedPrefsForm from "@/components/AdvancedPrefsForm";
 import PrefsForm from "@/components/PrefsForm";
 import Noty from "noty";
-import SaverPrefs from "@/../lib/prefs";
 
 const { ipcRenderer } = require("electron");
 
@@ -108,22 +107,18 @@ export default {
     }
   },
   async mounted() {
-    this.globals = await ipcRenderer.invoke("get-globals");
-
-    let opts = await ipcRenderer.invoke("get-saver-opts");
-
-    this.prefs = new SaverPrefs({
-      baseDir: opts.base,
-      systemSource: opts.systemDir
-    });
+    this.loadData();
   },
   methods: {
+    async loadData() {
+      this.globals = await ipcRenderer.invoke("get-globals");
+      this.prefs = await ipcRenderer.invoke("get-prefs");
+    },
     async handleSave(output) {
       this.disabled = true;
       try {
-        let changes = await this.prefs.updatePrefs(this.prefs);
+        await ipcRenderer.invoke("update-prefs", this.prefs);
 
-        ipcRenderer.send("prefs-updated", changes);
         ipcRenderer.send("set-autostart", this.prefs.auto_start);
         ipcRenderer.send("set-global-launch-shortcut", this.prefs.launchShortcut);
       }
@@ -146,8 +141,7 @@ export default {
     async resetToDefaults() {
       const result = await ipcRenderer.invoke("reset-to-defaults-dialog");
       if ( result === 1 ) {
-        this.prefs.defaults = this.globals.CONFIG_DEFAULTS;
-        this.prefs.reset();
+        this.prefs = await ipcRenderer.invoke("get-defaults");
         await this.handleSave("Settings reset");
       }
     },

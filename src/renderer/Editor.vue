@@ -77,7 +77,13 @@
           </template>
           
           <h4>Preview</h4>
-          <div class="saver-detail" />
+          <div class="saver-detail">
+            <iframe
+              :src="previewUrl"
+              scrolling="no"
+              class="saver-preview"
+            />
+          </div>
         </template>
       </div>
     </div>
@@ -217,6 +223,10 @@ export default {
     },
     previewWrapper: function() {
       return document.querySelector(".saver-detail");
+    },
+    previewUrl: function() {
+      const urlParams = new URLSearchParams(this.urlOpts(this.saver));
+      return `${this.saver.url}?${urlParams.toString()}`;
     }
   },
   async mounted() {
@@ -250,40 +260,8 @@ export default {
         }
       });
     }
-
-    this.resizeInterval = window.setInterval(() => {
-      this.checkResize();
-    }, 50);
-  },
-  beforeDestroy() {
-    window.clearInterval(this.resizeInterval);
   },
   methods: {
-    // https://github.com/stream-labs/streamlabs-obs/blob/163e9a7eaf39200077874ae80d00e66108c106dc/app/components/Chat.vue.ts#L41
-    rectChanged(rect) {
-      return (
-        rect.left !== this.currentPosition.x ||
-        rect.top !== this.currentPosition.y ||
-        rect.width !== this.currentPosition.width ||
-        rect.height !== this.currentPosition.height
-      );
-    },
-    checkResize() {
-      const rect = this.previewWrapper.getBoundingClientRect();
-      if (this.currentPosition == null || this.rectChanged(rect)) {
-        this.currentPosition = { 
-          x: rect.left, 
-          y: rect.top, 
-          width: rect.width, 
-          height: rect.height 
-        };
-        ipcRenderer.send("update-preview", {
-          target: "editor",
-          bounds: this.currentPosition,
-          url: this.getUrl()
-        });
-      }
-    },
     urlOpts() {
       var base = {
         width: this.size.width,

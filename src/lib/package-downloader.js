@@ -18,11 +18,9 @@ module.exports = class PackageDownloader {
   }
 
   getPackage() {
-    var source = this.prefs.sourceRepo;
-    var sourceUpdatedAt = this.prefs.sourceUpdatedAt;
     var attrs = {
-      repo: source,
-      updated_at: sourceUpdatedAt,
+      repo: this.prefs.sourceRepo,
+      updated_at: new Date(this.prefs.sourceUpdatedAt),
       dest: this.prefs.defaultSaversDir
     };
 
@@ -57,12 +55,13 @@ module.exports = class PackageDownloader {
     }
     else {
       this.prefs.updateCheckTimestamp = now;
-      this.prefs.writeSync();
+      // this.prefs.writeSync();
 
       this.logger("check package: " + p.repo);
       return p.checkLatestRelease().then((result) => {
-        this.prefs.sourceUpdatedAt = result.updated_at;
-        this.prefs.writeSync();
+        if ( result && result.updated_at ) {
+          this.prefs.sourceUpdatedAt = result.updated_at;
+        }
         return result;
       });
     }

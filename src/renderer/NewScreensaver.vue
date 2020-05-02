@@ -1,7 +1,10 @@
 <template>
   <div id="new">
     <div class="content">
-      <div class="container-fluid">
+      <div
+        :key="renderIndex"
+        class="container-fluid"
+      >
         <h1>New Screensaver</h1>
         <template v-if="!canAdd">
           <div class="need-setup-message">
@@ -69,8 +72,6 @@
 import SaverForm from "@/components/SaverForm";
 import LocalFolderInput from "@/components/LocalFolderInput";
 
-import SaverPrefs from "@/../lib/prefs";
-
 const { ipcRenderer } = require("electron");
 
 export default {
@@ -85,7 +86,8 @@ export default {
         requirements: ["screen"]
       },
       disabled: false,
-      prefs: undefined
+      prefs: undefined,
+      renderIndex: 0
     };
   },
   computed: {
@@ -102,31 +104,28 @@ export default {
       return decodeURIComponent(this.params.get("screenshot"));
     },
     canAdd: function() {
-      return this.isLoaded &&
-        this.prefs !== undefined &&
+      return this.prefs !== undefined &&
         this.prefs.localSource !== undefined &&
         this.prefs.localSource !== "";
     }
   },
   async mounted() {
     this.opts = await ipcRenderer.invoke("get-saver-opts");
-    this.prefs = new SaverPrefs({
-      baseDir: this.opts.base,
-      systemSource: this.opts.systemDir
-    });
+    this.prefs = await ipcRenderer.invoke("get-prefs");
   },
   methods: {
     closeWindow() {
       ipcRenderer.send("close-window", "addNew");
     },
-    async localSourceChange(ls) {
+    localSourceChange(ls) {
       var tmp = {
         localSource: ls
       };
       this.prefs = Object.assign(this.prefs, tmp);
-      let changes = await this.prefs.updatePrefs(this.prefs);
+      this.renderIndex += 1;
       this.disabled = false;
-      ipcRenderer.send("prefs-updated", changes);
+
+      ipcRenderer.invoke("update-local-source", ls);
     },
     async saveData() {
       if ( document.querySelectorAll(":invalid").length > 0 ) {
@@ -139,9 +138,6 @@ export default {
       this.disabled = true;
       const data = await ipcRenderer.invoke("create-screensaver", this.saver);
 
-      // let systemPath = this.opts.systemDir;
-      // var src = path.join(systemPath, "__template");
-      // var data = this.manager.create(src, this.saver);
       ipcRenderer.send("savers-updated");
       ipcRenderer.send("open-window", "editor", {
         src: data.dest,

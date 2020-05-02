@@ -2,7 +2,11 @@
   <div id="prefs">
     <template v-if="saverIsPicked">
       <div class="saver-detail">
-        <!-- this is where the preview goes -->
+        <iframe
+          :src="previewUrl"
+          scrolling="no"
+          class="saver-preview"
+        />
       </div>
       <div class="saver-info space-at-top">
         <saver-summary 
@@ -67,7 +71,6 @@ import SaverOptions from "@/components/SaverOptions";
 import SaverSummary from "@/components/SaverSummary";
 import Noty from "noty";
 
-import SaverPrefs from "@/../lib/prefs";
 import Saver from "@/../lib/saver";
 
 const { ipcRenderer } = require("electron");
@@ -148,13 +151,7 @@ export default {
     await this.getData();
 
     this.getCurrentSaver();
-    this.checkResize();
-
-    this.$nextTick(() => {
-      this.resizeInterval = window.setInterval(() => {
-        this.checkResize();
-      }, 50);
-    });
+    this.resizePreview();
 
     this.globals = await ipcRenderer.invoke("get-globals");
     if ( this.globals.NEW_RELEASE_AVAILABLE ) {
@@ -180,45 +177,22 @@ export default {
   },
   methods: {
     async setupPrefs() {
-      let opts = await ipcRenderer.invoke("get-saver-opts");
-      this.prefs = new SaverPrefs({
-        baseDir: opts.base,
-        systemSource: opts.systemDir
-      });
-      this.saver = this.prefs.current;
+      this.prefs = await ipcRenderer.invoke("get-prefs");
+      this.saver = this.prefs.saver;
     },
-    // https://github.com/stream-labs/streamlabs-obs/blob/
-    // 163e9a7eaf39200077874ae80d00e66108c106dc/app/components/Chat.vue.ts#L41
-    rectChanged(rect) {
-      return (
-        rect.left !== this.currentPosition.x ||
-        rect.top !== this.currentPosition.y ||
-        rect.width !== this.currentPosition.width ||
-        rect.height !== this.currentPosition.height
-      );
-    },
-    updateCurrentPosition() {
-      const rect = this.previewWrapper.getBoundingClientRect();
-      if (this.currentPosition == null || this.rectChanged(rect)) {
-        this.currentPosition = { 
-          x: rect.left, 
-          y: rect.top, 
-          width: rect.width, 
-          height: rect.height 
-        };
-        ipcRenderer.send("update-preview", {
-          target: "prefs",
-          bounds: this.currentPosition,
-          url: this.previewUrl
-        });
-      }
-    },
-    checkResize() {
-      if ( ! document.querySelector(".saver-detail") ) {
-        return;
-      }
+    resizePreview() {
+      document.documentElement.style
+        .setProperty("--preview-width", `${this.size.width}px`);
+      document.documentElement.style
+        .setProperty("--preview-height", `${this.size.height}px`);
+      //const scale = this.size.height/this.size.width;
+      // const scale = 320 / this.size.height;
+      const scale = 500 / (this.size.width + 40);
+      //     zf = incomingBounds.height / (size.height * PREVIEW_PADDING);
 
-      this.updateCurrentPosition();
+      // console.log(`SCALE ${scale}`);
+      document.documentElement.style
+        .setProperty("--preview-scale", `${scale}`);
     },
     onOptionsChange() {
       ipcRenderer.send("update-preview", {
@@ -270,10 +244,7 @@ export default {
         return new Saver(data);
       });
 
-      var tmp = this.prefs.toHash();
-      if ( tmp.options === undefined ) {
-        tmp.options = {};
-      }
+      var tmp = {};
 
       if ( this.savers.length <= 0 ) {
         return;
@@ -283,14 +254,15 @@ export default {
       for(var i = 0, l = this.savers.length; i < l; i++ ) {
         var s = this.savers[i];
 
-        if ( tmp.options[s.key] === undefined ) {
-          tmp.options[s.key] = {};
-        }
+        //        tmp[s.key] = this.prefs.getOptions(s.key);
+        // if ( tmp[s.key] === undefined ) {
+        //   tmp.options[s.key] = {};
+        // }
 
-        tmp.options[s.key] = s.settings;
+        tmp[s.key] = s.settings;
       }
 
-      this.options = Object.assign({}, this.options, tmp.options);
+      this.options = Object.assign({}, this.options, tmp);
 
       // https://vuejs.org/v2/guide/reactivity.html
       // However, new properties added to the object will not
@@ -299,18 +271,17 @@ export default {
       this.prefs = Object.assign(this.prefs, tmp);
 
       // pick the first screensaver if nothing picked yet
-      if ( this.prefs.current === undefined || this.saverObj === undefined ) {
-        this.prefs.current = this.savers[0].key;
+      if ( this.prefs.saver === undefined || this.saverObj === undefined ) {
+        this.prefs.saver = this.savers[0].key;
         this.getCurrentSaver();
       }
     },
     async onSaversUpdated() {
       await this.setupPrefs();
-      // await ipcRenderer.invoke("reset");
       await this.getData();
     },
     getCurrentSaver() {
-      this.saver = this.prefs.current;
+      this.saver = this.prefs.saver;
     },
     createNewScreensaver() {
       ipcRenderer.send("open-window", "add-new", {
@@ -347,18 +318,17 @@ export default {
     },
     async saveData() {
       // @todo should this use Object.assign?
-      this.prefs.current = this.saver;
+      this.prefs.saver = this.saver;
       this.prefs.options = this.options;
 
-      return await this.prefs.updatePrefs(this.prefs);
+      return await ipcRenderer.invoke("update-prefs", this.prefs);
     },
     async saveDataClick() {
       let output;
 
       this.disabled = true;
       try {
-        let changes = await this.saveData();
-        ipcRenderer.send("prefs-updated", changes);
+        await this.saveData();
         output = "Changes saved!";
       }
       catch(e) {

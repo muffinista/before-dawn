@@ -233,6 +233,10 @@ module.exports = class SaverListManager {
 
     if ( typeof(contents.settings) === "undefined" ) {
       if ( settings === undefined ) {
+        if ( ! this.prefs.options ) {
+          this.prefs.options = {};
+        }
+
         // ensure that all screensavers have options set
         if ( this.prefs.options[contents.key] === undefined ) {
           this.prefs.options[contents.key] = {};

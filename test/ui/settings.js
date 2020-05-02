@@ -29,7 +29,7 @@ describe("Settings", function() {
   };
 
   let currentPrefs = function() {
-    return new SaverPrefs(workingDir);
+    return new SaverPrefs(workingDir).data;
   };
 
   beforeEach(() => {
@@ -127,7 +127,7 @@ describe("Settings", function() {
 
 
   it("resets defaults", function() {
-    const resetDialogOpts = [ { method: "showMessageBox", value: 1 } ];
+    const resetDialogOpts = [ { method: "showMessageBox", value: { response: 1 } } ];
 
     return pickSettingsWindow().
       then(() => app.fakeDialog.mock(resetDialogOpts)).
