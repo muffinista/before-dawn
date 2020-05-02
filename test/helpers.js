@@ -38,7 +38,7 @@ exports.specifyConfig = (dest, name) => {
 };
 
 
-exports.setupConfig = (workingDir, name="config.json", attrs={}) => {
+exports.setupConfig = (workingDir, name="config", attrs={}) => {
   const dest = path.join(workingDir, "config.json");
   fs.copySync(
     path.join(__dirname, "fixtures/" + name + ".json"),
@@ -48,8 +48,6 @@ exports.setupConfig = (workingDir, name="config.json", attrs={}) => {
   if ( attrs !== {} ) {
     let store = new Conf({cwd: workingDir});
     store.set(attrs);
-    // console.log(store.data);
-    // console.log(store.path);
   }
 };
 
@@ -154,10 +152,10 @@ exports.stopApp = function(app) {
 };
 
 exports.setupFullConfig = function(workingDir) {
-  let saversDir = path.join(workingDir, "savers");
+  let saversDir = exports.getTempDir();
   let saverJSONFile = exports.addSaver(saversDir, "saver");
 
-  exports.setupConfig(workingDir, "config.json", {
+  exports.setupConfig(workingDir, "config", {
     "sourceRepo": "foo/bar",
     "sourceUpdatedAt": new Date(0),
     "saver": saverJSONFile 

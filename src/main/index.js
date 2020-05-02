@@ -51,14 +51,26 @@ const menusAndTrays = require("./menus.js");
 const dock = require("./dock.js");
 const windows = require("./windows.js");
 
-const cursor = require("hide-cursor");
-
 // NOTE -- this needs to be global, otherwise the app icon gets
 // garbage collected and won't show up in the system tray
 let appIcon = null;
 
 let debugMode = ( process.env.DEBUG_MODE !== undefined );
 let testMode = ( process.env.TEST_MODE !== undefined );
+
+let cursor;
+
+// don't hide cursor in tests
+if ( testMode ) {
+  cursor = {
+    hide: () => {},
+    show: () => {}
+  };
+}
+else {
+  cursor = require("hide-cursor");
+}
+
 
 var exitOnQuit = false;
 
@@ -1152,6 +1164,10 @@ let setupIPC = function() {
 
   ipcMain.handle("update-prefs", async(_event, attrs) => {
     log.info("update-prefs", attrs);
+
+    // ensure a value for this
+    attrs.firstLoad = false;
+
     prefs.store.set(attrs);
 
     savers.reset();

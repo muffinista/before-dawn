@@ -11,7 +11,6 @@ describe("tray", function() {
 
   beforeEach(function() {
     workingDir = helpers.getTempDir();
-
     saversDir = helpers.getTempDir();
     let saverJSONFile = helpers.addSaver(saversDir, "saver");
 
