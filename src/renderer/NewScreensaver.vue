@@ -110,7 +110,6 @@ export default {
     }
   },
   async mounted() {
-    this.opts = await ipcRenderer.invoke("get-saver-opts");
     this.prefs = await ipcRenderer.invoke("get-prefs");
   },
   methods: {

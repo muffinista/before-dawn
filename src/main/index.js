@@ -60,7 +60,9 @@ let testMode = ( process.env.TEST_MODE !== undefined );
 
 let cursor;
 
+//
 // don't hide cursor in tests
+//
 if ( testMode ) {
   cursor = {
     hide: () => {},
@@ -1132,12 +1134,7 @@ let setupIPC = function() {
       handles[key].window.close();
     }
   });
-  
-  ipcMain.handle("get-saver-opts", () => {
-    log.info("get-saver-opts");
-    return saverOpts;
-  });
-  
+    
   ipcMain.handle("get-prefs", () => {
     log.info("get-prefs");
     return prefs.data;
@@ -1188,16 +1185,6 @@ let setupIPC = function() {
     return prefs.defaults;
   });
 
-  // ipcMain.handle("reset-to-defaults", async() => {
-  //   log.info("reset-to-defaults");
-  //   prefs.reset();
-  //   prefs.store.set(global.CONFIG_DEFAULTS);
-
-  //   savers.reset();
-  //   updateStateManager();
-  //   checkForPackageUpdates();
-  // });
-
   ipcMain.handle("update-local-source", async(_event, ls) => {
     log.info("update-local-source", ls);
     prefs.store.set("localSource", ls);
@@ -1247,21 +1234,6 @@ let setupIPC = function() {
     log.info("savers-updated");
     toggleSaversUpdated();
   });
-    
-  //
-  // user has updated their preferences, let's reload
-  //
-  // ipcMain.on("prefs-updated", () => {
-  //   log.info("prefs-updated");
-  //   prefs.reload();
-  //   savers.reset();
-  //   updateStateManager();
-  //   checkForPackageUpdates();
-  
-  //   // this was causing a double load of data basically, which
-  //   // might be fine but seems like an issue, so skipping for now
-  //   // handles.prefs.window.webContents.send("savers-updated");
-  // });
   
   ipcMain.on("set-autostart", (_event, value) => {
     log.info("set-autostart");

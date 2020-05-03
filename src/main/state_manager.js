@@ -11,7 +11,10 @@ const STATES = {
   STATE_PAUSED: Symbol("paused") // screensaver is paused
 };
 
+// check for updates every 5 seconds when idle
 const IDLE_CHECK_RATE = 5000;
+
+// check for updates every .25 second when active
 const ACTIVE_CHECK_RATE = 250;
 
 class StateManager {
