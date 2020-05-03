@@ -9,138 +9,135 @@
 </body>
 
 <script>
- const { ipcRenderer, desktopCapturer } = require('electron');
- const temp = require("temp");
- const os = require("os");
- const fs = require('fs');
- const fsPromises = fs.promises;
- const asyncMutex = require('async-mutex').Mutex;
-
- const mutex = new asyncMutex();
- 
- var findOrCreate = function(type, screen_id) {
-   var el, id;
-   id = type + screen_id;
-
-   el = document.getElementById(id);
-   if ( el === null ) {
-     el = document.createElement(type);
-     el.id = id;
-
-     document.body.appendChild(el);
-   }
-
-   return el;    
- };
-
- var getUserMediaError = function(e) {
-   // log.info('getUserMediaError');
-   // log.info(e);
- };
- 
-
- var screenToFile = async function(video, canvas, photo, s, cb) {
-   var tempName = temp.path({dir: os.tmpdir(), suffix:'.png'});
-   var width = video.videoWidth;
-   var height = video.videoHeight;
-
-   canvas.setAttribute('width', video.videoWidth);
-   canvas.setAttribute('height', video.videoHeight);
-   
-   var context = canvas.getContext('2d');
-   canvas.width = video.videoWidth;
-   canvas.height = video.videoHeight;
-   context.drawImage(video, 0, 0, width, height);
-   
-   var data = canvas.toDataURL('image/png', 1.0);
-
-   context.clearRect(0, 0, canvas.width, canvas.height);
-   
-   photo.setAttribute('src', data);
-
-   var buffer = Buffer.from(data.split(",")[1], 'base64');
-   await fsPromises.writeFile(tempName, buffer);
-
-   return tempName;
- }; // screenToFile
-
- var cleanup = function(video, canvas, photo, s) {
-   //
-   // stop video capture
-   // this seems to handle a problem where CPU load spikes
-   // after capture
-   //
-   if ( s !== undefined ) {
-     s.getVideoTracks().forEach((track) => {
-       track.stop();
-     });
-   }
-   
-   // https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Using_HTML5_audio_and_video
-   video.pause();
-   video.src = "";
-   photo.src = "";
-   video.load();
-   
-   video.remove();
-   canvas.remove();
-   photo.remove();
- };
-
- var captureScreen = async function(id, width, height) {
-   var video = findOrCreate('video', id);
-   var canvas = findOrCreate('canvas', id);
-   var photo = findOrCreate('photo', id);
-   var screen_id;
-
-   var screen_opts = {
-     audio: false,
-     video: {
-       mandatory: {
-         // fun fact -- you need to use max here
-         // @see https://groups.google.com/a/chromium.org/forum/#!topic/chromium-apps/TP_rsnYVQWg
-         maxWidth: width,
-         maxHeight: height,
-         chromeMediaSource: 'desktop'
-       }
-     }
-   };
-
-   // adding muted helps with some security errors
-   // @see https://stackoverflow.com/questions/49930680/
-   // how-to-handle-uncaught-in-promise-domexception-play-failed-because-the-use
-   video.muted = "muted";
-
-   const sources = await desktopCapturer.getSources({
-     types: ["screen"],
-     thumbnailSize: { width: 0, height: 0 }
-   });
-   let screen = sources.find((s) => { return s.display_id == id; });
-   if ( ! screen ) {
-     screen = sources[0];
-   }
-   screen_id = sources[0].id;
-
-
-   screen_opts.video.mandatory.chromeMediaSourceId = screen_id;
-   const mediaStream = await navigator.mediaDevices.getUserMedia(screen_opts);
-   video.srcObject = mediaStream;
-   await video.play();
-   
-   const result = await screenToFile(video, canvas, photo, mediaStream);
-   cleanup(video, canvas, photo, mediaStream);
-   return result;
- }; // captureScreen
-
- ipcRenderer.on("request-screenshot", async (event, opts) => {
-   const release = await mutex.acquire();
-   try {
-     const result = await captureScreen(opts.id, opts.width, opts.height);
-     ipcRenderer.send('screenshot-' + opts.id, {url:result});
-   }
-   finally {
-     release();
-   }
- });
+  const { ipcRenderer, desktopCapturer } = require('electron');
+  const temp = require("temp");
+  const os = require("os");
+  const fs = require('fs');
+  const fsPromises = fs.promises;
+  const asyncMutex = require('async-mutex').Mutex;
+  
+  const mutex = new asyncMutex();
+  
+  var findOrCreate = function(type, screen_id) {
+    var el, id;
+    id = type + screen_id;
+    
+    el = document.getElementById(id);
+    if ( el === null ) {
+      el = document.createElement(type);
+      el.id = id;
+      
+      document.body.appendChild(el);
+    }
+    
+    return el;    
+  };
+  
+  var getUserMediaError = function(e) {
+    // log.info('getUserMediaError');
+    // log.info(e);
+  };
+  
+  
+  var screenToFile = async function(video, canvas, photo, s, cb) {
+    var tempName = temp.path({dir: os.tmpdir(), suffix:'.png'});
+    var width = video.videoWidth;
+    var height = video.videoHeight;
+    
+    canvas.setAttribute('width', video.videoWidth);
+    canvas.setAttribute('height', video.videoHeight);
+    
+    var context = canvas.getContext('2d');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    context.drawImage(video, 0, 0, width, height);
+    
+    var data = canvas.toDataURL('image/png', 1.0);
+    
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    
+    photo.setAttribute('src', data);
+    
+    var buffer = Buffer.from(data.split(",")[1], 'base64');
+    await fsPromises.writeFile(tempName, buffer);
+    
+    return tempName;
+  }; // screenToFile
+  
+  var cleanup = function(video, canvas, photo, s) {
+    //
+    // stop video capture
+    // this seems to handle a problem where CPU load spikes
+    // after capture
+    //
+    if ( s !== undefined ) {
+      s.getVideoTracks().forEach((track) => {
+        track.stop();
+      });
+    }
+    
+    // https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Using_HTML5_audio_and_video
+    video.pause();
+    video.src = "";
+    photo.src = "";
+    video.load();
+    
+    video.remove();
+    canvas.remove();
+    photo.remove();
+  };
+  
+  var captureScreen = async function(id, width, height) {
+    var video = findOrCreate('video', id);
+    var canvas = findOrCreate('canvas', id);
+    var photo = findOrCreate('photo', id);
+    
+    var screen_opts = {
+      audio: false,
+      video: {
+        mandatory: {
+          // fun fact -- you need to use max here
+          // @see https://groups.google.com/a/chromium.org/forum/#!topic/chromium-apps/TP_rsnYVQWg
+          maxWidth: width,
+          maxHeight: height,
+          chromeMediaSource: 'desktop'
+        }
+      }
+    };
+    
+    // adding muted helps with some security errors
+    // @see https://stackoverflow.com/questions/49930680/
+    // how-to-handle-uncaught-in-promise-domexception-play-failed-because-the-use
+    video.muted = "muted";
+    
+    const sources = await desktopCapturer.getSources({
+      types: ["screen"],
+      thumbnailSize: { width: 0, height: 0 }
+    });
+    let screen = sources.find((s) => { return s.display_id.toString() === id.toString(); });
+    if ( ! screen ) {
+      screen = sources[0];
+    }
+    
+    screen_opts.video.mandatory.chromeMediaSourceId = screen.id;
+    const mediaStream = await navigator.mediaDevices.getUserMedia(screen_opts);
+    video.srcObject = mediaStream;
+    await video.play();
+    
+    const result = await screenToFile(video, canvas, photo, mediaStream);
+    cleanup(video, canvas, photo, mediaStream);
+    return result;
+  }; // captureScreen
+  
+  ipcRenderer.on("request-screenshot", async (event, opts) => {
+    const release = await mutex.acquire();
+    try {
+      const result = await captureScreen(opts.id, opts.width, opts.height);
+      ipcRenderer.send('screenshot-' + opts.id, {url:result});
+    }
+    finally {
+      release();
+    }
+  });
 </script>
 </html>
