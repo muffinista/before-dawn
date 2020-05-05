@@ -51,6 +51,11 @@ const menusAndTrays = require("./menus.js");
 const dock = require("./dock.js");
 const windows = require("./windows.js");
 
+var Mutex = require("async-mutex").Mutex;
+var withTimeout = require("async-mutex").withTimeout;
+
+const mutex = withTimeout(new Mutex(), 30000, new Error("timeout"));
+
 // NOTE -- this needs to be global, otherwise the app icon gets
 // garbage collected and won't show up in the system tray
 let appIcon = null;
@@ -78,11 +83,6 @@ var exitOnQuit = false;
 
 // load some global CSS we'll inject into running screensavers
 const globalCSSCode = fs.readFileSync( path.join(__dirname, "assets", "global.css"), "ascii");  
-// const globalCSSPreviewCode = globalCSSCode.split(/\n/).filter((l) => l.indexOf("cursor: none") === -1).join("\n");
-
-// const PREVIEW_PADDING = 1.15;
-
-
 
 /**
  * track some information about windows, previews, bounds for the prefs window
@@ -144,6 +144,13 @@ if (! singleLock ) {
   process.exit();
 }
 
+try {
+  const logDest = log.transports.file.getFile().path;
+  console.log(`I am writing logs to ${logDest}`); 
+}
+catch(e) {
+  console.log(e);
+}
 
 
 /**
@@ -697,10 +704,6 @@ var setStateToRunning = function() {
  * run the user's chosen screensaver on any available screens
  */
 var runScreenSaver = function() {
-  // let savers = new SaverListManager({
-  //   prefs: prefs
-  // });
-
   let setupPromise;
 
   log.info("runScreenSaver");
@@ -937,9 +940,6 @@ var setupIfNeeded = async function() {
     // stop processing here, we know we need to setup
     return true;
   }
-  // var savers = new SaverListManager({
-  //   prefs: prefs
-  // });
 
   log.info(`checking if ${prefs.saver} is valid`);
   let exists = await savers.confirmExists(prefs.saver);
@@ -1009,14 +1009,24 @@ var setupReleaseCheck = function() {
 /**
  * check for screensaver package updates
  */
-var checkForPackageUpdates = function() {  
+var checkForPackageUpdates = async function() {  
   log.info("checkForPackageUpdates");
-  const PackageDownloader = require("../lib/package-downloader.js");
-  let pd = new PackageDownloader(prefs);
-  return pd.updatePackage().then((result) => {
+  let result = {};
+
+  const release = await mutex.acquire();
+  try {
+    const PackageDownloader = require("../lib/package-downloader.js");
+
+    const pd = new PackageDownloader(prefs);
+    result = await pd.updatePackage();
+  
     log.info(result);
     toggleSaversUpdated();
-  }); 
+  }
+  finally {
+    release();
+  }
+  return result;
 };
 
 /**

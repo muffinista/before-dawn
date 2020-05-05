@@ -221,9 +221,6 @@ export default {
 
       return result;
     },
-    previewWrapper: function() {
-      return document.querySelector(".saver-detail");
-    },
     previewUrl: function() {
       const urlParams = new URLSearchParams(this.urlOpts(this.saver));
       return `${this.saver.url}?${urlParams.toString()}`;

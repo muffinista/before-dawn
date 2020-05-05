@@ -68,43 +68,6 @@ export default {
       return ( typeof(this.savers) !== "undefined" &&
                this.savers.length > 0);
     },
-    saverIsPicked() {
-      return this.saverIndex >= 0;
-    },
-    saverIndex: function() {
-      return this.savers.findIndex((s) => s.key === this.saver);
-    },
-    saverOptions: function() {
-      if ( ! this.isLoaded ) {
-        return undefined;
-      }
-      if ( this.saverIndex < 0 ) {
-        return {};
-      }
-
-      return this.savers[this.saverIndex].options;
-    },
-    saverValues: function() {
-      if ( typeof(this.prefs) === "undefined" ) {
-        return {};
-      }
-      return this.options[this.saver];
-    },
-    saverSettings: function() {
-      return this.savers[this.saverIndex].settings;
-    },
-    saverObj: function() {
-      return this.savers[this.saverIndex];
-    },
-    params: function() {
-      // parse incoming URL params -- we'll get a link to 
-      // the current screen images for previews here
-      return new URLSearchParams(document.location.search);
-    },
-    screenshot: function() {
-      // the main app will pass us a screenshot URL, here it is
-      return decodeURIComponent(this.params.get("screenshot"));
-    }
   },
   async mounted() {
     this.loadData();

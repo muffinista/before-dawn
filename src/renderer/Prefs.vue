@@ -113,15 +113,6 @@ export default {
 
       return this.savers[this.saverIndex].options;
     },
-    saverValues: function() {
-      if ( typeof(this.prefs) === "undefined" ) {
-        return {};
-      }
-      return this.options[this.saver];
-    },
-    saverSettings: function() {
-      return this.savers[this.saverIndex].settings;
-    },
     saverObj: function() {
       return this.savers[this.saverIndex];
     },
@@ -133,9 +124,6 @@ export default {
     screenshot: function() {
       // the main app will pass us a screenshot URL, here it is
       return decodeURIComponent(this.params.get("screenshot"));
-    },
-    previewWrapper: function() {
-      return document.querySelector(".saver-detail");
     },
     previewUrl: function() {
       const urlParams = new URLSearchParams(this.urlOpts(this.saver));
@@ -172,7 +160,6 @@ export default {
     });
   },
   beforeDestroy() {
-    window.clearInterval(this.resizeInterval);
     ipcRenderer.removeListener("savers-updated", this.onSaversUpdated);
   },
   methods: {

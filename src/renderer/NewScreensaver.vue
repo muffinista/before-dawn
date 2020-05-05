@@ -91,9 +91,6 @@ export default {
     };
   },
   computed: {
-    isLoaded: function() {
-      return typeof(this.prefs) !== "undefined";
-    },
     params: function() {
       // parse incoming URL params -- we'll get a link 
       // to the current screen images for previews here
