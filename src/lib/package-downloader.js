@@ -31,7 +31,7 @@ module.exports = class PackageDownloader {
 
   updatePackage(p) {
     var lastCheckAt = this.prefs.updateCheckTimestamp;
-    var now = new Date().getTime();
+    var now = new Date(); //.getTime();
     var diff = now - lastCheckAt;
 
     this.logger("updatePackage", now, lastCheckAt);
@@ -46,18 +46,17 @@ module.exports = class PackageDownloader {
       return Promise.resolve({downloaded: false});
     }
 
-    this.logger("lastCheckAt: " + lastCheckAt + " - " + diff + " - " + PACKAGE_WAIT_TIME);
+    this.logger(`lastCheckAt: ${lastCheckAt} ${diff} ${PACKAGE_WAIT_TIME}`);
     // don't bother checking if there's no source repo specified,
     // or if we've pinged it recently
     if ( typeof(p.repo) === "undefined" || p.repo === "" || diff < PACKAGE_WAIT_TIME ) {
-      this.logger("skip package check for now: " + diff);
+      this.logger(`skip package check for now: ${diff}`);
       return Promise.resolve({downloaded: false});
     }
     else {
       this.prefs.updateCheckTimestamp = now;
-      // this.prefs.writeSync();
 
-      this.logger("check package: " + p.repo);
+      this.logger(`check package: ${p.repo}`);
       return p.checkLatestRelease().then((result) => {
         if ( result && result.updated_at ) {
           this.prefs.sourceUpdatedAt = result.updated_at;

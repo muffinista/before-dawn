@@ -23,18 +23,15 @@ class StateManager {
 
     this.currentState = STATES.STATE_NONE;
 
-    this._idleTime = undefined;
-    this._blankTime = undefined;
-    this._onIdleTime = undefined;
-    this._onBlankTime = undefined;
-    
-    this._onReset = undefined;
+    this._idleTime = () => {};
+    this._blankTime = () => {};
+    this._onIdleTime = () => {};
+    this._onBlankTime = () => {};
+    this._onReset = () => {};
     this.lastTime = -1;
 
     this._ignoreReset = false;
     this.keepTicking = true;  
-
-    // this._initialOffset = undefined;
 
     this._idleFn = fn;
 
@@ -79,7 +76,6 @@ class StateManager {
    * reset to idle and clear any timers
    */
   reset() {
-    // this._initialOffset = 0;
     this.switchState(STATES.STATE_IDLE);
   }
 
@@ -131,7 +127,7 @@ class StateManager {
     // force a reload. we also run it if the new state is idle, this
     // should help with some weird issues where timers aren't being
     // reset properly
-    var callEnterState = ( this.currentState !== s || s === STATES.STATE_IDLE || force === true);
+    const callEnterState = ( this.currentState !== s || s === STATES.STATE_IDLE || force === true);
 
     this.currentState = s;
     
@@ -159,7 +155,6 @@ class StateManager {
         break;
     }
   }
-
 
   getCurrentState() {
     return this.currentState;
@@ -191,24 +186,12 @@ class StateManager {
    * check idle time and determine if we should switch states
    */
   tick(runAgain) {
-    var i, nextTime, hadActivity;
-
     if ( this.currentState !== STATES.STATE_NONE && this.currentState !== STATES.STATE_PAUSED ) {
-      // if ( this._initialOffset === undefined ) {
-      //   // get the idle time when we booted. this is a bit of a hack
-      //   // to work better on CI setups
-      //   this._initialOffset = this._idleFn();
-      // }
-
-
-//      i = this._idleFn() + this._initialOffset;
-      i = this._idleFn();
-
-      nextTime = this.getNextTime();
-
-      hadActivity = (i < this.lastTime);
+      const i = this._idleFn();
+      const nextTime = this.getNextTime();
+      const hadActivity = (i < this.lastTime);
     
-      if ( hadActivity && this.currentState !== STATES.STATE_IDLE && typeof(this._onReset) !== "undefined" ) {
+      if ( hadActivity && this.currentState !== STATES.STATE_IDLE ) {
         // we won't actually reset the state while a screensaver is
         // loading, because sometimes we get zombie electron windows
         // when we do that
@@ -217,8 +200,6 @@ class StateManager {
         }
       }
       else if ( i >= nextTime ) {
-        // this._initialOffset = 0;
-  
         if ( this.currentState === STATES.STATE_IDLE) {
           this.switchState(STATES.STATE_RUNNING);
         }

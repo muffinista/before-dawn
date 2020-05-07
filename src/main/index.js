@@ -131,7 +131,7 @@ let saverOpts = {};
 // usually we want to check power state before running, but
 // we'll skip that check depending on the value of this toggle
 // so that manually running screensaver works just fine
-var checkPowerState = true;
+let checkPowerState = true;
 
 const RELEASE_CHECK_INTERVAL = 1000 * 60 * 60 * 12;
 
