@@ -116,15 +116,6 @@ export default {
     saverObj: function() {
       return this.savers[this.saverIndex];
     },
-    params: function() {
-      // parse incoming URL params -- we'll get a link to the 
-      // current screen images for previews here
-      return new URLSearchParams(document.location.search);
-    },
-    screenshot: function() {
-      // the main app will pass us a screenshot URL, here it is
-      return decodeURIComponent(this.params.get("screenshot"));
-    },
     previewUrl: function() {
       const urlParams = new URLSearchParams(this.urlOpts(this.saver));
       return `${this.saverObj.url}?${urlParams.toString()}`;
@@ -132,6 +123,7 @@ export default {
   },
   async mounted() {
     this.size = await ipcRenderer.invoke("get-primary-display-bounds");
+    this.screenshot = await ipcRenderer.invoke("get-primary-screenshot");
     this.logger = log.info; //function() {};
 
     ipcRenderer.on("savers-updated", this.onSaversUpdated);

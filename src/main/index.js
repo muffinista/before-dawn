@@ -261,6 +261,9 @@ var openTestShim = function() {
 };
 
 
+let screenshots = {};
+
+
 /**
  * Open the preferences window
  * @returns {Promise} Promise that resolves when prefs window is shown
@@ -274,11 +277,13 @@ var openPrefsWindow = function() {
   }
 
   return new Promise((resolve) => {
-    var primary = cachedPrimaryScreen;
+    const primary = cachedPrimaryScreen;
 
     // take a screenshot of the main screen for use in previews
-    grabScreen(primary).then((message) => {
-      var prefsUrl = getUrl("prefs.html");
+    grabScreen(primary).then((grab) => {
+      screenshots[primary.id] = grab.url;
+
+      const prefsUrl = getUrl("prefs.html");
 
       handles.prefs.window = new BrowserWindow({
         show: false,
@@ -299,16 +304,9 @@ var openPrefsWindow = function() {
       if ( handles.prefs.window.removeMenu !== undefined ) {
         handles.prefs.window.removeMenu();
       }
-
-      prefsUrl = prefsUrl + "?screenshot=" + encodeURIComponent("file://" + message.url);
       
       handles.prefs.window.on("closed", () => {
         handles.prefs.window = null;
-
-        if ( handles.prefs.preview ) {
-          handles.prefs.preview.destroy();
-          handles.prefs.preview = null;  
-        }
         dock.hideDockIfInactive(app);
       });
 
@@ -378,8 +376,8 @@ var addNewSaver = function() {
   var primary = cachedPrimaryScreen;
 
   // take a screenshot of the main screen for use in previews
-  grabScreen(primary).then((message) => {
-    newUrl = newUrl + "?screenshot=" + encodeURIComponent("file://" + message.url);
+  grabScreen(primary).then((grab) => {
+    screenshots[primary.id] = grab.url;
 
     handles.addNew.window = new BrowserWindow({
       show: false,
@@ -393,8 +391,6 @@ var addNewSaver = function() {
       },
       icon: path.join(__dirname, "assets", "iconTemplate.png")
     });
-
-    handles.addNew.window.screenshot = message.url;
 
     handles.addNew.window.on("closed", () => {
       handles.addNew.window = null;
@@ -460,8 +456,7 @@ var openEditor = (args) => {
   var editorUrl = getUrl("editor.html");
   
   var target = editorUrl + "?" +
-               "src=" + encodeURIComponent(key) +
-               "&screenshot=" + encodeURIComponent(screenshot);
+               "src=" + encodeURIComponent(key);
 
   if ( handles.editor.window == null ) {
     handles.editor.window = new BrowserWindow({
@@ -1225,7 +1220,11 @@ let setupIPC = function() {
   ipcMain.handle("get-primary-display-bounds", () => {
     return cachedPrimaryScreen.bounds;
   });
-  
+
+  ipcMain.handle("get-primary-screenshot", () => {
+    return screenshots[cachedPrimaryScreen.id];
+  });
+
   ipcMain.on("preview-error", (_event, message, source, lineno) => {
     let opts = {
       message: message,

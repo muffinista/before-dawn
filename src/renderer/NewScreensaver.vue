@@ -96,10 +96,6 @@ export default {
       // to the current screen images for previews here
       return new URLSearchParams(document.location.search);
     },
-    screenshot: function() {
-      // the main app will pass us a screenshot URL, here it is
-      return decodeURIComponent(this.params.get("screenshot"));
-    },
     canAdd: function() {
       return this.prefs !== undefined &&
         this.prefs.localSource !== undefined &&
@@ -108,6 +104,7 @@ export default {
   },
   async mounted() {
     this.prefs = await ipcRenderer.invoke("get-prefs");
+    this.screenshot = await ipcRenderer.invoke("get-primary-screenshot");
   },
   methods: {
     closeWindow() {
