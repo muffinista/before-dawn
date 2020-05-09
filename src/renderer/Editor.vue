@@ -206,9 +206,6 @@ export default {
     src: function() {
       return this.params.get("src");
     },
-    screenshot: function() {
-      return this.params.get("screenshot");
-    },
     folderPath: function() {
       return path.dirname(this.src);
     },
@@ -232,6 +229,7 @@ export default {
     }
 
     this.size = await ipcRenderer.invoke("get-primary-display-bounds");
+    this.screenshot = await ipcRenderer.invoke("get-primary-screenshot");
 
     ipcRenderer.on("console-message", (sender, event, level, message, line, sourceId) => {
       // only output messages from the screensaver folder itself
