@@ -51,8 +51,8 @@ const menusAndTrays = require("./menus.js");
 const dock = require("./dock.js");
 const windows = require("./windows.js");
 
-var Mutex = require("async-mutex").Mutex;
-var withTimeout = require("async-mutex").withTimeout;
+const Mutex = require("async-mutex").Mutex;
+const withTimeout = require("async-mutex").withTimeout;
 
 const mutex = withTimeout(new Mutex(), 30000, new Error("timeout"));
 
@@ -81,13 +81,13 @@ else {
 let cachedScreens = [];
 let cachedPrimaryScreen = undefined;
 
-var exitOnQuit = false;
+let exitOnQuit = false;
 
 // load some global CSS we'll inject into running screensavers
 const globalCSSCode = fs.readFileSync( path.join(__dirname, "assets", "global.css"), "ascii");  
 
 /**
- * track some information about windows, previews, bounds for the prefs window
+ * track some information about windows and preview bounds for the prefs window
  * and editor window
  */
 let handles = {
@@ -121,9 +121,9 @@ let handles = {
   }
 };
 
-var trayMenu;
+let trayMenu;
 
-var electronScreen;
+let electronScreen;
 
 let prefs = undefined;
 let savers = undefined;
