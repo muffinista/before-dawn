@@ -42,6 +42,14 @@ describe("Prefs", function() {
     return helpers.stopApp(app);
 	});
 
+  before(function() {
+    if ( process.platform === "linux" ) {
+      // eslint-disable-next-line no-console
+      console.log("skipping on linux");
+      this.skip();
+    }
+  });
+
   it("lists screensavers", function() {
     return pickPrefsWindow().
       then(() => app.client.waitUntilTextExists("body", "Screensaver One")).

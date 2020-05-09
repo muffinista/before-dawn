@@ -78,6 +78,8 @@ else {
   cursor = require("hide-cursor");
 }
 
+let cachedScreens = [];
+let cachedPrimaryScreen = undefined;
 
 var exitOnQuit = false;
 
@@ -272,7 +274,7 @@ var openPrefsWindow = function() {
   }
 
   return new Promise((resolve) => {
-    var primary = electronScreen.getPrimaryDisplay();
+    var primary = cachedPrimaryScreen;
 
     // take a screenshot of the main screen for use in previews
     grabScreen(primary).then((message) => {
@@ -373,7 +375,7 @@ var openSettingsWindow = function() {
  */
 var addNewSaver = function() {
   var newUrl = getUrl("new.html");
-  var primary = electronScreen.getPrimaryDisplay();
+  var primary = cachedPrimaryScreen;
 
   // take a screenshot of the main screen for use in previews
   grabScreen(primary).then((message) => {
@@ -656,6 +658,16 @@ var blankScreen = function(s) {
 };
 
 
+
+/**
+ * grab a list of displays and cache it for later
+ */
+var loadDisplayData = function() {
+  log.info("loadDisplayData");
+  cachedScreens = electronScreen.getAllDisplays();
+  cachedPrimaryScreen = electronScreen.getPrimaryDisplay();
+};
+
 /**
  * get a list of displays connected to the computer.
  */
@@ -663,29 +675,23 @@ var getDisplays = function() {
   var displays = [];
   if ( debugMode === true || prefs.runOnSingleDisplay === true ) {
     displays = [
-      electronScreen.getPrimaryDisplay()
+      cachedPrimaryScreen
     ];
   }
   else {
-    displays = getAllDisplays();
+    displays = cachedScreens;
   }
 
   return displays;
 };
 
-/**
- * get a list of all displays
- */
-var getAllDisplays = function() {
-  return electronScreen.getAllDisplays();
-};
 
 /**
  * get a list of the non primary displays connected to the computer
  */
 var getNonPrimaryDisplays = function() {
-  var primary = electronScreen.getPrimaryDisplay();
-  return electronScreen.getAllDisplays().filter((d) => {
+  var primary = cachedPrimaryScreen;
+  return cachedScreens.filter((d) => {
     return d.id !== primary.id;
   });
 };
@@ -740,7 +746,7 @@ var runScreenSaver = function() {
       // make sure we have something to display
       if ( typeof(saver) === "undefined" ) {
         log.info("No screensaver defined!");
-        blanks = getAllDisplays();
+        blanks = cachedScreens;
       }
       else {
         displays = getDisplays();
@@ -1217,8 +1223,7 @@ let setupIPC = function() {
   });
   
   ipcMain.handle("get-primary-display-bounds", () => {
-    const bounds = electronScreen.getPrimaryDisplay().bounds;
-    return bounds;
+    return cachedPrimaryScreen.bounds;
   });
   
   ipcMain.on("preview-error", (_event, message, source, lineno) => {
@@ -1313,6 +1318,7 @@ let setupIPC = function() {
   });
 };
 
+
 /**
  * handle initial startup of app
  */
@@ -1349,13 +1355,19 @@ var bootApp = async function() {
     prefs: prefs
   });
 
+
+  loadDisplayData();
+
   //
   // setup some event handlers for when screen count changes, mostly
   // to ensure that we wake up if the user plugs in or removes a
   // monitor
   //
   ["display-added", "display-removed"].forEach((type) => {
-    electronScreen.on(type, windows.handleDisplayChange);
+    electronScreen.on(type, () => {
+      windows.handleDisplayChange();
+      loadDisplayData();
+    });
   });
 
   ["suspend", "resume", "lock-screen", "unlock-screen"].forEach((type) => {

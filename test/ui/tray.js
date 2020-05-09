@@ -34,15 +34,15 @@ describe("tray", function() {
     return helpers.stopApp(app);
 	});
 
-  describe("run now", function() {
-    before(function() {
-      if ( process.platform === "win32" ) {
-        // eslint-disable-next-line no-console
-        console.log("skipping on win32");
-        this.skip();
-      }
-    });
+  before(function() {
+    if ( process.platform === "win32" ) {
+      // eslint-disable-next-line no-console
+      console.log("skipping on win32");
+      this.skip();
+    }
+  });
 
+  describe("run now", function() {
     it("opens screensaver", function() {
       return helpers.waitForWindow(app, "test shim").
         then(() => app.client.click("button.RunNow")).
