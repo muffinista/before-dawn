@@ -78,6 +78,8 @@ else {
   cursor = require("hide-cursor");
 }
 
+let cachedScreens = [];
+let cachedPrimaryScreen = undefined;
 
 var exitOnQuit = false;
 
@@ -656,10 +658,12 @@ var blankScreen = function(s) {
 };
 
 
-let cachedScreens = [];
-let cachedPrimaryScreen = undefined;
 
+/**
+ * grab a list of displays and cache it for later
+ */
 var loadDisplayData = function() {
+  log.info("loadDisplayData");
   cachedScreens = electronScreen.getAllDisplays();
   cachedPrimaryScreen = electronScreen.getPrimaryDisplay();
 };
