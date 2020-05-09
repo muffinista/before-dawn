@@ -18,7 +18,6 @@ describe("Add New", function() {
 
   let currentPrefs = function() {
     return JSON.parse(fs.readFileSync(`${workingDir}/config.json`));
-    // return new SaverPrefs(workingDir);
   };
 
   helpers.setupTest(this);
@@ -35,6 +34,14 @@ describe("Add New", function() {
     }
 
     return helpers.stopApp(app);
+  });
+
+  before(function() {
+    if ( process.platform === "linux" ) {
+      // eslint-disable-next-line no-console
+      console.log("skipping on linux");
+      this.skip();
+    }
   });
 
 
