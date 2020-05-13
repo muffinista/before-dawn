@@ -66,9 +66,10 @@ let testMode = ( process.env.TEST_MODE !== undefined );
 let cursor;
 
 //
-// don't hide cursor in tests
+// don't hide cursor in tests or in windows, since
+// that causes the tray to stop working???
 //
-if ( testMode ) {
+if ( testMode || process.platform === "win32" ) {
   cursor = {
     hide: () => {},
     show: () => {}
@@ -513,7 +514,8 @@ var getWindowOpts = function(s) {
   // so we default it to false there
   if (process.platform !== "darwin" ) {
     opts.fullscreen = true;
-    opts.frame = false;
+    // opts.focusable = false;
+    // opts.frame = false;
   }
 
   if ( testMode === true ) {
@@ -539,6 +541,12 @@ var runSaver = function(screenshot, saver, s, url_opts, tickCount) {
   var w = new BrowserWindow(windowOpts);       
   w.isSaver = true;
   
+
+  if ( w.removeMenu !== undefined ) {
+    w.removeMenu();
+  }
+
+  console.log(windowOpts);
   let diff = process.hrtime(tickCount);
   log.info("let's do this", s.id, diff[0] * 1e9 + diff[1]);
 
@@ -546,9 +554,7 @@ var runSaver = function(screenshot, saver, s, url_opts, tickCount) {
   try {   
     // Emitted when the window is closed.
     w.on("closed", function() {
-      if (process.platform !== "win32" ) {
-        cursor.show();
-      }
+      cursor.show();
       windows.forceWindowClose(w);
     });
     
@@ -567,7 +573,7 @@ var runSaver = function(screenshot, saver, s, url_opts, tickCount) {
     
     w.once("ready-to-show", () => {
       log.info("ready-to-show", s.id);
-      if ( debugMode !== true && testMode !== true ) {
+      if ( testMode !== true ) {
         windows.setFullScreen(w);
       }
 
