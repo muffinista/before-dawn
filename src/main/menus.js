@@ -218,7 +218,7 @@ var trayMenuTemplate = function() {
     {
       label: "Run Now",
       click: function() {
-        setTimeout(main.setStateToRunning, 50);
+        setTimeout(main.setStateToRunning, 1000);
       }
     },
     {

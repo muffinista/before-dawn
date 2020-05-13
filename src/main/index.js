@@ -543,57 +543,62 @@ var runSaver = function(screenshot, saver, s, url_opts, tickCount) {
   log.info("let's do this", s.id, diff[0] * 1e9 + diff[1]);
 
 
-  try {   
-    // Emitted when the window is closed.
-    w.on("closed", function() {
-      if (process.platform !== "win32" ) {
-        cursor.show();
+  return new Promise((resolve, reject) => {
+    try {   
+      // Emitted when the window is closed.
+      w.on("closed", function() {
+        if (process.platform !== "win32" ) {
+          cursor.show();
+        }
+        windows.forceWindowClose(w);
+      });
+      
+      // inject our custom JS and CSS into the screensaver window
+      w.webContents.on("did-finish-load", function() {
+        log.info("did-finish-load", s.id);
+        if (!w.isDestroyed()) {
+          w.webContents.insertCSS(globalCSSCode);
+        }
+      });
+  
+      // we could do something nice with either of these events
+      w.webContents.on("crashed", log.info);
+      w.webContents.on("unresponsive", log.info);
+  
+      
+      w.once("ready-to-show", () => {
+        log.info("ready-to-show", s.id);
+        if ( debugMode !== true && testMode !== true ) {
+          windows.setFullScreen(w);
+        }
+  
+        diff = process.hrtime(tickCount);
+        log.info(`rendered in ${diff[0] * 1e9 + diff[1]} nanoseconds`);
+        resolve(s.id);
+      });
+      
+      if ( typeof(screenshot) !== "undefined" ) {
+        url_opts.screenshot = encodeURIComponent("file://" + screenshot);
       }
+  
+      const urlParams = new URLSearchParams(url_opts);
+      let url = `${saver.url}?${urlParams.toString()}`;
+  
+      log.info("Loading " + url, s.id);
+  
+      if ( debugMode === true ) {
+        w.webContents.openDevTools();
+      }
+      // and load the index.html of the app.
+      w.loadURL(url);
+    }
+    catch (e) {
+      log.info(e);
       windows.forceWindowClose(w);
-    });
-    
-    // inject our custom JS and CSS into the screensaver window
-    w.webContents.on("did-finish-load", function() {
-      log.info("did-finish-load", s.id);
-      if (!w.isDestroyed()) {
-        w.webContents.insertCSS(globalCSSCode);
-      }
-    });
-
-    // we could do something nice with either of these events
-    w.webContents.on("crashed", log.info);
-    w.webContents.on("unresponsive", log.info);
-
-    
-    w.once("ready-to-show", () => {
-      log.info("ready-to-show", s.id);
-      if ( debugMode !== true && testMode !== true ) {
-        windows.setFullScreen(w);
-      }
-
-      diff = process.hrtime(tickCount);
-      log.info(`rendered in ${diff[0] * 1e9 + diff[1]} nanoseconds`);
-    });
-    
-    if ( typeof(screenshot) !== "undefined" ) {
-      url_opts.screenshot = encodeURIComponent("file://" + screenshot);
+      reject(s.id, e);
     }
-
-    const urlParams = new URLSearchParams(url_opts);
-    let url = `${saver.url}?${urlParams.toString()}`;
-
-    log.info("Loading " + url, s.id);
-
-    if ( debugMode === true ) {
-      w.webContents.openDevTools();
-    }
-    // and load the index.html of the app.
-    w.loadURL(url);
-  }
-  catch (e) {
-    log.info(e);
-    windows.forceWindowClose(w);
-  }
+  
+  });
 };
 
 /**
@@ -612,7 +617,7 @@ var runScreenSaverOnDisplay = function(saver, s) {
   // don't do anything if we don't actually have a screensaver
   if ( typeof(saver) === "undefined" || saver === null ) {
     log.info("no saver, exiting");
-    return;
+    return Promise.resolve();
   }
 
   let tickCount = process.hrtime();
@@ -623,12 +628,12 @@ var runScreenSaverOnDisplay = function(saver, s) {
   //
   const reqs = saver.requirements;
   if ( reqs.findIndex((x) => { return x === "screen"; }) > -1 ) {
-    grabScreen(s).then((message) => {
+    return grabScreen(s).then((message) => {
       runSaver(message.url, saver, s, url_opts, tickCount);
     });
   }
   else {
-    runSaver(undefined, saver, s, url_opts, tickCount);
+    return runSaver(undefined, saver, s, url_opts, tickCount);
   }
 };
 
@@ -636,20 +641,24 @@ var runScreenSaverOnDisplay = function(saver, s) {
  * blank out the given screen
  */
 var blankScreen = function(s) {
-  if ( process.env.TEST_MODE ) {
-    log.info("refusing to blank screen in test mode");
-    return;
-  }
-
-  let windowOpts = getWindowOpts(s);
-  let w = new BrowserWindow(windowOpts);     
-  w.isSaver = true;
-
-  windows.setFullScreen(w);
-
-  log.info("blankScreen", s.id, windowOpts);
-
-  w.show();
+  return new Promise((resolve) => {
+    if ( process.env.TEST_MODE ) {
+      log.info("refusing to blank screen in test mode");
+    }
+    else {
+      let windowOpts = getWindowOpts(s);
+      let w = new BrowserWindow(windowOpts);     
+      w.isSaver = true;
+    
+      windows.setFullScreen(w);
+    
+      log.info("blankScreen", s.id, windowOpts);
+    
+      w.show();  
+    }
+  
+    resolve(s.id); 
+  });
 };
 
 
@@ -700,21 +709,16 @@ var setStateToRunning = function() {
   stateManager.run();
 };
 
-
 /**
- * run the user's chosen screensaver on any available screens
+ * return a promise the resolves to the path to the screensaver and its options
  */
-var runScreenSaver = function() {
-  let setupPromise;
-
-  log.info("runScreenSaver");
-
-  let workingPath = getSystemDir();
+var findScreensaver = function() {
+  const workingPath = getSystemDir();
   // check if the user is running the random screensaver. if so, pick one!
-  let randomPath = path.join(workingPath, "system-savers", "random", "saver.json");
+  const randomPath = path.join(workingPath, "system-savers", "random", "saver.json");
   log.info("random: " + randomPath);
   if ( prefs.saver === randomPath ) {
-    setupPromise = new Promise((resolve) => {
+    return new Promise((resolve) => {
       savers.list(() => {
         // @todo s can be undefined
         // https://sentry.io/organizations/colin-mitchell/issues/955633850/?project=172824&query=is%3Aunresolved&statsPeriod=14d&utc=false
@@ -723,12 +727,19 @@ var runScreenSaver = function() {
       });
     });
   }
-  else {
-    setupPromise = Promise.resolve(prefs.saver, prefs.getOptions(prefs.saver));
-  }
+
+  return Promise.resolve(prefs.saver, prefs.getOptions(prefs.saver));
+};
+
+/**
+ * run the user's chosen screensaver on any available screens
+ */
+var runScreenSaver = function() {
+  log.info("runScreenSaver");
+  const setupPromise = findScreensaver();
 
   setupPromise.
-          then((saverKey, settings) => savers.loadFromFile(saverKey, settings)).
+    then((saverKey, settings) => savers.loadFromFile(saverKey, settings)).
     catch((err) => {
       log.info("================ loading saver failed?");
       log.info(err.message);
@@ -740,7 +751,7 @@ var runScreenSaver = function() {
       
       // make sure we have something to display
       if ( typeof(saver) === "undefined" ) {
-        log.info("No screensaver defined!");
+        log.info("No screensaver defined! Just blank everything");
         blanks = cachedScreens;
       }
       else {
@@ -749,43 +760,33 @@ var runScreenSaver = function() {
           blanks = getNonPrimaryDisplays();
         }
       }
-      
-      // limit to a single screen when debugging
-      if ( debugMode === true ) {
-        dock.showDock(app);
-      }
 
-      try {
-        var i;
-        // turn off idle checks for a couple seconds while loading savers
-        stateManager.ignoreReset(true);
+      // turn off idle checks for a couple seconds while loading savers
+      // stateManager.ignoreReset
+      // stateManager.ignoreReset(true);
 
-        if (process.platform !== "win32" ) {
-          cursor.hide();
-        }
-  
-        for ( i in displays ) {
-          runScreenSaverOnDisplay(saver, displays[i]);
-        } // for
+      cursor.hide();
 
-        // if we're only running on primary display, blank out the other ones
-        for ( i in blanks ) {
-          blankScreen(blanks[i]);
-        }
-      }
-      catch (e) {
+      //
+      // generate an array of promises for rendering screensavers on any screens
+      //
+      const promises = displays
+        .map((d) => runScreenSaverOnDisplay(saver, d))
+        .concat(
+          blanks.map((d) => blankScreen(d))
+        );
+
+
+      Promise.all(promises).then(() => {
+        log.info("our work is done, set state to running");
+        stateManager.running(); 
+      }).catch((e) => {
         log.info("running screensaver failed");
         log.info(e);
-        stateManager.ignoreReset(false);
-        if (process.platform !== "win32" ) {
-          cursor.show();
-        } 
-      }
-      finally {
-        setTimeout(function() {
-          stateManager.ignoreReset(false);
-        }, 2500);
-      }
+
+        stateManager.reset();
+        cursor.show(); 
+      });
     });
 };
 
@@ -814,9 +815,7 @@ var stopScreenSaver = function(fromBlank) {
   }
 
   windows.closeRunningScreensavers();
-  if (process.platform !== "win32" ) {
-    cursor.show();
-  }
+  cursor.show();
 };
 
 
@@ -841,6 +840,9 @@ var getSystemDir = function() {
 };
 
 
+/**
+ * determine the path to any assets we need
+ */
 var getAssetDir = function() {
   if ( process.env.TEST_MODE) {
     return path.join(__dirname, "data");

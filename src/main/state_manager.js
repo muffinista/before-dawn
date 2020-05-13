@@ -6,6 +6,7 @@
 const STATES = {
   STATE_NONE: Symbol("none"), // initial state
   STATE_IDLE: Symbol("idle"), // not running, waiting
+  STATE_LOADING: Symbol("loading"), // the liminal state when a screesaver is loaded but not 100%
   STATE_RUNNING: Symbol("running"), // running a screensaver
   STATE_BLANKED: Symbol("blanked"), // long idle, screen is blanked
   STATE_PAUSED: Symbol("paused") // screensaver is paused
@@ -26,6 +27,7 @@ class StateManager {
     this._idleTime = () => {};
     this._blankTime = () => {};
     this._onIdleTime = () => {};
+    this._onIdleTimeRunning = () => {};
     this._onBlankTime = () => {};
     this._onReset = () => {};
     this.lastTime = -1;
@@ -62,6 +64,9 @@ class StateManager {
     if ( opts.onReset ) {
       this._onReset = opts.onReset;
     }
+    if ( opts.onIdleTimeRunning ) {
+      this._onIdleTimeRunning = opts.onIdleTimeRunning;
+    }
 
     if ( opts.state ) {
       this.switchState(opts.state);
@@ -77,6 +82,7 @@ class StateManager {
    */
   reset() {
     this.switchState(STATES.STATE_IDLE);
+    this.ignoreReset(false);
   }
 
 
@@ -91,6 +97,11 @@ class StateManager {
    * start running the state machine
    */
   run() {
+    this.switchState(STATES.STATE_LOADING);
+  }
+
+  running() {
+    this.ignoreReset(false);
     this.switchState(STATES.STATE_RUNNING);
   }
 
@@ -98,24 +109,22 @@ class StateManager {
    * handle calling the onIdleTime callback specified in setup
    */
   onIdleTime() {
-    if ( typeof(this._onIdleTime) !== "undefined" ) {
-      this._onIdleTime();
-    }
+    this._onIdleTime();
   }
 
   /**
    * handle calling the onBlankTime callback specified in setup
    */
   onBlankTime() {
-    if ( typeof(this._onBlankTime) !== "undefined" ) {
-      this._onBlankTime();
-    }
+    this._onBlankTime();
   }
 
   onReset() {
-    if ( typeof(this._onReset) !== "undefined" ) {
-      this._onReset();
-    } 
+    this._onReset();
+  }
+
+  onIdleTimeRunning() {
+    this._onIdleTimeRunning();
   }
 
   /**
@@ -145,8 +154,11 @@ class StateManager {
       case STATES.STATE_IDLE:
         this.onReset();
         break;
-      case STATES.STATE_RUNNING:
+      case STATES.STATE_LOADING:
         this.onIdleTime();
+        break;
+      case STATES.STATE_RUNNING:
+        this.onIdleTimeRunning();
         break;
       case STATES.STATE_BLANKED:
         this.onBlankTime();
@@ -201,7 +213,7 @@ class StateManager {
       }
       else if ( i >= nextTime ) {
         if ( this.currentState === STATES.STATE_IDLE) {
-          this.switchState(STATES.STATE_RUNNING);
+          this.switchState(STATES.STATE_LOADING);
         }
         else if ( this.currentState === STATES.STATE_RUNNING) {
           this.switchState(STATES.STATE_BLANKED);
