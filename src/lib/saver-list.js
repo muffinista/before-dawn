@@ -201,6 +201,10 @@ module.exports = class SaverListManager {
             var stub = path.dirname(src);
             var s = _self.loadFromData(contents, stub, settings);
 
+            // add the source path as an attribute to make it easier
+            // to load/save/update this saver later if needed
+            s.src = src;
+
             if ( s.valid ) {
               resolve(s);
             }
