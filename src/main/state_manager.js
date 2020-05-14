@@ -219,8 +219,9 @@ class StateManager {
           this.switchState(STATES.STATE_BLANKED);
         }
       }
-      
-      this.lastTime = i;
+      if ( this.currentState !== STATES.STATE_LOADING ) {
+        this.lastTime = i;
+      }
     }
 
     if ( runAgain !== false ) {

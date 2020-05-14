@@ -42,6 +42,7 @@ const power = require("./power.js");
 const StateManager = require("./state_manager.js");
 const SaverPrefs = require("../lib/prefs.js");
 const SaverFactory = require("../lib/saver-factory.js");
+const Saver = require("../lib/saver.js");
 const SaverListManager = require("../lib/saver-list.js");
 const Package = require("../lib/package.js");
 
@@ -453,7 +454,7 @@ var openAboutWindow = function() {
 var openEditor = (args) => {
   var key = args.src;
   var screenshot = args.screenshot;
-
+  
   var editorUrl = getUrl("editor.html");
   
   var target = editorUrl + "?" +
@@ -1226,6 +1227,11 @@ let setupIPC = function() {
     return data;
   });
   
+  ipcMain.handle("save-screensaver", async(_event, attrs, dest) => {
+    const s = new Saver(attrs);
+    s.write(attrs, dest);
+  });
+
   ipcMain.handle("get-primary-display-bounds", () => {
     return cachedPrimaryScreen.bounds;
   });
