@@ -177,8 +177,6 @@ import SaverOptionInput from "@/components/SaverOptionInput";
 import SaverOptions from "@/components/SaverOptions";
 import Noty from "noty";
 
-import Saver from "@/../lib/saver";
-
 const { ipcRenderer } = require("electron");
 
 export default {
@@ -317,14 +315,12 @@ export default {
     closeWindow() {
       ipcRenderer.send("close-window", "editor");
     },
-    saveData() {
+    async saveData() {
       this.disabled = true;
 
       this.saver.options = this.options;
 
-      // @todo use ipc to update saver?
-      const s = new Saver(this.saver);
-      s.write(this.saver, this.src);
+      await ipcRenderer.invoke("save-screensaver", this.saver, this.src);
       ipcRenderer.send("savers-updated", this.src);
 
       new Noty({
@@ -339,8 +335,8 @@ export default {
 
       this.disabled = false;
     },
-    saveDataAndClose() {
-      this.saveData();
+    async saveDataAndClose() {
+      await this.saveData();
       this.closeWindow();
     },
     openFolder() {

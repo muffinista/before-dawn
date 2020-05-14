@@ -71,8 +71,6 @@ import SaverOptions from "@/components/SaverOptions";
 import SaverSummary from "@/components/SaverSummary";
 import Noty from "noty";
 
-import Saver from "@/../lib/saver";
-
 const { ipcRenderer } = require("electron");
 const log = require("electron-log");
 
@@ -217,29 +215,25 @@ export default {
       ipcRenderer.send("open-window", "settings");
     },
     async getData() {
-      const tmpList = await ipcRenderer.invoke("list-savers");
-      // @todo shouldn't need Saver object here
-      this.savers = tmpList.map((data) => {
-        return new Saver(data);
-      });
-
       var tmp = {};
+      this.savers = await ipcRenderer.invoke("list-savers");
 
       if ( this.savers.length <= 0 ) {
         return;
       }
         
       // ensure default settings in the config for all savers
-      for(var i = 0, l = this.savers.length; i < l; i++ ) {
-        var s = this.savers[i];
+      this.savers = this.savers.map((s) => {
+        if ( s.settings === undefined ) {
+          s.settings = {};
+        }
+        return s;
+      });
 
-        //        tmp[s.key] = this.prefs.getOptions(s.key);
-        // if ( tmp[s.key] === undefined ) {
-        //   tmp.options[s.key] = {};
-        // }
-
+      // generate a hash of saver options by key
+      this.savers.forEach((s) => {
         tmp[s.key] = s.settings;
-      }
+      });
 
       this.options = Object.assign({}, this.options, tmp);
 
