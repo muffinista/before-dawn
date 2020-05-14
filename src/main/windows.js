@@ -39,7 +39,10 @@ var handleDisplayChange = function() {
 var closeRunningScreensavers = function() {
   // main.log.info("closeRunningScreensavers");
   attemptToStopScreensavers();
+
+  // be really aggressive about closing lagging windows
   setTimeout(forcefullyCloseScreensavers, 2500);
+  setTimeout(forcefullyCloseScreensavers, 5000);
 };
 
 /**
