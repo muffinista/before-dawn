@@ -18,6 +18,8 @@ const IDLE_CHECK_RATE = 5000;
 // check for updates every .25 second when active
 const ACTIVE_CHECK_RATE = 250;
 
+const IDLE_PADDING_CHECK = 1;
+
 class StateManager {
   constructor(fn) {
     this.STATES = STATES;
@@ -30,7 +32,9 @@ class StateManager {
     this._onIdleTimeRunning = () => {};
     this._onBlankTime = () => {};
     this._onReset = () => {};
+
     this.lastTime = -1;
+    this.enteredStateTimestamp = -1;
 
     this._ignoreReset = false;
     this.keepTicking = true;  
@@ -41,6 +45,10 @@ class StateManager {
       idle: IDLE_CHECK_RATE,
       active: ACTIVE_CHECK_RATE
     };
+  }
+
+  get currentTimeStamp() {
+    return process.hrtime()[0];
   }
 
   set idleFn(x) {
@@ -139,7 +147,8 @@ class StateManager {
     const callEnterState = ( this.currentState !== s || s === STATES.STATE_IDLE || force === true);
 
     this.currentState = s;
-    
+    this.enteredStateTimestamp = this.currentTimeStamp;
+
     if ( callEnterState ) {
       this.onEnterState(s);
     }
@@ -201,8 +210,9 @@ class StateManager {
     if ( this.currentState !== STATES.STATE_NONE && this.currentState !== STATES.STATE_PAUSED ) {
       const i = this._idleFn();
       const nextTime = this.getNextTime();
-      const hadActivity = (i < this.lastTime);
-    
+      const hadActivity = (i < this.lastTime ||
+        (this.currentState === STATES.STATE_RUNNING && i <= 10  && this.currentTimeStamp - i - IDLE_PADDING_CHECK > this.enteredStateTimestamp));
+
       if ( hadActivity && this.currentState !== STATES.STATE_IDLE ) {
         // we won't actually reset the state while a screensaver is
         // loading, because sometimes we get zombie electron windows
@@ -219,6 +229,7 @@ class StateManager {
           this.switchState(STATES.STATE_BLANKED);
         }
       }
+
       if ( this.currentState !== STATES.STATE_LOADING ) {
         this.lastTime = i;
       }
