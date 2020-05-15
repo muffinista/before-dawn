@@ -6,6 +6,7 @@ const { spawn } = require("child_process");
 const webpack = require("webpack");
 const WebpackDevServer = require("webpack-dev-server");
 const webpackHotMiddleware = require("webpack-hot-middleware");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 const mainConfig = require("../webpack.main.config");
 const rendererConfig = require("../webpack.renderer.config");
@@ -37,7 +38,7 @@ function logStats (proc, data) {
 }
 
 function startRenderer () {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     rendererConfig.entry.renderer = [path.join(__dirname, "dev-client")].concat(rendererConfig.entry.renderer);
 
     const compiler = webpack(rendererConfig);
@@ -46,16 +47,14 @@ function startRenderer () {
       heartbeat: 2500 
     });
 
-    compiler.plugin("compilation", compilation => {
-      compilation.plugin("html-webpack-plugin-after-emit", (data, cb) => {
+    compiler.hooks.compilation.tap("compilation", compilation => {
+      HtmlWebpackPlugin.getHooks(compilation).afterEmit.tapAsync("html-webpack-plugin-after-emit", (data, cb) => {
         hotMiddleware.publish({ action: "reload" });
-        if ( typeof(cb) !== "undefined" ) {
-          cb();
-        }
+        cb();
       });
     });
 
-    compiler.plugin("done", stats => {
+    compiler.hooks.done.tap("done", stats => {
       logStats("Renderer", stats);
     });
 
@@ -78,12 +77,12 @@ function startRenderer () {
 }
 
 function startMain () {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     //mainConfig.entry.main = [path.join(__dirname, '../src/main/index.js')].concat(mainConfig.entry.main)
 
     const compiler = webpack(mainConfig);
 
-    compiler.plugin("watch-run", (compilation, done) => {
+    compiler.hooks.watchRun.tapAsync("watch-run", (compilation, done) => {
       logStats("Main", "compiling...");
       hotMiddleware.publish({ action: "compiling" });
       done();
