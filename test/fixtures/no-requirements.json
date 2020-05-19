@@ -1,0 +1,28 @@
+{
+  "name": "Screensaver One",
+  "description": "A Screensaver",
+  "aboutUrl": "",
+  "author": "Colin Mitchell",
+  "source": "index.html",
+  "options": [
+    {
+      "index": 0,
+      "name": "load_url",
+      "type": "text",
+      "description": "Load the specified URL",
+      "min": "1",
+      "max": "100",
+      "default": ""
+    },
+    {
+      "index": 1,
+      "name": "sound",
+      "type": "boolean",
+      "description": "Play sound?",
+      "min": "1",
+      "max": "100",
+      "default": "true"
+    }
+  ],
+  "editable": true
+}
