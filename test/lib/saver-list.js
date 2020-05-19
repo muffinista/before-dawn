@@ -111,6 +111,14 @@ describe("SaverListManager", function() {
           done();
         });
     });
+
+    it("adds requirements if missing", (done) => {
+      var f = path.join(__dirname, "../fixtures/no-requirements.json");
+      savers.loadFromFile(f, false, {}).then((s) => {
+        assert.deepEqual(["screen"], s.requirements);
+        done();
+      });
+    });
   });
   
   describe("list", function() {

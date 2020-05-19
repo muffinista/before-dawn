@@ -635,7 +635,7 @@ var runScreenSaverOnDisplay = function(saver, s) {
   // otherwise just boot it
   //
   const reqs = saver.requirements;
-  if ( reqs.findIndex((x) => { return x === "screen"; }) > -1 ) {
+  if ( reqs !== undefined && reqs.findIndex((x) => { return x === "screen"; }) > -1 ) {
     return grabScreen(s).then((message) => {
       runSaver(message.url, saver, s, url_opts, tickCount);
     });
