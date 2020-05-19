@@ -262,6 +262,10 @@ module.exports = class SaverListManager {
       contents.published = true;
     }
 
+    if ( typeof(contents.requirements) === "undefined" ) {
+      contents.requirements = ["screen"];
+    }
+
     contents.valid = typeof(contents.name) !== "undefined" &&
       typeof(contents.description) !== "undefined" &&
       contents.published === true;
