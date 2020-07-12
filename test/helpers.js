@@ -135,7 +135,6 @@ exports.application = function(workingDir, quietMode=false, localZip, localZipDa
     env: env,
     quitTimeout: 5000
   });
-// console.log(a);
   fakeDialog.apply(a);
   a.fakeDialog = fakeDialog;
   
@@ -145,9 +144,9 @@ exports.application = function(workingDir, quietMode=false, localZip, localZipDa
 };
 
 
-exports.stopApp = function(app) {
+exports.stopApp = async function(app) {
   if (app && app.isRunning()) {
-    return app.stop();
+    await app.stop();
   }
 };
 
@@ -177,25 +176,55 @@ exports.removeLocalSource = function(workingDir) {
 };
 
 exports.getWindowByTitle = async (app, title) => {
-  let result = -1;
-  return await app.client.getWindowCount().then(async (count) => {
-    for ( var i = 0; i < count; i++ ) {
-      if ( result === -1 ) {
-        await app.client.windowByIndex(i).getTitle().then((res) => {
-          // // eslint-disable-next-line no-console
-          // console.log(i, res, title, res === title);
+  await app.client.getWindowHandles();
+  try {
+    await app.client.waitUntilWindowLoaded();
+  }
+  catch(e) {
+    // Error: waitUntilWindowLoaded waitUntil condition failed with the following reason: no such window: target window already closed
+    console.log(e);
+  }
+  try {
+    await app.client.switchWindow(title);
+    return true;
+  }
+  catch(e) {
+    return false;
+  }
+};
 
-          if ( res === title ) {
-            result = i;
-            return i;
-          }
-        });  
-      }
-    }
-
-    return result;
+exports.waitForText = async(app, lookup, text, doAssert) => {
+  await app.client.waitUntil(async () => {
+    const elem = await app.client.$(lookup);
+    const res = await elem.getText();
+    return res.indexOf(text) !== -1;
   });
 
+  if ( doAssert === true ) {
+    const elem = await app.client.$(lookup);
+    const res = await elem.getText();
+    assert(res.lastIndexOf(text) !== -1);
+  }
+};
+
+exports.getElementText = async(app, lookup) => {
+  const elem = await app.client.$(lookup);
+  return await elem.getText();
+};
+
+exports.click = async(app, lookup) => {
+  const el = await app.client.$(lookup);
+  await el.click();
+};
+
+exports.setValue = async(app, lookup, value) => {
+  const el = await app.client.$(lookup);
+  await el.setValue(value);
+};
+
+exports.getValue = async(app, lookup) => {
+  const el = await app.client.$(lookup);
+  return el.getValue();
 };
 
 exports.sleep = function sleep(ms) {
@@ -208,8 +237,8 @@ exports.waitForWindow = async (app, title, skipAssert) => {
   let result = -1;
   for ( var totalTime = 0; totalTime < windowCheckDelay; totalTime += delayStep ) {
     result = await exports.getWindowByTitle(app, title);
-    if ( result !== -1 ) {
-      break;
+    if ( result === true ) {
+      return true;
     }
     else {
       await exports.sleep(delayStep);

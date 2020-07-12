@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>test shim</title>
+    <script>
+     function htmlToElement(html) {
+       var template = document.createElement('template');
+       html = html.trim(); // Never return a text node of whitespace as the result
+       template.innerHTML = html;
+       return template.content.firstChild;
+     }
+
+     function addTestItem(label) {
+       var className = label.replace(/ /g, '');
+       var el = htmlToElement(`<li><button class="${className}">${label}</button></li>`);
+       list.appendChild(el);
+       el.addEventListener("click", function(e) {
+         e.preventDefault();
+         ipcRenderer.invoke('call-menu-item', label)
+         console.log(label);
+       });
+     }
+    </script>
+  </head>
+
+  <body>
+    test shim!
+    <ul>
+    </ul>
+
+    <div id="currentState"></div>
+    <script>
+     const { ipcRenderer } = require('electron');
+     var list = document.querySelector("ul")
+     ipcRenderer.invoke('list-menu-items').then((items) => {
+       items.forEach((label) => {
+         addTestItem(label);
+       });
+     });
+
+     setInterval(function() {
+       ipcRenderer.invoke('get-current-state').then((state) => {
+         document.querySelector("#currentState").innerHTML = state;
+       });
+     }, 100);
+    </script>
+  </body>
+</html>

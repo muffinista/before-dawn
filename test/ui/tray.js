@@ -1,5 +1,6 @@
 "use strict";
 
+const assert = require("assert");
 const helpers = require("../helpers.js");
 
 describe("tray", function() {
@@ -9,7 +10,7 @@ describe("tray", function() {
 
   helpers.setupTest(this);
 
-  beforeEach(function() {
+  beforeEach(async function() {
     workingDir = helpers.getTempDir();
     saversDir = helpers.getTempDir();
     let saverJSONFile = helpers.addSaver(saversDir, "saver");
@@ -22,16 +23,16 @@ describe("tray", function() {
     });
 
     app = helpers.application(workingDir);
-    return app.start().
-      then(() => helpers.waitUntilBooted(app, true));
+    await app.start();
+    await helpers.waitUntilBooted(app, true);
+    await helpers.waitForWindow(app, "test shim");
   });
 
-	afterEach(function() {
+	afterEach(async function() {
     if (this.currentTest.state === "failed") {
       helpers.outputLogs(app);
     }
-
-    return helpers.stopApp(app);
+    await helpers.stopApp(app);
 	});
 
   before(function() {
@@ -42,28 +43,36 @@ describe("tray", function() {
     }
   });
 
+  const clickAndExpect = async function(klass, title) {
+    //await helpers.waitForWindow(app, "test shim");
+    const el = await app.client.$(`button.${klass}`);
+    try {
+      el.click();
+      await helpers.waitForWindow(app, title);
+      return true;
+    }
+    catch(e) {
+      console.log(e);
+      return false;
+    }
+  };
+  
   describe("run now", function() {
-    it("opens screensaver", function() {
-      return helpers.waitForWindow(app, "test shim").
-        then(() => app.client.click("button.RunNow")).
-        then(() => helpers.waitForWindow(app, "screensaver"));
-    });
+//    it("opens screensaver", async function() {
+//      assert(await clickAndExpect("RunNow", "screensaver"));
+//    });
   });
 
   describe("preferences", function() {
-    it("opens prefs window", function() {
-      return helpers.waitForWindow(app, "test shim").
-        then(() => app.client.click("button.Preferences")).
-        then(() => helpers.waitForWindow(app, "Before Dawn: Preferences") ); 
+    it("opens prefs window", async function() {
+      assert(await clickAndExpect("Preferences", "Before Dawn: Preferences"));
     });
   });
 
   describe("about", function() {
-    it("opens about window", function() {
-      return helpers.waitForWindow(app, "test shim").
-        then(() => app.client.click("button.AboutBeforeDawn")).
-        then(() => helpers.waitForWindow(app, "Before Dawn: About!") );
-    });    
+    it("opens about window", async function() {
+      assert(await clickAndExpect("Preferences", "Before Dawn: About"));
+    });
   });
 
   describe("enable/disable", function() {
@@ -75,19 +84,14 @@ describe("tray", function() {
       }
     });
 
-    it("toggles app status", function() {
-      return helpers.waitForWindow(app, "test shim").
-        then(() => app.client.waitUntilTextExists("body", "idle")).
-        then(() => app.client.click("button.Disable")).
-        then(() => {
-          helpers.sleep(1000);
-        }).
-        then(() => app.client.waitUntilTextExists("body", "paused")).
-        then(() => app.client.click("button.Enable")).
-        then(() => {
-          helpers.sleep(1000);
-        }).
-        then(() => app.client.waitUntilTextExists("body", "idle"));
+    it("toggles app status", async function() {
+      await helpers.waitForText(app, "body", "idle");
+      await helpers.click(app, "button.Disable");
+      await helpers.sleep(1000);
+      await helpers.waitForText(app, "body", "paused");
+      await helpers.click(app, "button.Enable");
+      await helpers.sleep(1000);
+      await helpers.waitForText(app, "body", "idle");
     });
   });
 });

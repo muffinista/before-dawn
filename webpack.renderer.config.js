@@ -149,24 +149,24 @@ let rendererConfig = {
         /noty/
       ]
     }),
-    new CopyWebpackPlugin(
-      [
+    new CopyWebpackPlugin({
+      patterns: [
         {
           from: path.join(__dirname, "src", "renderer", "assets"),
           to: path.join(outputDir, "assets"),
-          ignore: [".*"]
+          globOptions: {
+            ignore: [".*"]
+          }
         },
         {
           from: path.join(__dirname, "src", "main", "system-savers"),
           to: path.join(outputDir, "system-savers"),
-          ignore: [".*"]
-        },
-        {
-          from: path.join(__dirname, "src", "shim.html"),
-          to: path.join(outputDir)
+          globOptions: {
+            ignore: [".*"]
+          }
         }
       ]
-    ),
+    }),
     new MiniCssExtractPlugin({
       filename: "[name].css",
       chunkFilename: "[id].css"

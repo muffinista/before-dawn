@@ -78,7 +78,7 @@ describe("bootstrap", function() {
 
       it("does not show prefs", async function() {
         const res = await helpers.waitForWindow(app, prefsWindowTitle, true);
-        assert.equal(-1, res);
+        assert.equal(false, res);
       });
     });
 

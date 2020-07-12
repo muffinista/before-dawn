@@ -165,7 +165,7 @@ catch(e) {
 var openGrabberWindow = function() {
   return new Promise((resolve) => {
     log.info("openGrabberWindow");
-    const grabberUrl = "file://" + __dirname + "/assets/grabber.html";
+    const grabberUrl = `file://${__dirname}/assets/grabber.html`;
 
     var grabberWindow = new BrowserWindow({
       show: false,
@@ -208,7 +208,7 @@ var grabScreen = function(s) {
       (process.platform === "darwin" && systemPreferences.getMediaAccessStatus("screen") !== "granted" ) ||
       testMode === true ) {
       resolve({
-          url: path.join(__dirname, "assets", "color-bars.png")
+        url: path.join(__dirname, "assets", "color-bars.png")
       });
     }
     else {
@@ -254,11 +254,12 @@ var openTestShim = function() {
     width: 200,
     height: 400,
     webPreferences: {
+      webSecurity: false,
       nodeIntegration: true
     }
   });
 
-  var shimUrl = "file://" + __dirname + "/shim.html";
+  const shimUrl = `file://${__dirname}/assets/shim.html`;
   testWindow.loadURL(shimUrl);
 };
 
@@ -569,18 +570,18 @@ var runSaver = function(screenshot, saver, s, url_opts, tickCount) {
           w.webContents.insertCSS(globalCSSCode);
         }
       });
-  
+      
       // we could do something nice with either of these events
       w.webContents.on("crashed", log.info);
       w.webContents.on("unresponsive", log.info);
-  
+      
       
       w.once("ready-to-show", () => {
         log.info("ready-to-show", s.id);
         if ( testMode !== true ) {
           windows.setFullScreen(w);
         }
-  
+        
         diff = process.hrtime(tickCount);
         log.info(`rendered in ${diff[0] * 1e9 + diff[1]} nanoseconds`);
         resolve(s.id);
@@ -589,12 +590,12 @@ var runSaver = function(screenshot, saver, s, url_opts, tickCount) {
       if ( typeof(screenshot) !== "undefined" ) {
         url_opts.screenshot = encodeURIComponent("file://" + screenshot);
       }
-  
+      
       const urlParams = new URLSearchParams(url_opts);
       let url = `${saver.url}?${urlParams.toString()}`;
-  
+      
       log.info("Loading " + url, s.id);
-  
+      
       if ( debugMode === true ) {
         w.webContents.openDevTools();
       }
@@ -657,14 +658,14 @@ var blankScreen = function(s) {
       let windowOpts = getWindowOpts(s);
       let w = new BrowserWindow(windowOpts);     
       w.isSaver = true;
-    
+      
       windows.setFullScreen(w);
-    
+      
       log.info("blankScreen", s.id, windowOpts);
-    
+      
       w.show();  
     }
-  
+    
     resolve(s.id); 
   });
 };
@@ -748,54 +749,54 @@ var runScreenSaver = function() {
 
   setupPromise.
     then((saverKey, settings) => savers.loadFromFile(saverKey, settings)).
-    catch((err) => {
-      log.info("================ loading saver failed?");
-      log.info(err.message);
-      return undefined;
-    }).
-    then((saver) => {
-      var displays = [];
-      var blanks = [];
-      
-      // make sure we have something to display
-      if ( typeof(saver) === "undefined" ) {
-        log.info("No screensaver defined! Just blank everything");
-        blanks = cachedScreens;
-      }
-      else {
-        displays = getDisplays();
-        if ( debugMode !== true && testMode !== true && prefs.runOnSingleDisplay === true ) {
-          blanks = getNonPrimaryDisplays();
-        }
-      }
+          catch((err) => {
+            log.info("================ loading saver failed?");
+            log.info(err.message);
+            return undefined;
+          }).
+          then((saver) => {
+            var displays = [];
+            var blanks = [];
+            
+            // make sure we have something to display
+            if ( typeof(saver) === "undefined" ) {
+              log.info("No screensaver defined! Just blank everything");
+              blanks = cachedScreens;
+            }
+            else {
+              displays = getDisplays();
+              if ( debugMode !== true && testMode !== true && prefs.runOnSingleDisplay === true ) {
+                blanks = getNonPrimaryDisplays();
+              }
+            }
 
-      // turn off idle checks for a couple seconds while loading savers
-      // stateManager.ignoreReset
-      // stateManager.ignoreReset(true);
+            // turn off idle checks for a couple seconds while loading savers
+            // stateManager.ignoreReset
+            // stateManager.ignoreReset(true);
 
-      cursor.hide();
+            cursor.hide();
 
-      //
-      // generate an array of promises for rendering screensavers on any screens
-      //
-      const promises = displays
-        .map((d) => runScreenSaverOnDisplay(saver, d))
-        .concat(
-          blanks.map((d) => blankScreen(d))
-        );
+            //
+            // generate an array of promises for rendering screensavers on any screens
+            //
+            const promises = displays
+              .map((d) => runScreenSaverOnDisplay(saver, d))
+              .concat(
+                blanks.map((d) => blankScreen(d))
+              );
 
 
-      Promise.all(promises).then(() => {
-        log.info("our work is done, set state to running");
-        stateManager.running(); 
-      }).catch((e) => {
-        log.info("running screensaver failed");
-        log.info(e);
+            Promise.all(promises).then(() => {
+              log.info("our work is done, set state to running");
+              stateManager.running(); 
+            }).catch((e) => {
+              log.info("running screensaver failed");
+              log.info(e);
 
-        stateManager.reset();
-        cursor.show(); 
-      });
-    });
+              stateManager.reset();
+              cursor.show(); 
+            });
+          });
 };
 
 
@@ -887,7 +888,7 @@ var setupForTesting = function() {
   if ( testMode === true ) {
     log.info("opening shim for test mode");
     openTestShim();
-  }    
+  } 
 };
 
 /**
@@ -1030,7 +1031,7 @@ var checkForPackageUpdates = async function() {
 
     const pd = new PackageDownloader(prefs);
     result = await pd.updatePackage();
-  
+    
     log.info(result);
     toggleSaversUpdated();
   }
@@ -1080,7 +1081,7 @@ var askAboutApplicationsFolder = function() {
  * check for permissions to access certain systems on OSX
  */
 var askAboutMediaAccess = async function() {
-  if (process.platform !== "darwin" ) {
+  if (process.platform !== "darwin" || testMode === true ) {
     return;
   }
 
@@ -1155,7 +1156,7 @@ let setupIPC = function() {
       handles[key].window.close();
     }
   });
-    
+  
   ipcMain.handle("get-prefs", () => {
     log.info("get-prefs");
     return prefs.data;
@@ -1215,13 +1216,13 @@ let setupIPC = function() {
   
   ipcMain.handle("create-screensaver", async(_event, attrs) => {
     const factory = new SaverFactory();
-  
+    
     let systemPath = getSystemDir();
-  
+    
     const src = path.join(systemPath, "system-savers", "__template");
     const dest = prefs.localSource;
     const data = factory.create(src, dest, attrs);
-  
+    
     savers.reset();
 
     return data;
@@ -1283,7 +1284,7 @@ let setupIPC = function() {
       buttons: ["No", "Yes"],
       defaultId: 0
     });
-  
+    
     if ( result.response === 1 ) {
       const appRepo = global.APP_REPO;
       shell.openExternal(`https://github.com/${appRepo}/releases/latest`);
@@ -1311,7 +1312,7 @@ let setupIPC = function() {
         buttons: ["No", "Yes"],
         defaultId: 0
       }); 
-  
+    
     return result.response;
   });
   
@@ -1324,7 +1325,24 @@ let setupIPC = function() {
       });
     return result;
   });
-  
+
+  if ( testMode === true ) {
+    ipcMain.handle("list-menu-items", async () => {
+      const keys = menusAndTrays.trayMenuTemplate().map((item) => item.label);
+      return keys;
+    });
+
+    ipcMain.handle("call-menu-item", async (_event, label) => {
+      console.log(label);
+      const el = menusAndTrays.trayMenuTemplate().find((item) => item.label === label);
+      console.log(el);
+      el.click();
+    });
+
+    ipcMain.handle("get-current-state", async () => {
+      return stateManager.currentStateString;
+    });
+  }
   
   ipcMain.on("quit-app", () => {
     log.info("quit-app");

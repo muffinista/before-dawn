@@ -3,6 +3,10 @@
 const main = require("./index.js");
 
 var toggle = function(appName, value) {
+  if ( process.env.TEST_MODE !== undefined ) {
+    return;
+  }
+
   var AutoLaunch = require("auto-launch");
   var appLauncher = new AutoLaunch({
     name: appName
