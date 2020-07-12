@@ -35,13 +35,22 @@ describe("tray", function() {
     await helpers.stopApp(app);
 	});
 
+  // before(function() {
+  //   if ( process.platform === "win32" ) {
+  //     // eslint-disable-next-line no-console
+  //     console.log("skipping on win32");
+  //     this.skip();
+  //   }
+  // });
+
   before(function() {
-    if ( process.platform === "win32" ) {
+    if ( process.env.CI) {
       // eslint-disable-next-line no-console
-      console.log("skipping on win32");
+      console.log("Cowardly skipping test in CI");
       this.skip();
     }
   });
+
 
   const clickAndExpect = async function(klass, title) {
     //await helpers.waitForWindow(app, "test shim");

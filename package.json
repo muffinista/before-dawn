@@ -62,7 +62,7 @@
     "@arkweid/lefthook": "^0.7.1",
     "@babel/core": "^7.7.2",
     "@babel/preset-env": "^7.7.1",
-    "@octokit/rest": "^17.0.0",
+    "@octokit/rest": "^18.0.0",
     "@sentry/cli": "^1.51.1",
     "@sentry/webpack-plugin": "^1.9.3",
     "babel-eslint": "^10.0.3",
@@ -122,7 +122,6 @@
     "webpack-cli": "^3.3.9",
     "webpack-dev-server": "^3.9.0",
     "webpack-hot-middleware": "^2.25.0",
-    "webpack-node-externals": "^1.7.2",
     "xvfb-maybe": "^0.2.1"
   },
   "build": {
