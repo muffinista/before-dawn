@@ -44,7 +44,7 @@ describe("Settings", function() {
     await app.start();
     await app.fakeDialog.mock(fakeDialogOpts);
     await app.client.waitUntilWindowLoaded();
-    await app.electron.ipcRenderer.send("open-window", "prefs");
+    await helpers.callIpc(app, "open-window prefs");
     await helpers.waitForWindow(app, "Before Dawn: Preferences");
     await helpers.click(app, "button.settings");
     await helpers.waitForWindow(app, "Before Dawn: Settings");

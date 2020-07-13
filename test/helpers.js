@@ -181,9 +181,11 @@ exports.getWindowByTitle = async (app, title) => {
     await app.client.waitUntilWindowLoaded();
   }
   catch(e) {
-    // Error: waitUntilWindowLoaded waitUntil condition failed with the following reason: no such window: target window already closed
-    console.log(e);
+    // Error: waitUntilWindowLoaded waitUntil condition failed 
+    // with the following reason: no such window: target window already closed
+    // console.log(e);
   }
+
   try {
     await app.client.switchWindow(title);
     return true;
@@ -286,6 +288,16 @@ exports.waitForWindowClosed = async (app, title, skipAssert) => {
 
 exports.waitUntilBooted = async(app) => {
   return exports.waitForWindow(app, "test shim");
+};
+
+exports.callIpc = async(app, method) => {
+  await exports.waitForWindow(app, "test shim");
+
+  let el = await app.client.$("#ipc");
+  await el.setValue(method);
+
+  el = await app.client.$("#ipcSend");
+  await el.click();
 };
 
 exports.outputLogs = function(app) {

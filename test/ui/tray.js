@@ -36,27 +36,21 @@ describe("tray", function() {
 	});
 
   // before(function() {
-  //   if ( process.platform === "win32" ) {
+  //   if ( process.env.CI) {
   //     // eslint-disable-next-line no-console
-  //     console.log("skipping on win32");
+  //     console.log("Cowardly skipping test in CI");
   //     this.skip();
   //   }
   // });
 
-  before(function() {
-    if ( process.env.CI) {
-      // eslint-disable-next-line no-console
-      console.log("Cowardly skipping test in CI");
-      this.skip();
-    }
-  });
-
-
-  const clickAndExpect = async function(klass, title) {
-    //await helpers.waitForWindow(app, "test shim");
-    const el = await app.client.$(`button.${klass}`);
+  /**
+   * 
+   * @param {string} klass class name of button to click
+   * @param {string} title title of window we expect to get
+   */
+  const sendIpcAndExpect = async function(cmd, title) {
+    await helpers.callIpc(app, cmd);
     try {
-      el.click();
       await helpers.waitForWindow(app, title);
       return true;
     }
@@ -65,22 +59,23 @@ describe("tray", function() {
       return false;
     }
   };
-  
+
   describe("run now", function() {
-//    it("opens screensaver", async function() {
-//      assert(await clickAndExpect("RunNow", "screensaver"));
-//    });
+   it("opens screensaver", async function() {
+    await helpers.callIpc(app, "run-screensaver");
+    await helpers.waitForText(app, "#currentState", "running");
+   });
   });
 
   describe("preferences", function() {
     it("opens prefs window", async function() {
-      assert(await clickAndExpect("Preferences", "Before Dawn: Preferences"));
+      assert(await sendIpcAndExpect("open-window prefs", "Before Dawn: Preferences"));
     });
   });
 
   describe("about", function() {
     it("opens about window", async function() {
-      assert(await clickAndExpect("Preferences", "Before Dawn: About"));
+      assert(await sendIpcAndExpect("open-window about", "Before Dawn: About"));
     });
   });
 
@@ -95,11 +90,11 @@ describe("tray", function() {
 
     it("toggles app status", async function() {
       await helpers.waitForText(app, "body", "idle");
-      await helpers.click(app, "button.Disable");
-      await helpers.sleep(1000);
+
+      await helpers.callIpc(app, "pause");
       await helpers.waitForText(app, "body", "paused");
-      await helpers.click(app, "button.Enable");
-      await helpers.sleep(1000);
+
+      await helpers.callIpc(app, "enable");
       await helpers.waitForText(app, "body", "idle");
     });
   });

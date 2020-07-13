@@ -224,9 +224,7 @@ var trayMenuTemplate = function() {
     {
       label: "Disable",
       click: function() {
-        let stateManager = main.getStateManager();
-
-        stateManager.pause();
+        main.setStateToPaused();
         updateTrayIcon();
         main.getTrayMenu().items[1].visible = false;
         main.getTrayMenu().items[2].visible = true;
@@ -235,9 +233,7 @@ var trayMenuTemplate = function() {
     {
       label: "Enable",
       click: function() { 
-        let stateManager = main.getStateManager();
-        stateManager.reset();
-
+        main.resetState();
         updateTrayIcon();
         main.getTrayMenu().items[1].visible = true;
         main.getTrayMenu().items[2].visible = false;

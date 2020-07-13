@@ -718,6 +718,14 @@ var setStateToRunning = function() {
   stateManager.run();
 };
 
+var setStateToPaused = function() {
+  stateManager.pause();
+};
+var resetState = function() {
+  stateManager.reset();
+};
+
+
 /**
  * return a promise the resolves to the path to the screensaver and its options
  */
@@ -1147,21 +1155,47 @@ var handleLocalPackage = async function() {
  * setup assorted IPC listeners
  */
 let setupIPC = function() {
+  /**
+   * open the window specified by 'key', passing args along
+   */
   ipcMain.on("open-window", (_event, key, args) => {
     windowMethods[key](args);
   });
+
+  /**
+   * set screensaver state to paused
+   */
+  ipcMain.on("pause", () => {
+    setStateToPaused();
+  });
+
+  /**
+   * set screensaver state to enabled
+   */
+  ipcMain.on("enable", () => {
+    resetState();
+  });
   
+  /**
+   * close the window specified by 'key'
+   */
   ipcMain.on("close-window", (event, key) => {
     if ( handles[key].window ) {
       handles[key].window.close();
     }
   });
-  
+
+  /**
+   * return prefs data to requester
+   */
   ipcMain.handle("get-prefs", () => {
     log.info("get-prefs");
     return prefs.data;
   });
-  
+
+  /**
+   * return a couple of global variables
+   */
   ipcMain.handle("get-globals", () => {
     return {
       APP_VERSION: global.APP_VERSION,
@@ -1170,18 +1204,27 @@ let setupIPC = function() {
       NEW_RELEASE_AVAILABLE: global.NEW_RELEASE_AVAILABLE
     };
   });
-  
+
+  /**
+   * return a list of screensavers
+   */
   ipcMain.handle("list-savers", async () => {
-    log.info("list-savers");
+    // log.info("list-savers");
     const entries = await savers.list();
     return entries;
   });
-  
+
+  /**
+   * load and return the specified screensaver
+   */
   ipcMain.handle("load-saver", async (_event, key) => {
-    log.info("load-saver", key);
+    // log.info("load-saver", key);
     return await savers.loadFromFile(key);
   });
-  
+
+  /**
+   * delete the specified screensaver
+   */
   ipcMain.handle("delete-saver", async(_event, attrs) => {
     log.info("delete-saver", attrs);
     await savers.delete(attrs);
@@ -1189,6 +1232,9 @@ let setupIPC = function() {
     prefs.reload();
   });
 
+  /**
+   * update prefs with the incoming attrs
+   */
   ipcMain.handle("update-prefs", async(_event, attrs) => {
     log.info("update-prefs", attrs);
 
@@ -1202,18 +1248,28 @@ let setupIPC = function() {
     checkForPackageUpdates();
   });
 
+
+  /**
+   * return the default settings for the app
+   */
   ipcMain.handle("get-defaults", async() => {
     log.info("get-defaults");
     return prefs.defaults;
   });
 
+  /**
+   * update the local source settings
+   */
   ipcMain.handle("update-local-source", async(_event, ls) => {
     log.info("update-local-source", ls);
     prefs.store.set("localSource", ls);
 
     savers.reset();
   });
-  
+
+  /**
+   * create a new screensaver from our template
+   */
   ipcMain.handle("create-screensaver", async(_event, attrs) => {
     const factory = new SaverFactory();
     
@@ -1227,20 +1283,34 @@ let setupIPC = function() {
 
     return data;
   });
-  
+
+  /**
+   * save/update a screensaver object
+   */
   ipcMain.handle("save-screensaver", async(_event, attrs, dest) => {
     const s = new Saver(attrs);
     s.write(attrs, dest);
   });
 
+  /**
+   * return the bounds of the primary screen to the requester
+   */
   ipcMain.handle("get-primary-display-bounds", () => {
     return cachedPrimaryScreen.bounds;
   });
 
+  /**
+   * return a screengrab of the primary screen to the requester
+   */
   ipcMain.handle("get-primary-screenshot", () => {
     return screenshots[cachedPrimaryScreen.id];
   });
 
+  /**
+   * display information about an error happening in a preview in 
+   * the editor window.
+   * @todo i don't think this is working very well
+   */
   ipcMain.on("preview-error", (_event, message, source, lineno) => {
     let opts = {
       message: message,
@@ -1255,27 +1325,55 @@ let setupIPC = function() {
     }
   });
   
+  /**
+   * load the requested URL in a browser
+   */
   ipcMain.on("launch-url", (_event, url) => {
     const { shell } = require("electron");
     shell.openExternal(url);
   });
   
+  /**
+   * handle savers-updated event. this is sent when a screensaver is created/updated
+   */
   ipcMain.on("savers-updated", () => {
     log.info("savers-updated");
     toggleSaversUpdated();
   });
-  
+
+  /**
+   * set autostart value
+   */
   ipcMain.on("set-autostart", (_event, value) => {
     log.info("set-autostart");
+    if ( process.env.TEST_MODE !== undefined ) {
+      log.info("we're in test mode, skipping autostart");
+      return;
+    }
+  
     const autostarter = require("./autostarter.js");
     autostarter.toggle(global.APP_NAME, value);
   });
-  
+
+  /**
+   * handle event to set global launch shortcut
+   */
   ipcMain.on("set-global-launch-shortcut", () => {
     log.info("set-global-launch-shortcut");
     setupLaunchShortcut();
   });
-  
+
+  /**
+   * run the users specified screensaver
+   */
+  ipcMain.on("run-screensaver", () => {
+    log.info("run-screensaver");
+    setStateToRunning();
+  });
+
+  /**
+   * display a dialog about a package update
+   */
   ipcMain.on("display-update-dialog", async () => {
     const result = await dialog.showMessageBox({
       type: "info",
@@ -1290,7 +1388,10 @@ let setupIPC = function() {
       shell.openExternal(`https://github.com/${appRepo}/releases/latest`);
     }
   });
-  
+
+  /**
+   * display a dialog when the user wants to reset to default settings
+   */
   ipcMain.handle("reset-to-defaults-dialog", async () => {
     const result = await dialog.showMessageBox({
       type: "info",
@@ -1301,7 +1402,10 @@ let setupIPC = function() {
     });
     return result.response;
   });
-  
+
+  /**
+   * display a confirmation dialog for deleting a screensaver
+   */
   ipcMain.handle("delete-screensaver-dialog", async (_event, saver) => {
     const result = await dialog.showMessageBox(
       {
@@ -1315,7 +1419,10 @@ let setupIPC = function() {
     
     return result.response;
   });
-  
+
+  /**
+   * display a folder chooser for setting local source
+   */
   ipcMain.handle("show-open-dialog", async () => {
     const result = await dialog.showOpenDialog(
       {
@@ -1327,23 +1434,18 @@ let setupIPC = function() {
   });
 
   if ( testMode === true ) {
-    ipcMain.handle("list-menu-items", async () => {
-      const keys = menusAndTrays.trayMenuTemplate().map((item) => item.label);
-      return keys;
-    });
-
-    ipcMain.handle("call-menu-item", async (_event, label) => {
-      console.log(label);
-      const el = menusAndTrays.trayMenuTemplate().find((item) => item.label === label);
-      console.log(el);
-      el.click();
-    });
-
+    /**
+     * handle requests to get the current state of the app. this
+     * is currently only called by our test shim
+     */
     ipcMain.handle("get-current-state", async () => {
       return stateManager.currentStateString;
     });
   }
   
+  /**
+   * handle quit app events
+   */
   ipcMain.on("quit-app", () => {
     log.info("quit-app");
     quitApp();
@@ -1704,6 +1806,8 @@ if ( testMode === true ) {
 
 exports.log = log;
 exports.setStateToRunning = setStateToRunning;
+exports.setStateToPaused = setStateToPaused;
+exports.resetState = resetState;
 exports.getStateManager = getStateManager;
 exports.getAppIcon = getAppIcon;
 exports.getTrayMenu = getTrayMenu;

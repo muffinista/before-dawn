@@ -30,7 +30,7 @@ describe("Prefs", function() {
     app = helpers.application(workingDir, true);
     await app.start();
     await app.client.waitUntilWindowLoaded();
-    await app.electron.ipcRenderer.send("open-window", "prefs");
+    await helpers.callIpc(app, "open-window prefs");
     await helpers.waitForWindow(app, "Before Dawn: Preferences");
     await pickPrefsWindow();
 	});
