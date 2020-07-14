@@ -19,6 +19,14 @@ describe("Prefs", function() {
     return new SaverPrefs(workingDir);
   };
 
+  before(function() {
+    if ( process.platform === "linux" ) {
+      // eslint-disable-next-line no-console
+      console.log("skipping on linux");
+      this.skip();
+    }
+  });
+
   beforeEach(async function() {
     workingDir = helpers.getTempDir();
     saversDir = helpers.getTempDir();
@@ -42,14 +50,6 @@ describe("Prefs", function() {
 
     await helpers.stopApp(app);
 	});
-
-  before(function() {
-    if ( process.platform === "linux" ) {
-      // eslint-disable-next-line no-console
-      console.log("skipping on linux");
-      this.skip();
-    }
-  });
 
   it("lists screensavers", async function() {
     await helpers.waitForText(app, "body", "Screensaver One", true);
