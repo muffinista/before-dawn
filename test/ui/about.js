@@ -11,16 +11,16 @@ describe("About", function() {
   const windowTitle = "Before Dawn: About!";
   helpers.setupTest(this);
 
-  beforeEach(() => {
+  beforeEach(async () => {
     workingDir = helpers.getTempDir();
     helpers.setupFullConfig(workingDir);
 
     app = helpers.application(workingDir, true);
 
-    return app.start().
-              then(() => helpers.waitUntilBooted(app) ).
-              then(() => app.electron.ipcRenderer.send("open-window", "about")).
-              then(() => helpers.waitForWindow(app, windowTitle) );
+    await app.start();
+    await helpers.waitUntilBooted(app);
+    await helpers.callIpc(app, "open-window about");
+    await helpers.waitForWindow(app, windowTitle);
   });
 
 	afterEach(function() {
@@ -31,12 +31,11 @@ describe("About", function() {
     return helpers.stopApp(app);
 	});
 
-  it("has some text and current version number", function() {
-    return helpers.waitForWindow(app, windowTitle).
-      then(() => app.client.getText("body")).
-      then((res) => {
-        assert(res.lastIndexOf("// screensaver fun //") !== -1);
-        assert(res.lastIndexOf(packageJSON.version) !== -1);
-      });
+  it("has some text and current version number", async function() {
+    const elem = await app.client.$("body");
+    const text = await elem.getText();
+
+    assert(text.lastIndexOf("// screensaver fun //") !== -1);
+    assert(text.lastIndexOf(packageJSON.version) !== -1);
   });
 });

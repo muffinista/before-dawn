@@ -93,26 +93,28 @@ let mainConfig = {
     new CleanWebpackPlugin({
       cleanOnceBeforeBuildPatterns: []
     }),
-    new CopyWebpackPlugin([
-      {
-        from: path.join(__dirname, "package.json"),
-        to: path.join(outputDir)
-      },
-      {
-        from: path.join(__dirname, "src", "main", "assets"),
-        to: path.join(outputDir, "assets"),
-        ignore: [".*"]
-      },
-      {
-        from: path.join(__dirname, "src", "main", "system-savers"),
-        to: path.join(outputDir, "system-savers"),
-        ignore: [".*"]
-      },
-      {
-        from: path.join(__dirname, "src", "shim.html"),
-        to: path.join(outputDir)
-      }
-    ]),
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: path.join(__dirname, "package.json"),
+          to: path.join(outputDir)
+        },
+        {
+          from: path.join(__dirname, "src", "main", "assets"),
+          to: path.join(outputDir, "assets"),
+          globOptions: {
+            ignore: [".*"]
+          }
+        },
+        {
+          from: path.join(__dirname, "src", "main", "system-savers"),
+          to: path.join(outputDir, "system-savers"),
+          globOptions: {
+            ignore: [".*"]
+          }
+        }
+      ]
+    }),
     new webpack.NoEmitOnErrorsPlugin(),
   ],
   resolve: {

@@ -165,7 +165,7 @@ catch(e) {
 var openGrabberWindow = function() {
   return new Promise((resolve) => {
     log.info("openGrabberWindow");
-    const grabberUrl = "file://" + __dirname + "/assets/grabber.html";
+    const grabberUrl = `file://${__dirname}/assets/grabber.html`;
 
     var grabberWindow = new BrowserWindow({
       show: false,
@@ -208,7 +208,7 @@ var grabScreen = function(s) {
       (process.platform === "darwin" && systemPreferences.getMediaAccessStatus("screen") !== "granted" ) ||
       testMode === true ) {
       resolve({
-          url: path.join(__dirname, "assets", "color-bars.png")
+        url: path.join(__dirname, "assets", "color-bars.png")
       });
     }
     else {
@@ -254,11 +254,12 @@ var openTestShim = function() {
     width: 200,
     height: 400,
     webPreferences: {
+      webSecurity: false,
       nodeIntegration: true
     }
   });
 
-  var shimUrl = "file://" + __dirname + "/shim.html";
+  const shimUrl = `file://${__dirname}/assets/shim.html`;
   testWindow.loadURL(shimUrl);
 };
 
@@ -569,18 +570,18 @@ var runSaver = function(screenshot, saver, s, url_opts, tickCount) {
           w.webContents.insertCSS(globalCSSCode);
         }
       });
-  
+      
       // we could do something nice with either of these events
       w.webContents.on("crashed", log.info);
       w.webContents.on("unresponsive", log.info);
-  
+      
       
       w.once("ready-to-show", () => {
         log.info("ready-to-show", s.id);
         if ( testMode !== true ) {
           windows.setFullScreen(w);
         }
-  
+        
         diff = process.hrtime(tickCount);
         log.info(`rendered in ${diff[0] * 1e9 + diff[1]} nanoseconds`);
         resolve(s.id);
@@ -589,12 +590,12 @@ var runSaver = function(screenshot, saver, s, url_opts, tickCount) {
       if ( typeof(screenshot) !== "undefined" ) {
         url_opts.screenshot = encodeURIComponent("file://" + screenshot);
       }
-  
+      
       const urlParams = new URLSearchParams(url_opts);
       let url = `${saver.url}?${urlParams.toString()}`;
-  
+      
       log.info("Loading " + url, s.id);
-  
+      
       if ( debugMode === true ) {
         w.webContents.openDevTools();
       }
@@ -657,14 +658,14 @@ var blankScreen = function(s) {
       let windowOpts = getWindowOpts(s);
       let w = new BrowserWindow(windowOpts);     
       w.isSaver = true;
-    
+      
       windows.setFullScreen(w);
-    
+      
       log.info("blankScreen", s.id, windowOpts);
-    
+      
       w.show();  
     }
-  
+    
     resolve(s.id); 
   });
 };
@@ -717,6 +718,14 @@ var setStateToRunning = function() {
   stateManager.run();
 };
 
+var setStateToPaused = function() {
+  stateManager.pause();
+};
+var resetState = function() {
+  stateManager.reset();
+};
+
+
 /**
  * return a promise the resolves to the path to the screensaver and its options
  */
@@ -748,54 +757,54 @@ var runScreenSaver = function() {
 
   setupPromise.
     then((saverKey, settings) => savers.loadFromFile(saverKey, settings)).
-    catch((err) => {
-      log.info("================ loading saver failed?");
-      log.info(err.message);
-      return undefined;
-    }).
-    then((saver) => {
-      var displays = [];
-      var blanks = [];
-      
-      // make sure we have something to display
-      if ( typeof(saver) === "undefined" ) {
-        log.info("No screensaver defined! Just blank everything");
-        blanks = cachedScreens;
-      }
-      else {
-        displays = getDisplays();
-        if ( debugMode !== true && testMode !== true && prefs.runOnSingleDisplay === true ) {
-          blanks = getNonPrimaryDisplays();
-        }
-      }
+          catch((err) => {
+            log.info("================ loading saver failed?");
+            log.info(err.message);
+            return undefined;
+          }).
+          then((saver) => {
+            var displays = [];
+            var blanks = [];
+            
+            // make sure we have something to display
+            if ( typeof(saver) === "undefined" ) {
+              log.info("No screensaver defined! Just blank everything");
+              blanks = cachedScreens;
+            }
+            else {
+              displays = getDisplays();
+              if ( debugMode !== true && testMode !== true && prefs.runOnSingleDisplay === true ) {
+                blanks = getNonPrimaryDisplays();
+              }
+            }
 
-      // turn off idle checks for a couple seconds while loading savers
-      // stateManager.ignoreReset
-      // stateManager.ignoreReset(true);
+            // turn off idle checks for a couple seconds while loading savers
+            // stateManager.ignoreReset
+            // stateManager.ignoreReset(true);
 
-      cursor.hide();
+            cursor.hide();
 
-      //
-      // generate an array of promises for rendering screensavers on any screens
-      //
-      const promises = displays
-        .map((d) => runScreenSaverOnDisplay(saver, d))
-        .concat(
-          blanks.map((d) => blankScreen(d))
-        );
+            //
+            // generate an array of promises for rendering screensavers on any screens
+            //
+            const promises = displays
+              .map((d) => runScreenSaverOnDisplay(saver, d))
+              .concat(
+                blanks.map((d) => blankScreen(d))
+              );
 
 
-      Promise.all(promises).then(() => {
-        log.info("our work is done, set state to running");
-        stateManager.running(); 
-      }).catch((e) => {
-        log.info("running screensaver failed");
-        log.info(e);
+            Promise.all(promises).then(() => {
+              log.info("our work is done, set state to running");
+              stateManager.running(); 
+            }).catch((e) => {
+              log.info("running screensaver failed");
+              log.info(e);
 
-        stateManager.reset();
-        cursor.show(); 
-      });
-    });
+              stateManager.reset();
+              cursor.show(); 
+            });
+          });
 };
 
 
@@ -887,7 +896,7 @@ var setupForTesting = function() {
   if ( testMode === true ) {
     log.info("opening shim for test mode");
     openTestShim();
-  }    
+  } 
 };
 
 /**
@@ -1030,7 +1039,7 @@ var checkForPackageUpdates = async function() {
 
     const pd = new PackageDownloader(prefs);
     result = await pd.updatePackage();
-  
+    
     log.info(result);
     toggleSaversUpdated();
   }
@@ -1080,7 +1089,7 @@ var askAboutApplicationsFolder = function() {
  * check for permissions to access certain systems on OSX
  */
 var askAboutMediaAccess = async function() {
-  if (process.platform !== "darwin" ) {
+  if (process.platform !== "darwin" || testMode === true ) {
     return;
   }
 
@@ -1146,21 +1155,47 @@ var handleLocalPackage = async function() {
  * setup assorted IPC listeners
  */
 let setupIPC = function() {
+  /**
+   * open the window specified by 'key', passing args along
+   */
   ipcMain.on("open-window", (_event, key, args) => {
     windowMethods[key](args);
   });
+
+  /**
+   * set screensaver state to paused
+   */
+  ipcMain.on("pause", () => {
+    setStateToPaused();
+  });
+
+  /**
+   * set screensaver state to enabled
+   */
+  ipcMain.on("enable", () => {
+    resetState();
+  });
   
+  /**
+   * close the window specified by 'key'
+   */
   ipcMain.on("close-window", (event, key) => {
     if ( handles[key].window ) {
       handles[key].window.close();
     }
   });
-    
+
+  /**
+   * return prefs data to requester
+   */
   ipcMain.handle("get-prefs", () => {
     log.info("get-prefs");
     return prefs.data;
   });
-  
+
+  /**
+   * return a couple of global variables
+   */
   ipcMain.handle("get-globals", () => {
     return {
       APP_VERSION: global.APP_VERSION,
@@ -1169,18 +1204,27 @@ let setupIPC = function() {
       NEW_RELEASE_AVAILABLE: global.NEW_RELEASE_AVAILABLE
     };
   });
-  
+
+  /**
+   * return a list of screensavers
+   */
   ipcMain.handle("list-savers", async () => {
-    log.info("list-savers");
+    // log.info("list-savers");
     const entries = await savers.list();
     return entries;
   });
-  
+
+  /**
+   * load and return the specified screensaver
+   */
   ipcMain.handle("load-saver", async (_event, key) => {
-    log.info("load-saver", key);
+    // log.info("load-saver", key);
     return await savers.loadFromFile(key);
   });
-  
+
+  /**
+   * delete the specified screensaver
+   */
   ipcMain.handle("delete-saver", async(_event, attrs) => {
     log.info("delete-saver", attrs);
     await savers.delete(attrs);
@@ -1188,6 +1232,9 @@ let setupIPC = function() {
     prefs.reload();
   });
 
+  /**
+   * update prefs with the incoming attrs
+   */
   ipcMain.handle("update-prefs", async(_event, attrs) => {
     log.info("update-prefs", attrs);
 
@@ -1201,45 +1248,69 @@ let setupIPC = function() {
     checkForPackageUpdates();
   });
 
+
+  /**
+   * return the default settings for the app
+   */
   ipcMain.handle("get-defaults", async() => {
     log.info("get-defaults");
     return prefs.defaults;
   });
 
+  /**
+   * update the local source settings
+   */
   ipcMain.handle("update-local-source", async(_event, ls) => {
     log.info("update-local-source", ls);
     prefs.store.set("localSource", ls);
 
     savers.reset();
   });
-  
+
+  /**
+   * create a new screensaver from our template
+   */
   ipcMain.handle("create-screensaver", async(_event, attrs) => {
     const factory = new SaverFactory();
-  
+    
     let systemPath = getSystemDir();
-  
+    
     const src = path.join(systemPath, "system-savers", "__template");
     const dest = prefs.localSource;
     const data = factory.create(src, dest, attrs);
-  
+    
     savers.reset();
 
     return data;
   });
-  
+
+  /**
+   * save/update a screensaver object
+   */
   ipcMain.handle("save-screensaver", async(_event, attrs, dest) => {
     const s = new Saver(attrs);
     s.write(attrs, dest);
   });
 
+  /**
+   * return the bounds of the primary screen to the requester
+   */
   ipcMain.handle("get-primary-display-bounds", () => {
     return cachedPrimaryScreen.bounds;
   });
 
+  /**
+   * return a screengrab of the primary screen to the requester
+   */
   ipcMain.handle("get-primary-screenshot", () => {
     return screenshots[cachedPrimaryScreen.id];
   });
 
+  /**
+   * display information about an error happening in a preview in 
+   * the editor window.
+   * @todo i don't think this is working very well
+   */
   ipcMain.on("preview-error", (_event, message, source, lineno) => {
     let opts = {
       message: message,
@@ -1254,27 +1325,55 @@ let setupIPC = function() {
     }
   });
   
+  /**
+   * load the requested URL in a browser
+   */
   ipcMain.on("launch-url", (_event, url) => {
     const { shell } = require("electron");
     shell.openExternal(url);
   });
   
+  /**
+   * handle savers-updated event. this is sent when a screensaver is created/updated
+   */
   ipcMain.on("savers-updated", () => {
     log.info("savers-updated");
     toggleSaversUpdated();
   });
-  
+
+  /**
+   * set autostart value
+   */
   ipcMain.on("set-autostart", (_event, value) => {
     log.info("set-autostart");
+    if ( process.env.TEST_MODE !== undefined ) {
+      log.info("we're in test mode, skipping autostart");
+      return;
+    }
+  
     const autostarter = require("./autostarter.js");
     autostarter.toggle(global.APP_NAME, value);
   });
-  
+
+  /**
+   * handle event to set global launch shortcut
+   */
   ipcMain.on("set-global-launch-shortcut", () => {
     log.info("set-global-launch-shortcut");
     setupLaunchShortcut();
   });
-  
+
+  /**
+   * run the users specified screensaver
+   */
+  ipcMain.on("run-screensaver", () => {
+    log.info("run-screensaver");
+    setStateToRunning();
+  });
+
+  /**
+   * display a dialog about a package update
+   */
   ipcMain.on("display-update-dialog", async () => {
     const result = await dialog.showMessageBox({
       type: "info",
@@ -1283,13 +1382,16 @@ let setupIPC = function() {
       buttons: ["No", "Yes"],
       defaultId: 0
     });
-  
+    
     if ( result.response === 1 ) {
       const appRepo = global.APP_REPO;
       shell.openExternal(`https://github.com/${appRepo}/releases/latest`);
     }
   });
-  
+
+  /**
+   * display a dialog when the user wants to reset to default settings
+   */
   ipcMain.handle("reset-to-defaults-dialog", async () => {
     const result = await dialog.showMessageBox({
       type: "info",
@@ -1300,7 +1402,10 @@ let setupIPC = function() {
     });
     return result.response;
   });
-  
+
+  /**
+   * display a confirmation dialog for deleting a screensaver
+   */
   ipcMain.handle("delete-screensaver-dialog", async (_event, saver) => {
     const result = await dialog.showMessageBox(
       {
@@ -1311,10 +1416,13 @@ let setupIPC = function() {
         buttons: ["No", "Yes"],
         defaultId: 0
       }); 
-  
+    
     return result.response;
   });
-  
+
+  /**
+   * display a folder chooser for setting local source
+   */
   ipcMain.handle("show-open-dialog", async () => {
     const result = await dialog.showOpenDialog(
       {
@@ -1324,8 +1432,20 @@ let setupIPC = function() {
       });
     return result;
   });
+
+  if ( testMode === true ) {
+    /**
+     * handle requests to get the current state of the app. this
+     * is currently only called by our test shim
+     */
+    ipcMain.handle("get-current-state", async () => {
+      return stateManager.currentStateString;
+    });
+  }
   
-  
+  /**
+   * handle quit app events
+   */
   ipcMain.on("quit-app", () => {
     log.info("quit-app");
     quitApp();
@@ -1686,6 +1806,8 @@ if ( testMode === true ) {
 
 exports.log = log;
 exports.setStateToRunning = setStateToRunning;
+exports.setStateToPaused = setStateToPaused;
+exports.resetState = resetState;
 exports.getStateManager = getStateManager;
 exports.getAppIcon = getAppIcon;
 exports.getTrayMenu = getTrayMenu;

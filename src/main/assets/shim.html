@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>test shim</title>
+  </head>
+
+  <body>
+    test shim!
+
+    <input id="ipc" value="" />
+    <button id="ipcSend">go</button>
+
+    <div id="currentState"></div>
+    <script>
+     const { ipcRenderer } = require('electron');
+     document.querySelector('#ipcSend').addEventListener("click", async () => {
+        const vals = document.querySelector('#ipc').value.split(' ');
+        await ipcRenderer.send(vals[0], vals[1]);
+     });
+
+     setInterval(function() {
+       ipcRenderer.invoke('get-current-state').then((state) => {
+         document.querySelector("#currentState").innerHTML = state;
+       });
+     }, 100);
+    </script>
+  </body>
+</html>

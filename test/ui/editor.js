@@ -28,117 +28,103 @@ describe("Editor", function() {
     }
   });
 
-	beforeEach(() => {
+	beforeEach(async () => {
     workingDir = helpers.getTempDir();
-    app = helpers.application(workingDir, true);
     
     var saversDir = helpers.getTempDir();
 
     saverJSON = helpers.addSaver(saversDir, "saver-one", "saver.json");
 
-		return app.start().
-      then(() => helpers.waitUntilBooted(app) ).
-      then(() => app.client.electron.ipcRenderer.send("open-window", "editor", {
-        screenshot: "file://" + path.join(__dirname, "../fixtures/screenshot.png"),
-        src: saverJSON
-      })).
-      then(() => helpers.waitForWindow(app, windowTitle) );
+    app = helpers.application(workingDir, true);
+    await app.start();
+    await app.client.waitUntilWindowLoaded();
+    await app.electron.ipcRenderer.send("open-window", "editor", {
+      screenshot: "file://" + path.join(__dirname, "../fixtures/screenshot.png"),
+      src: saverJSON
     });
+    await helpers.waitForWindow(app, windowTitle);
+    await pickEditorWindow();
+  });
 
   afterEach(function() {
-    // if (this.currentTest.state === "failed") {
-    //   helpers.outputLogs(app);
-    // }
+    if (this.currentTest.state === "failed") {
+      helpers.outputLogs(app);
+    }
 
     return helpers.stopApp(app);
   });
     
-  it("edits basic settings", function() {
-    return pickEditorWindow().
-      then(() => app.client.getValue("#saver-form [name='name']")).
-      then((res) => {
-        assert.equal("Screensaver One", res);
-      }).
-      then(() => app.client.setValue("#saver-form [name='name']", "A New Name!!!")).
-      then(() => app.client.setValue("#saver-form [name='description']", "A Thing I Made?")).
-      then(() => app.client.click("button.save")).
-      then(() => {
-        var p = new Promise( (resolve) => {
-          setTimeout(() => {
-            var x = JSON.parse(fs.readFileSync(saverJSON)).name;
-            resolve(x);
-          }, 1000);
-        });
+  it("edits basic settings", async function() {
+    const val = await helpers.getValue(app, "#saver-form [name='name']");
+    assert.equal("Screensaver One", val);
 
-        return p;
-      }).
-      then((res) => { assert.equal(res, "A New Name!!!"); });
+    await helpers.setValue(app, "#saver-form [name='name']", "A New Name!!!");
+    await helpers.setValue(app, "#saver-form [name='description']", "A Thing I Made?");
+    await helpers.click(app, "button.save");
+
+    await helpers.sleep(100);
+
+    var x = JSON.parse(fs.readFileSync(saverJSON)).name;
+    assert.equal(x, "A New Name!!!");
   });
 
-  it("adds and removes options", function() {
-    return pickEditorWindow().
-      then(() => app.client.waitUntilTextExists("body", "Options", 60000)).
-      then(() => app.client.setValue(".entry[data-index='0'] [name='name']", "My Option")).
-      then(() => app.client.setValue(".entry[data-index='0'] [name='description']", "An Option I Guess?")).
-      then(() => app.webContents.executeJavaScript("document.querySelector('button.add-option').scrollIntoView()")).
-      then(() => app.client.click("button.add-option")).
-      then(() => app.client.setValue(".entry[data-index='1'] [name='name']", "My Second Option")).
-      then(() => app.client.setValue(".entry[data-index='1'] [name='description']", "Another Option I Guess?")).
-      then(() => app.client.selectByVisibleText(".entry[data-index='1'] select", "yes/no")).
-      then(() => app.webContents.executeJavaScript("document.querySelector('button.add-option').scrollIntoView()")).
-      then(() => app.client.click("button.add-option")).
-      then(() => app.client.setValue(".entry[data-index='2'] [name='name']", "My Third Option")).
-      then(() => app.client.setValue(".entry[data-index='2'] [name='description']", "Here We Go Again")).
-      then(() => app.client.selectByVisibleText(".entry[data-index='2'] select", "slider")).
-      then(() => app.client.click("button.save")).
-      then(() => {
-        var p = new Promise( (resolve) => {
-          setTimeout(() => {
-            var x = JSON.parse(fs.readFileSync(saverJSON));
-            resolve(x);
-          }, 1000);
-        });
+  it("adds and removes options", async function() {
+    await helpers.waitForText(app, "body", "Options", true);
 
-        return p;
-      }).
-      then((data) => {
-        var opt = data.options[0];
-        assert.equal("My Option", opt.name);
-        assert.equal("An Option I Guess?", opt.description);
-        assert.equal("text", opt.type);
+    await helpers.setValue(app, ".entry[data-index='0'] [name='name']", "My Option");
+    await helpers.setValue(app, ".entry[data-index='0'] [name='description']", "An Option I Guess?");
+    await app.webContents.executeJavaScript("document.querySelector('button.add-option').scrollIntoView()");
+    await helpers.click(app, "button.add-option");
+    await helpers.setValue(app, ".entry[data-index='1'] [name='name']", "My Second Option");
+    await helpers.setValue(app, ".entry[data-index='1'] [name='description']", "Another Option I Guess?");
 
-        opt = data.options[1];
-        assert.equal("My Second Option", opt.name);
-        assert.equal("Another Option I Guess?", opt.description);
-        assert.equal("boolean", opt.type);
+    let el = await app.client.$(".entry[data-index='1'] select");
+    await el.selectByVisibleText("yes/no");
 
-        opt = data.options[2];
-        assert.equal("My Third Option", opt.name);
-        assert.equal("Here We Go Again", opt.description);
-        assert.equal("slider", opt.type);
-      }).
-      then(() => app.client.click(".entry[data-index='1'] button.remove-option")).
-      then(() => app.client.click("button.save")).
-      then(() => {
-        var p = new Promise( (resolve) => {
-          setTimeout(() => {
-            var x = JSON.parse(fs.readFileSync(saverJSON));
-            resolve(x);
-          }, 1000);
-        });
+    await app.webContents.executeJavaScript("document.querySelector('button.add-option').scrollIntoView()");
+    await helpers.click(app, "button.add-option");
+    await helpers.setValue(app, ".entry[data-index='2'] [name='name']", "My Third Option");
+    await helpers.setValue(app, ".entry[data-index='2'] [name='description']", "Here We Go Again");
 
-        return p;
-      }).
-      then((data) => {
-        var opt = data.options[0];
-        assert.equal("My Option", opt.name);
-        assert.equal("An Option I Guess?", opt.description);
-        assert.equal("text", opt.type);
-        
-        opt = data.options[1];
-        assert.equal("My Third Option", opt.name);
-        assert.equal("Here We Go Again", opt.description);
-        assert.equal("slider", opt.type);
-      });
-    });
+    el = await app.client.$(".entry[data-index='2'] select");
+    await el.selectByVisibleText("slider");
+
+    await helpers.click(app, "button.save");
+
+    await helpers.sleep(100);
+
+    var data = JSON.parse(fs.readFileSync(saverJSON));
+
+    var opt = data.options[0];
+    assert.equal("My Option", opt.name);
+    assert.equal("An Option I Guess?", opt.description);
+    assert.equal("text", opt.type);
+
+    opt = data.options[1];
+    assert.equal("My Second Option", opt.name);
+    assert.equal("Another Option I Guess?", opt.description);
+    assert.equal("boolean", opt.type);
+
+    opt = data.options[2];
+    assert.equal("My Third Option", opt.name);
+    assert.equal("Here We Go Again", opt.description);
+    assert.equal("slider", opt.type);
+
+    await helpers.click(app, ".entry[data-index='1'] button.remove-option");
+    await helpers.click(app, "button.save");
+
+    await helpers.sleep(100);
+
+    data = JSON.parse(fs.readFileSync(saverJSON));
+
+    opt = data.options[0];
+    assert.equal("My Option", opt.name);
+    assert.equal("An Option I Guess?", opt.description);
+    assert.equal("text", opt.type);
+    
+    opt = data.options[1];
+    assert.equal("My Third Option", opt.name);
+    assert.equal("Here We Go Again", opt.description);
+    assert.equal("slider", opt.type);
+  });
 });
