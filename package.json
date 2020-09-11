@@ -51,7 +51,7 @@
     "hide-cursor": "^0.0.1",
     "linux-battery": "^3.0.1",
     "mkdirp": "^1.0.0",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^2.6.1",
     "osx-battery": "gillstrom/osx-battery.git",
     "proper-lockfile": "^4.1.1",
     "rimraf": "^3.0.0",
