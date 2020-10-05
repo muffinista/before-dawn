@@ -1094,6 +1094,14 @@ var askAboutMediaAccess = async function() {
   }
 
   ["microphone", "camera", "screen"].forEach(async (type) => {
+    // if ( type === "screen" ) {
+    //   const {
+    //     hasScreenCapturePermission,
+    //     hasPromptedForPermission 
+    //   } = require('mac-screen-capture-permissions');
+    //   const result = hasPromptedForPermission();
+    //   const result2 = hasScreenCapturePermission();
+    // }
     // https://www.electronjs.org/docs/api/system-preferences#systempreferencesaskformediaaccessmediatype-macos
     log.info(`access to ${type}: ${systemPreferences.getMediaAccessStatus(type)}`);
 
@@ -1613,9 +1621,9 @@ var updateStateManager = function() {
   log.info(`updateStateManager idleTime: ${prefs.delay} blankTime: ${(prefs.delay + prefs.sleep)}`);
 
   stateManager.setup({
-    idleTime: prefs.delay * 60,
-    blankTime: (prefs.delay + prefs.sleep) * 60,
-    onIdleTime: runScreenSaverIfPowered,
+    idleTime: prefs.delay > 0 ? prefs.delay * 60 : Number.POSITIVE_INFINITY,
+    blankTime: prefs.sleep > 0 ? (prefs.delay + prefs.sleep) * 60 : Number.POSITIVE_INFINITY,
+    onIdleTime: runScreenSaverIfPowered, 
     onBlankTime: blankScreenIfNeeded,
     onReset: windows.closeRunningScreensavers
   });
