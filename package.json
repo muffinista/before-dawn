@@ -114,7 +114,6 @@
     "style-loader": "^1.0.0",
     "url-loader": "^4.1.0",
     "vue": "^2.6.10",
-    "vue-electron": "^1.0.6",
     "vue-loader": "^15.7.1",
     "vue-style-loader": "^4.1.2",
     "vue-template-compiler": "^2.6.10",
