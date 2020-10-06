@@ -14,7 +14,7 @@ before_install:
 - export PATH="$HOME/.yarn/bin:$PATH"
 branches:
   only:
-  - master
+  - main
 cache: yarn
 script:
 - yarn test-lib && yarn release
