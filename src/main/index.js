@@ -1094,6 +1094,8 @@ var askAboutMediaAccess = async function() {
   }
 
   ["microphone", "camera", "screen"].forEach(async (type) => {
+    // note: this might be handy
+    //     "mac-screen-capture-permissions": "^1.1.0",
     // if ( type === "screen" ) {
     //   const {
     //     hasScreenCapturePermission,
