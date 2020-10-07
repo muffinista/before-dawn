@@ -1,5 +1,4 @@
 import Vue from "vue";
-import VueElectron from "vue-electron";
 import BootstrapVue from "bootstrap-vue";
 
 import Prefs from "./Prefs";
@@ -12,13 +11,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
 import "@/../css/styles.scss";
 
-
-if (!process.env.IS_WEB) {
-  Vue.use(require("vue-electron"));
-}
 Vue.config.productionTip = false;
-
-Vue.use(VueElectron);
 Vue.use(BootstrapVue);
 
 var actions = {
