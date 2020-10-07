@@ -10,7 +10,7 @@ before_install:
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -y libx11-dev libxss-dev
   icnsutils graphicsmagick libappindicator1 libxtst-dev ; fi
 - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then cinst -y python2; fi
-- curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.19.2
+- curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.22.4
 - export PATH="$HOME/.yarn/bin:$PATH"
 branches:
   only:
