@@ -5,7 +5,7 @@ permalink: /contributing.html
 ---
 
 Contributions and suggestions are eagerly accepted. Please read the
-[code of conduct](https://github.com/muffinista/before-dawn/blob/master/code_of_conduct.md)
+[code of conduct](https://github.com/muffinista/before-dawn/blob/main/code_of_conduct.md)
 before contributing.
 
 

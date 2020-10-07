@@ -12,7 +12,7 @@ const travisApiUrl = "https://api.travis-ci.org/repo/muffinista%2Fbefore-dawn/re
 const body = {
   "accountName": "muffinista",
   "projectSlug": "before-dawn",
-  "branch": "master"
+  "branch": "main"
 };
 
 const appveyorOpts = {
@@ -26,7 +26,7 @@ const appveyorOpts = {
 
 const travisBody = {
   "request": {
-    "branch": "master"
+    "branch": "main"
   }
 };
 const travisOpts = {

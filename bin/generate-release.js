@@ -27,7 +27,7 @@ async function main() {
     owner: owner, 
     repo: repo, 
     tag_name: tag_name, 
-    target_commitish: "master",
+    target_commitish: "main",
     name: tag_name,
     body: "description",
     draft: draft
