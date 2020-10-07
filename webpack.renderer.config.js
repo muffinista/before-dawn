@@ -19,7 +19,7 @@ const VueLoaderPlugin = require("vue-loader/lib/plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const SentryWebpackPlugin = require("@sentry/webpack-plugin");
 
-const devMode = (process.env.NODE_ENV !== "production");
+// const devMode = (process.env.NODE_ENV !== "production");
 const releaseName = `${packageJSON.productName} ${packageJSON.version}`;
 
 var htmlPageOptions = function(id, title) {
@@ -29,9 +29,9 @@ var htmlPageOptions = function(id, title) {
     id: id,
     title: `${productName}: ${title}`,
     minify: {
-      collapseWhitespace: true,
-      removeAttributeQuotes: true,
-      removeComments: true
+      collapseWhitespace: false,
+      removeAttributeQuotes: false,
+      removeComments: false
     },
     nodeModules: false // devMode ? path.resolve(__dirname, "node_modules") : false
   };
@@ -75,11 +75,9 @@ let rendererConfig = {
         }
       },
       {
-        //test: /\.(scss)$/,
         test: /\.(sa|sc|c)ss$/,
         use: [
-          devMode ? "style-loader" : MiniCssExtractPlugin.loader,
-          //'vue-style-loader',
+          MiniCssExtractPlugin.loader,
           "css-loader",
           "sass-loader",
         ]
@@ -104,16 +102,6 @@ let rendererConfig = {
               sass: "vue-style-loader!css-loader!sass-loader?indentedSyntax=1",
               scss: "vue-style-loader!css-loader!sass-loader"
             }
-          }
-        }
-      },
-      {
-        test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
-        use: {
-          loader: "url-loader",
-          query: {
-            limit: 10000,
-            name: "imgs/[name]--[folder].[ext]"
           }
         }
       },
