@@ -28,7 +28,12 @@ module.exports = class Power {
       const cmd = this.commands[this.platform].cmd;
       const opts = this.commands[this.platform].opts;
   
-      return await this.query(cmd, opts);
+      try {
+        return await this.query(cmd, opts);
+      }
+      catch(e) {
+        return undefined;
+      }
     }
 
     return undefined;

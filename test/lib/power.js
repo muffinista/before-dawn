@@ -7,14 +7,6 @@ const fs = require("fs");
 const Power = require("../../src/lib/power.js");
 
 describe("Power", function() {
-  describe("rawData", () => {
-    it("has output", async () => {
-      let power = new Power();
-      const result = await power.rawData();
-      assert(result);
-    });
-  });
-
   describe("charging", () => {
     const loadFixture = (platform, type) => {
       const f = path.join(__dirname, `../fixtures/power/${platform}-${type}.txt`);
