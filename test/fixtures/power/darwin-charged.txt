@@ -1,0 +1,55 @@
++-o AppleSmartBattery  <class AppleSmartBattery, id 0x1000002cc, registered, matched, active, busy 0 (0 ms), retain 6>
+    {
+      "TimeRemaining" = 21
+      "AvgTimeToEmpty" = 65535
+      "AdapterDetails" = {"HwVersion"="1.0","SerialString"="C04809504AEGW85BC","AdapterID"=5718,"Manufacturer"="Apple Inc.","FwVersion"="01070069","Watts"=86,"Current"=4300,"PMUConfiguration"=2092,"Model"="0x1656","Voltage"=20000,"Name"="87W USB-C Power Adapter"}
+      "AppleRawCurrentCapacity" = 6526
+      "InstantTimeToEmpty" = 65535
+      "AppleRawMaxCapacity" = 6835
+      "ExternalChargeCapable" = Yes
+      "FullPathUpdated" = 1603825132
+      "CellVoltage" = (4343,4339,4334,0)
+      "Voltage" = 13013
+      "BatteryInvalidWakeSeconds" = 30
+      "AdapterInfo" = 0
+      "MaxCapacity" = 6835
+      "DesignCycleCount70" = 0
+      "PermanentFailureStatus" = 0
+      "Manufacturer" = "SMP"
+      "AppleRawAdapterDetails" = ({"HwVersion"="1.0","SerialString"="C04809504AEGW85BC","AdapterID"=5718,"Manufacturer"="Apple Inc.","FwVersion"="01070069","Watts"=86,"Current"=4300,"PMUConfiguration"=2092,"Model"="0x1656","Voltage"=20000,"Name"="87W USB-C Power Adapter"})
+      "Location" = 0
+      "CurrentCapacity" = 6526
+      "BatteryFCCData" = {"DOD2"=480,"DOD0"=488,"PassedCharge"=182,"DOD1"=488,"ResScale"=200}
+      "LegacyBatteryInfo" = {"Amperage"=1537,"Flags"=7,"Capacity"=6835,"Current"=6526,"Voltage"=13013,"Cycle Count"=11}
+      "BatteryInstalled" = Yes
+      "FirmwareSerialNumber" = 1
+      "CycleCount" = 11
+      "PackReserve" = 200
+      "DesignCapacity" = 6669
+      "OperationStatus" = 58371
+      "ManufactureDate" = 20674
+      "AvgTimeToFull" = 21
+      "ChargerData" = {"ChargingCurrent"=1936,"NotChargingReason"=0,"ChargingVoltage"=13016,"VacVoltageLimit"=4342}
+      "BatterySerialNumber" = "D860224N01CHDWCC2"
+      "BootPathUpdated" = 1602953067
+      "BatteryData" = {"StateOfCharge"=96,"PMUConfigured"=976,"Voltage"=13016,"QmaxCell1"=7295,"AdapterPower"=1115924509,"SystemPower"=6758,"ResScale"=200,"QmaxCell2"=7204,"QmaxCell0"=7218,"CycleCount"=11,"DesignCapacity"=6669}
+      "PostDischargeWaitSeconds" = 120
+      "Temperature" = 3083
+      "BestAdapterIndex" = 0
+      "UserVisiblePathUpdated" = 1603825192
+      "IOReportLegendPublic" = Yes
+      "InstantAmperage" = 1536
+      "FullyCharged" = No
+      "ManufacturerData" = <00000000070200013925000003353830033030320341544c003b00>
+      "DeviceName" = "bq20z451"
+      "MaxErr" = 1
+      "IOGeneralInterest" = "IOCommand is not serializable"
+      "IOReportLegend" = ({"IOReportChannels"=((7167869599145487988,6460407809,"BatteryCycleCount")),"IOReportGroupName"="Battery","IOReportChannelInfo"={"IOReportChannelUnit"=0}})
+      "Amperage" = 1537
+      "IsCharging" = Yes
+      "DesignCycleCount9C" = 1000
+      "PostChargeWaitSeconds" = 120
+      "ExternalConnected" = Yes
+    }
+    
+

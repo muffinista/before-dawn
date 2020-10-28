@@ -36,8 +36,6 @@ const path = require("path");
 const url = require("url");
 
 const screenLock = require("./screen.js");
-const power = require("./power.js");
-
 
 const StateManager = require("./state_manager.js");
 const SaverPrefs = require("../lib/prefs.js");
@@ -45,6 +43,7 @@ const SaverFactory = require("../lib/saver-factory.js");
 const Saver = require("../lib/saver.js");
 const SaverListManager = require("../lib/saver-list.js");
 const Package = require("../lib/package.js");
+const Power = require("../lib/power.js");
 
 var releaseChecker;
 
@@ -1587,6 +1586,7 @@ var runScreenSaverIfPowered = function() {
   
   // check if we are on battery, and if we should be running in that case
   if ( checkPowerState && prefs.disableOnBattery ) {
+    const power = new Power();
     power.charging().then((is_powered) => {
       if ( is_powered ) {       
         runScreenSaverIfNotFullscreen();
