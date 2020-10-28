@@ -71,7 +71,8 @@ import SaverOptions from "@/components/SaverOptions";
 import SaverSummary from "@/components/SaverSummary";
 import Noty from "noty";
 
-const { ipcRenderer } = require("electron");
+const ipcRenderer = window.ipcRenderer;
+
 const log = require("electron-log");
 
 export default {

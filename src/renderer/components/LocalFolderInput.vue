@@ -25,7 +25,8 @@
 </template>
 
 <script>
-const { ipcRenderer } = require("electron");
+const ipcRenderer = window.ipcRenderer;
+
 export default {
   name: "LocalFolderInput",
   components: { },
