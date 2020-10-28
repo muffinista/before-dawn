@@ -3,13 +3,6 @@
   <head>
     <meta charset="utf-8">
     <title><%= htmlWebpackPlugin.options.title %></title>
-    <% if (htmlWebpackPlugin.options.nodeModules) { %>
-      <!-- Add `node_modules/` to global paths so `require` works properly in development -->
-      <script>
-        const remote = require('electron').remote;
-        require('module').globalPaths.push('<%= htmlWebpackPlugin.options.nodeModules.replace(/\\/g, '\\\\') %>');
-      </script>
-    <% } %>
   </head>
   <body>
     <div id="<%= htmlWebpackPlugin.options.id %>"></div>

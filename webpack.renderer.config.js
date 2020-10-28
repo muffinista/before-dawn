@@ -32,8 +32,7 @@ var htmlPageOptions = function(id, title) {
       collapseWhitespace: false,
       removeAttributeQuotes: false,
       removeComments: false
-    },
-    nodeModules: false // devMode ? path.resolve(__dirname, "node_modules") : false
+    }
   };
 };
 
