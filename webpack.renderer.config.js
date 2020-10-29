@@ -160,14 +160,14 @@ let rendererConfig = {
     })
   ],
   optimization: {
-    noEmitOnErrors: true,
+    emitOnErrors: false,
     nodeEnv: (process.env.NODE_ENV === "production" ? "production" : "development")
   },
   output: {
     filename: "[name].js",
     libraryTarget: "commonjs2",
     path: outputDir,
-    sourceMapFilename: "[name].js.map"
+    publicPath: "."
   },
   mode: (process.env.NODE_ENV === "production" ? "production" : "development"),
   resolve: {

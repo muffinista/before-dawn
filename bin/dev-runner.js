@@ -61,7 +61,7 @@ function startRenderer () {
     const server = new WebpackDevServer(
       compiler,
       {
-        contentBase: path.join(__dirname, "../"),
+        contentBase: path.join(__dirname, "..", "output"),
         quiet: true,
         before (app, ctx) {
           app.use(hotMiddleware);
