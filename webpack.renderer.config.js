@@ -117,25 +117,6 @@ let rendererConfig = {
     new HtmlWebpackPlugin(htmlPageOptions("editor", "Editor")),    
     new HtmlWebpackPlugin(htmlPageOptions("new", "Create Screensaver!")),
     new HtmlWebpackPlugin(htmlPageOptions("about", "About!")),
-    new PurgecssPlugin({
-      paths: glob.sync([
-        path.join(__dirname, "src", "index.ejs"),
-        path.join(__dirname, "src", "**", "*.vue"),
-        path.join(__dirname, "src", "**", "*.js")
-      ]),
-      whitelistPatterns: [
-        /nav/,
-        /nav-tabs/,
-        /nav-link/,
-        /nav-item/,
-        /tablist/,
-        /tabindex/,
-        /tooltip/,
-        /button-group/,
-        /btn/,
-        /noty/
-      ]
-    }),
     new CopyWebpackPlugin({
       patterns: [
         {
@@ -157,7 +138,26 @@ let rendererConfig = {
     new MiniCssExtractPlugin({
       filename: "[name].css",
       chunkFilename: "[id].css"
-    })
+    }),
+    new PurgecssPlugin({
+      paths: glob.sync([
+        path.join(__dirname, "src", "index.ejs"),
+        path.join(__dirname, "src", "**", "*.vue"),
+        path.join(__dirname, "src", "**", "*.js")
+      ]),
+      safelist: [
+        /nav/,
+        /nav-tabs/,
+        /nav-link/,
+        /nav-item/,
+        /tablist/,
+        /tabindex/,
+        /tooltip/,
+        /button-group/,
+        /btn/,
+        /noty/
+      ]
+    }),
   ],
   optimization: {
     emitOnErrors: false,
