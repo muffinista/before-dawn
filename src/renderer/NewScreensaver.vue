@@ -72,7 +72,8 @@
 import SaverForm from "@/components/SaverForm";
 import LocalFolderInput from "@/components/LocalFolderInput";
 
-const { ipcRenderer } = require("electron");
+const ipcRenderer = window.ipcRenderer;
+
 
 export default {
   name: "NewScreensaver",

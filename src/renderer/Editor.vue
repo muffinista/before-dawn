@@ -177,7 +177,8 @@ import SaverOptionInput from "@/components/SaverOptionInput";
 import SaverOptions from "@/components/SaverOptions";
 import Noty from "noty";
 
-const { ipcRenderer } = require("electron");
+const ipcRenderer = window.ipcRenderer;
+
 
 export default {
   name: "Editor",

@@ -1,5 +1,3 @@
-// eslint-disable-next-line no-unused-vars
-const { init } = require("@sentry/electron");
 
 global.IS_DEV = require("electron-is-dev");
 
@@ -31,6 +29,8 @@ global.NEW_RELEASE_AVAILABLE = false;
 global.HELP_URL = "https://muffinista.github.io/before-dawn/";
 global.ISSUES_URL = "https://github.com/muffinista/before-dawn/issues";
 global.APP_CREDITS = "by Colin Mitchell // muffinlabs.com";
+global.SENTRY_DSN = "https://b86f7b0ac5604b55b4fd03adedc5d205@sentry.io/172824";
+
 
 if ( packageJSON.release_server && ! global.IS_DEV ) {
   global.RELEASE_SERVER = packageJSON.release_server;
@@ -69,12 +69,17 @@ global.CONFIG_DEFAULTS = {
   runOnSingleDisplay: true
 };
 
-
-global.TRACK_ERRORS = false;
-
 // this is a free sentry account and the URL will be in every copy of
 // the app that gets distributed, so i'm committing it to the repo for now
-if ( process.env.TEST_MODE === undefined && ! global.IS_DEV ) {
-  global.TRACK_ERRORS = true;
-  require("./assets/sentry.js");
+if ( process.env.TEST_MODE === undefined && ! global.IS_DEV && global.SENTRY_DSN !== undefined ) {
+  console.log(`setting up sentry with ${global.SENTRY_DSN}`);
+  const { init } = require("@sentry/electron/dist/main");
+  init({
+    dsn: global.SENTRY_DSN,
+    release: process.env.BEFORE_DAWN_RELEASE_NAME,
+    onFatalError: (error) => {
+      // eslint-disable-next-line no-console
+      console.log(error);
+    },
+  });
 }

@@ -80,13 +80,13 @@ describe("tray", function() {
   });
 
   describe("enable/disable", function() {
-    before(function() {
-      if ( process.platform === "win32" ) {
-        // eslint-disable-next-line no-console
-        console.log("skipping on win32");
-        this.skip();
-      }
-    });
+    // before(function() {
+    //   if ( process.platform === "win32" ) {
+    //     // eslint-disable-next-line no-console
+    //     console.log("skipping on win32");
+    //     this.skip();
+    //   }
+    // });
 
     it("toggles app status", async function() {
       await helpers.waitForText(app, "body", "idle");

@@ -175,8 +175,8 @@ var openGrabberWindow = function() {
       y: 2000,
       webPreferences: {
         nodeIntegration: true,
-        webSecurity: false, //!global.IS_DEV
-        preload: global.TRACK_ERRORS ? path.join(__dirname, "assets", "sentry.js") : undefined
+        enableRemoteModule: true,
+        webSecurity: false
       }
     });
     grabberWindow.noTray = true;
@@ -213,7 +213,7 @@ var grabScreen = function(s) {
     else {
       let windowRef;
       ipcMain.once(`screenshot-${s.id}`, function(_e, message) {
-        log.info("got screenshot!", message);
+        // log.info("got screenshot!", message);
 
         // close the screen grabber window
         try {
@@ -254,7 +254,8 @@ var openTestShim = function() {
     height: 400,
     webPreferences: {
       webSecurity: false,
-      nodeIntegration: true
+      nodeIntegration: true,
+      enableRemoteModule: true
     }
   });
 
@@ -296,9 +297,10 @@ var openPrefsWindow = function() {
         minHeight: 600,
         resizable: true,
         webPreferences: {
-          webSecurity: false, //!global.IS_DEV
+          webSecurity: false,
+          preload: path.join(__dirname, "assets", "preload.js"),
           nodeIntegration: true,
-          preload: global.TRACK_ERRORS ? path.join(__dirname, "assets", "sentry.js") : undefined
+          enableRemoteModule: process.env.TEST_MODE === "true"
         },
         icon: path.join(__dirname, "assets", "iconTemplate.png")
       });
@@ -345,9 +347,10 @@ var openSettingsWindow = function() {
     modal: true,
     icon: path.join(__dirname, "assets", "iconTemplate.png"),
     webPreferences: {
+      webSecurity: false,
+      preload: path.join(__dirname, "assets", "preload.js"),
       nodeIntegration: true,
-      webSecurity: false, //!global.IS_DEV
-      preload: global.TRACK_ERRORS ? path.join(__dirname, "assets", "sentry.js") : undefined
+      enableRemoteModule: process.env.TEST_MODE === "true"
     }
   });
 
@@ -387,9 +390,10 @@ var addNewSaver = function() {
       height: 700,
       resizable:true,
       webPreferences: {
-        webSecurity: false, //!global.IS_DEV
+        webSecurity: false,
+        preload: path.join(__dirname, "assets", "preload.js"),
         nodeIntegration: true,
-        preload: global.TRACK_ERRORS ? path.join(__dirname, "assets", "sentry.js") : undefined
+        enableRemoteModule: process.env.TEST_MODE === "true"
       },
       icon: path.join(__dirname, "assets", "iconTemplate.png")
     });
@@ -420,9 +424,9 @@ var openAboutWindow = function() {
     resizable:false,
     icon: path.join(__dirname, "assets", "iconTemplate.png"),
     webPreferences: {
+      preload: path.join(__dirname, "assets", "preload.js"),
       nodeIntegration: true,
-      webSecurity: false, //!global.IS_DEV
-      preload: global.TRACK_ERRORS ? path.join(__dirname, "assets", "sentry.js") : undefined
+      enableRemoteModule: process.env.TEST_MODE === "true"
     }
   });
 
@@ -464,9 +468,10 @@ var openEditor = (args) => {
     handles.editor.window = new BrowserWindow({
       show: false,
       webPreferences: {
+        webSecurity: false,
+        preload: path.join(__dirname, "assets", "preload.js"),
         nodeIntegration: true,
-        webSecurity: false, //!global.IS_DEV
-        preload: global.TRACK_ERRORS ? path.join(__dirname, "assets", "sentry.js") : undefined
+        enableRemoteModule: process.env.TEST_MODE === "true"
       },
     });  
   }
@@ -675,7 +680,7 @@ var blankScreen = function(s) {
  * grab a list of displays and cache it for later
  */
 var loadDisplayData = function() {
-  log.info("loadDisplayData");
+  // log.info("loadDisplayData");
   cachedScreens = electronScreen.getAllDisplays();
   cachedPrimaryScreen = electronScreen.getPrimaryDisplay();
 };
@@ -778,8 +783,7 @@ var runScreenSaver = function() {
             }
 
             // turn off idle checks for a couple seconds while loading savers
-            // stateManager.ignoreReset
-            // stateManager.ignoreReset(true);
+            stateManager.ignoreReset(true);
 
             cursor.hide();
 
@@ -960,10 +964,10 @@ var setupIfNeeded = async function() {
     return true;
   }
 
-  log.info(`checking if ${prefs.saver} is valid`);
-  let exists = await savers.confirmExists(prefs.saver);
+  // log.info(`checking if ${prefs.saver} is valid`);
+  const exists = await savers.confirmExists(prefs.saver);
 
-  let results = !exists;
+  // let results = !exists;
   if ( ! exists ) {
     log.info("need to pick a new screensaver");
   }
@@ -971,7 +975,7 @@ var setupIfNeeded = async function() {
     log.info("looks like we are good to go");
   }
 
-  return results;
+  return !exists;
 };
 
 /**
@@ -1525,6 +1529,12 @@ var bootApp = async function() {
   const idler = require("desktop-idle");
   stateManager = new StateManager();
   stateManager.idleFn = idler.getIdleTime;
+
+  // stateManager.idleFn = () => {
+  //   const x = idler.getIdleTime();
+  //   log.info(x);
+  //   return x;
+  // };
 
   updateStateManager();
 

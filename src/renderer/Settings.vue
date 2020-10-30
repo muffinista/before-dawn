@@ -45,7 +45,8 @@ import AdvancedPrefsForm from "@/components/AdvancedPrefsForm";
 import PrefsForm from "@/components/PrefsForm";
 import Noty from "noty";
 
-const { ipcRenderer } = require("electron");
+const ipcRenderer = window.ipcRenderer;
+
 
 export default {
   name: "Settings",
