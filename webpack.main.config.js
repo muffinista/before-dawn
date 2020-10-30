@@ -40,7 +40,7 @@ let mainConfig = {
   devtool: "inline-source-map",
   mode: (process.env.NODE_ENV === "production" ? "production" : "development"),
   entry: {
-    main: path.join(__dirname, "src/main/index.js")
+    main: path.join(__dirname, "src", "main", "index.js")
   },
   externals: deps,
   module: {
@@ -80,7 +80,7 @@ let mainConfig = {
     __filename: false
   },
   optimization: {
-    noEmitOnErrors: true,
+    emitOnErrors: false,
     nodeEnv: (process.env.NODE_ENV === "production" ? "production" : "development")
   },
   output: {
@@ -114,8 +114,7 @@ let mainConfig = {
           }
         }
       ]
-    }),
-    new webpack.NoEmitOnErrorsPlugin(),
+    })
   ],
   resolve: {
     extensions: [".js", ".json", ".node"]
@@ -149,7 +148,7 @@ if (process.env.NODE_ENV === "production") {
 } else {
   mainConfig.plugins.push(
     new webpack.DefinePlugin({
-      "__static": `"${path.join(__dirname, "../static").replace(/\\/g, "\\\\")}"`
+      "__static": `"${path.join(__dirname, "..", "static").replace(/\\/g, "\\\\")}"`
     })
   );
 }

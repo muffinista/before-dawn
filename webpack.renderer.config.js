@@ -52,7 +52,7 @@ let externals = [
 let rendererConfig = {
   devtool: "inline-source-map",
   entry: {
-    renderer: path.join(__dirname, "src/renderer/main.js")
+    renderer: path.join(__dirname, "src", "renderer", "main.js")
   },
   externals: externals,
   module: {
@@ -117,25 +117,6 @@ let rendererConfig = {
     new HtmlWebpackPlugin(htmlPageOptions("editor", "Editor")),    
     new HtmlWebpackPlugin(htmlPageOptions("new", "Create Screensaver!")),
     new HtmlWebpackPlugin(htmlPageOptions("about", "About!")),
-    new PurgecssPlugin({
-      paths: glob.sync([
-        path.join(__dirname, "./src/index.ejs"),
-        path.join(__dirname, "./src/**/*.vue"),
-        path.join(__dirname, "./src/**/*.js")
-      ]),
-      whitelistPatterns: [
-        /nav/,
-        /nav-tabs/,
-        /nav-link/,
-        /nav-item/,
-        /tablist/,
-        /tabindex/,
-        /tooltip/,
-        /button-group/,
-        /btn/,
-        /noty/
-      ]
-    }),
     new CopyWebpackPlugin({
       patterns: [
         {
@@ -157,23 +138,42 @@ let rendererConfig = {
     new MiniCssExtractPlugin({
       filename: "[name].css",
       chunkFilename: "[id].css"
-    })
+    }),
+    new PurgecssPlugin({
+      paths: glob.sync([
+        path.join(__dirname, "src", "index.ejs"),
+        path.join(__dirname, "src", "**", "*.vue"),
+        path.join(__dirname, "src", "**", "*.js")
+      ]),
+      safelist: [
+        /nav/,
+        /nav-tabs/,
+        /nav-link/,
+        /nav-item/,
+        /tablist/,
+        /tabindex/,
+        /tooltip/,
+        /button-group/,
+        /btn/,
+        /noty/
+      ]
+    }),
   ],
   optimization: {
-    noEmitOnErrors: true,
+    emitOnErrors: false,
     nodeEnv: (process.env.NODE_ENV === "production" ? "production" : "development")
   },
   output: {
     filename: "[name].js",
     libraryTarget: "commonjs2",
     path: outputDir,
-    sourceMapFilename: "[name].js.map"
+    publicPath: "."
   },
   mode: (process.env.NODE_ENV === "production" ? "production" : "development"),
   resolve: {
     alias: {
       // handy alias for the root path of render files
-      "@": path.join(__dirname, "src/renderer"),
+      "@": path.join(__dirname, "src", "renderer"),
 
       // vue template compiler
       "vue$": "vue/dist/vue.esm.js"

@@ -197,7 +197,7 @@ var openGrabberWindow = function() {
  * @returns {Promise} Promise that resolves with object containing URL of screenshot
  */
 var grabScreen = function(s) {
-  log.info("grab screen");
+  log.info(`grab screen ${s.id}`);
   return new Promise((resolve) => {
     //
     // bypass screen capture in test mode
