@@ -114,8 +114,9 @@ let mainConfig = {
           }
         }
       ]
-    }),
-    new webpack.NoEmitOnErrorsPlugin(),
+    })
+    // ,
+    // new webpack.NoEmitOnErrorsPlugin(),
   ],
   resolve: {
     extensions: [".js", ".json", ".node"]
