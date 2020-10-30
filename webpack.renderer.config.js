@@ -52,7 +52,7 @@ let externals = [
 let rendererConfig = {
   devtool: "inline-source-map",
   entry: {
-    renderer: path.join(__dirname, "src/renderer/main.js")
+    renderer: path.join(__dirname, "src", "renderer", "main.js")
   },
   externals: externals,
   module: {
@@ -119,9 +119,9 @@ let rendererConfig = {
     new HtmlWebpackPlugin(htmlPageOptions("about", "About!")),
     new PurgecssPlugin({
       paths: glob.sync([
-        path.join(__dirname, "./src/index.ejs"),
-        path.join(__dirname, "./src/**/*.vue"),
-        path.join(__dirname, "./src/**/*.js")
+        path.join(__dirname, "src", "index.ejs"),
+        path.join(__dirname, "src", "**", "*.vue"),
+        path.join(__dirname, "src", "**", "*.js")
       ]),
       whitelistPatterns: [
         /nav/,
@@ -173,7 +173,7 @@ let rendererConfig = {
   resolve: {
     alias: {
       // handy alias for the root path of render files
-      "@": path.join(__dirname, "src/renderer"),
+      "@": path.join(__dirname, "src", "renderer"),
 
       // vue template compiler
       "vue$": "vue/dist/vue.esm.js"
