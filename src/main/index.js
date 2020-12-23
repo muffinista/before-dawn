@@ -56,7 +56,7 @@ const withTimeout = require("async-mutex").withTimeout;
 
 const mutex = withTimeout(new Mutex(), 30000, new Error("timeout"));
 
-const forcefocus = require('forcefocus');
+const forcefocus = require("forcefocus");
 
 // NOTE -- this needs to be global, otherwise the app icon gets
 // garbage collected and won't show up in the system tray
@@ -588,8 +588,10 @@ var runSaver = function(screenshot, saver, s, url_opts, tickCount) {
           windows.setFullScreen(w);
         }
 
-        log.info("force focus");
-        forcefocus.focusWindow(w);
+        if (process.platform === "win32" ) {
+          log.info("force focus");
+          forcefocus.focusWindow(w);
+        }
         
         diff = process.hrtime(tickCount);
         log.info(`rendered in ${diff[0] * 1e9 + diff[1]} nanoseconds`);
