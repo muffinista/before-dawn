@@ -5,9 +5,14 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-latest, macOS-latest]
+        os: [ubuntu-latest, windows-latest, macOS-latest]
         node-version: [12.x]
     steps:
+    - name: Install ubuntu requirements
+      if: ${{ matrix.os == 'ubuntu-latest' }}
+      run: |
+        sudo apt-get -qq update
+        sudo apt-get install -y libx11-dev libxss-dev icnsutils graphicsmagick libappindicator1 libxtst-dev
     - uses: actions/checkout@v2
     - name: Use Node.js
       uses: actions/setup-node@v1
