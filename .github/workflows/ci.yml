@@ -1,5 +1,5 @@
 name: Run tests
-on: [push]
+on: push
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -24,6 +24,6 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-node-
     - name: Setup
-      - run: yarn
+      run: yarn
     - run: yarn test-lib
     - run: yarn test-ui
