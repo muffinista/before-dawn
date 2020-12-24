@@ -1,5 +1,8 @@
 name: Build release
-on: push
+on:
+  push:
+    branches:
+      - main
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -25,4 +28,4 @@ jobs:
     - name: Build
       run: yarn
     - name: Release
-    - run: yarn release
+      run: yarn release
