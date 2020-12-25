@@ -11,13 +11,17 @@ jobs:
     name: Run eslint
     # Set the type of machine to run on
     runs-on: ubuntu-latest
-
     steps:
+      - name: Install ubuntu requirements
+        run: |
+          sudo apt-get -qq update
+          sudo apt-get install -y libx11-dev libxss-dev icnsutils graphicsmagick libappindicator1 libxtst-dev
+
       # Checks out a copy of your repository on the ubuntu-latest machine
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Run Super-Linter
+      - name: Run ESlint
         uses: hallee/eslint-action@1.0.3
         with:
           repo-token: ${{secrets.GITHUB_TOKEN}}
