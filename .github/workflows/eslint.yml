@@ -21,7 +21,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Run ESlint
-        uses: hallee/eslint-action@1.0.3
-        with:
-          repo-token: ${{secrets.GITHUB_TOKEN}}
+    - name: Setup code
+      run: yarn
+    - name: Run eslint
+      run: yarn eslint
