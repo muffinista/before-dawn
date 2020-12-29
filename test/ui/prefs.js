@@ -19,13 +19,13 @@ describe("Prefs", function() {
     return new SaverPrefs(workingDir);
   };
 
-  before(function() {
-    if ( process.platform === "linux" ) {
-      // eslint-disable-next-line no-console
-      console.log("skipping on linux");
-      this.skip();
-    }
-  });
+  // before(function() {
+  //   if ( process.platform === "linux" ) {
+  //     // eslint-disable-next-line no-console
+  //     console.log("skipping on linux");
+  //     this.skip();
+  //   }
+  // });
 
   beforeEach(async function() {
     workingDir = helpers.getTempDir();
@@ -57,7 +57,6 @@ describe("Prefs", function() {
 
   it("allows picking a screensaver", async function() {
     await helpers.waitForText(app, "body", "Screensaver One", true);
-    console.log(app);
     await app.webContents.executeJavaScript("document.querySelector(\"[type='radio'][data-name='Screensaver One']\").click()");
     await helpers.waitForText(app, ".saver-description", "A Screensaver", true);
     await helpers.click(app, "button.save");

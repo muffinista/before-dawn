@@ -36,13 +36,13 @@ describe("Add New", function() {
     await helpers.stopApp(app);
   });
 
-  before(function() {
-    if ( process.platform === "linux" ) {
-      // eslint-disable-next-line no-console
-      console.log("skipping on linux");
-      this.skip();
-    }
-  });
+  // before(function() {
+  //   if ( process.platform === "linux" ) {
+  //     // eslint-disable-next-line no-console
+  //     console.log("skipping on linux");
+  //     this.skip();
+  //   }
+  // });
 
 
   describe("when not setup", function() {
