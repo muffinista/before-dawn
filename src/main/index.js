@@ -34,6 +34,7 @@ const {app,
 const fs = require("fs");
 const path = require("path");
 const url = require("url");
+const exec = require("child_process").execFile;
 
 const screenLock = require("./screen.js");
 
@@ -111,6 +112,9 @@ let handles = {
   addNew: {
     window: null
   },
+  about: {
+    window: null
+  },
   editor: {
     window: null,
     bounds: {
@@ -121,7 +125,10 @@ let handles = {
       width: 320,
       height: 320
     }
-  }
+  },
+  // shim: {
+  //   window: null
+  // }
 };
 
 let trayMenu;
@@ -140,6 +147,12 @@ let checkPowerState = true;
 
 const RELEASE_CHECK_INTERVAL = 1000 * 60 * 60 * 12;
 
+
+const defaultWebPreferences = {
+  enableRemoteModule: testMode,
+  contextIsolation: !testMode,
+  nodeIntegration: testMode
+};
 
 const singleLock = app.requestSingleInstanceLock();
 if (! singleLock ) {
@@ -176,8 +189,8 @@ var openGrabberWindow = function() {
       x: 6000,
       y: 2000,
       webPreferences: {
-        nodeIntegration: true,
-        enableRemoteModule: true,
+        ...defaultWebPreferences,
+        preload: path.join(__dirname, "assets", "grabber.js"),
         webSecurity: false
       }
     });
@@ -185,7 +198,8 @@ var openGrabberWindow = function() {
     
     grabberWindow.once("ready-to-show", () => {
       log.info("grabber open");
-      //grabberWindow.webContents.openDevTools();
+      // grabberWindow.show();
+      // grabberWindow.webContents.openDevTools();
       resolve(grabberWindow);
     });
 
@@ -255,14 +269,16 @@ var openTestShim = function() {
     width: 200,
     height: 400,
     webPreferences: {
-      webSecurity: false,
-      nodeIntegration: true,
-      enableRemoteModule: true
+      ...defaultWebPreferences,
+      preload: path.join(__dirname, "assets", "shim.js"),
+      webSecurity: false
     }
   });
 
   const shimUrl = `file://${__dirname}/assets/shim.html`;
   testWindow.loadURL(shimUrl);
+
+  //handles.shim.window = testWindow;
 };
 
 
@@ -299,10 +315,9 @@ var openPrefsWindow = function() {
         minHeight: 600,
         resizable: true,
         webPreferences: {
+          ...defaultWebPreferences,
           webSecurity: false,
-          preload: path.join(__dirname, "assets", "preload.js"),
-          nodeIntegration: true,
-          enableRemoteModule: process.env.TEST_MODE === "true"
+          preload: path.join(__dirname, "assets", "preload.js")
         },
         icon: path.join(__dirname, "assets", "iconTemplate.png")
       });
@@ -322,7 +337,7 @@ var openPrefsWindow = function() {
       });
       
       handles.prefs.window.once("show", resolve);
-      
+
       log.info("loading " + prefsUrl);
       handles.prefs.window.loadURL(prefsUrl);
     });
@@ -349,10 +364,9 @@ var openSettingsWindow = function() {
     modal: true,
     icon: path.join(__dirname, "assets", "iconTemplate.png"),
     webPreferences: {
+      ...defaultWebPreferences,
       webSecurity: false,
       preload: path.join(__dirname, "assets", "preload.js"),
-      nodeIntegration: true,
-      enableRemoteModule: process.env.TEST_MODE === "true"
     }
   });
 
@@ -392,10 +406,9 @@ var addNewSaver = function() {
       height: 700,
       resizable:true,
       webPreferences: {
+        ...defaultWebPreferences,
         webSecurity: false,
         preload: path.join(__dirname, "assets", "preload.js"),
-        nodeIntegration: true,
-        enableRemoteModule: process.env.TEST_MODE === "true"
       },
       icon: path.join(__dirname, "assets", "iconTemplate.png")
     });
@@ -419,35 +432,34 @@ var addNewSaver = function() {
  */
 var openAboutWindow = function() {
   var aboutUrl = getUrl("about.html");
-  var w = new BrowserWindow({
+  handles.about.window = new BrowserWindow({
     show: false,
     width:500,
     height:600,
     resizable:false,
     icon: path.join(__dirname, "assets", "iconTemplate.png"),
     webPreferences: {
+      ...defaultWebPreferences,
       preload: path.join(__dirname, "assets", "preload.js"),
-      nodeIntegration: true,
-      enableRemoteModule: process.env.TEST_MODE === "true"
     }
   });
 
-  if ( w.removeMenu !== undefined ) {
-    w.removeMenu();
+  if ( handles.about.window.removeMenu !== undefined ) {
+    handles.about.window.removeMenu();
   }
 
-  w.on("closed", () => {
-    w = null;
+  handles.about.window.on("closed", () => {
+    handles.about.window = null;
     dock.hideDockIfInactive(app);
   });
 
-  w.once("ready-to-show", () => {
-    w.show();
+  handles.about.window.once("ready-to-show", () => {
+    handles.about.window.show();
     dock.showDock(app);
   });
 
   log.info(`open ${aboutUrl}`);
-  w.loadURL(aboutUrl);
+  handles.about.window.loadURL(aboutUrl);
 };
 
 
@@ -470,10 +482,9 @@ var openEditor = (args) => {
     handles.editor.window = new BrowserWindow({
       show: false,
       webPreferences: {
+        ...defaultWebPreferences,
         webSecurity: false,
         preload: path.join(__dirname, "assets", "preload.js"),
-        nodeIntegration: true,
-        enableRemoteModule: process.env.TEST_MODE === "true"
       },
     });  
   }
@@ -482,6 +493,11 @@ var openEditor = (args) => {
 
   handles.editor.window.once("ready-to-show", () => {
     handles.editor.window.show();
+
+    if (process.env.NODE_ENV === "test") {
+      handles.editor.window.webContents.closeDevTools();
+    }
+
     dock.showDock(app);
   });
 
@@ -514,6 +530,7 @@ var getWindowOpts = function(s) {
     y: s.bounds.y,
     show: false,
     webPreferences: {
+      contextIsolation: true,
       nodeIntegration: false
     }
   };
@@ -607,9 +624,9 @@ var runSaver = function(screenshot, saver, s, url_opts, tickCount) {
       
       log.info("Loading " + url, s.id);
       
-      if ( debugMode === true ) {
-        w.webContents.openDevTools();
-      }
+      // if ( debugMode === true ) {
+      //   w.webContents.openDevTools();
+      // }
       // and load the index.html of the app.
       w.loadURL(url);
     }
@@ -1179,6 +1196,7 @@ let setupIPC = function() {
    * open the window specified by 'key', passing args along
    */
   ipcMain.on("open-window", (_event, key, args) => {
+    console.log(key, args);
     windowMethods[key](args);
   });
 
@@ -1203,6 +1221,16 @@ let setupIPC = function() {
     if ( handles[key].window ) {
       handles[key].window.close();
     }
+  });
+
+  ipcMain.on("close-all-windows", () => {
+    console.log("close-all-windows");
+    Object.keys(handles).forEach(function(key) {
+      if ( handles[key].window ) {
+        console.log("close $key");
+        handles[key].window.close();
+      }
+    });
   });
 
   /**
@@ -1325,25 +1353,6 @@ let setupIPC = function() {
   ipcMain.handle("get-primary-screenshot", () => {
     return screenshots[cachedPrimaryScreen.id];
   });
-
-  /**
-   * display information about an error happening in a preview in 
-   * the editor window.
-   * @todo i don't think this is working very well
-   */
-  ipcMain.on("preview-error", (_event, message, source, lineno) => {
-    let opts = {
-      message: message,
-      source: source,
-      lineno: lineno
-    };
-    if ( handles.editor.window ) {
-      handles.editor.window.webContents.send("preview-error", opts);
-    }
-    else if ( handles.prefs.window ) {
-      handles.prefs.window.webContents.send("preview-error", opts);
-    }
-  });
   
   /**
    * load the requested URL in a browser
@@ -1389,6 +1398,49 @@ let setupIPC = function() {
   ipcMain.on("run-screensaver", () => {
     log.info("run-screensaver");
     setStateToRunning();
+  });
+
+  ipcMain.on("toggle-dev-tools", () => {
+    log.info("toggle-dev-tools");
+    if ( handles.editor.window !== null ) {
+      handles.editor.window.webContents.openDevTools();
+    }
+  });
+
+  /**
+   * open a folder
+   */
+  ipcMain.on("open-folder", (_event, src) => {
+    var cmd;
+    var args = [];
+    
+    // figure out the path to the screensaver folder. use
+    // decodeURIComponent to convert %20 to spaces
+    var filePath = path.dirname(decodeURIComponent(url.parse(src).path));
+
+    switch(process.platform) {
+    case "darwin":
+      cmd = "open";
+      args = [ filePath ];
+      break;
+    case "win32":
+      if (process.env.SystemRoot) {
+        cmd = path.join(process.env.SystemRoot, "explorer.exe");
+      }
+      else {
+        cmd = "explorer.exe";
+      }
+      args = [`/select,${filePath}`];
+      break;
+    default:
+      // # Strip the filename from the path to make sure we pass a directory
+      // # path. If we pass xdg-open a file path, it will open that file in the
+      // # most suitable application instead, which is not what we want.
+      cmd = "xdg-open";
+      args = [ filePath ];
+    }
+    
+    exec(cmd, args, function() {});
   });
 
   /**
@@ -1453,6 +1505,9 @@ let setupIPC = function() {
     return result;
   });
 
+  //
+  // setup a couple of IPC methods we only use in tests
+  //
   if ( testMode === true ) {
     /**
      * handle requests to get the current state of the app. this
@@ -1460,6 +1515,23 @@ let setupIPC = function() {
      */
     ipcMain.handle("get-current-state", async () => {
       return stateManager.currentStateString;
+    });
+
+    /**
+     * get a list of tray item labels
+     */
+    ipcMain.handle("get-tray-items", async () => {
+      return menusAndTrays.trayMenuTemplate().map(item => item.label);
+    });
+
+    /**
+     * fake a click on a tray item
+     */
+    ipcMain.handle("click-tray-item", (_event, label) => {
+      log.info(`click-tray-item ${label}`);
+      const items = menusAndTrays.trayMenuTemplate();
+      const item = items.find(item => item.label === label);
+      item.click();
     });
   }
   
@@ -1652,12 +1724,14 @@ var updateStateManager = function() {
 /**
  * check for a new release of the app
  */
-
 var checkForNewRelease = function() {
   log.info("checkForNewRelease");
   releaseChecker.checkLatestRelease();
 };
 
+/**
+ * setup a global shortcut to run a screensaver
+ */
 var setupLaunchShortcut = function() {
   globalShortcut.unregisterAll();
   if ( prefs.launchShortcut !== undefined && prefs.launchShortcut !== "" ) {

@@ -23,18 +23,18 @@ describe("About", function() {
     await helpers.waitForWindow(app, windowTitle);
   });
 
-	afterEach(function() {
+	afterEach(async function () {
     if (this.currentTest.state === "failed") {
       helpers.outputLogs(app);
     }
 
-    return helpers.stopApp(app);
+    await helpers.stopApp(app);
 	});
 
   it("has some text and current version number", async function() {
     const elem = await app.client.$("body");
     const text = await elem.getText();
-
+ 
     assert(text.lastIndexOf("// screensaver fun //") !== -1);
     assert(text.lastIndexOf(packageJSON.version) !== -1);
   });

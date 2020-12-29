@@ -167,17 +167,10 @@
 </template>
 
 <script>
-const fs = require("fs");
-const path = require("path");
-const url = require("url");
-const exec = require("child_process").execFile;
-
 import SaverForm from "@/components/SaverForm";  
 import SaverOptionInput from "@/components/SaverOptionInput";
 import SaverOptions from "@/components/SaverOptions";
 import Noty from "noty";
-
-const ipcRenderer = window.ipcRenderer;
 
 
 export default {
@@ -205,9 +198,6 @@ export default {
     src: function() {
       return this.params.get("src");
     },
-    folderPath: function() {
-      return path.dirname(this.src);
-    },
     optionDefaults: function() {
       var result = {};
       for ( var i = 0; i < this.options.length; i++ ) {
@@ -227,33 +217,14 @@ export default {
       return;
     }
 
-    this.size = await ipcRenderer.invoke("get-primary-display-bounds");
-    this.screenshot = await ipcRenderer.invoke("get-primary-screenshot");
+    this.size = await window.api.getDisplayBounds();
+    this.screenshot = await window.api.getScreenshot();
 
-    ipcRenderer.on("console-message", (sender, event, level, message, line, sourceId) => {
-      // only output messages from the screensaver folder itself
-      if ( sourceId.indexOf(this.folderPath) !== -1 ) {
-        // eslint-disable-next-line no-console
-        console.log(message);
-      }
-    });
-    ipcRenderer.on("preview-error", (sender, event) => {
-      // eslint-disable-next-line no-console
-      console.log(`Error on line ${event.lineno}: ${event.message}`);
-    });
-
-    this.saver = await ipcRenderer.invoke("load-saver", this.src);
+    this.saver = await window.api.loadSaver(this.src);
     this.options = this.saver.options;
     this.lastIndex = this.saver.options.length;
 
-    // make sure folder actually exists
-    if ( fs.existsSync(this.folderPath) ) {
-      fs.watch(this.folderPath, (eventType, filename) => {
-        if (filename) {
-          this.renderPreview();
-        }
-      });
-    }
+    window.api.watchFolder(this.src, this.renderPreview);
   },
   methods: {
     urlOpts() {
@@ -261,7 +232,7 @@ export default {
         width: this.size.width,
         height: this.size.height,
         preview: 1,
-        platform: process.platform,
+        platform: window.api.platform(),
         screenshot: this.screenshot
       };
       
@@ -314,15 +285,15 @@ export default {
       this.lastIndex = this.lastIndex + 1;
     },   
     closeWindow() {
-      ipcRenderer.send("close-window", "editor");
+      window.api.closeWindow("editor");
     },
     async saveData() {
       this.disabled = true;
 
       this.saver.options = this.options;
 
-      await ipcRenderer.invoke("save-screensaver", this.saver, this.src);
-      ipcRenderer.send("savers-updated", this.src);
+      await window.api.saveScreensaver(this.saver, this.src);
+      window.api.saversUpdated(this.src);
 
       new Noty({
         type: "success",
@@ -341,43 +312,14 @@ export default {
       this.closeWindow();
     },
     openFolder() {
-      var cmd;
-      var args = [];
-      
-      // figure out the path to the screensaver folder. use
-      // decodeURIComponent to convert %20 to spaces
-      var filePath = path.dirname(decodeURIComponent(url.parse(this.src).path));
-
-      switch(process.platform) {
-      case "darwin":
-        cmd = "open";
-        args = [ filePath ];
-        break;
-      case "win32":
-        if (process.env.SystemRoot) {
-          cmd = path.join(process.env.SystemRoot, "explorer.exe");
-        }
-        else {
-          cmd = "explorer.exe";
-        }
-        args = [`/select,${filePath}`];
-        break;
-      default:
-        // # Strip the filename from the path to make sure we pass a directory
-        // # path. If we pass xdg-open a file path, it will open that file in the
-        // # most suitable application instead, which is not what we want.
-        cmd = "xdg-open";
-        args = [ filePath ];
-      }
-      
-      exec(cmd, args, function() {});
+      window.api.openFolder(this.src);
     },
     getUrl() {
       const urlParams = new URLSearchParams(this.urlOpts(this.saver));
       return `${this.saver.url}?${urlParams.toString()}`;
     },
     renderPreview() {
-      ipcRenderer.send("update-preview", {
+      window.api.updatePreview({
         target: "editor",
         bounds: this.currentPosition,
         url: this.getUrl(),
@@ -385,7 +327,7 @@ export default {
       });
     },
     openConsole() {
-      this.currentWindow.toggleDevTools();
+      window.api.toggleDevTools();
     },   
   }
 }; 

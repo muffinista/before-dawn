@@ -45,8 +45,6 @@ import AdvancedPrefsForm from "@/components/AdvancedPrefsForm";
 import PrefsForm from "@/components/PrefsForm";
 import Noty from "noty";
 
-const ipcRenderer = window.ipcRenderer;
-
 
 export default {
   name: "Settings",
@@ -75,16 +73,15 @@ export default {
   },
   methods: {
     async loadData() {
-      this.globals = await ipcRenderer.invoke("get-globals");
-      this.prefs = await ipcRenderer.invoke("get-prefs");
+      this.globals = await window.api.getGlobals();
+      this.prefs = await window.api.getPrefs();
     },
     async handleSave(output) {
       this.disabled = true;
       try {
-        await ipcRenderer.invoke("update-prefs", this.prefs);
-
-        ipcRenderer.send("set-autostart", this.prefs.auto_start);
-        ipcRenderer.send("set-global-launch-shortcut", this.prefs.launchShortcut);
+        await window.api.updatePrefs(this.prefs);
+        window.api.setAutostart(this.prefs.auto_start);
+        window.api.setGlobalLaunchShortcut(this.prefs.launchShortcut);
       }
       catch(e) {
         output = "Something went wrong!";
@@ -103,14 +100,14 @@ export default {
       }).show();
     },
     async resetToDefaults() {
-      const result = await ipcRenderer.invoke("reset-to-defaults-dialog");
+      const result = await window.api.resetToDefaultsDialog();
       if ( result === 1 ) {
-        this.prefs = await ipcRenderer.invoke("get-defaults");
+        this.prefs = await window.api.getDefaults();
         await this.handleSave("Settings reset");
       }
     },
     closeWindow() {
-      ipcRenderer.send("close-window", "settings");
+      window.api.closeWindow("settings");
     },
     async saveDataClick() {
       await this.handleSave("Changes saved!");

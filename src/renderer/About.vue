@@ -104,8 +104,6 @@
 </template>
 
 <script>
-const ipcRenderer = window.ipcRenderer;
-
 export default {
   name: "About",
   components: {},
@@ -123,12 +121,12 @@ export default {
     }
   },
   async mounted() {
-    this.globals = await ipcRenderer.invoke("get-globals");
+    this.globals = await window.api.getGlobals();
   },
   methods: {
     open(evt) {
       evt.preventDefault();
-      ipcRenderer.send("launch-url", event.target.href);
+      window.api.openUrl(event.target.href);
     }
   },
 };

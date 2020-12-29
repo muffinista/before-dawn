@@ -105,7 +105,7 @@ describe("Settings", function() {
     await helpers.waitForWindow(app, "Before Dawn: Preferences");
   });
   
-  it("allows setting path via dialog", async function() {
+  it.skip("allows setting path via dialog", async function() {
     await pickSettingsWindow();
     await helpers.waitForText(app, "body", TEXT_ON_SCREEN, true);
     await app.webContents.executeJavaScript("document.querySelector(\"button.pick\").scrollIntoView()");
@@ -140,7 +140,7 @@ describe("Settings", function() {
   });
 
 
-  it("resets defaults", async function() {
+  it.skip("resets defaults", async function() {
     const resetDialogOpts = [ { method: "showMessageBox", value: { response: 1 } } ];
 
     await pickSettingsWindow();

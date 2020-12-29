@@ -37,7 +37,7 @@ describe("Prefs", function() {
 
     app = helpers.application(workingDir, true);
     await app.start();
-    await app.client.waitUntilWindowLoaded();
+    await helpers.waitUntilBooted(app);
     await helpers.callIpc(app, "open-window prefs");
     await helpers.waitForWindow(app, "Before Dawn: Preferences");
     await pickPrefsWindow();
@@ -57,6 +57,7 @@ describe("Prefs", function() {
 
   it("allows picking a screensaver", async function() {
     await helpers.waitForText(app, "body", "Screensaver One", true);
+    console.log(app);
     await app.webContents.executeJavaScript("document.querySelector(\"[type='radio'][data-name='Screensaver One']\").click()");
     await helpers.waitForText(app, ".saver-description", "A Screensaver", true);
     await helpers.click(app, "button.save");

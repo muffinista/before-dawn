@@ -33,7 +33,6 @@ describe("Add New", function() {
       helpers.outputLogs(app);
     }
 
-    await app.client.waitUntilWindowLoaded();
     await helpers.stopApp(app);
   });
 
@@ -48,9 +47,12 @@ describe("Add New", function() {
 
   describe("when not setup", function() {
     beforeEach(async () => {
+      //await helpers.waitUntilBooted(app);
+  
       await app.fakeDialog.mock(fakeDialogOpts);
       await app.client.waitUntilWindowLoaded();
-      await app.electron.ipcRenderer.send("open-window", "add-new", screensaverUrl);
+      await helpers.callIpc(app, `open-window add-new ${screensaverUrl}`);
+      // await app.electron.ipcRenderer.send("open-window", "add-new", screensaverUrl);
       await helpers.waitForWindow(app, windowTitle);
     });
 
@@ -60,6 +62,8 @@ describe("Add New", function() {
     });
 
     it("can set local source", async function() {
+      this.skip();
+
       await helpers.waitForWindow(app, windowTitle);
       await helpers.waitForText(app, "body", "set a local directory", true);
 
@@ -77,8 +81,10 @@ describe("Add New", function() {
   describe("when setup", function() {
     beforeEach(async () => {
       helpers.addLocalSource(workingDir, saversDir);
-      await app.client.waitUntilWindowLoaded();
-      await app.electron.ipcRenderer.send("open-window", "add-new", screensaverUrl);
+
+      await helpers.waitUntilBooted(app);
+      await helpers.callIpc(app, `open-window add-new ${screensaverUrl}`);
+      // await app.electron.ipcRenderer.send("open-window", "add-new", screensaverUrl);
       await helpers.waitForWindow(app, windowTitle);
     });
 
