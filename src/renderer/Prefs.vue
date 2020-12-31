@@ -71,9 +71,7 @@ import SaverOptions from "@/components/SaverOptions";
 import SaverSummary from "@/components/SaverSummary";
 import Noty from "noty";
 
-const ipcRenderer = window.ipcRenderer;
-
-const log = require("electron-log");
+//const log = require("electron-log");
 
 export default {
   name: "Prefs",
@@ -121,18 +119,18 @@ export default {
     }
   },
   async mounted() {
-    this.size = await ipcRenderer.invoke("get-primary-display-bounds");
-    this.screenshot = await ipcRenderer.invoke("get-primary-screenshot");
-    this.logger = log.info; //function() {};
+    this.size = await window.api.getDisplayBounds();
+    this.screenshot = await window.api.getScreenshot();
+    this.logger = console.log; //log.info;
 
-    ipcRenderer.on("savers-updated", this.onSaversUpdated);
+    window.api.addListener("savers-updated", this.onSaversUpdated);
     await this.setupPrefs();
     await this.getData();
 
     this.getCurrentSaver();
     this.resizePreview();
 
-    this.globals = await ipcRenderer.invoke("get-globals");
+    this.globals = await window.api.getGlobals();
     if ( this.globals.NEW_RELEASE_AVAILABLE ) {
       this.$nextTick(() => {
         this.renderUpdateNotice();
@@ -151,11 +149,11 @@ export default {
     });
   },
   beforeDestroy() {
-    ipcRenderer.removeListener("savers-updated", this.onSaversUpdated);
+    window.api.removeListener("savers-updated", this.onSaversUpdated);
   },
   methods: {
     async setupPrefs() {
-      this.prefs = await ipcRenderer.invoke("get-prefs");
+      this.prefs = await window.api.getPrefs();
       this.saver = this.prefs.saver;
     },
     resizePreview() {
@@ -173,7 +171,7 @@ export default {
         .setProperty("--preview-scale", `${scale}`);
     },
     onOptionsChange() {
-      ipcRenderer.send("update-preview", {
+      window.api.updatePreview({
         target: "prefs",
         bounds: this.currentPosition,
         url: this.previewUrl
@@ -184,7 +182,7 @@ export default {
         width: this.size.width,
         height: this.size.height,
         preview: 1,
-        platform: process.platform,
+        platform: window.api.platform(),
         screenshot: this.screenshot
       };
 
@@ -205,7 +203,7 @@ export default {
     },
     updateSaverPreview(force) {
       this.renderIndex += 1;
-      ipcRenderer.send("update-preview", {
+      window.api.updatePreview({
         target: "prefs",
         bounds: this.currentPosition,
         url: this.previewUrl,
@@ -213,11 +211,11 @@ export default {
       });
     },
     openSettings() {
-      ipcRenderer.send("open-window", "settings");
+      window.api.openWindow("settings");
     },
     async getData() {
       var tmp = {};
-      this.savers = await ipcRenderer.invoke("list-savers");
+      this.savers = await window.api.listSavers();
 
       if ( this.savers.length <= 0 ) {
         return;
@@ -258,7 +256,7 @@ export default {
       this.saver = this.prefs.saver;
     },
     createNewScreensaver() {
-      ipcRenderer.send("open-window", "add-new", {
+      window.api.openWindow("add-new", {
         screenshot: this.screenshot
       });
     },
@@ -267,7 +265,7 @@ export default {
         src: s.src,
         screenshot: this.screenshot
       };
-      ipcRenderer.send("open-window", "editor", opts);
+      window.api.openWindow("editor", opts);
     },
     async deleteSaver(s) {
       const index = this.savers.indexOf(s);
@@ -278,7 +276,7 @@ export default {
 
       this.savers.splice(index, 1);
 
-      await ipcRenderer.invoke("delete-saver", s);
+      await window.api.deleteSaver(s);
       await this.getData();
     },
     updateSaverOption(saver, name, value) {
@@ -295,7 +293,7 @@ export default {
       this.prefs.saver = this.saver;
       this.prefs.options = this.options;
 
-      return await ipcRenderer.invoke("update-prefs", this.prefs);
+      return await window.api.updatePrefs(this.prefs);
     },
     async saveDataClick() {
       let output;
@@ -321,7 +319,7 @@ export default {
       }).show();
     },
     renderUpdateNotice() {
-      ipcRenderer.send("display-update-dialog");
+      window.api.displayUpdateDialog();
     }
   }
 }; 

@@ -19,13 +19,13 @@ describe("Prefs", function() {
     return new SaverPrefs(workingDir);
   };
 
-  before(function() {
-    if ( process.platform === "linux" ) {
-      // eslint-disable-next-line no-console
-      console.log("skipping on linux");
-      this.skip();
-    }
-  });
+  // before(function() {
+  //   if ( process.platform === "linux" ) {
+  //     // eslint-disable-next-line no-console
+  //     console.log("skipping on linux");
+  //     this.skip();
+  //   }
+  // });
 
   beforeEach(async function() {
     workingDir = helpers.getTempDir();
@@ -37,7 +37,7 @@ describe("Prefs", function() {
 
     app = helpers.application(workingDir, true);
     await app.start();
-    await app.client.waitUntilWindowLoaded();
+    await helpers.waitUntilBooted(app);
     await helpers.callIpc(app, "open-window prefs");
     await helpers.waitForWindow(app, "Before Dawn: Preferences");
     await pickPrefsWindow();

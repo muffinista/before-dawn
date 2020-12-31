@@ -165,7 +165,8 @@ let rendererConfig = {
   },
   output: {
     filename: "[name].js",
-    libraryTarget: "commonjs2",
+    library: "[name]",
+    libraryTarget: "var",
     path: outputDir,
     publicPath: "."
   },
@@ -180,7 +181,7 @@ let rendererConfig = {
     },
     extensions: [".js", ".vue", ".json", ".css", ".node"]
   },
-  target: "electron-renderer"
+  target: "web"
 };
 
 

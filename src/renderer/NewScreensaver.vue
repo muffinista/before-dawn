@@ -72,9 +72,6 @@
 import SaverForm from "@/components/SaverForm";
 import LocalFolderInput from "@/components/LocalFolderInput";
 
-const ipcRenderer = window.ipcRenderer;
-
-
 export default {
   name: "NewScreensaver",
   components: {
@@ -104,12 +101,12 @@ export default {
     }
   },
   async mounted() {
-    this.prefs = await ipcRenderer.invoke("get-prefs");
-    this.screenshot = await ipcRenderer.invoke("get-primary-screenshot");
+    this.prefs = await window.api.getPrefs();
+    this.screenshot = await window.api.getScreenshot();
   },
   methods: {
     closeWindow() {
-      ipcRenderer.send("close-window", "addNew");
+      window.api.closeWindow("addNew");
     },
     localSourceChange(ls) {
       var tmp = {
@@ -119,7 +116,7 @@ export default {
       this.renderIndex += 1;
       this.disabled = false;
 
-      ipcRenderer.invoke("update-local-source", ls);
+      window.api.updateLocalSource(ls);
     },
     async saveData() {
       if ( document.querySelectorAll(":invalid").length > 0 ) {
@@ -130,14 +127,15 @@ export default {
       }
 
       this.disabled = true;
-      const data = await ipcRenderer.invoke("create-screensaver", this.saver);
+      const data = await window.api.createScreensaver(this.saver);
 
-      ipcRenderer.send("savers-updated");
-      ipcRenderer.send("open-window", "editor", {
+      window.api.saversUpdated();
+
+      window.api.openWindow("editor", {
         src: data.dest,
         screenshot: this.screenshot
       });
-      ipcRenderer.send("close-window", "addNew");
+      window.api.closeWindow("addNew");
     }
   },
 };

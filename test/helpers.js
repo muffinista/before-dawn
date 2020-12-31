@@ -3,6 +3,7 @@ const path = require("path");
 const fs = require("fs-extra");
 const Application = require("spectron").Application;
 const fakeDialog = require("spectron-dialog-addon").default;
+
 const Conf = require("conf");
 
 const chai = require("chai");
@@ -145,8 +146,20 @@ exports.application = function(workingDir, quietMode=false, localZip, localZipDa
 
 
 exports.stopApp = async function(app) {
-  if (app && app.isRunning()) {
-    await app.stop();
+  await exports.callIpc(app, "quit-app");
+  await exports.sleep(1000);
+
+  try {
+    if (app && app.isRunning()) {
+      await app.stop();
+    }
+  }
+  catch(e) {
+    // console.log(e);
+  }
+
+  if ( app.chromeDriver && app.chromeDriver.process ) {
+    await app.chromeDriver.process.kill();
   }
 };
 
@@ -298,6 +311,10 @@ exports.callIpc = async(app, method) => {
 
   el = await app.client.$("#ipcSend");
   await el.click();
+};
+
+exports.clickTrayItem = async (app, label) => {
+  await app.electron.ipcRenderer.send("click-tray-item", label);
 };
 
 exports.outputLogs = function(app) {

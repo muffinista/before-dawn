@@ -6,20 +6,48 @@
 
   <body>
     test shim!
+    <ul id="tray">
+
+    </ul>
+
 
     <input id="ipc" value="" />
     <button id="ipcSend">go</button>
 
     <div id="currentState"></div>
     <script>
-     const { ipcRenderer } = require('electron');
-     document.querySelector('#ipcSend').addEventListener("click", async () => {
+      var list = document.querySelector("ul");
+
+      function htmlToElement(html) {
+        var template = document.createElement('template');
+        html = html.trim(); // Never return a text node of whitespace as the result
+        template.innerHTML = html;
+        return template.content.firstChild;
+      }
+
+      function addTestItem(label) {
+        var className = label.replace(/ /g, '');
+        var el = htmlToElement(`<li><button class="${className}">${label}</button></li>`);
+        list.appendChild(el);
+        el.addEventListener("click", function(e) {
+          e.preventDefault();
+          window.shimApi.clickTray(label);
+        });
+      }
+
+      window.shimApi.getTrayItems().then((items) => {
+        items.forEach((item) => {
+          addTestItem(item);
+        });
+      });
+
+      document.querySelector('#ipcSend').addEventListener("click", async () => {
         const vals = document.querySelector('#ipc').value.split(' ');
-        await ipcRenderer.send(vals[0], vals[1]);
-     });
+        await window.shimApi.send(vals[0], vals[1]);
+      });
 
      setInterval(function() {
-       ipcRenderer.invoke('get-current-state').then((state) => {
+       window.shimApi.getCurrentState().then((state) => {
          document.querySelector("#currentState").innerHTML = state;
        });
      }, 100);
