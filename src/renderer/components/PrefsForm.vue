@@ -3,7 +3,7 @@
     <h1>Settings</h1>
     <form v-on="$listeners" class="grid">
       <div class="options">
-        <div class="form-check">
+        <div class="form-check hide-on-darwin">
           <label class="form-check-label">
             <input type="checkbox" id="lock" class="form-check-input" v-model="prefs.lock" />
             Lock screen after running?

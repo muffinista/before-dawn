@@ -840,7 +840,9 @@ var runScreenSaver = function() {
  * should we lock the user's screen when returning from running the saver?
  */
 var shouldLockScreen = function() {
-  return ( prefs.lock === true );
+  // we can't lock the screen on OSX because it would involve using
+  // private APIs and is a super pain in the butt
+  return ( process.platform !== "darwin" && prefs.lock === true );
 };
 
 /**
@@ -854,7 +856,7 @@ var stopScreenSaver = function(fromBlank) {
   }
   
   // trigger lock screen before actually closing anything
-  else if ( shouldLockScreen() ) {
+  else if ( shouldLockScreen() && screenLock.doLockScreen ) {
     screenLock.doLockScreen();
   }
 
@@ -1288,6 +1290,9 @@ let setupIPC = function() {
 
     // ensure a value for this
     attrs.firstLoad = false;
+    if ( attrs.launchShortcut === undefined ) {
+      attrs.launchShortcut = "";
+    }
 
     prefs.store.set(attrs);
 
