@@ -904,10 +904,10 @@
   resolved "https://registry.yarnpkg.com/@istanbuljs/schema/-/schema-0.1.2.tgz#26520bf09abe4a5644cd5414e37125a8954241dd"
   integrity sha512-tsAQNx32a8CoFhjhijUIhI4kccIAgmGhy8LZMZgGfmXcpMbPRUqn5LWmgRttILi6yeGmBJd2xsPkFMs0PzgPCw==
 
-"@muffinista/goto-sleep@^0.0.2":
-  version "0.0.2"
-  resolved "https://registry.yarnpkg.com/@muffinista/goto-sleep/-/goto-sleep-0.0.2.tgz#e3e0933b8915604c096e966c6e8f5941534ecf18"
-  integrity sha512-46CfSDPaD8wO/gMsZEKkT1iTD4U+wZXPe8dEVyT5Ms0H6DZMgHbjIf3TMhsl5GHI10C3UuqVTSGWZFIHQ9KDkQ==
+"@muffinista/goto-sleep@^0.0.3":
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/@muffinista/goto-sleep/-/goto-sleep-0.0.3.tgz#d1c31937cccb64500b9f41928507bdaf97614ac9"
+  integrity sha512-ZL1FTIrzCSZoV73Q/AlSstZzWOb3IhL5o6J4kx0ErbszbQCOrpZ9phv+cfBcrblVaorotMwjg5yofKCqO0SuQQ==
   dependencies:
     bindings "^1.5.0"
     nan "^2.14.0"

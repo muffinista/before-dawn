@@ -842,7 +842,7 @@ var runScreenSaver = function() {
 var shouldLockScreen = function() {
   // we can't lock the screen on OSX because it would involve using
   // private APIs and is a super pain in the butt
-  return ( process.platform !== "darwin" && prefs.lock === true );
+  return ( prefs.lock === true );
 };
 
 /**

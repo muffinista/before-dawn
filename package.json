@@ -37,7 +37,7 @@
     "url": "git://github.com/muffinista/before-dawn.git"
   },
   "dependencies": {
-    "@muffinista/goto-sleep": "^0.0.2",
+    "@muffinista/goto-sleep": "^0.0.3",
     "@sentry/electron": "^2.0.0",
     "async-mutex": "^0.2.2",
     "auto-launch": "^5.0.5",

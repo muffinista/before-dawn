@@ -1,11 +1,19 @@
 <template>
   <div id="prefs-form">
     <h1>Settings</h1>
-    <form v-on="$listeners" class="grid">
+    <form
+      class="grid"
+      v-on="$listeners"
+    >
       <div class="options">
-        <div class="form-check hide-on-darwin">
+        <div class="form-check">
           <label class="form-check-label">
-            <input type="checkbox" id="lock" class="form-check-input" v-model="prefs.lock" />
+            <input
+              id="lock"
+              v-model="prefs.lock"
+              type="checkbox"
+              class="form-check-input"
+            >
             Lock screen after running?
           </label>
           <small class="form-text text-muted">
@@ -15,7 +23,12 @@
 
         <div class="form-check">
           <label class="form-check-label">
-            <input type="checkbox" id="disableOnBattery" class="form-check-input" v-model="prefs.disableOnBattery" />
+            <input
+              id="disableOnBattery"
+              v-model="prefs.disableOnBattery"
+              type="checkbox"
+              class="form-check-input"
+            >
             Disable when on battery?
           </label>
           <small class="form-text text-muted">
@@ -28,7 +41,11 @@
         <!-- ' -->
         <div class="form-check">
           <label class="form-check-label">
-            <input type="checkbox" class="form-check-input" v-model="prefs.auto_start" />
+            <input
+              v-model="prefs.auto_start"
+              type="checkbox"
+              class="form-check-input"
+            >
             Auto start on login?
           </label>
           <small class="form-text text-muted">
@@ -38,8 +55,12 @@
 
         <div class="form-check">
           <label class="form-check-label">
-            <input type="checkbox" id="primary-display" class="form-check-input"
-                   v-model="prefs.runOnSingleDisplay" />
+            <input
+              id="primary-display"
+              v-model="prefs.runOnSingleDisplay"
+              type="checkbox"
+              class="form-check-input"
+            >
             Only run on the primary display?
           </label>
           <small class="form-text text-muted">
@@ -53,7 +74,7 @@
 
 <script>
 export default {
-  name: "prefs-form",
+  name: "PrefsForm",
   components: {},
   props: ["prefs"],
   methods: {
