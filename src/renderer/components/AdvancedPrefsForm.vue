@@ -27,24 +27,6 @@
           Enter a key combination that will be used to run a screensaver.
         </small>
       </div>
-    <!--
-      <div class="form-group">
-        <label for="repo">Github Repo URL:</label>
-        <div class="input-group input-group-sm">
-          <div class="input-group-prepend">
-            <span class="input-group-text">github.com/</span>
-          </div>
-          <input type="text" v-model="prefs.sourceRepo"
-                 class="form-control form-control-sm" />
-        </div>
-        <small class="form-text text-muted">
-          We will download releases from this repository instead of
-          the default repo if specified. This defaults to
-          'muffinista/before-dawn-screensavers'
-        </small>
-      </div>
-    -->
-
     </form>
   </div>
 </template>
@@ -81,7 +63,6 @@ export default {
       if ( output.length === 0 ) {
         if ( event.key == "Backspace" ) {
           event.target.value = "";
-          this.$emit("launchShortcutChange", "");
           this.prefs.launchShortcut = undefined;
         }
 
@@ -91,7 +72,6 @@ export default {
       output.push(`${event.key}`.toUpperCase());
       output = output.join("+");
 
-      this.$emit("launchShortcutChange", output);
       this.prefs.launchShortcut = output;
 
       event.target.value = output;

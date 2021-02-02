@@ -116,6 +116,9 @@ export default {
     previewUrl: function() {
       const urlParams = new URLSearchParams(this.urlOpts(this.saver));
       return `${this.saverObj.url}?${urlParams.toString()}`;
+    },
+    platformClass: function() {
+      return `platform-${window.api.platform()}`;
     }
   },
   async mounted() {

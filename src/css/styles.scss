@@ -68,6 +68,11 @@ small {
 #prefs > header {
   grid-area: header;
 }
+
+.platform-darwin .hide-on-darwin {
+  display: none;
+}
+
 .saver-list-wrapper {
   grid-area: saver-list;
   height: var(--preview-wrapper-height);

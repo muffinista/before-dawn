@@ -1,5 +1,5 @@
 <template>
-  <div id="settings">
+  <div id="settings" :class="platformClass">
     <template v-if="prefs !== undefined">
       <div class="container-fluid">
         <prefs-form :prefs="prefs" />
@@ -67,6 +67,9 @@ export default {
       return ( typeof(this.savers) !== "undefined" &&
                this.savers.length > 0);
     },
+    platformClass: function() {
+      return `platform-${window.api.platform()}`;
+    }
   },
   async mounted() {
     this.loadData();
