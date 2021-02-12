@@ -59,7 +59,8 @@ module.exports = class Package {
 
   async getReleaseInfo() {
     if ( this.useLocalFile ) {
-      var stats = fs.statSync(this.localZip);
+      this.logger("use local zip file");
+      let stats = fs.statSync(this.localZip);
       this.data = {
         created_at: stats.mtime,
         published_at: stats.mtime,
@@ -67,6 +68,7 @@ module.exports = class Package {
       };
     }
     else {
+      this.logger(`get release info from ${this.url}`);
       this.data = await fetch(this.url, this.defaultHeaders)
         .then(res => res.json())
         .then((json) => {
