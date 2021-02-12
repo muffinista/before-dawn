@@ -85,7 +85,7 @@ describe("PackageDownloader", function() {
 
       it("skips download if fresh", (done) => {
         var now = new Date().getTime();
-        sandbox.stub(fakePackage, "checkLatestRelease").resolves();
+        sandbox.stub(fakePackage, "checkLatestRelease").resolves({ downloaded: false });
 
         prefs.updateCheckTimestamp = now;
         pd.updatePackage(fakePackage).then((result) => {

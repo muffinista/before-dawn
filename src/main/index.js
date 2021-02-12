@@ -974,6 +974,12 @@ var setupIfNeeded = async function() {
     return false;
   }
 
+  if (process.env.NODE_ENV === "test" ) {
+    log.info("test mode, skip setup checks!");
+    return false;
+  }
+
+
   // check if we should download savers, set something up, etc
   if ( localPackageCheck.downloaded || process.env.FORCE_SETUP || prefs.needSetup ) {
     log.info("needSetup!");
@@ -992,8 +998,6 @@ var setupIfNeeded = async function() {
 
   // log.info(`checking if ${prefs.saver} is valid`);
   const exists = await savers.confirmExists(prefs.saver);
-
-  // let results = !exists;
   if ( ! exists ) {
     log.info("need to pick a new screensaver");
   }
@@ -1066,7 +1070,7 @@ var checkForPackageUpdates = async function() {
   try {
     const PackageDownloader = require("../lib/package-downloader.js");
 
-    const pd = new PackageDownloader(prefs);
+    const pd = new PackageDownloader(prefs, log.info);
     result = await pd.updatePackage();
     
     log.info(result);
@@ -1160,11 +1164,13 @@ var handleLocalPackage = async function() {
   let saverData = path.join(getAssetDir(), global.LOCAL_PACKAGE_DATA);
   
   let resultsJSON = path.join(app.getPath("userData"), `${global.LOCAL_PACKAGE}.json`);
+  const saversDest = path.join(app.getPath("userData"), "savers");
+  const noFiles = (!fs.existsSync(resultsJSON) || !fs.existsSync(saversDest));
 
-  if ( !fs.existsSync(resultsJSON) && fs.existsSync(saverZip) && fs.existsSync(saverData) ) {
+  if ( noFiles && fs.existsSync(saverZip) && fs.existsSync(saverData) ) {
     log.info(`load savers from ${saverZip}`);
     var attrs = {
-      dest: path.join(app.getPath("userData"), "savers"),
+      dest: saversDest,
       local_zip: saverZip
     };
 
@@ -1250,7 +1256,6 @@ let setupIPC = function() {
     return {
       APP_VERSION: global.APP_VERSION,
       APP_REPO: global.APP_REPO,
-      CONFIG_DEFAULTS: global.CONFIG_DEFAULTS,
       NEW_RELEASE_AVAILABLE: global.NEW_RELEASE_AVAILABLE
     };
   });
@@ -1307,6 +1312,7 @@ let setupIPC = function() {
    */
   ipcMain.handle("get-defaults", async() => {
     log.info("get-defaults");
+    log.info(prefs.defaults);
     return prefs.defaults;
   });
 

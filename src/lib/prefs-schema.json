@@ -5,7 +5,7 @@
   },
   "sourceRepo": {
     "type": "string",
-    "default": ""
+    "default": "muffinista/before-dawn-screensavers"
   },
   "delay": {
     "type": "number",

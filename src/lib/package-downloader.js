@@ -1,5 +1,6 @@
 "use strict";
 
+const fs = require("fs");
 const Package = require("./package.js");
 
 // wait for awhile before checking for a new package
@@ -21,7 +22,8 @@ module.exports = class PackageDownloader {
     var attrs = {
       repo: this.prefs.sourceRepo,
       updated_at: new Date(this.prefs.sourceUpdatedAt),
-      dest: this.prefs.defaultSaversDir
+      dest: this.prefs.defaultSaversDir,
+      log: this.logger
     };
 
     this.logger("getPackage", attrs);
@@ -31,7 +33,7 @@ module.exports = class PackageDownloader {
 
   updatePackage(p) {
     var lastCheckAt = this.prefs.updateCheckTimestamp;
-    var now = new Date(); //.getTime();
+    var now = new Date();
     var diff = now - lastCheckAt;
 
     this.logger("updatePackage", now, lastCheckAt);
@@ -47,9 +49,10 @@ module.exports = class PackageDownloader {
     }
 
     this.logger(`lastCheckAt: ${lastCheckAt} ${diff} ${PACKAGE_WAIT_TIME}`);
+    const forceDownload = !fs.existsSync(this.prefs.defaultSaversDir);
+
     // don't bother checking if there's no source repo specified,
-    // or if we've pinged it recently
-    if ( typeof(p.repo) === "undefined" || p.repo === "" || diff < PACKAGE_WAIT_TIME ) {
+   if ( typeof(p.repo) === "undefined" || p.repo === "" ) {
       this.logger(`skip package check for now: ${diff}`);
       return Promise.resolve({downloaded: false});
     }
@@ -57,7 +60,8 @@ module.exports = class PackageDownloader {
       this.prefs.updateCheckTimestamp = now;
 
       this.logger(`check package: ${p.repo}`);
-      return p.checkLatestRelease().then((result) => {
+      return p.checkLatestRelease(forceDownload).then((result) => {
+        this.logger(result);
         if ( result && result.updated_at ) {
           this.prefs.sourceUpdatedAt = result.updated_at;
         }

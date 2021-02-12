@@ -26,9 +26,9 @@ describe("SaverPrefs", () => {
       assert.equal(true, prefs.needSetup);
     });
 
-    it("should set noSource", () => {
-      assert.equal(true, prefs.noSource);
-    });
+    // it("should set noSource", () => {
+    //   assert.equal(true, prefs.noSource);
+    // });
   });
 
   describe("with config", () => {
@@ -127,27 +127,10 @@ describe("SaverPrefs", () => {
 
   // no source
   describe("noSource", () => {
-    // describe("without config", () => {
-    //   it("is true", () => {
-    //     prefs = new SaverPrefs(tmpdir);
-    //     assert.equal(true, prefs.noSource);
-    //   });
-    // });
-
     describe("with config", () => {
       beforeEach(() => {
         prefs = new SaverPrefs(tmpdir);
         helpers.specifyConfig(prefs.configFile, "config");
-      });
-
-      it("is true if no source repo and no local source", () => {
-        prefs.store.delete("sourceRepo");
-        prefs.store.delete("localSource");
-        assert.equal(true, prefs.noSource);
-
-        prefs.sourceRepo = "";
-        prefs.localSource = "";
-        assert.equal(true, prefs.noSource);
       });
 
       it("is false if source repo", () => {
@@ -189,12 +172,13 @@ describe("SaverPrefs", () => {
     });
 
     it("includes localSource", () => {
+      let saversDir = path.join(tmpdir, "savers");
       let localSourceDir = helpers.getTempDir();
       prefs.localSource = localSourceDir;
 
       let result = prefs.sources;
-      assert.deepEqual(
-        [ localSourceDir, systemDir ], result);
+      assert.deepStrictEqual(
+        [ saversDir, localSourceDir, systemDir ], result);
     });
 
     it("includes repo", () => {

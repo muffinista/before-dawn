@@ -79,9 +79,14 @@ export default {
       this.globals = await window.api.getGlobals();
       this.prefs = await window.api.getPrefs();
     },
-    async handleSave(output) {
+    async handleSave(output, reloadSavers) {
       this.disabled = true;
       try {
+        if ( reloadSavers === true ) {
+          this.prefs.sourceUpdatedAt = new Date(0);
+          this.prefs.updateCheckTimestamp = new Date(0);
+        }
+
         await window.api.updatePrefs(this.prefs);
         window.api.setAutostart(this.prefs.auto_start);
         window.api.setGlobalLaunchShortcut(this.prefs.launchShortcut);
@@ -105,7 +110,7 @@ export default {
     async resetToDefaults() {
       const result = await window.api.resetToDefaultsDialog();
       if ( result === 1 ) {
-        this.prefs = await window.api.getDefaults();
+        this.prefs = await window.api.getDefaults();        
         await this.handleSave("Settings reset");
       }
     },

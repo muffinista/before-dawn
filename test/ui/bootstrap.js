@@ -95,22 +95,4 @@ describe("bootstrap", function() {
       });
     });
   });
-
-
-  describe("with invalid config", () => {
-    beforeEach(async () => {
-      helpers.specifyConfig(configDest, "bad-config");
-      await bootApp();
-    });
-    
-    it("re-creates config file", function() {
-      assert(fs.existsSync(configDest));
-      let data = JSON.parse(fs.readFileSync(configDest));
-      assert.equal("muffinista/before-dawn-screensavers", data.sourceRepo);
-    });  
-
-    it("shows prefs", async function() {
-      await helpers.waitForWindow(app, prefsWindowTitle);
-    });
-  });
 });
