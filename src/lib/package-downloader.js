@@ -36,7 +36,7 @@ module.exports = class PackageDownloader {
     var now = new Date();
     var diff = now - lastCheckAt;
 
-    this.logger("updatePackage", now, lastCheckAt);
+    this.logger("updatePackage now vs last check:", now, lastCheckAt);
 
     if ( p === undefined ) {
       p = this.getPackage();
@@ -61,7 +61,6 @@ module.exports = class PackageDownloader {
 
       this.logger(`check package: ${p.repo}`);
       return p.checkLatestRelease(forceDownload).then((result) => {
-        this.logger(result);
         if ( result && result.updated_at ) {
           this.prefs.sourceUpdatedAt = result.updated_at;
         }
