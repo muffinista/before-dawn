@@ -29,7 +29,7 @@
   },
   "runOnSingleDisplay": {
     "type": "boolean",
-    "default": false
+    "default": true
   },
   "localSource": {
     "type": "string",
