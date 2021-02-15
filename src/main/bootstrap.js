@@ -6,7 +6,6 @@ let packageJSON = {};
 
 try {
   packageJSON = require("../../package.json");
-  // console.log("packageJSON", packageJSON);
 
   version = packageJSON.version;
 
@@ -36,28 +35,6 @@ if ( packageJSON.release_server && ! global.IS_DEV ) {
   global.RELEASE_SERVER = packageJSON.release_server;
   global.RELEASE_CHECK_URL = `${global.RELEASE_SERVER}/update/${process.platform}/${global.APP_VERSION_BASE}`;
   global.PACKAGE_DOWNLOAD_URL = `https://github.com/${global.APP_REPO}/releases/latest`;
-}
-
-
-if ( !process.env.LOCAL_PACKAGE && process.env.TEST_MODE === undefined ) {
-  try {
-    let localSavers = packageJSON.resources.savers;
-    process.env.LOCAL_PACKAGE = localSavers;
-
-    let localSaversJSON = packageJSON.resources.data;
-    process.env.LOCAL_PACKAGE_DATA = localSaversJSON;
-  }
-  catch(e) {
-    // eslint-disable-next-line no-console
-    console.log(e);
-  }
-}
-
-if ( process.env.LOCAL_PACKAGE ) {
-  global.LOCAL_PACKAGE = process.env.LOCAL_PACKAGE;
-}
-if ( process.env.LOCAL_PACKAGE_DATA ) {
-  global.LOCAL_PACKAGE_DATA = process.env.LOCAL_PACKAGE_DATA;
 }
 
 // this is a free sentry account and the URL will be in every copy of

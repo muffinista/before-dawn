@@ -114,7 +114,7 @@ exports.savedConfig = function(p) {
   return JSON.parse(json);
 };
 
-exports.application = function(workingDir, quietMode=false, localZip, localZipData) {
+exports.application = function(workingDir, quietMode=false) {
   let env = {
     BEFORE_DAWN_DIR: workingDir,
     CONFIG_DIR: workingDir,
@@ -122,14 +122,6 @@ exports.application = function(workingDir, quietMode=false, localZip, localZipDa
     QUIET_MODE: quietMode
   };
 
-  if ( localZip !== undefined ) {
-    env.LOCAL_PACKAGE = localZip;
-  }
-  if ( localZipData !== undefined ) {
-    env.LOCAL_PACKAGE_DATA = localZipData;
-  }
- 
-  // console.log(`boot from ${appPath}`);
   var a = new Application({
     path: appPath,
     args: [path.join(__dirname, "..", "output/main.js")],
