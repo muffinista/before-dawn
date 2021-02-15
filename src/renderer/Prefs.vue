@@ -252,6 +252,7 @@ export default {
       }
     },
     async onSaversUpdated() {
+      this.logger("onSaversUpdated!");
       await this.setupPrefs();
       await this.getData();
     },

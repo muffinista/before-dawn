@@ -1,8 +1,24 @@
 <template>
-  <div id="settings" :class="platformClass">
+  <div
+    id="settings"
+  >
     <template v-if="prefs !== undefined">
       <div class="container-fluid">
         <prefs-form :prefs="prefs" />
+      </div>
+      <div class="container-fluid">
+        <template v-if="hasScreensaverUpdate === true">
+          <button
+            class="btn btn-large btn-primary reset-to-defaults"
+            @click="downloadScreensaverUpdates"
+          >
+            Download screensaver updates
+            <b-spinner
+              v-if="downloadingUpdates === true"
+              small
+            />
+          </button>
+        </template>
       </div>
       <div class="container-fluid">
         <advanced-prefs-form
@@ -45,7 +61,6 @@ import AdvancedPrefsForm from "@/components/AdvancedPrefsForm";
 import PrefsForm from "@/components/PrefsForm";
 import Noty from "noty";
 
-
 export default {
   name: "Settings",
   components: {
@@ -55,11 +70,13 @@ export default {
     return {
       savers: [],
       prefs: {},
+      release: {},
       options: {},
       saver: undefined,
       disabled: false,
       renderIndex: 0,
-      globals: undefined
+      globals: undefined,
+      downloadingUpdates: false
     };
   },
   computed: {
@@ -67,9 +84,10 @@ export default {
       return ( typeof(this.savers) !== "undefined" &&
                this.savers.length > 0);
     },
-    platformClass: function() {
-      return `platform-${window.api.platform()}`;
-    }
+    hasScreensaverUpdate: function() {
+      return ( typeof(this.release) !== "undefined" &&
+               this.release.is_update === true );
+    },
   },
   async mounted() {
     this.loadData();
@@ -78,16 +96,14 @@ export default {
     async loadData() {
       this.globals = await window.api.getGlobals();
       this.prefs = await window.api.getPrefs();
+      this.release = await window.api.getScreensaverPackage();
     },
-    async handleSave(output, reloadSavers) {
+    async handleSave(output) {
       this.disabled = true;
       try {
-        if ( reloadSavers === true ) {
-          this.prefs.sourceUpdatedAt = new Date(0);
-          this.prefs.updateCheckTimestamp = new Date(0);
-        }
-
         await window.api.updatePrefs(this.prefs);
+        await window.api.saversUpdated();
+
         window.api.setAutostart(this.prefs.auto_start);
         window.api.setGlobalLaunchShortcut(this.prefs.launchShortcut);
       }
@@ -120,6 +136,26 @@ export default {
     async saveDataClick() {
       await this.handleSave("Changes saved!");
       this.closeWindow();
+    },
+    async downloadScreensaverUpdates() {
+      try {
+        this.downloadingUpdates = true;
+
+        await window.api.downloadScreensaverPackage();
+
+        new Noty({
+          type: "success",
+          layout: "topRight",
+          timeout: 1000,
+          text: "Screensavers updated!",
+          animation: {
+            open: null
+          }
+        }).show();
+      }
+      finally {
+        this.downloadingUpdates = false;
+      }
     },
     localSourceChange(ls) {
       var tmp = {

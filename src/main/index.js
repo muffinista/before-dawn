@@ -52,10 +52,7 @@ const menusAndTrays = require("./menus.js");
 const dock = require("./dock.js");
 const windows = require("./windows.js");
 
-const Mutex = require("async-mutex").Mutex;
-const withTimeout = require("async-mutex").withTimeout;
-
-const mutex = withTimeout(new Mutex(), 30000, new Error("timeout"));
+// const mutex = withTimeout(new Mutex(), 30000, new Error("timeout"));
 
 const forcefocus = require("forcefocus");
 
@@ -356,7 +353,7 @@ var openSettingsWindow = function() {
   handles.settings.window = new BrowserWindow({
     show: false,
     width:600,
-    height:600,
+    height:650,
     maxWidth: 600,
     minWidth: 600,
     resizable: true,
@@ -871,6 +868,7 @@ var stopScreenSaver = function(fromBlank) {
  * other critical files exist.
  */
 var getSystemDir = function() {
+
   if ( process.env.BEFORE_DAWN_SYSTEM_DIR !== undefined ) {
     return process.env.BEFORE_DAWN_SYSTEM_DIR;
   }
@@ -886,18 +884,18 @@ var getSystemDir = function() {
 };
 
 
-/**
- * determine the path to any assets we need
- */
-var getAssetDir = function() {
-  if ( process.env.TEST_MODE) {
-    return path.join(__dirname, "data");
-  }
-  if ( global.IS_DEV ) {
-    return path.join(__dirname, "..", "..", "data");
-  }
-  return path.join(app.getAppPath(), "data");
-};
+// /**
+//  * determine the path to any assets we need
+//  */
+// var getAssetDir = function() {
+//   if ( process.env.TEST_MODE) {
+//     return path.join(__dirname, "data");
+//   }
+//   if ( global.IS_DEV ) {
+//     return path.join(__dirname, "..", "..", "data");
+//   }
+//   return path.join(app.getAppPath(), "data");
+// };
 
 
 /**
@@ -963,12 +961,6 @@ var setupMenuAndTray = function() {
 var setupIfNeeded = async function() {
   log.info("setupIfNeeded");
 
-  let localPackageCheck = await handleLocalPackage();
-  if ( localPackageCheck.downloaded ) {
-    log.info(`set update to ${new Date(localPackageCheck.published_at)}`);
-    prefs.sourceUpdatedAt = new Date(localPackageCheck.published_at);
-  }
-
   if ( process.env.QUIET_MODE === "true" ) {
     log.info("Quiet mode, skip setup checks!");
     return false;
@@ -979,18 +971,10 @@ var setupIfNeeded = async function() {
     return false;
   }
 
-
   // check if we should download savers, set something up, etc
-  if ( localPackageCheck.downloaded || process.env.FORCE_SETUP || prefs.needSetup ) {
+  if ( process.env.FORCE_SETUP || prefs.needSetup ) {
     log.info("needSetup!");
     prefs.setDefaultRepo(global.SAVER_REPO);
-
-    if ( ! localPackageCheck.downloaded ) {
-      log.info("check for updated download");
-      const PackageDownloader = require("../lib/package-downloader.js");
-      let pd = new PackageDownloader(prefs);
-      await pd.updatePackage();
-    }
 
     // stop processing here, we know we need to setup
     return true;
@@ -1060,40 +1044,6 @@ var setupReleaseCheck = function() {
 };
 
 /**
- * check for screensaver package updates
- */
-var checkForPackageUpdates = async function() {  
-  log.info("checkForPackageUpdates");
-  let result = {};
-
-  const release = await mutex.acquire();
-  try {
-    const PackageDownloader = require("../lib/package-downloader.js");
-
-    const pd = new PackageDownloader(prefs, log.info);
-    result = await pd.updatePackage();
-    
-    log.info(result);
-    toggleSaversUpdated();
-  }
-  finally {
-    release();
-  }
-  return result;
-};
-
-/**
- * setup our recurring screensaver package check
- */
-var setupPackageCheck = function() {
-  log.info("run initial package check");
-  checkForPackageUpdates().then(() => {
-    log.info("Setup recurring package check");
-    setInterval(() => checkForPackageUpdates, RELEASE_CHECK_INTERVAL);
-  });
-};
-
-/**
  * Check if we should move the app to the actual application folder.
  * This is important because the app is pretty fragile on OSX otherwise.
  */
@@ -1150,49 +1100,15 @@ var askAboutMediaAccess = async function() {
   });
 };
 
+const getPackage = function() {
+  const attrs = {
+    repo: prefs.sourceRepo,
+    updated_at: new Date(prefs.sourceUpdatedAt),
+    dest: prefs.defaultSaversDir,
+    log: log.info
+  };
 
-/**
- * Before Dawn releases will come with a zipfile of screensavers
- */
-var handleLocalPackage = async function() {
-  log.info(`handleLocalPackage ${global.LOCAL_PACKAGE}`);
-  if ( !global.LOCAL_PACKAGE || !global.LOCAL_PACKAGE_DATA) {
-    return {downloaded: false};
-  }
-
-  let saverZip = path.join(getAssetDir(), global.LOCAL_PACKAGE);
-  let saverData = path.join(getAssetDir(), global.LOCAL_PACKAGE_DATA);
-  
-  let resultsJSON = path.join(app.getPath("userData"), `${global.LOCAL_PACKAGE}.json`);
-  const saversDest = path.join(app.getPath("userData"), "savers");
-  const noFiles = (!fs.existsSync(resultsJSON) || !fs.existsSync(saversDest));
-
-  if ( noFiles && fs.existsSync(saverZip) && fs.existsSync(saverData) ) {
-    log.info(`load savers from ${saverZip}`);
-    var attrs = {
-      dest: saversDest,
-      local_zip: saverZip
-    };
-
-    let p = new Package(attrs);
-    await p.checkLatestRelease(true);
-
-    let results = JSON.parse(fs.readFileSync(saverData));
-    results.downloaded = true;
-
-    const { promisify } = require("util");
-
-    const writeFileAsync = promisify(fs.writeFile);
-    await writeFileAsync(resultsJSON, JSON.stringify(results));
-
-    return results;
-  }
-  else {
-    log.info(`don't load savers from ${saverZip}`);
-    return {
-      downloaded: false
-    };
-  }
+  return new Package(attrs);
 };
 
 
@@ -1264,7 +1180,6 @@ let setupIPC = function() {
    * return a list of screensavers
    */
   ipcMain.handle("list-savers", async () => {
-    // log.info("list-savers");
     const entries = await savers.list();
     return entries;
   });
@@ -1273,7 +1188,6 @@ let setupIPC = function() {
    * load and return the specified screensaver
    */
   ipcMain.handle("load-saver", async (_event, key) => {
-    // log.info("load-saver", key);
     return await savers.loadFromFile(key);
   });
 
@@ -1303,7 +1217,20 @@ let setupIPC = function() {
 
     savers.reset();
     updateStateManager();
-    checkForPackageUpdates();
+  });
+
+  ipcMain.handle("check-screensaver-package", async() => {
+    log.info("check-screensaver-package");
+    return getPackage().getReleaseInfo();
+  });
+
+  ipcMain.handle("download-screensaver-package", async() => {
+    log.info("download-screensaver-package");
+    const result = await getPackage().downloadPackage();
+    
+    log.info(result);
+    toggleSaversUpdated();
+    return result;
   });
 
 
@@ -1635,7 +1562,6 @@ var bootApp = async function() {
 
   setupMenuAndTray();
   setupReleaseCheck();
-  setupPackageCheck();
   setupLaunchShortcut();
 
   // don't show app in dock
