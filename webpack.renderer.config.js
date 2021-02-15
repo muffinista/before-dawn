@@ -155,6 +155,7 @@ let rendererConfig = {
         /tooltip/,
         /button-group/,
         /btn/,
+        /spinner/,
         /noty/
       ]
     }),

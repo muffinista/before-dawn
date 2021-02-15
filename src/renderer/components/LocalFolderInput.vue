@@ -35,7 +35,7 @@ export default {
   },
   methods: {
     async showPathChooser() {
-      const result = await ipcRenderer.invoke("show-open-dialog");
+      const result = await window.api.showOpenDialog();
       this.handlePathChoice(result);
     },
     handlePathChoice(result) {

@@ -64,14 +64,20 @@ module.exports = class Package {
       this.data = {
         created_at: stats.mtime,
         published_at: stats.mtime,
-        zipball_url: this.localZip
+        zipball_url: this.localZip,
+        is_update: stats.mtime > new Date(this.updated_at)
       };
     }
     else {
       this.logger(`get release info from ${this.url}`);
+      if ( this.data ) {
+        return this.data;
+      }
+
       this.data = await fetch(this.url, this.defaultHeaders)
         .then(res => res.json())
         .then((json) => {
+          json.is_update = new Date(json.published_at) > new Date(this.updated_at);
           return json;
         })
         .catch((err) => {
@@ -87,34 +93,41 @@ module.exports = class Package {
     return this.data;
   }
 
+  async hasUpdate() {
+    const data = await this.getReleaseInfo();
+    return data.is_update;
+  }
+
   async checkLatestRelease(force) {
-    let data = await this.getReleaseInfo();
-
-    if ( data && (
-      force === true ||
-      data.published_at && new Date(data.published_at) > new Date(this.updated_at) )
-    ) {
-      this.logger("download package updates!");
-      let dest;
-
-      if ( this.useLocalFile ) {
-        dest = this.localZip;
-      }
-      else {
-        dest = await this.downloadFile(data.zipball_url);
-      }
-    
-      await this.zipToSavers(dest);
-
-      this.downloaded = true;
-      this.updated_at = data.published_at;
-
-      return this.attrs();  
+    const data = await this.getReleaseInfo();
+    if ( force === true || data.is_update ) {
+      return this.downloadRelease();
     }
     else {
       this.logger("no package update available");
       return this.attrs();
     }
+  }
+
+  async downloadRelease() {
+    this.logger("download package updates!");
+    const data = await this.getReleaseInfo();
+
+    let dest;
+
+    if ( this.useLocalFile ) {
+      dest = this.localZip;
+    }
+    else {
+      dest = await this.downloadFile(data.zipball_url);
+    }
+  
+    await this.zipToSavers(dest);
+
+    this.downloaded = true;
+    this.updated_at = data.published_at;
+
+    return this.attrs();  
   }
 
   async downloadFile(url, dest) {

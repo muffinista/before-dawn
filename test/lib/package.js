@@ -84,11 +84,12 @@ describe("Package", function() {
     describe("remote package", function() {
       beforeEach(() => {
         p = new Package(attrs);
-        sandbox.stub(p, "getReleaseInfo").
-                returns(require("../fixtures/release.json"));
       });
       
       it("calls downloadFile", async () => {
+        sandbox.stub(p, "getReleaseInfo").
+          returns(require("../fixtures/release.json"));
+
         var df = sandbox.stub(p, "downloadFile").resolves(zipPath);
 
         await p.checkLatestRelease();
@@ -96,6 +97,9 @@ describe("Package", function() {
       });
 
       it("doesnt call if not needed", async () => {
+        sandbox.stub(p, "getReleaseInfo").
+          returns(require("../fixtures/release-no-update.json"));
+
         var cb = sinon.spy();
         var df = sandbox.stub(p, "downloadFile");
 
