@@ -148,11 +148,14 @@ module.exports = class Package {
     });
   }
 
-  zipToSavers(tempName) {
+  zipToSavers(tempName, dest) {
     let self = this;
+    if ( dest === undefined ) {
+      dest = self.dest;
+    }
 
     return new Promise(function (resolve, reject) {
-      lockfile.lock(self.dest, { realpath: false, stale: 30000 }).then((release) => {
+      lockfile.lock(dest, { realpath: false, stale: 30000 }).then((release) => {
         yauzl.open(tempName, {lazyEntries: true}, (err, zipfile) => {
           if (err) {
             release().then(() => {
@@ -183,7 +186,7 @@ module.exports = class Package {
               var parts = fullPath.split(/\//);
               parts.shift();
               
-              fullPath = path.join(self.dest, path.join(...parts));
+              fullPath = path.join(dest, path.join(...parts));
               if (/\/$/.test(entry.fileName)) {
                 // directory file names end with '/' 
                 mkdirp(fullPath).then(() => {

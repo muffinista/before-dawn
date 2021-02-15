@@ -12,8 +12,6 @@ const mkdirp = require("mkdirp");
 
 const srcRoot = path.join(__dirname, "..");
 const workingDir = path.join(srcRoot, "data");
-const pjsonPath = path.join(srcRoot, "package.json");
-const pjson = require(pjsonPath);
 
 let opts = {
   auth: `token ${process.env.GITHUB_AUTH_TOKEN}`
@@ -32,7 +30,6 @@ rimraf.sync(`${workingDir}/*`);
 async function main() {
   let result = await octokit.repos.getLatestRelease({owner, repo});
 
-//  console.log(result.data);
   const tag_name = result.data.tag_name;
   const jsonFile = `${repo}-${tag_name}.json`;
 
@@ -40,19 +37,14 @@ async function main() {
   fs.writeFileSync(jsonDest, JSON.stringify(result.data));
 
   const url = result.data.zipball_url;
-  const zipFile = `${repo}-${tag_name}.zip`;
-  const dest = path.join(srcRoot, "data", zipFile);
+  const dest = path.join(srcRoot, "data", "savers");
 
   const p = new Package({
     repo: `${owner}/${repo}`,
     dest: dest
   });
 
-  await p.downloadFile(url, dest);
-
-  pjson.resources.savers = zipFile;
-  pjson.resources.data = jsonFile;
-  fs.writeFileSync(pjsonPath, JSON.stringify(pjson, null, 2));
+  await p.downloadRelease(url, dest);
 }
 
 main().catch(e => console.error(e));
