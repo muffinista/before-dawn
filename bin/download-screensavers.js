@@ -14,7 +14,7 @@ const srcRoot = path.join(__dirname, "..");
 const workingDir = path.join(srcRoot, "data");
 
 let opts = {
-  auth: `token ${process.env.GITHUB_AUTH_TOKEN}`
+  // auth: `token ${process.env.GITHUB_AUTH_TOKEN}`
 };
 
 const octokit = new Octokit(opts);
@@ -41,7 +41,8 @@ async function main() {
 
   const p = new Package({
     repo: `${owner}/${repo}`,
-    dest: dest
+    dest: dest,
+    log: console.log
   });
 
   await p.downloadRelease(url, dest);
