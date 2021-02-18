@@ -30,18 +30,19 @@ module.exports = class SaverListManager {
     else {
       this.logger = function() {};
     }
-
-    if ( typeof(opts) === "string" ) {
-      opts = {
-        base: opts
-      };
-    }
   
     this.baseDir = this.prefs.baseDir;
+
+    if ( opts.rootDir ) {
+      this.rootDir = opts.rootDir;
+    }
+    else {
+      this.rootDir = this.baseDir;
+    }
   }
   
   get defaultSaversDir() {
-    return path.join(this.baseDir, "savers");
+    return this.prefs.saversDir;
   }
   
   setup() {
