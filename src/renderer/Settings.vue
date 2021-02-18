@@ -138,7 +138,7 @@ export default {
       this.closeWindow();
     },
     async downloadScreensaverUpdates() {
-      if ( this.downloadScreensaverUpdates === true ) {
+      if ( this.downloadingUpdates === true ) {
         return;
       }
 

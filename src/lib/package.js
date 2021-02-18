@@ -208,6 +208,7 @@ module.exports = class Package {
                   
                   // ensure parent directory exists 
                   mkdirp(path.dirname(fullPath)).then(() => {
+                    self.logger(`${entry.fileName} -> ${fullPath}`);
                     readStream.pipe(fs.createWriteStream(fullPath));
                     readStream.on("end", function() {
                       zipfile.readEntry();

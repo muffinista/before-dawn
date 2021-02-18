@@ -25,30 +25,6 @@ describe("SaverPrefs", () => {
     it("should load", () => {
       assert.equal(true, prefs.needSetup);
     });
-
-    // it("should set noSource", () => {
-    //   assert.equal(true, prefs.noSource);
-    // });
-  });
-
-  describe("with config", () => {
-    // it("recovers from corrupt config", () => {
-    //   helpers.specifyConfig(prefs.configFile, "bad-config");
-    //   prefs = new SaverPrefs(tmpdir);
-
-    //   assert.equal(true, prefs.firstLoad);
-    //   let configDest = path.join(tmpdir, "config.json");
-    //   assert.equal(true, fs.existsSync(configDest));
-    // });
-
-    // it("works with existing config", () => {
-    //   helpers.specifyConfig(prefs.configFile, "config");
-    //   prefs = new SaverPrefs(tmpdir);
-
-    //   assert.equal(true, !prefs.firstLoad);
-    //   let configDest = path.join(tmpdir, "config.json");
-    //   assert.equal(true, fs.existsSync(configDest));
-    // });
   });
 
   // reload
