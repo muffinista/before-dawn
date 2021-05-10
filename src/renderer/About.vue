@@ -126,7 +126,7 @@ export default {
   methods: {
     open(evt) {
       evt.preventDefault();
-      window.api.openUrl(event.target.href);
+      window.api.openUrl(evt.target.href);
     }
   },
 };
