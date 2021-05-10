@@ -1,15 +1,16 @@
 "use strict";
 
 const main = require("./index.js");
+const path = require("path");
 
 const icons = {
   "win32" : {
-    active: __dirname + "/assets/icon.ico",
-    paused: __dirname + "/assets/icon-paused.ico"
+    active: path.join(__dirname , "assets", "icon.ico"),
+    paused: path.join(__dirname , "assets", "icon-paused.ico")
   },
   "default": {
-    active: __dirname + "/assets/iconTemplate.png",
-    paused: __dirname + "/assets/icon-pausedTemplate.png"
+    active: path.join(__dirname , "assets", "iconTemplate.png"),
+    paused: path.join(__dirname , "assets", "icon-pausedTemplate.png")
   }
 };
 
