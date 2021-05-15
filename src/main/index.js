@@ -1102,10 +1102,11 @@ var askAboutMediaAccess = async function() {
 const getPackage = function() {
   const attrs = {
     repo: prefs.sourceRepo,
-    updated_at: new Date(prefs.sourceUpdatedAt),
     dest: prefs.defaultSaversDir,
     log: log.info
   };
+
+  console.log(attrs);
 
   return new Package(attrs);
 };
@@ -1225,7 +1226,7 @@ let setupIPC = function() {
 
   ipcMain.handle("download-screensaver-package", async() => {
     log.info("download-screensaver-package");
-    const result = await getPackage().downloadPackage();
+    const result = await getPackage().downloadRelease();
     
     log.info(result);
     toggleSaversUpdated();

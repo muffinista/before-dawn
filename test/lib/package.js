@@ -102,24 +102,8 @@ describe("Package", function() {
 
         var cb = sinon.spy();
         var df = sandbox.stub(p, "downloadFile");
-
-        p.updated_at = "2017-06-06T23:55:44Z";
         
         await p.checkLatestRelease(cb);
-        assert(!df.calledOnce);
-      });
-    });
-
-    describe("local package", function() {
-      beforeEach(() => {
-        attrs.local_zip = zipPath;
-        p = new Package(attrs);
-      });
-      
-      it("doesnt call downloadFile", async () => {
-        var df = sandbox.stub(p, "downloadFile");
-
-        await p.checkLatestRelease();
         assert(!df.calledOnce);
       });
     });

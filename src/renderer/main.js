@@ -1,5 +1,4 @@
 import Vue from "vue";
-import BootstrapVue from "bootstrap-vue";
 
 import Prefs from "./Prefs";
 import Settings from "./Settings";
@@ -7,12 +6,9 @@ import Editor from "./Editor";
 import NewScreensaver from "./NewScreensaver";
 import About from "./About";
 
-import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap-vue/dist/bootstrap-vue.css";
 import "@/../css/styles.scss";
 
 Vue.config.productionTip = false;
-Vue.use(BootstrapVue);
 
 var actions = {
   "prefs": { components: { Prefs }, template: "<Prefs/>" },

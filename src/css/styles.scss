@@ -4,16 +4,16 @@
   --preview-width: 500px;
   --preview-height: 320px;
   --preview-scale: 1.0;
-  --footer-height: 50px;
+  --footer-height: 30px;
   --space-at-top: 1.0rem;
   --footer-padding: 25px;
   --small-padding: 10px;
   --font-size: 14px;
 }
 
-/* purgecss start ignore */
 @import "~noty/lib/noty.css";
 @import "~noty/lib/themes/mint.css";
+@import "normalize.css";
 
 html {
   height: 100%;
@@ -31,6 +31,22 @@ select {
   font: menu;
 }
 
+
+
+button {
+  cursor: pointer;
+  height: 21px;
+  padding: 0px 16px;
+  font-size: var(--font-size);
+  border: 1px solid;
+  border-radius: 4px;
+  border-top-color: rgb(198, 198, 198);
+  border-bottom-color: rgb(170, 170, 170);
+  border-left-color: rgb(192, 192, 192);
+  border-right-color: rgb(192, 192, 192);
+}
+
+
 h1 {
   font-size: 1.1rem;
 }
@@ -40,10 +56,16 @@ h1 {
 small {
   font-size: 95%;
 }
+.text-muted {
+  color: grey;
+}
 
 .form-check {
-  margin-bottom: 0.3rem;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1.0rem;
 }
+ 
 .btn:focus {
   outline: none !important;
   box-shadow: none !important;
@@ -52,11 +74,20 @@ small {
   margin-left: 3px;
 }
 
+.input-group {
+  display: flex;
+  width: 100%;
+}
+
+
+#prefs, #settings, #editor, #about {
+  padding: 0.5rem;
+}
+
 //
 // prefs page
 //
 #prefs {
-  padding: 0.5rem;
   display: grid;
   grid-template-columns: var(--preview-wrapper-width) 1fr;
   grid-template-rows: var(--preview-wrapper-height) 1fr var(--footer-height);
@@ -88,7 +119,17 @@ small {
     padding-left: 0.25rem;
     padding-top: 0.5rem;
     padding-bottom: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+    border-left: 1px solid rgba(0, 0, 0, 0.125);
   }
+
+  li.list-group-item.active {
+    color: #fff;
+    background-color: #007bff;
+    border-color: #007bff;
+  }
+
 
   label {
     font-size: 0.9rem;
@@ -115,7 +156,7 @@ div.saver-detail {
 }
 .saver-preview::-webkit-scrollbar {
   width: 0px;
- height: 0px;
+  height: 0px;
 }
 
 div.basic-prefs {
@@ -151,6 +192,8 @@ footer.footer {
   background-color: #f5f5f5;
   padding-left: 5px;
   padding-right: 5px;
+  display: flex;
+  justify-content: space-between;
 }
 
 #prefs h1 {
@@ -177,9 +220,6 @@ ul {
   display: none;
 }
 
-button {
-  cursor: pointer;
-}
 
 button.add-option {
   margin-top: 12px;
@@ -297,6 +337,42 @@ input[type="range"] {
   max-width: 250px;
 }
 
+div.space-evenly {
+  display: flex;
+  justify-content: space-between;
+  max-width: 95%;
+}
+
+div.form-group {
+  margin-bottom: 1rem;
+  max-width: 95%;
+
+  label {
+    display: inline-block;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+  }
+  input, button {
+    display: block;
+    height: auto;
+    font-size: 1rem;
+    padding: .375rem .75rem;
+    line-height: 1.5;
+  }
+  input {
+    width: 100%;
+  }
+  input[type=checkbox] {
+    width: initial;
+    display: inline-block;
+  }
+  .hint {
+    display: block;
+  }
+}
+div.form-group.full-width {
+  max-width: 100%;
+}
 
 // new screensaver
 #new {
@@ -305,4 +381,7 @@ input[type="range"] {
 .need-setup-message {
   height: 80vh;
 }
-/* purgecss end ignore */
+
+.block {
+  display: block;
+}
