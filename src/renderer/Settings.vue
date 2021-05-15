@@ -13,7 +13,7 @@
             @click="downloadScreensaverUpdates"
           >
             Download screensaver updates
-            <b-spinner
+            <Spinner
               v-if="downloadingUpdates === true"
               small
             />
@@ -59,12 +59,13 @@
 <script>
 import AdvancedPrefsForm from "@/components/AdvancedPrefsForm";
 import PrefsForm from "@/components/PrefsForm";
+import Spinner from "@/components/Spinner";
 import Noty from "noty";
 
 export default {
   name: "Settings",
   components: {
-    AdvancedPrefsForm, PrefsForm
+    AdvancedPrefsForm, PrefsForm, Spinner
   },
   data() {
     return {

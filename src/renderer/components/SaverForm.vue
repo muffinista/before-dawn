@@ -3,52 +3,76 @@
     <form v-on="$listeners">
       <div class="form-group">
         <label for="name">Name:</label>
-        <input type="text"
-               name="name"
-               v-model="saver.name"
-               class="form-control" required />
-        <div class="hint">The name of your screensaver.</div>
+        <input
+          v-model="saver.name"
+          type="text"
+          name="name"
+          class="form-control"
+          required
+        >
+        <div class="hint">
+          The name of your screensaver.
+        </div>
       </div>
       
       <div class="form-group">
         <label for="name">Description:</label>
-        <input type="text"
-               name="description"
-               v-model="saver.description"
-               class="form-control" required />
-        <div class="hint">A brief description of your screensaver.</div>
+        <input
+          v-model="saver.description"
+          type="text"
+          name="description"
+          class="form-control"
+          required
+        >
+        <div class="hint">
+          A brief description of your screensaver.
+        </div>
       </div>
       <div class="form-group">
         <label for="aboutUrl">About URL:</label>
-        <input type="text"
-               name="aboutUrl"
-               v-model="saver.aboutUrl"
-               class="form-control" />
-        <div class="hint">If you have a URL with more details about your work, put it here!</div>
+        <input
+          v-model="saver.aboutUrl"
+          type="text"
+          name="aboutUrl"
+          class="form-control"
+        >
+        <div class="hint">
+          If you have a URL with more details about your work, put it here!
+        </div>
       </div>
       <div class="form-group">
         <label for="author">Author:</label>
-        <input type="text"
-               name="author"
-               v-model="saver.author"
-               class="form-control" />
-        <div class="hint">The author of this screensaver.</div>
+        <input
+          v-model="saver.author"
+          type="text"
+          name="author"
+          class="form-control"
+        >
+        <div class="hint">
+          The author of this screensaver.
+        </div>
       </div>
 
       <div class="form-group">
         <h5>Requirements:</h5>
-        <input type="checkbox" id="screen" value="screen" v-model="saver.requirements">
+        <input
+          id="screen"
+          v-model="saver.requirements"
+          type="checkbox"
+          value="screen"
+        >
         <label for="screen">Screen capture</label>
-        <div class="hint">This screensaver will be sent an image of the desktop</div>
+        <div class="hint">
+          This screensaver will be sent an image of the desktop
+        </div>
       </div>
-
     </form>
   </div>
 </template>
 
 <script>
   export default {
-    name: "saver-form",
+    name: "SaverForm",
     components: { },
     props: ["saver"],
     methods: {

@@ -35,7 +35,7 @@
       </template>
     </div>
 
-    <footer class="footer d-flex justify-content-between">
+    <footer class="footer">
       <div>
         <button
           class="align-middle btn btn-large btn-primary create"
@@ -70,8 +70,6 @@ import SaverList from "@/components/SaverList";
 import SaverOptions from "@/components/SaverOptions";
 import SaverSummary from "@/components/SaverSummary";
 import Noty from "noty";
-
-//const log = require("electron-log");
 
 export default {
   name: "Prefs",

@@ -13,7 +13,7 @@
             <option value="30">30 minutes</option>
             <option value="60">1 hour</option>
           </select>
-          <small class="form-text text-muted">
+          <small class="form-text text-muted block">
             The screensaver will activate once your computer has been idle for this amount of time.
           </small>
         </div>
@@ -29,7 +29,7 @@
             <option value="30">30 minutes</option>
             <option value="60">1 hour</option>
           </select>
-          <small class="form-text text-muted">
+          <small class="form-text text-muted block">
             The screensaver will stop, and the displays will
             be turned off to save energy after this amount
             of time.

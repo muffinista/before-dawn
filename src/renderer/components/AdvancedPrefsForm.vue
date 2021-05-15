@@ -1,15 +1,18 @@
 <template>
   <div id="advanced-prefs-form">
     <h1>Advanced Options</h1>
-    <p class="form-text text-muted">Be careful with these!</p>
+    <p class="form-text text-muted">
+      Be careful with these!
+    </p>
     <form>
-      <div class="form-group">
+      <div class="form-group full-width">
         <label for="localSource">Local Source:</label>
         <local-folder-input
-          v-on="$listeners"
           :value="prefs.localSource"
           handler="localSourceChange"
-          name="localSource"></local-folder-input>
+          name="localSource"
+          v-on="$listeners"
+        />
 
         <small class="form-text text-muted">
           We will load screensavers from any directories listed here. Use this to add your own screensavers!
@@ -18,11 +21,14 @@
 
       <div class="form-group">
         <label for="hotkey">Global hotkey:</label>
-        <input type="text"
-          name="hotkey"
-          readonly="readonly" class="form-control form-control-sm"
+        <input
           v-model="prefs.launchShortcut"
-          v-on:keydown="updateHotkey" />
+          type="text"
+          name="hotkey"
+          readonly="readonly"
+          class="form-control form-control-sm"
+          @keydown="updateHotkey"
+        >
         <small class="form-text text-muted">
           Enter a key combination that will be used to run a screensaver.
         </small>
@@ -35,7 +41,7 @@
 import LocalFolderInput from "@/components/LocalFolderInput";
 
 export default {
-  name: "advanced-prefs-form",
+  name: "AdvancedPrefsForm",
   components: {
     localFolderInput: LocalFolderInput,
   },

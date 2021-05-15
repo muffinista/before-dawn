@@ -1,7 +1,6 @@
 "use strict";
 
 const path = require("path");
-const glob = require("glob-all");
 const packageJSON = require(`${"./package.json"}`);
 
 const productName = packageJSON.productName;
@@ -14,7 +13,6 @@ const outputDir = path.join(__dirname, "output");
 
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const PurgecssPlugin = require("purgecss-webpack-plugin");
 const VueLoaderPlugin = require("vue-loader/lib/plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const SentryWebpackPlugin = require("@sentry/webpack-plugin");
@@ -64,7 +62,7 @@ let rendererConfig = {
         include: [
           // use `include` vs `exclude` to white-list vs black-list
           //path.resolve(__dirname, "src"), // white-list your app source files
-          require.resolve("bootstrap-vue"), // white-list bootstrap-vue
+          // require.resolve("bootstrap-vue"), // white-list bootstrap-vue
         ],
         use: {
           loader: "eslint-loader",
@@ -120,13 +118,6 @@ let rendererConfig = {
     new CopyWebpackPlugin({
       patterns: [
         {
-          from: path.join(__dirname, "src", "renderer", "assets"),
-          to: path.join(outputDir, "assets"),
-          globOptions: {
-            ignore: [".*"]
-          }
-        },
-        {
           from: path.join(__dirname, "src", "main", "system-savers"),
           to: path.join(outputDir, "system-savers"),
           globOptions: {
@@ -138,26 +129,6 @@ let rendererConfig = {
     new MiniCssExtractPlugin({
       filename: "[name].css",
       chunkFilename: "[id].css"
-    }),
-    new PurgecssPlugin({
-      paths: glob.sync([
-        path.join(__dirname, "src", "index.ejs"),
-        path.join(__dirname, "src", "**", "*.vue"),
-        path.join(__dirname, "src", "**", "*.js")
-      ]),
-      safelist: [
-        /nav/,
-        /nav-tabs/,
-        /nav-link/,
-        /nav-item/,
-        /tablist/,
-        /tabindex/,
-        /tooltip/,
-        /button-group/,
-        /btn/,
-        /spinner/,
-        /noty/
-      ]
     }),
   ],
   optimization: {

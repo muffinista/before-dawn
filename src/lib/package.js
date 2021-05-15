@@ -23,19 +23,15 @@ module.exports = class Package {
   constructor(_attrs) {
     this.repo = _attrs.repo;
     this.dest = _attrs.dest;
-    this.updated_at = _attrs.updated_at;
+    this.version = _attrs.version;
     this.downloaded = false;
     this.url = `https://api.github.com/repos/${this.repo}/releases/latest`;
 
-    this.useLocalFile = false;
-
-    if ( _attrs.local_zip ) {
-      this.localZip = _attrs.local_zip;
-      this.useLocalFile = true;
-    }
-
-    if ( typeof(this.updated_at) === "undefined" ) {
-      this.updated_at = new Date(0);
+    if ( typeof(this.version) === "undefined" ) {
+      const saverPackageJson = path.join(this.dest, "package.json");
+      if ( fs.existsSync(saverPackageJson) ) {
+        this.version = JSON.parse(fs.readFileSync(saverPackageJson)).version;
+      }
     }
   
     if ( typeof(_attrs.log) === "undefined" ) {
@@ -52,44 +48,35 @@ module.exports = class Package {
   attrs() {
     return {
       dest: this.dest,
-      updated_at: this.updated_at,
+      version: this.version,
       downloaded: this.downloaded
     };
   }
 
   async getReleaseInfo() {
-    if ( this.useLocalFile ) {
-      this.logger("use local zip file");
-      let stats = fs.statSync(this.localZip);
-      this.data = {
-        created_at: stats.mtime,
-        published_at: stats.mtime,
-        zipball_url: this.localZip,
-        is_update: stats.mtime > new Date(this.updated_at)
-      };
+    this.logger(`get release info from ${this.url}`);
+    if ( this.data ) {
+      return this.data;
     }
-    else {
-      this.logger(`get release info from ${this.url}`);
-      if ( this.data ) {
-        return this.data;
-      }
 
-      this.data = await fetch(this.url, this.defaultHeaders)
-        .then(res => res.json())
-        .then((json) => {
-          json.is_update = new Date(json.published_at) > new Date(this.updated_at);
-          return json;
-        })
-        .catch((err) => {
-          this.logger(err);
-          if ( typeof(this.data) !== "undefined" ) {
-            return this.data;
-          }
-          else {
-            return {};
-          }
-        });
-    }
+    this.data = await fetch(this.url, this.defaultHeaders)
+      .then(res => res.json())
+      .then((json) => {
+        const remoteVersion = json.tag_name.replace(/^v/, "");
+        this.logger(`compare ${remoteVersion} to ${this.version}`);
+        json.is_update = remoteVersion !== this.version;
+        return json;
+      })
+      .catch((err) => {
+        this.logger(err);
+        if ( typeof(this.data) !== "undefined" ) {
+          return this.data;
+        }
+        else {
+          return {};
+        }
+      });
+
     return this.data;
   }
 

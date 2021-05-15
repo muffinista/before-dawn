@@ -5,28 +5,24 @@
       readonly="readonly"
       :name="name"
       :value="value"
-      class="form-control form-control-sm"
     >
-    <span class="input-group-btn">
-      <button
-        type="button"
-        class="btn btn-sm btn-secondary pick"
-        @click.stop="showPathChooser"
-      >...</button>
-    </span>
-    <span class="input-group-btn spaced">
-      <button
-        type="button"
-        class="btn btn-sm btn-secondary clear"
-        @click.stop="clearLocalSource"
-      >X</button>
-    </span>
+    <button
+      type="button"
+      class="pick"
+      @click.stop="showPathChooser"
+    >
+      ...
+    </button>
+    <button
+      type="button"
+      class="clear"
+      @click.stop="clearLocalSource"
+    >
+      X
+    </button>
   </div>
 </template>
-
 <script>
-const ipcRenderer = window.ipcRenderer;
-
 export default {
   name: "LocalFolderInput",
   components: { },
