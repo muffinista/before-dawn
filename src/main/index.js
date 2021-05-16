@@ -44,7 +44,7 @@ const SaverFactory = require("../lib/saver-factory.js");
 const Saver = require("../lib/saver.js");
 const SaverListManager = require("../lib/saver-list.js");
 const Package = require("../lib/package.js");
-const Power = require("../lib/power.js");
+const Power = require("../main/power.js");
 
 const idler = require("desktop-idle");
 
@@ -165,6 +165,11 @@ try {
 catch(e) {
   console.log(e);
 }
+
+const power = new Power({
+  platform: process.platform,
+  method: electron.powerMonitor.isOnBatteryPower
+});
 
 
 /**
@@ -1615,7 +1620,7 @@ var runScreenSaverIfNotFullscreen = function() {
  * activate the screensaver, but only if we're plugged in, or if the user
  * is fine with running on battery
  */
-var runScreenSaverIfPowered = function() {
+var runScreenSaverIfPowered = async function() {
   log.info("runScreenSaverIfPowered");
 
   if ( windows.screenSaverIsRunning() ) {
@@ -1625,15 +1630,14 @@ var runScreenSaverIfPowered = function() {
   
   // check if we are on battery, and if we should be running in that case
   if ( checkPowerState && prefs.disableOnBattery ) {
-    const power = new Power();
-    power.charging().then((is_powered) => {
-      if ( is_powered ) {       
-        runScreenSaverIfNotFullscreen();
-      }
-      else {
-        log.info("I would run, but we're on battery :(");
-      }
-    });
+    const isPowered = await power.charging();
+
+    if ( isPowered ) {       
+      runScreenSaverIfNotFullscreen();
+    }
+    else {
+      log.info("I would run, but we're on battery :(");
+    }
   }
   else {
     checkPowerState = true;
