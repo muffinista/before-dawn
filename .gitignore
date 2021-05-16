@@ -47,3 +47,6 @@ dist/*
 
 .electron-symbols
 .env
+
+data/savers
+data/*.*
