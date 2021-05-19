@@ -13,6 +13,7 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 const releaseName = `${packageJSON.productName} ${packageJSON.version}`;
 
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const SentryWebpackPlugin = require("@sentry/webpack-plugin");
 
 //
@@ -82,16 +83,15 @@ let mainConfig = {
     nodeEnv: (process.env.NODE_ENV === "production" ? "production" : "development")
   },
   output: {
-    clean: true,
     filename: "[name].js",
     libraryTarget: "commonjs2",
     path: outputDir,
     sourceMapFilename: "[name].js.map"
   },
   plugins: [
-    // new CleanWebpackPlugin({
-    //   cleanOnceBeforeBuildPatterns: []
-    // }),
+    new CleanWebpackPlugin({
+      cleanOnceBeforeBuildPatterns: []
+    }),
     new CopyWebpackPlugin({
       patterns: [
         {
