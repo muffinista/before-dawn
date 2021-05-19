@@ -8,6 +8,8 @@ var workingDir;
 var saversDir;
 const SaverPrefs = require("../../src/lib/prefs.js");
 
+// process.setMaxListeners(0);
+
 describe("Prefs", function() { 
   helpers.setupTest(this);
 
@@ -18,14 +20,6 @@ describe("Prefs", function() {
   let currentPrefs = function() {
     return new SaverPrefs(workingDir);
   };
-
-  // before(function() {
-  //   if ( process.platform === "linux" ) {
-  //     // eslint-disable-next-line no-console
-  //     console.log("skipping on linux");
-  //     this.skip();
-  //   }
-  // });
 
   beforeEach(async function() {
     workingDir = helpers.getTempDir();

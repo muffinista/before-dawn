@@ -153,7 +153,6 @@ class SaverPrefs {
 Object.keys(DEFAULTS).forEach(function(name) {
   Object.defineProperty(SaverPrefs.prototype, name, {
     get() {
-      // console.log(`GET ${name}`);
       const result = this.store.get(name);
 
       if ( name === "sourceUpdatedAt" || name === "updateCheckTimestamp" ) {
@@ -163,7 +162,6 @@ Object.keys(DEFAULTS).forEach(function(name) {
       return result;
     },
     set(newval) {
-      // console.log(`SET ${name} -> ${newval}`);
       if ( newval === undefined ) {
         this.store.delete(name);
       }

@@ -1,9 +1,6 @@
 <template>
   <div class="wrapper">
-    <form
-      class="input"
-      v-on="$listeners"
-    >
+    <form class="input">
       <label class="for-option">{{ option.name }}:</label>
       <input
         :type="renderType"
@@ -25,6 +22,7 @@
     name: "OptionInput",
     components: { },
     props: ["saver", "option", "value"],
+    emits: ["saverOption"],
     computed: {
       renderType: function() {
         if ( this.option.type === "slider" ) {

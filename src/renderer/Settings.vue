@@ -22,8 +22,10 @@
       </div>
       <div class="container-fluid">
         <advanced-prefs-form
-          :prefs="prefs"
-          @localSourceChange="localSourceChange"
+          :local-source="prefs.localSource"
+          :launch-shortcut="prefs.launchShortcut"
+          @update:localSource="localSourceChange"
+          @update:launchShortcut="prefs.launchShortcut=$event"
         />
       </div>
     </template>
@@ -102,7 +104,10 @@ export default {
     async handleSave(output) {
       this.disabled = true;
       try {
-        await window.api.updatePrefs(this.prefs);
+        // https://forum.vuejs.org/t/how-to-clone-property-value-as-simple-object/40032/2
+        const clone = JSON.parse(JSON.stringify(this.prefs));
+
+        await window.api.updatePrefs(clone);
         await window.api.saversUpdated();
 
         window.api.setAutostart(this.prefs.auto_start);

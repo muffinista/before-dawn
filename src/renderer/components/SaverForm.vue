@@ -1,6 +1,6 @@
 <template>
   <div id="saver-form">
-    <form v-on="$listeners">
+    <form >
       <div class="form-group">
         <label for="name">Name:</label>
         <input
@@ -54,7 +54,7 @@
       </div>
 
       <div class="form-group">
-        <h5>Requirements:</h5>
+        <h3>Requirements:</h3>
         <input
           id="screen"
           v-model="saver.requirements"

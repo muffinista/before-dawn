@@ -3,7 +3,7 @@
     <h1>Settings</h1>
     <form
       class="grid"
-      v-on="$listeners"
+      
     >
       <div class="options">
         <div class="form-check">

@@ -1,4 +1,4 @@
-import Vue from "vue";
+import { createApp } from "vue";
 
 import Prefs from "./Prefs";
 import Settings from "./Settings";
@@ -8,8 +8,6 @@ import About from "./About";
 
 import "@/../css/styles.scss";
 
-Vue.config.productionTip = false;
-
 var actions = {
   "prefs": { components: { Prefs }, template: "<Prefs/>" },
   "settings": { components: { Settings }, template: "<Settings/>" },
@@ -18,7 +16,8 @@ var actions = {
   "about": { components: { About }, template: "<About/>" }
 };
 
-var id = document.querySelector("body > div").id;
+
+var id = document.querySelector("body").dataset.id;
 var opts = actions[id];
 
-new Vue(opts).$mount("#" + id);
+createApp(opts).mount("body");

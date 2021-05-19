@@ -1,23 +1,28 @@
 <template>
   <div id="wrapper">
     <ul>
-      <li v-for="(option, index) in options" :key="index">
+      <li
+        v-for="(option, index) in options"
+        :key="index"
+      >
         <template v-if="option.type === 'boolean'">
           <boolean-input
-            v-on="$listeners"
+            :key="option.name"
             :saver="saver"
             :option="option"
             :value="values[option.name]"
             :name="option.name"
-            :key="option.name"></boolean-input>
+            @saverOption="handleOptionUpdate"
+          />
         </template>
         <template v-else>
           <option-input
-            v-on="$listeners"
+            :key="option.name"
             :saver="saver"
             :option="option"
             :value="values[option.name]"
-            :key="option.name"></option-input>
+            @saverOption="handleOptionUpdate"
+          />
         </template>
       </li>
     </ul>
@@ -28,13 +33,17 @@
 import OptionInput from "@/components/OptionInput";
 import BooleanInput from "@/components/BooleanInput";
 export default {
-  name: "saver-options",
-  props: ["saver", "options", "values"],
+  name: "SaverOptions",
   components: {
     optionInput: OptionInput,
     booleanInput: BooleanInput
   },
+  props: ["saver", "options", "values"],
+  emits: ["saverOption"],
   methods: {
+    handleOptionUpdate(saver, name, value) {
+      this.$emit("saverOption", saver, name, value);
+    }
   }
-}
+};
 </script>

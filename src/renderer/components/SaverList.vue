@@ -3,7 +3,7 @@
     <h1>Screensavers</h1>
     <ul class="saver-list list-group-flush">
       <saver-list-item
-        v-on="$listeners"
+        
         v-for="saver in savers"
         v-bind:saver="saver"
         :checked="saver.key == current"

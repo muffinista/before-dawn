@@ -2,7 +2,6 @@
   <div id="editor">
     <div class="button-group">
       <button
-        
         variant="default"
         title="Open screensaver folder"
         @click="openFolder"
@@ -124,21 +123,7 @@
     <div id="preview">
       <div class="container-fluid space-at-bottom">
         <template v-if="saver !== undefined">
-          <template v-if="options.length > 0">
-            <h4>Options</h4>
-            <small>
-              Tweak the values here and they will be sent along
-              to your preview.
-            </small>
-            <saver-options
-              :saver="saver"
-              :options="options"
-              :values="optionDefaults"
-              @change="onOptionsChange"
-            />
-          </template>
-          
-          <h4>Preview</h4>
+          <h3>Preview</h3>
           <div class="saver-detail">
             <iframe
               :src="previewUrl"
@@ -146,12 +131,26 @@
               class="saver-preview"
             />
           </div>
+
+          <template v-if="validOptions.length > 0">
+            <h3>Options</h3>
+            <small>
+              Tweak the values here and they will be sent along
+              to your preview.
+            </small>
+            <saver-options
+              :saver="saver"
+              :options="validOptions"
+              :values="optionDefaults"
+              @change="onOptionsChange"
+            />
+          </template>
         </template>
       </div>
     </div>
     <div id="description">
       <div class="container-fluid">
-        <h4>Description</h4>
+        <h2>Description</h2>
         <small>
           You can enter the basics about this screensaver
           here.
@@ -167,17 +166,12 @@
     <div id="options">
       <div class="container-fluid">
         <template v-if="saver !== undefined">
-          <h4>Configurable Options</h4>
+          <h2>Configurable Options</h2>
           <small>
             You can offer users configurable options to control
             your screensaver. Manage those here.
           </small>
-          
-          
-          <!--
-              note: is track-by ok here?
-              https://v1.vuejs.org/guide/list.html#track-by-index 
-            -->
+
           <div v-if="isLoaded">
             <saver-option-input
               v-for="(option, index) in options"
@@ -272,6 +266,9 @@ export default {
     previewUrl: function() {
       const urlParams = new URLSearchParams(this.urlOpts(this.saver));
       return `${this.saver.url}?${urlParams.toString()}`;
+    },
+    validOptions: function() {
+      return this.options.filter(o => o.name !== "");
     }
   },
   async mounted() {
@@ -354,7 +351,10 @@ export default {
 
       this.saver.options = this.options;
 
-      await window.api.saveScreensaver(this.saver, this.src);
+      // https://forum.vuejs.org/t/how-to-clone-property-value-as-simple-object/40032/2
+      const clone = JSON.parse(JSON.stringify(this.saver));
+
+      await window.api.saveScreensaver(clone, this.src);
       window.api.saversUpdated(this.src);
 
       new Noty({
