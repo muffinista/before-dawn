@@ -27,6 +27,7 @@ export default {
   name: "LocalFolderInput",
   components: { },
   props: ["name", "value", "handler"],
+  emits: ["update"],
   computed: {
   },
   methods: {
@@ -40,13 +41,13 @@ export default {
       }
 
       const choice = result.filePaths[0];
-      this.$emit(this.handler, choice);
+      this.$emit("update", choice);
 
       // blah this is weird
       document.querySelector(`[name=${this.name}]`).value = choice;
     },
     clearLocalSource() {
-      this.$emit(this.handler, "");
+      this.$emit("update", "");
       document.querySelector(`[name=${this.name}]`).value = "";
     },
   },

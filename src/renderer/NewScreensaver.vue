@@ -20,7 +20,6 @@
                   :value="prefs.localSource"
                   handler="localSourceChange"
                   name="localSource"
-                  v-on="$listeners"
                   @localSourceChange="localSourceChange"
                 />
               </template>
@@ -127,7 +126,10 @@ export default {
       }
 
       this.disabled = true;
-      const data = await window.api.createScreensaver(this.saver);
+      // https://forum.vuejs.org/t/how-to-clone-property-value-as-simple-object/40032/2
+      const clone = JSON.parse(JSON.stringify(this.saver));
+
+      const data = await window.api.createScreensaver(clone);
 
       window.api.saversUpdated();
 

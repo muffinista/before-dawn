@@ -8,12 +8,10 @@
       <div class="form-group full-width">
         <label for="localSource">Local Source:</label>
         <local-folder-input
-          :value="prefs.localSource"
-          handler="localSourceChange"
+          :value="localSource"
           name="localSource"
-          v-on="$listeners"
+          @update="$emit('update:localSource', $event)"
         />
-
         <small class="form-text text-muted">
           We will load screensavers from any directories listed here. Use this to add your own screensavers!
         </small>
@@ -22,7 +20,7 @@
       <div class="form-group">
         <label for="hotkey">Global hotkey:</label>
         <input
-          v-model="prefs.launchShortcut"
+          :value="launchShortcut"
           type="text"
           name="hotkey"
           readonly="readonly"
@@ -45,7 +43,16 @@ export default {
   components: {
     localFolderInput: LocalFolderInput,
   },
-  props: ["prefs"],
+  props: { 
+    localSource: {
+      type: String,
+      default: ""
+    },
+    launchShortcut: {
+      type: String,
+      default: undefined
+   }
+  },
   methods: {
     updateHotkey(event) {
       if ( event.key == "Control" || event.key == "Shift" || event.key == "Alt" || event.key == "Meta" ) {
@@ -69,7 +76,7 @@ export default {
       if ( output.length === 0 ) {
         if ( event.key == "Backspace" ) {
           event.target.value = "";
-          this.prefs.launchShortcut = undefined;
+          this.$emit("update:launchShortcut", undefined);
         }
 
         return;
@@ -78,7 +85,7 @@ export default {
       output.push(`${event.key}`.toUpperCase());
       output = output.join("+");
 
-      this.prefs.launchShortcut = output;
+      this.$emit("update:launchShortcut", output);
 
       event.target.value = output;
     },

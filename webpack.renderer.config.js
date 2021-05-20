@@ -13,7 +13,7 @@ const outputDir = path.join(__dirname, "output");
 
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const VueLoaderPlugin = require("vue-loader/lib/plugin");
+const { VueLoaderPlugin } = require("vue-loader");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const SentryWebpackPlugin = require("@sentry/webpack-plugin");
 
@@ -147,9 +147,7 @@ let rendererConfig = {
     alias: {
       // handy alias for the root path of render files
       "@": path.join(__dirname, "src", "renderer"),
-
-      // vue template compiler
-      "vue$": "vue/dist/vue.esm.js"
+      vue: "vue/dist/vue.esm-bundler.js"
     },
     extensions: [".js", ".vue", ".json", ".css", ".node"]
   },
@@ -166,7 +164,9 @@ if (process.env.NODE_ENV === "production") {
   rendererConfig.plugins.push(
     new webpack.DefinePlugin({
       "process.env.NODE_ENV": JSON.stringify("production"),
-      "process.env.BEFORE_DAWN_RELEASE_NAME": JSON.stringify(releaseName)
+      "process.env.BEFORE_DAWN_RELEASE_NAME": JSON.stringify(releaseName),
+      "__VUE_OPTIONS_API__": true,
+      "__VUE_PROD_DEVTOOLS__": false
     }),
     new webpack.LoaderOptionsPlugin({
       minimize: true
@@ -184,6 +184,10 @@ if (process.env.NODE_ENV === "production") {
   }
 } else {
   rendererConfig.plugins.push(
+    new webpack.DefinePlugin({
+      "__VUE_OPTIONS_API__": true,
+      "__VUE_PROD_DEVTOOLS__": false
+    }),
     new webpack.HotModuleReplacementPlugin()
   );
 }

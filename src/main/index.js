@@ -65,6 +65,10 @@ let testMode = ( process.env.TEST_MODE !== undefined );
 
 let cursor;
 
+if ( testMode === true ) {
+  require("@electron/remote/main").initialize();
+}
+
 //
 // don't hide cursor in tests or in windows, since
 // that causes the tray to stop working???

@@ -15,13 +15,17 @@
           role="button" 
           :data-name="saver.name" 
           @click.stop="onEditClick(saver)"
-        >edit</button>
+        >
+          edit
+        </button>
         <button
           class="btn btn-outline-secondary btn-sm" 
           href="#"
           role="button" 
           @click.stop="onDeleteClick(saver)"
-        >delete</button>
+        >
+          delete
+        </button>
       </div>
     </template>
 

@@ -134,7 +134,7 @@ describe("Settings", function() {
 
     await helpers.sleep(closeWindowDelay);
 
-    assert.equal("", currentPrefs().localSource);
+    assert.strictEqual(currentPrefs().localSource, "");
 
     await helpers.waitForWindow(app, "Before Dawn: Preferences");
   });

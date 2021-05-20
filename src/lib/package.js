@@ -63,7 +63,6 @@ module.exports = class Package {
       .then(res => res.json())
       .then((json) => {
         const remoteVersion = json.tag_name.replace(/^v/, "");
-        this.logger(`compare ${remoteVersion} to ${this.version}`);
         json.is_update = remoteVersion !== this.version;
         return json;
       })

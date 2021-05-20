@@ -4,9 +4,7 @@
     <meta charset="utf-8">
     <title><%= htmlWebpackPlugin.options.title %></title>
   </head>
-  <body>
-    <div id="<%= htmlWebpackPlugin.options.id %>"></div>
-
+  <body data-id="<%= htmlWebpackPlugin.options.id %>">
     <!-- webpack builds are automatically injected -->
   </body>
 </html>
