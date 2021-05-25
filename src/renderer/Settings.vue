@@ -62,7 +62,7 @@
 import AdvancedPrefsForm from "@/components/AdvancedPrefsForm";
 import PrefsForm from "@/components/PrefsForm";
 import Spinner from "@/components/Spinner";
-import Noty from "noty";
+import Notarize from "@/components/Notarize";
 
 export default {
   name: "Settings",
@@ -118,16 +118,7 @@ export default {
       }
 
       this.disabled = false;
-
-      new Noty({
-        type: "success",
-        layout: "topRight",
-        timeout: 1000,
-        text: output,
-        animation: {
-          open: null
-        }
-      }).show();
+      new Notarize({timeout: 1000}).show(output);
     },
     async resetToDefaults() {
       const result = await window.api.resetToDefaultsDialog();
@@ -150,18 +141,8 @@ export default {
 
       try {
         this.downloadingUpdates = true;
-
         await window.api.downloadScreensaverPackage();
-
-        new Noty({
-          type: "success",
-          layout: "topRight",
-          timeout: 1000,
-          text: "Screensavers updated!",
-          animation: {
-            open: null
-          }
-        }).show();
+        new Notarize({timeout: 1000}).show("Screensavers updated!");
       }
       finally {
         this.downloadingUpdates = false;
