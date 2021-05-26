@@ -44,15 +44,15 @@ const SaverFactory = require("../lib/saver-factory.js");
 const Saver = require("../lib/saver.js");
 const SaverListManager = require("../lib/saver-list.js");
 const Package = require("../lib/package.js");
-const Power = require("../lib/power.js");
+const Power = require("../main/power.js");
+
+const idler = require("desktop-idle");
 
 var releaseChecker;
 
 const menusAndTrays = require("./menus.js");
 const dock = require("./dock.js");
 const windows = require("./windows.js");
-
-// const mutex = withTimeout(new Mutex(), 30000, new Error("timeout"));
 
 const forcefocus = require("forcefocus");
 
@@ -64,6 +64,10 @@ let debugMode = ( process.env.DEBUG_MODE !== undefined );
 let testMode = ( process.env.TEST_MODE !== undefined );
 
 let cursor;
+
+if ( testMode === true ) {
+  require("@electron/remote/main").initialize();
+}
 
 //
 // don't hide cursor in tests or in windows, since
@@ -135,7 +139,6 @@ let electronScreen;
 let prefs = undefined;
 let savers = undefined;
 let stateManager = undefined;
-let saverOpts = {};
 
 // usually we want to check power state before running, but
 // we'll skip that check depending on the value of this toggle
@@ -166,6 +169,11 @@ try {
 catch(e) {
   console.log(e);
 }
+
+const power = new Power({
+  platform: process.platform,
+  method: electron.powerMonitor.isOnBatteryPower
+});
 
 
 /**
@@ -1103,10 +1111,11 @@ var askAboutMediaAccess = async function() {
 const getPackage = function() {
   const attrs = {
     repo: prefs.sourceRepo,
-    updated_at: new Date(prefs.sourceUpdatedAt),
     dest: prefs.defaultSaversDir,
     log: log.info
   };
+
+  console.log(attrs);
 
   return new Package(attrs);
 };
@@ -1226,7 +1235,7 @@ let setupIPC = function() {
 
   ipcMain.handle("download-screensaver-package", async() => {
     log.info("download-screensaver-package");
-    const result = await getPackage().downloadPackage();
+    const result = await getPackage().downloadRelease();
     
     log.info(result);
     toggleSaversUpdated();
@@ -1504,17 +1513,37 @@ var bootApp = async function() {
     });
   }
 
-  // these are some variables we'll pass to windows so they
-  // can bootstrap access to data/etc
-  saverOpts = {
-    base: global.basePath,
-    systemDir: path.join(getSystemDir(), "system-savers")
-  };
+  let saversDir;
+  if ( process.env.SAVERS_DIR ) {
+    saversDir = process.env.SAVERS_DIR;
+  }
+  else if ( global.IS_DEV ) {
+    saversDir = path.join(__dirname, "..", "..", "data", "savers");
+    log.info("hello from dev mode, 'node bin/download-screensavers' to grab screensavers");
+  }
+  else {
+    saversDir = path.join(process.resourcesPath, "savers");
+  }
+
+  const systemDir = path.join(getSystemDir(), "system-savers");
+
+  let basePath;
+  // store our root path as a global variable so we can access it from screens
+  if ( process.env.BEFORE_DAWN_DIR !== undefined ) {
+    basePath = process.env.BEFORE_DAWN_DIR;
+  }
+  else {
+    basePath = app.getPath("userData");
+  }
+  log.info("use base path", basePath);
+
 
   log.info("Loading prefs");
-  log.info(`baseDir: ${saverOpts.base}`);
-  log.info(`systemSource: ${saverOpts.systemDir}`);
-  prefs = new SaverPrefs(saverOpts.base, saverOpts.systemDir);
+  log.info(`baseDir: ${basePath}`);
+  log.info(`saversDir: ${saversDir}`);
+  log.info(`system savers: ${systemDir}`);
+
+  prefs = new SaverPrefs(basePath, systemDir, saversDir);
   savers = new SaverListManager({
     prefs: prefs
   });
@@ -1543,15 +1572,8 @@ var bootApp = async function() {
 
   setupIPC();
 
-  const idler = require("desktop-idle");
   stateManager = new StateManager();
   stateManager.idleFn = idler.getIdleTime;
-
-  // stateManager.idleFn = () => {
-  //   const x = idler.getIdleTime();
-  //   log.info(x);
-  //   return x;
-  // };
 
   updateStateManager();
 
@@ -1602,7 +1624,7 @@ var runScreenSaverIfNotFullscreen = function() {
  * activate the screensaver, but only if we're plugged in, or if the user
  * is fine with running on battery
  */
-var runScreenSaverIfPowered = function() {
+var runScreenSaverIfPowered = async function() {
   log.info("runScreenSaverIfPowered");
 
   if ( windows.screenSaverIsRunning() ) {
@@ -1612,15 +1634,14 @@ var runScreenSaverIfPowered = function() {
   
   // check if we are on battery, and if we should be running in that case
   if ( checkPowerState && prefs.disableOnBattery ) {
-    const power = new Power();
-    power.charging().then((is_powered) => {
-      if ( is_powered ) {       
-        runScreenSaverIfNotFullscreen();
-      }
-      else {
-        log.info("I would run, but we're on battery :(");
-      }
-    });
+    const isPowered = await power.charging();
+
+    if ( isPowered ) {       
+      runScreenSaverIfNotFullscreen();
+    }
+    else {
+      log.info("I would run, but we're on battery :(");
+    }
   }
   else {
     checkPowerState = true;
@@ -1767,18 +1788,6 @@ if ( global.IS_DEV ) {
   }
 }
 
-// store our root path as a global variable so we can access it from screens
-if ( process.env.BEFORE_DAWN_DIR !== undefined ) {
-  global.basePath = process.env.BEFORE_DAWN_DIR;
-}
-else {
-  global.basePath = app.getPath("userData");
-  // global.basePath = path.join(app.getPath("appData"), global.APP_DIR);
-}
-log.info("use base path", global.basePath);
-
-
-
 const windowMethods = {
   editor: openEditor,
   settings: openSettingsWindow,
@@ -1853,6 +1862,5 @@ exports.openPrefsWindow = openPrefsWindow;
 exports.openAboutWindow = openAboutWindow;
 exports.addNewSaver = addNewSaver;
 exports.openEditor = openEditor;
-exports.getSystemDir = getSystemDir;
 exports.toggleSaversUpdated = toggleSaversUpdated;
 exports.quitApp = quitApp;

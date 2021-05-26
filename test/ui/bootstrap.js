@@ -15,11 +15,11 @@ describe("bootstrap", function() {
   var workingDir;
   let app;
 
-  var bootApp = async function() {
-    app = helpers.application(workingDir, false, saverZip, saverData);  
-    await app.start();
-    await helpers.waitUntilBooted(app);
-  };
+  // var bootApp = async function() {
+  //   app = helpers.application(workingDir, false, saverZip, saverData);  
+  //   await app.start();
+  //   await helpers.waitUntilBooted(app);
+  // };
 
   helpers.setupTest(this);
 
@@ -59,40 +59,40 @@ describe("bootstrap", function() {
     });
   });
 
-  describe("with up to date config", () => {
-    beforeEach(() => {
-      helpers.setupConfig(workingDir, "config", {
-        "firstLoad": false,
-        "sourceRepo": "foo/bar",
-        "sourceUpdatedAt": new Date(0)
-      });
-    });
+  // describe("with up to date config", () => {
+  //   beforeEach(() => {
+  //     helpers.setupConfig(workingDir, "config", {
+  //       "firstLoad": false,
+  //       "sourceRepo": "foo/bar",
+  //       "sourceUpdatedAt": new Date(0)
+  //     });
+  //   });
 
-    describe("and a valid screenaver", () => {
-      beforeEach(async () => {
-        let saversDir = path.join(workingDir, "savers");
-        let saverJSONFile = helpers.addSaver(saversDir, "saver");
-        helpers.setConfigValue(workingDir, "saver", saverJSONFile);
-        await bootApp();
-      });
+  //   describe("and a valid screenaver", () => {
+  //     beforeEach(async () => {
+  //       let saversDir = path.join(workingDir, "savers");
+  //       let saverJSONFile = helpers.addSaver(saversDir, "saver");
+  //       helpers.setConfigValue(workingDir, "saver", saverJSONFile);
+  //       await bootApp();
+  //     });
 
-      it("does not show prefs", async function() {
-        const res = await helpers.waitForWindow(app, prefsWindowTitle, true);
-        assert.equal(false, res);
-      });
-    });
+  //     it("does not show prefs", async function() {
+  //       const res = await helpers.waitForWindow(app, prefsWindowTitle, true);
+  //       assert.equal(false, res);
+  //     });
+  //   });
 
-    describe("and an invalid screenaver", () => {
-      beforeEach(async () => {
-        let saversDir = path.join(workingDir, "savers");
-        helpers.addSaver(saversDir, "saver");
-        helpers.setConfigValue(workingDir, "saver", "i-dont-exist");
-        await bootApp();
-      });
+  //   describe("and an invalid screenaver", () => {
+  //     beforeEach(async () => {
+  //       let saversDir = path.join(workingDir, "savers");
+  //       helpers.addSaver(saversDir, "saver");
+  //       helpers.setConfigValue(workingDir, "saver", "i-dont-exist");
+  //       await bootApp();
+  //     });
 
-      it("shows prefs", async function() {
-        await helpers.waitForWindow(app, prefsWindowTitle);
-      });
-    });
-  });
+  //     it("shows prefs", async function() {
+  //       await helpers.waitForWindow(app, prefsWindowTitle);
+  //     });
+  //   });
+  // });
 });

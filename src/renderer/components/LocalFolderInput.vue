@@ -5,32 +5,29 @@
       readonly="readonly"
       :name="name"
       :value="value"
-      class="form-control form-control-sm"
     >
-    <span class="input-group-btn">
-      <button
-        type="button"
-        class="btn btn-sm btn-secondary pick"
-        @click.stop="showPathChooser"
-      >...</button>
-    </span>
-    <span class="input-group-btn spaced">
-      <button
-        type="button"
-        class="btn btn-sm btn-secondary clear"
-        @click.stop="clearLocalSource"
-      >X</button>
-    </span>
+    <button
+      type="button"
+      class="pick"
+      @click.stop="showPathChooser"
+    >
+      ...
+    </button>
+    <button
+      type="button"
+      class="clear"
+      @click.stop="clearLocalSource"
+    >
+      X
+    </button>
   </div>
 </template>
-
 <script>
-const ipcRenderer = window.ipcRenderer;
-
 export default {
   name: "LocalFolderInput",
   components: { },
   props: ["name", "value", "handler"],
+  emits: ["update"],
   computed: {
   },
   methods: {
@@ -44,13 +41,13 @@ export default {
       }
 
       const choice = result.filePaths[0];
-      this.$emit(this.handler, choice);
+      this.$emit("update", choice);
 
       // blah this is weird
       document.querySelector(`[name=${this.name}]`).value = choice;
     },
     clearLocalSource() {
-      this.$emit(this.handler, "");
+      this.$emit("update", "");
       document.querySelector(`[name=${this.name}]`).value = "";
     },
   },

@@ -1,16 +1,17 @@
 <template>
   <div id="advanced-prefs-form">
     <h1>Advanced Options</h1>
-    <p class="form-text text-muted">Be careful with these!</p>
+    <p class="form-text text-muted">
+      Be careful with these!
+    </p>
     <form>
-      <div class="form-group">
+      <div class="form-group full-width">
         <label for="localSource">Local Source:</label>
         <local-folder-input
-          v-on="$listeners"
-          :value="prefs.localSource"
-          handler="localSourceChange"
-          name="localSource"></local-folder-input>
-
+          :value="localSource"
+          name="localSource"
+          @update="$emit('update:localSource', $event)"
+        />
         <small class="form-text text-muted">
           We will load screensavers from any directories listed here. Use this to add your own screensavers!
         </small>
@@ -18,11 +19,14 @@
 
       <div class="form-group">
         <label for="hotkey">Global hotkey:</label>
-        <input type="text"
+        <input
+          :value="launchShortcut"
+          type="text"
           name="hotkey"
-          readonly="readonly" class="form-control form-control-sm"
-          v-model="prefs.launchShortcut"
-          v-on:keydown="updateHotkey" />
+          readonly="readonly"
+          class="form-control form-control-sm"
+          @keydown="updateHotkey"
+        >
         <small class="form-text text-muted">
           Enter a key combination that will be used to run a screensaver.
         </small>
@@ -35,11 +39,20 @@
 import LocalFolderInput from "@/components/LocalFolderInput";
 
 export default {
-  name: "advanced-prefs-form",
+  name: "AdvancedPrefsForm",
   components: {
     localFolderInput: LocalFolderInput,
   },
-  props: ["prefs"],
+  props: { 
+    localSource: {
+      type: String,
+      default: ""
+    },
+    launchShortcut: {
+      type: String,
+      default: undefined
+   }
+  },
   methods: {
     updateHotkey(event) {
       if ( event.key == "Control" || event.key == "Shift" || event.key == "Alt" || event.key == "Meta" ) {
@@ -63,7 +76,7 @@ export default {
       if ( output.length === 0 ) {
         if ( event.key == "Backspace" ) {
           event.target.value = "";
-          this.prefs.launchShortcut = undefined;
+          this.$emit("update:launchShortcut", undefined);
         }
 
         return;
@@ -72,7 +85,7 @@ export default {
       output.push(`${event.key}`.toUpperCase());
       output = output.join("+");
 
-      this.prefs.launchShortcut = output;
+      this.$emit("update:launchShortcut", output);
 
       event.target.value = output;
     },

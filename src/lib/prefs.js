@@ -6,15 +6,24 @@ const Conf = require("conf");
 const DEFAULTS = require("./prefs-schema.json");
 
 class SaverPrefs {
-  constructor(baseDir, systemSource=undefined) {
-    this.baseDir = baseDir;
+  constructor(baseConfigDir, rootDir=undefined, saversDir=undefined) {
+    this.baseDir = baseConfigDir;
 
-    if ( systemSource !== undefined ) {
-      this.systemSource = systemSource;
+    if ( rootDir === undefined ) {
+      this.rootDir = this.baseDir;
     }
     else {
-      this.systemSource = path.join(this.baseDir, "system-savers");
+      this.rootDir = rootDir;
     }
+
+    if ( saversDir === undefined ) {
+      this.saversDir = path.join(this.rootDir, "savers");
+    }
+    else {
+      this.saversDir = saversDir;
+    }
+
+    this.systemSource = path.join(this.rootDir, "system-savers");
 
     this.confOpts = {
       schema: DEFAULTS,
@@ -74,26 +83,17 @@ class SaverPrefs {
   }
 
   get defaultSaversDir() {
-    return path.join(this.baseDir, "savers");
+    return this.saversDir;
   }
 
   /**
    * get a list of folders we should check for screensavers
    */
   get sources() {
-    var source = this.sourceRepo;
     var local = this.localSource;
     var system = this.systemSource;
-
-    var root = path.join(this.baseDir, "savers");
     
-    var folders = [];
-
-    // if we're pulling savers from a git repo, this is where
-    // they will be located
-    if ( source !== undefined && source !== "" ) {
-      folders.push(root);
-    }
+    var folders = [this.defaultSaversDir];
 
     // if there's a local source, use that
     if ( local !== "" ) {
@@ -153,7 +153,6 @@ class SaverPrefs {
 Object.keys(DEFAULTS).forEach(function(name) {
   Object.defineProperty(SaverPrefs.prototype, name, {
     get() {
-      // console.log(`GET ${name}`);
       const result = this.store.get(name);
 
       if ( name === "sourceUpdatedAt" || name === "updateCheckTimestamp" ) {
@@ -163,7 +162,6 @@ Object.keys(DEFAULTS).forEach(function(name) {
       return result;
     },
     set(newval) {
-      // console.log(`SET ${name} -> ${newval}`);
       if ( newval === undefined ) {
         this.store.delete(name);
       }

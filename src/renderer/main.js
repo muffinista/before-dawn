@@ -1,5 +1,4 @@
-import Vue from "vue";
-import BootstrapVue from "bootstrap-vue";
+import { createApp } from "vue";
 
 import Prefs from "./Prefs";
 import Settings from "./Settings";
@@ -7,12 +6,7 @@ import Editor from "./Editor";
 import NewScreensaver from "./NewScreensaver";
 import About from "./About";
 
-import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap-vue/dist/bootstrap-vue.css";
 import "@/../css/styles.scss";
-
-Vue.config.productionTip = false;
-Vue.use(BootstrapVue);
 
 var actions = {
   "prefs": { components: { Prefs }, template: "<Prefs/>" },
@@ -22,7 +16,8 @@ var actions = {
   "about": { components: { About }, template: "<About/>" }
 };
 
-var id = document.querySelector("body > div").id;
+
+var id = document.querySelector("body").dataset.id;
 var opts = actions[id];
 
-new Vue(opts).$mount("#" + id);
+createApp(opts).mount("body");

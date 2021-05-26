@@ -9,19 +9,23 @@
     </h1>
     <template v-if="saver.editable">
       <div class="actions">
-        <a
+        <button
           class="btn btn-outline-secondary btn-sm edit" 
           href="#"
           role="button" 
           :data-name="saver.name" 
           @click.stop="onEditClick(saver)"
-        >edit</a>
-        <a
+        >
+          edit
+        </button>
+        <button
           class="btn btn-outline-secondary btn-sm" 
           href="#"
           role="button" 
           @click.stop="onDeleteClick(saver)"
-        >delete</a>
+        >
+          delete
+        </button>
       </div>
     </template>
 

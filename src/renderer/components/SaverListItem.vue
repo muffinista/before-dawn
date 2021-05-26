@@ -7,7 +7,7 @@
             name="screensaver" 
             :data-name="saver.name" 
             v-bind:value="saver.key" 
-            v-on="$listeners" 
+             
             :checked="checked"/>
           <b>{{saver.name}}</b>
           <div class="description">

@@ -1,7 +1,6 @@
 "use strict";
 
 const path = require("path");
-const glob = require("glob-all");
 const packageJSON = require(`${"./package.json"}`);
 
 const productName = packageJSON.productName;
@@ -14,8 +13,7 @@ const outputDir = path.join(__dirname, "output");
 
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const PurgecssPlugin = require("purgecss-webpack-plugin");
-const VueLoaderPlugin = require("vue-loader/lib/plugin");
+const { VueLoaderPlugin } = require("vue-loader");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const SentryWebpackPlugin = require("@sentry/webpack-plugin");
 
@@ -64,7 +62,7 @@ let rendererConfig = {
         include: [
           // use `include` vs `exclude` to white-list vs black-list
           //path.resolve(__dirname, "src"), // white-list your app source files
-          require.resolve("bootstrap-vue"), // white-list bootstrap-vue
+          // require.resolve("bootstrap-vue"), // white-list bootstrap-vue
         ],
         use: {
           loader: "eslint-loader",
@@ -120,13 +118,6 @@ let rendererConfig = {
     new CopyWebpackPlugin({
       patterns: [
         {
-          from: path.join(__dirname, "src", "renderer", "assets"),
-          to: path.join(outputDir, "assets"),
-          globOptions: {
-            ignore: [".*"]
-          }
-        },
-        {
           from: path.join(__dirname, "src", "main", "system-savers"),
           to: path.join(outputDir, "system-savers"),
           globOptions: {
@@ -138,26 +129,6 @@ let rendererConfig = {
     new MiniCssExtractPlugin({
       filename: "[name].css",
       chunkFilename: "[id].css"
-    }),
-    new PurgecssPlugin({
-      paths: glob.sync([
-        path.join(__dirname, "src", "index.ejs"),
-        path.join(__dirname, "src", "**", "*.vue"),
-        path.join(__dirname, "src", "**", "*.js")
-      ]),
-      safelist: [
-        /nav/,
-        /nav-tabs/,
-        /nav-link/,
-        /nav-item/,
-        /tablist/,
-        /tabindex/,
-        /tooltip/,
-        /button-group/,
-        /btn/,
-        /spinner/,
-        /noty/
-      ]
     }),
   ],
   optimization: {
@@ -176,9 +147,7 @@ let rendererConfig = {
     alias: {
       // handy alias for the root path of render files
       "@": path.join(__dirname, "src", "renderer"),
-
-      // vue template compiler
-      "vue$": "vue/dist/vue.esm.js"
+      vue: "vue/dist/vue.esm-bundler.js"
     },
     extensions: [".js", ".vue", ".json", ".css", ".node"]
   },
@@ -195,7 +164,9 @@ if (process.env.NODE_ENV === "production") {
   rendererConfig.plugins.push(
     new webpack.DefinePlugin({
       "process.env.NODE_ENV": JSON.stringify("production"),
-      "process.env.BEFORE_DAWN_RELEASE_NAME": JSON.stringify(releaseName)
+      "process.env.BEFORE_DAWN_RELEASE_NAME": JSON.stringify(releaseName),
+      "__VUE_OPTIONS_API__": true,
+      "__VUE_PROD_DEVTOOLS__": false
     }),
     new webpack.LoaderOptionsPlugin({
       minimize: true
@@ -213,6 +184,10 @@ if (process.env.NODE_ENV === "production") {
   }
 } else {
   rendererConfig.plugins.push(
+    new webpack.DefinePlugin({
+      "__VUE_OPTIONS_API__": true,
+      "__VUE_PROD_DEVTOOLS__": false
+    }),
     new webpack.HotModuleReplacementPlugin()
   );
 }

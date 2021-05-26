@@ -13,9 +13,7 @@ const mkdirp = require("mkdirp");
 const srcRoot = path.join(__dirname, "..");
 const workingDir = path.join(srcRoot, "data");
 
-let opts = {
-  // auth: `token ${process.env.GITHUB_AUTH_TOKEN}`
-};
+let opts = {};
 
 const octokit = new Octokit(opts);
 

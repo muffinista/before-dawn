@@ -1,7 +1,7 @@
 <template>
   <div class="wrapper">
-    <form class="input" v-on="$listeners">
-      <label class="for-option">{{option.name}}: {{option.description}}</label>
+    <form class="input">
+      <label class="for-option">{{ option.name }}: {{ option.description }}</label>
       <div class="boolean-options">
         <label>Yes
           <input
@@ -9,7 +9,8 @@
             :name="name"
             value="true"
             :checked="value==true || value==='true'"
-            v-on:change="emitChange(name, true)"></label>
+            @change="emitChange(name, true)"
+          ></label>
         
         <label>No
           <input
@@ -17,7 +18,8 @@
             :name="name"
             value="false"
             :checked="value==false || value==='false'"
-            v-on:change="emitChange(name, false)"></label>
+            @change="emitChange(name, false)"
+          ></label>
       </div>
     </form>
   </div>
@@ -25,10 +27,10 @@
 
 <script>
   export default {
-    name: "boolean-input",
-    props: ["saver", "option", "name", "value"],
+    name: "BooleanInput",
   
     components: { },
+    props: ["saver", "option", "name", "value"],
     computed: {
     },
     methods: {

@@ -1,10 +1,11 @@
 const { contextBridge, ipcRenderer } = require("electron");
-const { init } = require("@sentry/electron/dist/renderer");
+// const { contextBridge, ipcRenderer } = require('@electron/remote'); //.require("electron");
 
 const fs = require("fs");
 const path = require("path");
 
 if ( global.TRACK_ERRORS && global.SENTRY_DSN !== undefined ) {
+  const { init } = require("@sentry/electron/dist/renderer");
   init({
     dsn: global.SENTRY_DSN,
     enableNative: false,
@@ -63,7 +64,7 @@ const api = {
 const testMode = ( process.env.TEST_MODE !== undefined );
 
 if (testMode) {
-  window.electronRequire = require; // github.com/electron-userland/spectron#node-integration
+  // window.electronRequire = require('@electron/remote'); // github.com/electron-userland/spectron#node-integration
   window.api = api;
 } else {
   contextBridge.exposeInMainWorld("api", api);

@@ -31,11 +31,16 @@
     <div class="basic-prefs space-at-top">
       <template v-if="prefs !== undefined">
         <h1>Settings</h1>
-        <basic-prefs-form :prefs="prefs" />
+        <basic-prefs-form
+          :delay="prefs.delay"
+          :sleep="prefs.sleep"
+          @update:delay="prefs.delay = parseInt($event, 10)"
+          @update:sleep="prefs.sleep = parseInt($event, 10)"
+        />
       </template>
     </div>
 
-    <footer class="footer d-flex justify-content-between">
+    <footer class="footer">
       <div>
         <button
           class="align-middle btn btn-large btn-primary create"
@@ -70,8 +75,6 @@ import SaverList from "@/components/SaverList";
 import SaverOptions from "@/components/SaverOptions";
 import SaverSummary from "@/components/SaverSummary";
 import Noty from "noty";
-
-//const log = require("electron-log");
 
 export default {
   name: "Prefs",
@@ -151,7 +154,7 @@ export default {
       }
     });
   },
-  beforeDestroy() {
+  beforeUnmount() {
     window.api.removeListener("savers-updated", this.onSaversUpdated);
   },
   methods: {
@@ -284,20 +287,29 @@ export default {
       await this.getData();
     },
     updateSaverOption(saver, name, value) {
-      var tmp = this.options;
+      var tmp = JSON.parse(JSON.stringify(this.options));
       var update = {};
-      
+
       update[saver] = Object.assign({}, tmp[saver]);    
       update[saver][name] = value;
     
+      console.log(update);
       this.options = Object.assign({}, this.options, update);
+      console.log(this.options);
+      console.log(this.options[saver]);
     },
     async saveData() {
       // @todo should this use Object.assign?
       this.prefs.saver = this.saver;
       this.prefs.options = this.options;
 
-      return await window.api.updatePrefs(this.prefs);
+      // https://forum.vuejs.org/t/how-to-clone-property-value-as-simple-object/40032/2
+      const clone = JSON.parse(JSON.stringify(this.prefs));
+      console.log(clone);
+      // clone.saver = JSON.parse(JSON.stringify(this.prefs.saver));
+      // clone.options = JSON.parse(JSON.stringify(this.options));
+
+      return await window.api.updatePrefs(clone);
     },
     async saveDataClick() {
       let output;
@@ -309,6 +321,7 @@ export default {
       }
       catch(e) {
         output = "Something went wrong!";
+        console.log(e);
       }
 
       this.disabled = false;

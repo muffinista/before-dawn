@@ -1,7 +1,7 @@
 <template>
   <div class="wrapper">
-    <form class="input" v-on="$listeners">
-      <label class="for-option">{{option.name}}:</label>
+    <form class="input">
+      <label class="for-option">{{ option.name }}:</label>
       <input
         :type="renderType"
         :name="option.name"
@@ -10,17 +10,19 @@
         :value="value"
         :saver="saver"
         :class="inputClass"
-        v-on:change="emitChange(saver, option.name, $event.target.value)" />
-      <small class="form-text text-muted">{{option.description}}</small>
+        @change="emitChange(saver, option.name, $event.target.value)"
+      >
+      <small class="form-text text-muted">{{ option.description }}</small>
     </form>
   </div>
 </template>
 
 <script>
   export default {
-    name: "option-input",
-    props: ["saver", "option", "value"],
+    name: "OptionInput",
     components: { },
+    props: ["saver", "option", "value"],
+    emits: ["saverOption"],
     computed: {
       renderType: function() {
         if ( this.option.type === "slider" ) {

@@ -33,7 +33,7 @@ if ( global.before ) {
 
 exports.specifyConfig = (dest, name) => {
   fs.copySync(
-    path.join(__dirname, "fixtures/" + name + ".json"),
+    path.join(__dirname, "fixtures", name + ".json"),
     dest
   );
 };
@@ -118,6 +118,7 @@ exports.application = function(workingDir, quietMode=false) {
   let env = {
     BEFORE_DAWN_DIR: workingDir,
     CONFIG_DIR: workingDir,
+    SAVERS_DIR: workingDir,
     TEST_MODE: true,
     QUIET_MODE: quietMode
   };
@@ -160,8 +161,6 @@ exports.setupFullConfig = function(workingDir) {
   let saverJSONFile = exports.addSaver(saversDir, "saver");
 
   exports.setupConfig(workingDir, "config", {
-    "sourceRepo": "foo/bar",
-    "sourceUpdatedAt": new Date(0),
     "saver": saverJSONFile 
   });
 };

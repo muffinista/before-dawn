@@ -16,7 +16,6 @@ describe("About", function() {
     helpers.setupFullConfig(workingDir);
 
     app = helpers.application(workingDir, true);
-
     await app.start();
     await helpers.waitUntilBooted(app);
     await helpers.callIpc(app, "open-window about");

@@ -13,7 +13,7 @@
             @click="downloadScreensaverUpdates"
           >
             Download screensaver updates
-            <b-spinner
+            <Spinner
               v-if="downloadingUpdates === true"
               small
             />
@@ -22,8 +22,10 @@
       </div>
       <div class="container-fluid">
         <advanced-prefs-form
-          :prefs="prefs"
-          @localSourceChange="localSourceChange"
+          :local-source="prefs.localSource"
+          :launch-shortcut="prefs.launchShortcut"
+          @update:localSource="localSourceChange"
+          @update:launchShortcut="prefs.launchShortcut=$event"
         />
       </div>
     </template>
@@ -59,12 +61,13 @@
 <script>
 import AdvancedPrefsForm from "@/components/AdvancedPrefsForm";
 import PrefsForm from "@/components/PrefsForm";
+import Spinner from "@/components/Spinner";
 import Noty from "noty";
 
 export default {
   name: "Settings",
   components: {
-    AdvancedPrefsForm, PrefsForm
+    AdvancedPrefsForm, PrefsForm, Spinner
   },
   data() {
     return {
@@ -101,7 +104,10 @@ export default {
     async handleSave(output) {
       this.disabled = true;
       try {
-        await window.api.updatePrefs(this.prefs);
+        // https://forum.vuejs.org/t/how-to-clone-property-value-as-simple-object/40032/2
+        const clone = JSON.parse(JSON.stringify(this.prefs));
+
+        await window.api.updatePrefs(clone);
         await window.api.saversUpdated();
 
         window.api.setAutostart(this.prefs.auto_start);
@@ -138,7 +144,7 @@ export default {
       this.closeWindow();
     },
     async downloadScreensaverUpdates() {
-      if ( this.downloadScreensaverUpdates === true ) {
+      if ( this.downloadingUpdates === true ) {
         return;
       }
 

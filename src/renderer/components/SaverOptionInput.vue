@@ -1,63 +1,83 @@
 <template>
-<form v-on="$listeners"
-      :class="formType"
-      v-on:submit.prevent="noop"
-      :data-index="index">
+  <form
+    :class="formType"
+    :data-index="index"
+    @submit.prevent="noop"
+  >
     <div class="form-group row">
       <label class="col-sm-2 col-form-label">Name</label>
-      <div class="col-sm-10" >
-        <input type="text"
-               v-model="option.name"
-               name="name" class="form-control"
-               placeholder="Pick a name for this option" required />
+      <div class="col-sm-10">
+        <input
+          v-model="option.name"
+          type="text"
+          name="name"
+          class="form-control"
+          placeholder="Pick a name for this option"
+          required
+        >
       </div>
     </div>
-    
     <div class="form-group row">
       <label class="col-sm-2 col-form-label">Description</label>
-      <div class="col-sm-10" >
-        <input type="text"
-               v-model="option.description"
-               name="description"
-               placeholder="Describe what this option does"
-               class="form-control" required />
+      <div class="col-sm-10">
+        <input
+          v-model="option.description"
+          type="text"
+          name="description"
+          placeholder="Describe what this option does"
+          class="form-control"
+          required
+        >
       </div>
-    </div>
-        
+    </div>       
     <div class="form-group row">
       <label class="col-sm-2 col-form-label">Type</label>
-      <div class="col-sm-10" >
-        <select v-model="option.type"
-                class="form-control">
-          <option value="slider">slider</option>
-          <option value="text">text</option>
-          <option value="boolean">yes/no</option>
+      <div class="col-sm-10">
+        <select
+          v-model="option.type"
+          class="form-control"
+        >
+          <option value="slider">
+            slider
+          </option>
+          <option value="text">
+            text
+          </option>
+          <option value="boolean">
+            yes/no
+          </option>
         </select>
       </div>
     </div>
 
     <template v-if="option.type === 'slider'">
-      <div class="form-group row">
-        <label class="col-sm-2 col-form-label">Min</label>
-        <div class="col-sm-2">
-          <input type="number"
-                 v-model="option.min"
-                 class="form-control" />
+      <div class="space-evenly">
+        <div class="form-group">
+          <label class="col-sm-2 col-form-label">Min</label>
+          <input
+            v-model="option.min"
+            type="number"
+            class="form-control"
+          >
+        </div>
+          
+        <div class="form-group">
+          <label class="col-sm-2 col-form-label">Max</label>
+          <input
+            v-model="option.max"
+            type="number"
+            class="form-control"
+          >
         </div>
         
-        <label class="col-sm-2 col-form-label">Max</label>
-        <div class="col-sm-2">
-          <input type="number"
-                 v-model="option.max"
-                 class="form-control" />
-        </div>
-      
-        <label class="col-sm-2 col-form-label">Default</label>
-        <div class="col-sm-2">
-          <input type="text"
-                 v-model="option.default"
-                 placeholder="Default value of this option"
-                 class="form-control" />
+        <div class="form-group">
+          <label class="col-sm-2 col-form-label">Default</label>
+          <input
+            v-model="option.default"
+            type="text"
+            placeholder="Default value of this option"
+            class="form-control"
+          >
         </div>
       </div>
     </template>
@@ -65,39 +85,56 @@
       <div class="form-group row">
         <label class="col-sm-2 col-form-label">Default</label>
         <div class="col-sm-10">
-          <input type="text"
-                 v-model="option.default"
-                 placeholder="Default value of this option"
-                 class="form-control" />
+          <input
+            v-model="option.default"
+            type="text"
+            placeholder="Default value of this option"
+            class="form-control"
+          >
         </div>
       </div>
     </template>
-
     <template v-if="option.type ==='boolean'">
       <div class="form-group row">
         <label class="col-sm-2 col-form-label">Default</label>
         <div class="col-sm-2">
-          <select v-model="option.default" class="form-control">
-            <option disabled value="">Please select one</option>
-            <option value="true">Yes</option>
-            <option value="false">No</option>
+          <select
+            v-model="option.default"
+            class="form-control"
+          >
+            <option
+              disabled
+              value=""
+            >
+              Please select one
+            </option>
+            <option value="true">
+              Yes
+            </option>
+            <option value="false">
+              No
+            </option>
           </select>
         </div>
       </div>
     </template>
     <div class="form-actions">
-      <button type="button"
-              class="btn btn-danger remove-option"
-              v-on:click="onDeleteClick(option)">Remove this Option</button>
+      <button
+        type="button"
+        class="btn btn-danger remove-option"
+        @click="onDeleteClick(option)"
+      >
+        Remove this Option
+      </button>
     </div>
   </form>
 </template>
 
 <script>
   export default {
-    name: "saver-option-input",
-    props: ["option", "index"],
+    name: "SaverOptionInput",
     components: { },
+    props: ["option", "index"],
     computed: {
       formType: function() {
         if ( this.option.type === "slider" ) {
