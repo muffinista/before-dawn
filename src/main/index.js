@@ -528,12 +528,11 @@ var openEditor = (args) => {
 var getWindowOpts = function(s) {
   var opts = {
     backgroundColor: "#000000",
-    // autoHideMenuBar: true,
-    // skipTaskbar: true,
     alwaysOnTop: true,
     x: s.bounds.x,
     y: s.bounds.y,
     show: false,
+    frame: false,
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false
