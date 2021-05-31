@@ -528,12 +528,12 @@ var openEditor = (args) => {
 var getWindowOpts = function(s) {
   var opts = {
     backgroundColor: "#000000",
-    // autoHideMenuBar: true,
-    // skipTaskbar: true,
     alwaysOnTop: true,
     x: s.bounds.x,
     y: s.bounds.y,
     show: false,
+    roundedCorners: false,
+    titleBarStyle: "customButtonsOnHover",
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false
@@ -544,14 +544,12 @@ var getWindowOpts = function(s) {
   // so we default it to false there
   if (process.platform !== "darwin" ) {
     opts.fullscreen = true;
-    // opts.focusable = false;
-    // opts.frame = false;
   }
 
   if ( testMode === true ) {
     opts.fullscreen = false;
-    opts.width = 100;
-    opts.height = 100;
+    opts.width = 400;
+    opts.height = 400;
   }
 
   return opts;
