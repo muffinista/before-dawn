@@ -967,22 +967,15 @@ var setupMenuAndTray = function() {
 var setupIfNeeded = async function() {
   log.info("setupIfNeeded");
 
-  if ( process.env.QUIET_MODE === "true" ) {
-    log.info("Quiet mode, skip setup checks!");
-    return false;
-  }
-
-  if (process.env.NODE_ENV === "test" ) {
-    log.info("test mode, skip setup checks!");
+  if ( process.env.QUIET_MODE === "true" || process.env.NODE_ENV === "test" ) {
+    log.info("Quiet/test mode, skip setup checks!");
     return false;
   }
 
   // check if we should download savers, set something up, etc
   if ( process.env.FORCE_SETUP || prefs.needSetup ) {
-    log.info("needSetup!");
-    prefs.setDefaultRepo(global.SAVER_REPO);
-
     // stop processing here, we know we need to setup
+    log.info("needSetup!");
     return true;
   }
 
