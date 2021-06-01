@@ -17,18 +17,18 @@ describe("bootstrap", function() {
 
   helpers.setupTest(this);
 
-  before(function() {
-    if ( process.env.CI) {
-      // eslint-disable-next-line no-console
-      console.log("Cowardly skipping test in CI");
-      this.skip();
-    }
-  });
+  /* before(function() {
+   *   if ( process.env.CI) {
+   *     // eslint-disable-next-line no-console
+   *     console.log("Cowardly skipping test in CI");
+   *     this.skip();
+   *   }
+   * });
+   */
 
   beforeEach(() => {
     workingDir = helpers.getTempDir();
     configDest = path.join(workingDir, "config.json");  
-    app = helpers.application(workingDir, false, saverZip, saverData);
   });
 
 	afterEach(async function() {
@@ -42,6 +42,8 @@ describe("bootstrap", function() {
 
   describe("without config", () => {
     beforeEach(async () => {
+      app = helpers.application(workingDir, false, saverZip, saverData);
+
       assert(!fs.existsSync(configDest));
       await app.start();
       await helpers.waitUntilBooted(app);
@@ -50,6 +52,28 @@ describe("bootstrap", function() {
     it("creates config file and shows prefs", async function() {
       await helpers.waitForWindow(app, prefsWindowTitle);
       assert(fs.existsSync(configDest));
+    });
+  });
+
+  describe("with invalid config", () => {
+    beforeEach(async () => {
+      const dest = path.join(workingDir, "config.json");
+      fs.copySync(
+        path.join(__dirname, "..", "fixtures", "bad-config.json"),
+        dest
+      );
+
+      app = helpers.application(workingDir, true);
+
+      await app.start();
+      await helpers.waitUntilBooted(app);
+    });
+
+    it("creates config file and shows prefs", async function() {
+      await helpers.waitForWindow(app, prefsWindowTitle);
+      assert(fs.existsSync(configDest));
+      const data = JSON.parse(fs.readFileSync(configDest));
+      assert.equal(5, data.delay);
     });
   });
 });
