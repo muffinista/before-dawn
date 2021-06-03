@@ -34,7 +34,7 @@
   },
   "dependencies": {
     "@muffinista/goto-sleep": "^0.0.4",
-    "@sentry/electron": "^2.0.0",
+    "@sentry/electron": "^2.4.1",
     "async-mutex": "^0.3.0",
     "auto-launch": "^5.0.5",
     "conf": "^10.0.0",
