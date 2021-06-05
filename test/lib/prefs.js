@@ -64,14 +64,6 @@ describe("SaverPrefs", () => {
       assert.equal(false, prefs.needSetup);  
     });
 
-    it("is true with noSource", () => {
-      prefs = new SaverPrefs(tmpdir);
-      prefs.sourceRepo = "";
-      prefs.localSource = "";
-      assert.equal(true, prefs.noSource);
-      assert.equal(true, prefs.needSetup);
-    });
-
     it("is true if saver is undefined", () => {
       prefs = new SaverPrefs(tmpdir);
       assert.equal(true, prefs.needSetup);
@@ -219,22 +211,6 @@ describe("SaverPrefs", () => {
       prefs.store.delete("saver");
       let opts = prefs.getOptions();
       assert.deepEqual({}, opts);
-    });
-  });
-
-  // setDefaultRepo
-  describe("setDefaultRepo", () => {
-    beforeEach(() => {
-      prefs = new SaverPrefs(tmpdir);
-      helpers.specifyConfig(prefs.configFile, "default-repo");
-    });
-
-    it("works", () => {
-      assert.equal(true, prefs.sourceUpdatedAt !== undefined);
-      prefs.setDefaultRepo("foo/bar");
-
-      assert.deepEqual(new Date(0), prefs.sourceUpdatedAt);
-      assert.equal(prefs.sourceRepo, "foo/bar");
     });
   });
 });

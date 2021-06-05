@@ -74,7 +74,7 @@ import BasicPrefsForm from "@/components/BasicPrefsForm";
 import SaverList from "@/components/SaverList";
 import SaverOptions from "@/components/SaverOptions";
 import SaverSummary from "@/components/SaverSummary";
-import Noty from "noty";
+import Notarize from "@/components/Notarize";
 
 export default {
   name: "Prefs",
@@ -325,15 +325,7 @@ export default {
       }
 
       this.disabled = false;
-      new Noty({
-        type: "success",
-        layout: "topRight",
-        timeout: 1000,
-        text: output,
-        animation: {
-          open: null
-        }
-      }).show();
+      new Notarize({timeout: 1000}).show(output);
     },
     renderUpdateNotice() {
       window.api.displayUpdateDialog();

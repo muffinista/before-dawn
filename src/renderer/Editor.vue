@@ -226,7 +226,7 @@
 import SaverForm from "@/components/SaverForm";  
 import SaverOptionInput from "@/components/SaverOptionInput";
 import SaverOptions from "@/components/SaverOptions";
-import Noty from "noty";
+import Notarize from "@/components/Notarize";
 
 
 export default {
@@ -357,15 +357,7 @@ export default {
       await window.api.saveScreensaver(clone, this.src);
       window.api.saversUpdated(this.src);
 
-      new Noty({
-        type: "success",
-        layout: "bottomRight",
-        timeout: 2000,
-        text: "Changes saved!",
-        animation: {
-          open: null
-        }
-      }).show();
+      new Notarize({timeout: 1000}).show("Changes saved!");
 
       this.disabled = false;
     },

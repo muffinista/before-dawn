@@ -15,26 +15,20 @@ describe("bootstrap", function() {
   var workingDir;
   let app;
 
-  // var bootApp = async function() {
-  //   app = helpers.application(workingDir, false, saverZip, saverData);  
-  //   await app.start();
-  //   await helpers.waitUntilBooted(app);
-  // };
-
   helpers.setupTest(this);
 
-  before(function() {
-    if ( process.env.CI) {
-      // eslint-disable-next-line no-console
-      console.log("Cowardly skipping test in CI");
-      this.skip();
-    }
-  });
+  /* before(function() {
+   *   if ( process.env.CI) {
+   *     // eslint-disable-next-line no-console
+   *     console.log("Cowardly skipping test in CI");
+   *     this.skip();
+   *   }
+   * });
+   */
 
   beforeEach(() => {
     workingDir = helpers.getTempDir();
     configDest = path.join(workingDir, "config.json");  
-    app = helpers.application(workingDir, false, saverZip, saverData);
   });
 
 	afterEach(async function() {
@@ -48,6 +42,8 @@ describe("bootstrap", function() {
 
   describe("without config", () => {
     beforeEach(async () => {
+      app = helpers.application(workingDir, false, saverZip, saverData);
+
       assert(!fs.existsSync(configDest));
       await app.start();
       await helpers.waitUntilBooted(app);
@@ -59,40 +55,25 @@ describe("bootstrap", function() {
     });
   });
 
-  // describe("with up to date config", () => {
-  //   beforeEach(() => {
-  //     helpers.setupConfig(workingDir, "config", {
-  //       "firstLoad": false,
-  //       "sourceRepo": "foo/bar",
-  //       "sourceUpdatedAt": new Date(0)
-  //     });
-  //   });
+  describe("with invalid config", () => {
+    beforeEach(async () => {
+      const dest = path.join(workingDir, "config.json");
+      fs.copySync(
+        path.join(__dirname, "..", "fixtures", "bad-config.json"),
+        dest
+      );
 
-  //   describe("and a valid screenaver", () => {
-  //     beforeEach(async () => {
-  //       let saversDir = path.join(workingDir, "savers");
-  //       let saverJSONFile = helpers.addSaver(saversDir, "saver");
-  //       helpers.setConfigValue(workingDir, "saver", saverJSONFile);
-  //       await bootApp();
-  //     });
+      app = helpers.application(workingDir, true);
 
-  //     it("does not show prefs", async function() {
-  //       const res = await helpers.waitForWindow(app, prefsWindowTitle, true);
-  //       assert.equal(false, res);
-  //     });
-  //   });
+      await app.start();
+      await helpers.waitUntilBooted(app);
+    });
 
-  //   describe("and an invalid screenaver", () => {
-  //     beforeEach(async () => {
-  //       let saversDir = path.join(workingDir, "savers");
-  //       helpers.addSaver(saversDir, "saver");
-  //       helpers.setConfigValue(workingDir, "saver", "i-dont-exist");
-  //       await bootApp();
-  //     });
-
-  //     it("shows prefs", async function() {
-  //       await helpers.waitForWindow(app, prefsWindowTitle);
-  //     });
-  //   });
-  // });
+    it("creates config file and shows prefs", async function() {
+      await helpers.waitForWindow(app, prefsWindowTitle);
+      assert(fs.existsSync(configDest));
+      const data = JSON.parse(fs.readFileSync(configDest));
+      assert.equal(5, data.delay);
+    });
+  });
 });

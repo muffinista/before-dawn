@@ -27,6 +27,7 @@ class SaverPrefs {
 
     this.confOpts = {
       schema: DEFAULTS,
+      clearInvalidConfig: true,
       cwd: this.baseDir
     };
     if ( process.env.CONFIG_DIR ) {
@@ -72,15 +73,10 @@ class SaverPrefs {
 
   get needSetup() {
     return this.firstLoad === true || 
-      this.noSource === true || 
       this.saver === undefined ||
       this.saver === "";
   }
 
-  get noSource() {
-    return (this.sourceRepo === undefined || this.sourceRepo === "" ) &&
-      (this.localSource === undefined || this.localSource === "");
-  }
 
   get defaultSaversDir() {
     return this.saversDir;
@@ -130,35 +126,18 @@ class SaverPrefs {
 
     return result;
   }
-
-  async updatePrefs(data) {
-    for ( var k in data ) {
-      var v = data[k];
-      //this[k] = v;
-      this.store.set(k, v);
-    }
-
-    let result = this.changes;
-    this.changes = {};
-
-    return result;
-  }
-
-  setDefaultRepo(r) {
-    this.sourceRepo = r;
-    this.store.set("sourceUpdatedAt", new Date(0));
-  }
 }
+
 
 Object.keys(DEFAULTS).forEach(function(name) {
   Object.defineProperty(SaverPrefs.prototype, name, {
     get() {
       const result = this.store.get(name);
-
+      
       if ( name === "sourceUpdatedAt" || name === "updateCheckTimestamp" ) {
         return new Date(result);
       }
-
+      
       return result;
     },
     set(newval) {

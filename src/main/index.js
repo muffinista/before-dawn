@@ -83,9 +83,6 @@ else {
   cursor = require("hide-cursor");
 }
 
-let cachedScreens = [];
-let cachedPrimaryScreen = undefined;
-
 let exitOnQuit = false;
 
 // load some global CSS we'll inject into running screensavers
@@ -203,8 +200,6 @@ var openGrabberWindow = function() {
     
     grabberWindow.once("ready-to-show", () => {
       log.info("grabber open");
-      // grabberWindow.show();
-      // grabberWindow.webContents.openDevTools();
       resolve(grabberWindow);
     });
 
@@ -252,7 +247,7 @@ var grabScreen = function(s) {
 
       openGrabberWindow().then((w) => {
         windowRef = w;
-        log.info("send request");
+        log.info("send screengrab request");
         windowRef.webContents.send("request-screenshot", { 
           id: s.id, 
           width: s.bounds.width, 
@@ -303,7 +298,7 @@ var openPrefsWindow = function() {
   }
 
   return new Promise((resolve) => {
-    const primary = cachedPrimaryScreen;
+    const primary = electronScreen.getPrimaryDisplay();
 
     // take a screenshot of the main screen for use in previews
     grabScreen(primary).then((grab) => {
@@ -399,7 +394,7 @@ var openSettingsWindow = function() {
  */
 var addNewSaver = function() {
   var newUrl = getUrl("new.html");
-  var primary = cachedPrimaryScreen;
+  var primary = electronScreen.getPrimaryDisplay();
 
   // take a screenshot of the main screen for use in previews
   grabScreen(primary).then((grab) => {
@@ -528,12 +523,12 @@ var openEditor = (args) => {
 var getWindowOpts = function(s) {
   var opts = {
     backgroundColor: "#000000",
-    // autoHideMenuBar: true,
-    // skipTaskbar: true,
     alwaysOnTop: true,
     x: s.bounds.x,
     y: s.bounds.y,
     show: false,
+    roundedCorners: false,
+    titleBarStyle: "customButtonsOnHover",
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false
@@ -544,19 +539,38 @@ var getWindowOpts = function(s) {
   // so we default it to false there
   if (process.platform !== "darwin" ) {
     opts.fullscreen = true;
-    // opts.focusable = false;
-    // opts.frame = false;
   }
 
   if ( testMode === true ) {
     opts.fullscreen = false;
-    opts.width = 100;
-    opts.height = 100;
+    opts.width = 400;
+    opts.height = 400;
   }
 
   return opts;
 };
 
+var applyScreensaverWindowEvents = function(w) {
+  // Emitted when the window is closed.
+  w.on("closed", function() {
+    if (process.platform !== "win32" ) {
+      cursor.show();
+    }
+    windows.forceWindowClose(w);
+  });
+  
+  // inject our custom JS and CSS into the screensaver window
+  w.webContents.on("did-finish-load", function() {
+    log.info("did-finish-load");
+    if (!w.isDestroyed()) {
+      w.webContents.insertCSS(globalCSSCode);
+    }
+  });
+  
+  // we could do something nice with either of these events
+  w.webContents.on("render-process-gone", log.info);
+  w.webContents.on("unresponsive", log.info);
+};
 
 /**
  * 
@@ -570,39 +584,18 @@ var runSaver = function(screenshot, saver, s, url_opts, tickCount) {
   const windowOpts = getWindowOpts(s);
   var w = new BrowserWindow(windowOpts);       
   w.isSaver = true;
-  
 
   if ( w.removeMenu !== undefined ) {
     w.removeMenu();
   }
 
-  console.log(windowOpts);
   let diff = process.hrtime(tickCount);
-  log.info("let's do this", s.id, diff[0] * 1e9 + diff[1]);
+  log.info(`run screensaver ${saver.name} on screen ${s.id} ${saver.url} ts: ${diff[0] * 1e9 + diff[1]}`);
 
 
   return new Promise((resolve, reject) => {
-    try {   
-      // Emitted when the window is closed.
-      w.on("closed", function() {
-        if (process.platform !== "win32" ) {
-          cursor.show();
-        }
-        windows.forceWindowClose(w);
-      });
-      
-      // inject our custom JS and CSS into the screensaver window
-      w.webContents.on("did-finish-load", function() {
-        log.info("did-finish-load", s.id);
-        if (!w.isDestroyed()) {
-          w.webContents.insertCSS(globalCSSCode);
-        }
-      });
-      
-      // we could do something nice with either of these events
-      w.webContents.on("crashed", log.info);
-      w.webContents.on("unresponsive", log.info);
-      
+    try {
+      applyScreensaverWindowEvents(w);
       
       w.once("ready-to-show", () => {
         log.info("ready-to-show", s.id);
@@ -621,6 +614,7 @@ var runSaver = function(screenshot, saver, s, url_opts, tickCount) {
       });
       
       if ( typeof(screenshot) !== "undefined" ) {
+        log.info(`pass screenshot ${screenshot}`);
         url_opts.screenshot = encodeURIComponent("file://" + screenshot);
       }
       
@@ -629,9 +623,6 @@ var runSaver = function(screenshot, saver, s, url_opts, tickCount) {
       
       log.info("Loading " + url, s.id);
       
-      // if ( debugMode === true ) {
-      //   w.webContents.openDevTools();
-      // }
       // and load the index.html of the app.
       w.loadURL(url);
     }
@@ -682,37 +673,21 @@ var runScreenSaverOnDisplay = function(saver, s) {
 /**
  * blank out the given screen
  */
-var blankScreen = function(s) {
-  return new Promise((resolve) => {
-    if ( process.env.TEST_MODE ) {
-      log.info("refusing to blank screen in test mode");
-    }
-    else {
-      let windowOpts = getWindowOpts(s);
-      let w = new BrowserWindow(windowOpts);     
-      w.isSaver = true;
-      
-      windows.setFullScreen(w);
-      
-      log.info("blankScreen", s.id, windowOpts);
-      
-      w.show();  
-    }
-    
-    resolve(s.id); 
-  });
+var blankScreen = async function(s) {
+  if ( process.env.TEST_MODE ) {
+    log.info("refusing to blank screen in test mode");
+    return s.id;
+  }
+
+  const systemPath = getSystemDir();
+  const blankUrl = `file://${path.join(systemPath, "system-savers", "blank", "index.html")}`;
+  const saver = {
+    name: "Blank",
+    url: blankUrl
+  };
+  return runScreenSaverOnDisplay(saver, s);
 };
 
-
-
-/**
- * grab a list of displays and cache it for later
- */
-var loadDisplayData = function() {
-  // log.info("loadDisplayData");
-  cachedScreens = electronScreen.getAllDisplays();
-  cachedPrimaryScreen = electronScreen.getPrimaryDisplay();
-};
 
 /**
  * get a list of displays connected to the computer.
@@ -721,11 +696,11 @@ var getDisplays = function() {
   var displays = [];
   if ( debugMode === true || prefs.runOnSingleDisplay === true ) {
     displays = [
-      cachedPrimaryScreen
+      electronScreen.getPrimaryDisplay()
     ];
   }
   else {
-    displays = cachedScreens;
+    displays = electronScreen.getAllDisplays();
   }
 
   return displays;
@@ -736,8 +711,8 @@ var getDisplays = function() {
  * get a list of the non primary displays connected to the computer
  */
 var getNonPrimaryDisplays = function() {
-  var primary = cachedPrimaryScreen;
-  return cachedScreens.filter((d) => {
+  var primary = electronScreen.getPrimaryDisplay();
+  return electronScreen.getAllDisplays().filter((d) => {
     return d.id !== primary.id;
   });
 };
@@ -766,7 +741,7 @@ var findScreensaver = function() {
   const workingPath = getSystemDir();
   // check if the user is running the random screensaver. if so, pick one!
   const randomPath = path.join(workingPath, "system-savers", "random", "saver.json");
-  log.info("random: " + randomPath);
+  // log.info("random: " + randomPath);
   if ( prefs.saver === randomPath ) {
     return new Promise((resolve) => {
       savers.list(() => {
@@ -796,13 +771,13 @@ var runScreenSaver = function() {
             return undefined;
           }).
           then((saver) => {
-            var displays = [];
-            var blanks = [];
+            let displays = [];
+            let blanks = [];
             
             // make sure we have something to display
             if ( typeof(saver) === "undefined" ) {
               log.info("No screensaver defined! Just blank everything");
-              blanks = cachedScreens;
+              blanks = getDisplays();
             }
             else {
               displays = getDisplays();
@@ -810,6 +785,9 @@ var runScreenSaver = function() {
                 blanks = getNonPrimaryDisplays();
               }
             }
+
+            log.info("displays", displays);
+            log.info("blanks", blanks);
 
             // turn off idle checks for a couple seconds while loading savers
             stateManager.ignoreReset(true);
@@ -824,7 +802,6 @@ var runScreenSaver = function() {
               .concat(
                 blanks.map((d) => blankScreen(d))
               );
-
 
             Promise.all(promises).then(() => {
               log.info("our work is done, set state to running");
@@ -969,22 +946,15 @@ var setupMenuAndTray = function() {
 var setupIfNeeded = async function() {
   log.info("setupIfNeeded");
 
-  if ( process.env.QUIET_MODE === "true" ) {
-    log.info("Quiet mode, skip setup checks!");
-    return false;
-  }
-
-  if (process.env.NODE_ENV === "test" ) {
-    log.info("test mode, skip setup checks!");
+  if ( process.env.QUIET_MODE === "true" || process.env.NODE_ENV === "test" ) {
+    log.info("Quiet/test mode, skip setup checks!");
     return false;
   }
 
   // check if we should download savers, set something up, etc
   if ( process.env.FORCE_SETUP || prefs.needSetup ) {
-    log.info("needSetup!");
-    prefs.setDefaultRepo(global.SAVER_REPO);
-
     // stop processing here, we know we need to setup
+    log.info("needSetup!");
     return true;
   }
 
@@ -1269,7 +1239,6 @@ let setupIPC = function() {
     const factory = new SaverFactory();
     
     let systemPath = getSystemDir();
-    
     const src = path.join(systemPath, "system-savers", "__template");
     const dest = prefs.localSource;
     const data = factory.create(src, dest, attrs);
@@ -1291,14 +1260,14 @@ let setupIPC = function() {
    * return the bounds of the primary screen to the requester
    */
   ipcMain.handle("get-primary-display-bounds", () => {
-    return cachedPrimaryScreen.bounds;
+    return electronScreen.getPrimaryDisplay().bounds;
   });
 
   /**
    * return a screengrab of the primary screen to the requester
    */
   ipcMain.handle("get-primary-screenshot", () => {
-    return screenshots[cachedPrimaryScreen.id];
+    return screenshots[electronScreen.getPrimaryDisplay().id];
   });
   
   /**
@@ -1549,8 +1518,6 @@ var bootApp = async function() {
   });
 
 
-  loadDisplayData();
-
   //
   // setup some event handlers for when screen count changes, mostly
   // to ensure that we wake up if the user plugs in or removes a
@@ -1559,7 +1526,6 @@ var bootApp = async function() {
   ["display-added", "display-removed"].forEach((type) => {
     electronScreen.on(type, () => {
       windows.handleDisplayChange();
-      loadDisplayData();
     });
   });
 
