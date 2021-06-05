@@ -135,11 +135,17 @@ if (process.env.NODE_ENV === "production") {
   );
 
   if ( process.env.SENTRY_AUTH_TOKEN ) {
+    console.log("Using SentryWebpackPlugin");
+    const COMMIT_SHA = process.env.SENTRY_RELEASE || process.env.GITHUB_SHA;
     mainConfig.plugins.push(
       new SentryWebpackPlugin({
         include: "src",
         ignoreFile: ".sentrycliignore",
-        ignore: ["node_modules", "webpack.config.js", "webpack.main.config.js", "webpack.renderer.config.js"]
+        ignore: ["node_modules", "webpack.config.js", "webpack.main.config.js", "webpack.renderer.config.js"],
+        org: "colin-mitchell",
+        project: "before-dawn",
+        authToken: process.env.SENTRY_AUTH_TOKEN,
+        release: COMMIT_SHA,
       })
     );
   }
