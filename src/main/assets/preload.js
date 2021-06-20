@@ -64,7 +64,6 @@ const api = {
 const testMode = ( process.env.TEST_MODE !== undefined );
 
 if (testMode) {
-  // window.electronRequire = require('@electron/remote'); // github.com/electron-userland/spectron#node-integration
   window.api = api;
 } else {
   contextBridge.exposeInMainWorld("api", api);

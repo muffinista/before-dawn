@@ -869,20 +869,6 @@ var getSystemDir = function() {
 };
 
 
-// /**
-//  * determine the path to any assets we need
-//  */
-// var getAssetDir = function() {
-//   if ( process.env.TEST_MODE) {
-//     return path.join(__dirname, "data");
-//   }
-//   if ( global.IS_DEV ) {
-//     return path.join(__dirname, "..", "..", "data");
-//   }
-//   return path.join(app.getAppPath(), "data");
-// };
-
-
 /**
  * return the URL prefix we should use when loading app windows. if
  * running in development mode with hot reload enabled, we'll use an
