@@ -777,7 +777,7 @@ var runScreenSaver = function() {
             // make sure we have something to display
             if ( typeof(saver) === "undefined" ) {
               log.info("No screensaver defined! Just blank everything");
-              blanks = getDisplays();
+              blanks = getDisplays().concat(getNonPrimaryDisplays());
             }
             else {
               displays = getDisplays();
