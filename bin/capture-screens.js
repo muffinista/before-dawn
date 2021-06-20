@@ -10,10 +10,13 @@ const Application = require("spectron").Application;
 const appPath = require("electron");
 const helpers = require("../test/helpers.js");
 
+//const workingDir = "";
+
 let env = {
-//  BEFORE_DAWN_DIR: workingDir,
-  TEST_MODE: true,
-  //QUIET_MODE: true
+  // BEFORE_DAWN_DIR: workingDir,
+  CONFIG_DIR:  "/Users/colin/Library/Application Support/Before Dawn",
+  BEFORE_DAWN_DIR:  "/Users/colin/Library/Application Support/Before Dawn",
+  TEST_MODE: true
 };
 
 let app = new Application({
@@ -22,7 +25,7 @@ let app = new Application({
   env: env
 });
 
-const SCREENSAVER = "Emoji Starfield";
+const SCREENSAVER = "My Amazing Screensaver";
 app.start().
   then(() => app.client.waitUntilWindowLoaded() ).
   then(() => app.electron.ipcRenderer.send("open-window", "prefs")).
@@ -36,21 +39,21 @@ app.start().
       fs.writeFileSync(path.join(__dirname, "..", "assets", "prefs.png"), imageBuffer);
     })
   ).
-  then(() => app.client.click("button.settings")).
+  then(() => app.webContents.executeJavaScript("document.querySelector('button.settings').click()")).
   then(() => helpers.waitForWindow(app, "Before Dawn: Settings") ).
   then(() => app.browserWindow.capturePage()).
   then((imageBuffer) => fsPromises.writeFile(path.join(__dirname, "..", "assets", "settings.png"), imageBuffer)).
   then(() => app.electron.ipcRenderer.send("close-window", "settings")).
   then(() => helpers.waitForWindow(app, "Before Dawn: Preferences") ).
-  then(() => app.client.click("button.create")).
+  then(() => app.webContents.executeJavaScript("document.querySelector('button.create').click()")).
   then(() => helpers.waitForWindow(app, "Before Dawn: Create Screensaver!") ).
   then(() => helpers.sleep(200) ).
   then(() => app.browserWindow.capturePage()).
   then((imageBuffer) => fsPromises.writeFile(path.join(__dirname, "..", "assets", "create-screensaver.png"), imageBuffer)).
   then(() => helpers.sleep(200) ).
-  then(() => app.client.click("button.cancel")).
+  then(() => app.webContents.executeJavaScript("document.querySelector('button.cancel').click()")).
   then(() => helpers.waitForWindow(app, "Before Dawn: Preferences") ).
-  then(() => app.client.click("a.edit")).
+  then(() => app.webContents.executeJavaScript("document.querySelector('button.edit').click()")).
   then(() => helpers.waitForWindow(app, "Before Dawn: Editor") ).
   then(() => helpers.sleep(1200) ).
   then(() => app.browserWindow.capturePage()).
