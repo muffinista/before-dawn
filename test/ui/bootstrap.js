@@ -17,14 +17,14 @@ describe("bootstrap", function() {
 
   helpers.setupTest(this);
 
-  /* before(function() {
-   *   if ( process.env.CI) {
-   *     // eslint-disable-next-line no-console
-   *     console.log("Cowardly skipping test in CI");
-   *     this.skip();
-   *   }
-   * });
-   */
+  before(function() {
+    if ( process.env.CI) {
+      // eslint-disable-next-line no-console
+      console.log("Cowardly skipping test in CI");
+      this.skip();
+    }
+  });
+  
 
   beforeEach(() => {
     workingDir = helpers.getTempDir();
@@ -73,7 +73,7 @@ describe("bootstrap", function() {
       await helpers.waitForWindow(app, prefsWindowTitle);
       assert(fs.existsSync(configDest));
       const data = JSON.parse(fs.readFileSync(configDest));
-      assert.equal(5, data.delay);
+      assert.deepStrictEqual(5, data.delay);
     });
   });
 });
