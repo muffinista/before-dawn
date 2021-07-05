@@ -6,13 +6,11 @@ let packageJSON = {};
 
 try {
   packageJSON = require("../../package.json");
-
   version = packageJSON.version;
 
   if ( ! process.env.BEFORE_DAWN_RELEASE_NAME ) {
     process.env.BEFORE_DAWN_RELEASE_NAME = `${packageJSON.productName} ${packageJSON.version}`;
   }
-  
 }
 catch(e) {
   version = "0.0.0";
@@ -44,7 +42,6 @@ if ( process.env.TEST_MODE === undefined && ! global.IS_DEV && global.SENTRY_DSN
   const { init } = require("@sentry/electron/dist/main");
   init({
     dsn: global.SENTRY_DSN,
-    release: process.env.BEFORE_DAWN_RELEASE_NAME,
     onFatalError: (error) => {
       // eslint-disable-next-line no-console
       console.log(error);
