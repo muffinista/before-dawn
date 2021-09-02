@@ -9,24 +9,10 @@ var saversDir;
 const SaverPrefs = require("../../src/lib/prefs.js");
 
 describe("Settings", function() { 
-  const fakeDialogOpts = [ { method: "showOpenDialog", value: { filePaths: ["/not/a/real/path"] } } ];
   const closeWindowDelay = 750;
-  const TEXT_ON_SCREEN = "Be careful with these!";
-
-  before(function() {
-    if ( process.env.CI && process.env.TRAVIS_OS_NAME == "osx") {
-      // eslint-disable-next-line no-console
-      console.log("Cowardly skipping test in OSX CI");
-      this.skip();
-      return;
-    }
-  });
+  let window;
 
   helpers.setupTest(this);
-
-  let pickSettingsWindow = function() {
-    return helpers.getWindowByTitle(app, "Before Dawn: Settings");
-  };
 
   let currentPrefs = function() {
     return new SaverPrefs(workingDir).data;
@@ -40,120 +26,103 @@ describe("Settings", function() {
     helpers.addLocalSource(workingDir, saversDir);
     helpers.addSaver(saversDir, "saver-one", "saver.json");
 
-    app = helpers.application(workingDir, true);
-    await app.start();
-    await app.fakeDialog.mock(fakeDialogOpts);
-    await app.client.waitUntilWindowLoaded();
+    app = await helpers.application(workingDir, true);
     await helpers.callIpc(app, "open-window prefs");
     await helpers.waitForWindow(app, "Before Dawn: Preferences");
-    await helpers.click(app, "button.settings");
-    await helpers.waitForWindow(app, "Before Dawn: Settings");
+
+    window = await helpers.waitFor(app, "prefs");
+    await window.click("button.settings");
+
+    window = await helpers.waitFor(app, "settings");
   });
 
 	afterEach(async function() {
-    if (this.currentTest.state === "failed") {
-      helpers.outputLogs(app);
-    }
-
     await helpers.stopApp(app);
 	});
-
-  before(function() {
-    if ( process.platform === "linux" ) {
-      // eslint-disable-next-line no-console
-      console.log("skipping on linux");
-      this.skip();
-    }
-  });
 
   it("toggles checkboxes", async function() {
     let oldConfig = currentPrefs();
 
-    await pickSettingsWindow();
-    await helpers.waitForText(app, "body", TEXT_ON_SCREEN, true);
-    await helpers.click(app, "label*=Lock screen after running");
-    await helpers.click(app, "label*=Disable when on battery?");
-    await helpers.click(app, "label*=Auto start on login?");
-    await helpers.click(app, "label*=Only run on the primary display?");
-    await helpers.click(app, "button.save");
+    await window.check("text=Lock screen after running");
+    await window.check("text=Disable when on battery?");
+    await window.uncheck("text=Auto start on login?");
+    await window.uncheck("text=Only run on the primary display?");
+    await window.click("button.save");
 
     await helpers.sleep(closeWindowDelay);
 
     let updatedPrefs = currentPrefs();
-    assert.equal(!oldConfig.lock, updatedPrefs.lock);
-    assert.equal(!oldConfig.disableOnBattery, updatedPrefs.disableOnBattery);
-    assert.equal(!oldConfig.auto_start, updatedPrefs.auto_start);
-    assert.equal(!oldConfig.runOnSingleDisplay, updatedPrefs.runOnSingleDisplay);
+    assert.strictEqual(!oldConfig.lock, updatedPrefs.lock);
+    assert.strictEqual(!oldConfig.disableOnBattery, updatedPrefs.disableOnBattery);
+    assert.strictEqual(!oldConfig.auto_start, updatedPrefs.auto_start);
+    assert.strictEqual(!oldConfig.runOnSingleDisplay, updatedPrefs.runOnSingleDisplay);
 
-    await helpers.waitForWindow(app, "Before Dawn: Preferences");
+    await helpers.waitFor(app, "prefs");
   });
 
   it("leaves checkboxes", async function() {
     let oldConfig = currentPrefs();
 
-    await pickSettingsWindow();
-    await helpers.waitForText(app, "body", TEXT_ON_SCREEN, true);
-    await helpers.click(app, "button.save");
+    await window.click("button.save");
     await helpers.sleep(closeWindowDelay);
 
     let updatedPrefs = currentPrefs();
-    assert.equal(oldConfig.lock, updatedPrefs.lock);
-    assert.equal(oldConfig.disableOnBattery, updatedPrefs.disableOnBattery);
-    assert.equal(oldConfig.auto_start, updatedPrefs.auto_start);
-    assert.equal(oldConfig.runOnSingleDisplay, updatedPrefs.runOnSingleDisplay);
+    assert.strictEqual(oldConfig.lock, updatedPrefs.lock);
+    assert.strictEqual(oldConfig.disableOnBattery, updatedPrefs.disableOnBattery);
+    assert.strictEqual(oldConfig.auto_start, updatedPrefs.auto_start);
+    assert.strictEqual(oldConfig.runOnSingleDisplay, updatedPrefs.runOnSingleDisplay);
 
-    await helpers.waitForWindow(app, "Before Dawn: Preferences");
+    await helpers.waitFor(app, "prefs");
   });
   
   it.skip("allows setting path via dialog", async function() {
-    await pickSettingsWindow();
-    await helpers.waitForText(app, "body", TEXT_ON_SCREEN, true);
-    await app.webContents.executeJavaScript("document.querySelector(\"button.pick\").scrollIntoView()");
-    await helpers.click(app, "button.pick");
-    await helpers.sleep(50);
-    await helpers.click(app, "button.save");
+    const [fileChooser] = await Promise.all([
+      window.waitForEvent("filechooser"),
+      window.click("button.pick")
+    ]);
+    console.log(fileChooser);
+    await fileChooser.setFiles("/not/a/real/path");
+
+    await window.click("button.save");
     await helpers.sleep(closeWindowDelay);
 
-    assert.equal("/not/a/real/path", currentPrefs().localSource);
+    assert.strictEqual("/not/a/real/path", currentPrefs().localSource);
 
-    await helpers.waitForWindow(app, "Before Dawn: Preferences");
+    await helpers.waitFor(app, "prefs");
   });
 
   it("clears localSource", async function() {
-    await pickSettingsWindow();
-    await helpers.waitForText(app, "body", TEXT_ON_SCREEN, true);
-
     let ls = currentPrefs().localSource;
     assert( ls != "" && ls !== undefined);
 
-    await app.webContents.executeJavaScript("document.querySelector(\"button.clear\").scrollIntoView()");
-
-    await helpers.click(app, "button.clear");
+    await window.click("button.clear");
     await helpers.sleep(50);
-    await helpers.click(app, "button.save");
+    await window.click("button.save");
 
     await helpers.sleep(closeWindowDelay);
 
     assert.strictEqual(currentPrefs().localSource, "");
 
-    await helpers.waitForWindow(app, "Before Dawn: Preferences");
+    await helpers.waitFor(app, "prefs");
   });
 
 
+  // dialogs don't work yet
+  // @see https://github.com/microsoft/playwright/issues/8278
   it.skip("resets defaults", async function() {
-    const resetDialogOpts = [ { method: "showMessageBox", value: { response: 1 } } ];
+    window = await helpers.waitFor(app, "settings");
 
-    await pickSettingsWindow();
-    app.fakeDialog.mock(resetDialogOpts);
-    await helpers.waitForText(app, "body", TEXT_ON_SCREEN, true);
-    await app.webContents.executeJavaScript("document.querySelector(\"button.reset-to-defaults\").scrollIntoView()");
+    window.on("dialog", async dialog => {
+      console.log(dialog.message());
+      await dialog.accept();
+    });
 
-    await helpers.click(app, "button.reset-to-defaults");
-    await helpers.waitForText(app, "body", "Settings reset", true);
+    await window.click("button.reset-to-defaults");
+    await helpers.waitForText(window, "body", "Settings reset", true);
     await helpers.sleep(closeWindowDelay);
 
-    assert.equal("", currentPrefs().localSource);
+    assert.strictEqual("", currentPrefs().localSource);
 
-    await helpers.waitForWindow(app, "Before Dawn: Preferences");
+    await helpers.waitFor(app, "prefs");
   });
 });

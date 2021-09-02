@@ -1,13 +1,10 @@
 const tmp = require("tmp");
 const path = require("path");
 const fs = require("fs-extra");
-const Application = require("spectron").Application;
-const fakeDialog = require("spectron-dialog-addon").default;
+
+const { _electron: electron } = require("playwright");
 
 const Conf = require("conf");
-
-const chai = require("chai");
-const chaiAsPromised = require("chai-as-promised");
 
 const appPath = require("electron");
 const assert = require("assert");
@@ -24,12 +21,18 @@ if (process.env.CI) {
 
 const delayStep = 10;
 
-if ( global.before ) {
-  global.before(() => {
-    chai.should();
-    chai.use(chaiAsPromised);
-  });  
-}
+/**
+ * keep a list of window titles here so we can have
+ * a really clean system to open/load/wait for windows
+ */
+ const windowTitles = {
+  new: "Before Dawn: Create Screensaver!",
+  about: "Before Dawn: About!",
+  editor: "Before Dawn: Editor",
+  prefs: "Before Dawn: Preferences",
+  settings: "Before Dawn: Settings"
+};
+
 
 exports.specifyConfig = (dest, name) => {
   fs.copySync(
@@ -114,47 +117,6 @@ exports.savedConfig = function(p) {
   return JSON.parse(json);
 };
 
-exports.application = function(workingDir, quietMode=false) {
-  let env = {
-    BEFORE_DAWN_DIR: workingDir,
-    CONFIG_DIR: workingDir,
-    SAVERS_DIR: workingDir,
-    TEST_MODE: true,
-    QUIET_MODE: quietMode
-  };
-
-  var a = new Application({
-    path: appPath,
-    args: [path.join(__dirname, "..", "output/main.js")],
-    env: env,
-    quitTimeout: 5000
-  });
-  fakeDialog.apply(a);
-  a.fakeDialog = fakeDialog;
-  
-  chaiAsPromised.transferPromiseness = a.transferPromiseness;
-
-  return a;
-};
-
-
-exports.stopApp = async function(app) {
-  await exports.callIpc(app, "quit-app");
-  await exports.sleep(1000);
-
-  try {
-    if (app && app.isRunning()) {
-      await app.stop();
-    }
-  }
-  catch(e) {
-    // console.log(e);
-  }
-
-  if ( app.chromeDriver && app.chromeDriver.process ) {
-    await app.chromeDriver.process.kill();
-  }
-};
 
 exports.setupFullConfig = function(workingDir) {
   let saversDir = exports.getTempDir();
@@ -179,71 +141,144 @@ exports.removeLocalSource = function(workingDir) {
   fs.writeFileSync(src, JSON.stringify(data));
 };
 
-exports.getWindowByTitle = async (app, title) => {
-  await app.client.getWindowHandles();
-  try {
-    await app.client.waitUntilWindowLoaded();
-  }
-  catch(e) {
-    // Error: waitUntilWindowLoaded waitUntil condition failed 
-    // with the following reason: no such window: target window already closed
-    // console.log(e);
-  }
 
-  try {
-    await app.client.switchWindow(title);
-    return true;
-  }
-  catch(e) {
-    return false;
-  }
-};
+/**
+ * Launch the application via playwright
+ * 
+ * @param {string} workingDir 
+ * @param {boolean} quietMode 
+ * @returns application
+ */
+exports.application = async function(workingDir, quietMode=false) {
+  let env = {
+    BEFORE_DAWN_DIR: workingDir,
+    CONFIG_DIR: workingDir,
+    SAVERS_DIR: workingDir,
+    TEST_MODE: true,
+    QUIET_MODE: quietMode
+  };
 
-exports.waitForText = async(app, lookup, text, doAssert) => {
-  await app.client.waitUntil(async () => {
-    const elem = await app.client.$(lookup);
-    const res = await elem.getText();
-    return res.indexOf(text) !== -1;
+  let a = await electron.launch({
+    path: appPath,
+    args: [path.join(__dirname, "..", "output/main.js")],
+    env: env
   });
 
-  if ( doAssert === true ) {
-    const elem = await app.client.$(lookup);
-    const res = await elem.getText();
-    assert(res.lastIndexOf(text) !== -1);
+  // wait for the first window (our test shim) to open, and
+  // hang onto it for later use
+  exports.shim = await a.firstWindow();
+
+  return a;
+};
+
+
+/**
+ * 
+ * @param {app} app electron application
+ * @param {string} windowName the name of the window to wait for
+ * @returns Page
+ */
+ exports.waitFor = async (app, windowName) => {
+  const title = windowTitles[windowName];
+  await exports.waitForWindow(app, title);
+  return exports.getWindowByTitle(app, title);
+};
+
+
+/**
+ * Kill the app
+ * 
+ * @param {application} app 
+ */
+exports.stopApp = async function(app) {
+  try {
+    if (app ) {
+      await app.close();
+    }
+  }
+  catch(e) {
+    console.log(e);
   }
 };
 
-exports.getElementText = async(app, lookup) => {
-  const elem = await app.client.$(lookup);
-  return await elem.getText();
+
+/**
+ * Generate a lookup table of currently open windows
+ * 
+ * @param {*} app 
+ * @returns hash of window objects keyed by title
+ */
+exports.getWindowLookup = async(app) => {
+  const windows = await app.windows();
+  const promises = windows.map(async (window) => {
+    try {
+      const title = await window.title();
+      return [title, window];
+    } catch(e) {
+      // sometimes a window will be closing and trying to get the title
+      // will throw an error, but it's probably fine
+      return ["Missing window", window];
+    }
+  });
+
+  const results = await Promise.all(promises);
+  return results.reduce((map, obj) => {
+    map[obj[0]] = obj[1];
+    return map;
+  }, {});
 };
 
-exports.click = async(app, lookup) => {
-  const el = await app.client.$(lookup);
-  await el.click();
+/**
+ * Get window with the given title
+ * 
+ * @param {*} app 
+ * @param {*} title 
+ * @returns 
+ */
+exports.getWindowByTitle = async (app, title) => {
+  // make sure the app is open
+  await app.firstWindow();
+
+  const lookup = await exports.getWindowLookup(app);
+  return lookup[title];
 };
 
-exports.setValue = async(app, lookup, value) => {
-  const el = await app.client.$(lookup);
-  await el.setValue(value);
+/**
+ * wait for text on the given window
+ * @param {Page} window 
+ * @param {string} lookup lookup to pull a specific DOM section
+ * @param {string} text text to look for
+ * @param {boolean} doAssert 
+ */
+exports.waitForText = async(window, lookup, text, doAssert) => {
+  const content = await window.textContent(lookup);
+  if ( doAssert === true ) {
+    assert(content.lastIndexOf(text) !== -1);
+  }
 };
 
-exports.getValue = async(app, lookup) => {
-  const el = await app.client.$(lookup);
-  return el.getValue();
-};
-
+/**
+ * wait for ms milliseconds
+ * @param {*} ms 
+ * @returns 
+ */
 exports.sleep = function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 };
 
 
+/**
+ * wait for window with the specified name to be available
+ * @param {*} app 
+ * @param {*} title 
+ * @param {*} skipAssert 
+ * @returns 
+ */
 exports.waitForWindow = async (app, title, skipAssert) => {
-  //let maxAttempts = 20;
   let result = -1;
   for ( var totalTime = 0; totalTime < windowCheckDelay; totalTime += delayStep ) {
     result = await exports.getWindowByTitle(app, title);
-    if ( result === true ) {
+    if ( result ) {
       return true;
     }
     else {
@@ -252,78 +287,43 @@ exports.waitForWindow = async (app, title, skipAssert) => {
   }
 
   if ( skipAssert !== true ) {
-    assert.notEqual(-1, result, `window ${title} not opened`);
+    assert.notStrictEqual(-1, result, `window ${title} not opened`);
   }
 
   return result;
 };
 
-exports.waitForWindowClosed = async (app, title, skipAssert) => {
-  let result = -1;
-  await exports.sleep(delayStep);
 
-  for ( var totalTime = 0; totalTime < windowCheckDelay; totalTime += delayStep ) {
-    try {
-      result = await exports.getWindowByTitle(app, title);
-    }
-    catch(err) {
-      // // eslint-disable-next-line no-console
-      // console.log(err);
+/**
+ * Use the shim window to send an IPC command to the app
+ * @param {*} app 
+ * @param {*} method 
+ * @param {*} opts 
+ */
+exports.callIpc = async(_app, method, opts={}) => {
+  const window = exports.shim;
 
-      if ( err.message.indexOf("no such window") !== -1) {
-        result = -1;
-      }
-    }
-
-    if ( result === -1 ) {
-      break;
-    }
-    else {
-      await exports.sleep(delayStep);
-    }
-  }
-
-  if ( skipAssert !== true ) {
-    assert.equal(-1, result, `window ${title} still open`);
-  }
-
-  return result;
+  await window.fill("#ipc", method);
+  await window.fill("#ipcopts", JSON.stringify(opts));
+  await window.click("text=go");
 };
 
-exports.waitUntilBooted = async(app) => {
-  return exports.waitForWindow(app, "test shim");
-};
-
-exports.callIpc = async(app, method) => {
-  await exports.waitForWindow(app, "test shim");
-
-  let el = await app.client.$("#ipc");
-  await el.setValue(method);
-
-  el = await app.client.$("#ipcSend");
-  await el.click();
-};
-
-exports.clickTrayItem = async (app, label) => {
-  await app.electron.ipcRenderer.send("click-tray-item", label);
-};
-
-exports.outputLogs = function(app) {
-  return app.client.getMainProcessLogs().
-  then(function (logs) {
-    logs.forEach(function (log) {
-      // eslint-disable-next-line no-console
-      console.log(log);
-    });
-  }).
-  then(() => app.client.getRenderProcessLogs()).
-  then(function (logs) {
-    logs.forEach(function (log) {
-      // eslint-disable-next-line no-console
-      console.log(log.message);
-    });
-  });
-};
+// exports.outputLogs = function(app) {
+//   return app.client.getMainProcessLogs().
+//   then(function (logs) {
+//     logs.forEach(function (log) {
+//       // eslint-disable-next-line no-console
+//       console.log(log);
+//     });
+//   }).
+//   then(() => app.client.getRenderProcessLogs()).
+//   then(function (logs) {
+//     logs.forEach(function (log) {
+//       // eslint-disable-next-line no-console
+//       console.log(log.message);
+//     });
+//   });
+// };
 
 exports.setupTest = function (test) {
   test.timeout(testTimeout);
