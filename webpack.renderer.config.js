@@ -57,11 +57,7 @@ let rendererConfig = {
         test: /\.(js|vue)$/,
         enforce: "pre",
         exclude: /node_modules/,
-        include: [
-          // use `include` vs `exclude` to white-list vs black-list
-          //path.resolve(__dirname, "src"), // white-list your app source files
-          // require.resolve("bootstrap-vue"), // white-list bootstrap-vue
-        ],
+        include: [],
         use: {
           loader: "eslint-loader",
           options: {
@@ -138,7 +134,7 @@ let rendererConfig = {
     library: "[name]",
     libraryTarget: "var",
     path: outputDir,
-    publicPath: "."
+    publicPath: ""
   },
   mode: (process.env.NODE_ENV === "production" ? "production" : "development"),
   resolve: {
@@ -191,8 +187,7 @@ if (process.env.NODE_ENV === "production") {
     new webpack.DefinePlugin({
       "__VUE_OPTIONS_API__": true,
       "__VUE_PROD_DEVTOOLS__": false
-    }),
-    new webpack.HotModuleReplacementPlugin()
+    })
   );
 }
 

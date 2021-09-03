@@ -5,107 +5,80 @@ const path = require("path");
 const { spawn } = require("child_process");
 const webpack = require("webpack");
 const WebpackDevServer = require("webpack-dev-server");
-const webpackHotMiddleware = require("webpack-hot-middleware");
-const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 const mainConfig = require("../webpack.main.config");
 const rendererConfig = require("../webpack.renderer.config");
 
 let electronProcess = null;
 let manualRestart = false;
-let hotMiddleware;
+let skipMainRestart = true;
 
-function logStats (proc, data) {
-  let log = "";
-
-  log += `┏ ${proc} Process ${new Array((19 - proc.length) + 1).join("-")}`;
-  log += "\n\n";
-
-  if (typeof data === "object") {
-    data.toString({
-      colors: true,
-      chunks: false
-    }).split(/\r?\n/).forEach(line => {
-      log += "  " + line + "\n";
-    });
-  } else {
-    log += `  ${data}\n`;
-  }
-
-  log += "\n" + `┗ ${new Array(28 + 1).join("-")}` + "\n";
-
-  console.log(log);
-}
-
+/**
+ * Setup webpack compiler and server for the renderer process
+ * 
+ * @returns Promise
+ */
 function startRenderer () {
   return new Promise((resolve) => {
-    rendererConfig.entry.renderer = [path.join(__dirname, "dev-client")].concat(rendererConfig.entry.renderer);
-
     const compiler = webpack(rendererConfig);
-    hotMiddleware = webpackHotMiddleware(compiler, { 
-      log: false, 
-      heartbeat: 2500 
-    });
-
-    compiler.hooks.compilation.tap("compilation", compilation => {
-      HtmlWebpackPlugin.getHooks(compilation).afterEmit.tapAsync("html-webpack-plugin-after-emit", (data, cb) => {
-        hotMiddleware.publish({ action: "reload" });
-        cb();
-      });
-    });
-
-    compiler.hooks.done.tap("done", stats => {
-      logStats("Renderer", stats);
-    });
-
-    const server = new WebpackDevServer(
-      compiler,
-      {
-        contentBase: path.join(__dirname, "..", "output"),
-        quiet: true,
-        before (app, ctx) {
-          app.use(hotMiddleware);
-          ctx.middleware.waitUntilValid(() => {
-            resolve();
-          });
-        }
+    const serverOptions = {
+      host: "localhost",
+      port: 9080,
+      hot: true,
+      onListening: function (devServer) {
+        const port = devServer.server.address().port;
+        console.log("Listening on port:", port);
+      },
+      onAfterSetupMiddleware: function (server) {
+        server.middleware.waitUntilValid(() => {
+          console.log("startRenderer finished");
+          resolve();
+        });
       }
+    };
+
+    const devServer = new WebpackDevServer(
+      serverOptions, compiler
     );
 
-    server.listen(9080);
+    devServer.start(null, "localhost", () => {
+    });
   });
 }
 
-function startMain () {
+/**
+ * Setup webpack compiler and watcher for the main process
+ * 
+ * @returns Promise
+ */
+ function startMain () {
   return new Promise((resolve) => {
-    //mainConfig.entry.main = [path.join(__dirname, '../src/main/index.js')].concat(mainConfig.entry.main)
+    const mainCompiler = webpack(mainConfig);
+    mainCompiler.run(() => {
+      mainCompiler.watch({}, (err) => {
+        if (err) {
+          console.log(err);
+          return;
+        }
 
-    const compiler = webpack(mainConfig);
+        // skip the first watch event
+        if ( skipMainRestart ) {
+          skipMainRestart = false;
+          return;
+        }
 
-    compiler.hooks.watchRun.tapAsync("watch-run", (compilation, done) => {
-      logStats("Main", "compiling...");
-      hotMiddleware.publish({ action: "compiling" });
-      done();
-    });
+        // kill and restart the main process
+        if (electronProcess && electronProcess.kill) {
+          manualRestart = true;
+          process.kill(electronProcess.pid);
+          electronProcess = null;
+          startElectron();
 
-    compiler.watch({}, (err, stats) => {
-      if (err) {
-        console.log(err);
-        return;
-      }
-
-      logStats("Main", stats);
-
-      if (electronProcess && electronProcess.kill) {
-        manualRestart = true;
-        process.kill(electronProcess.pid);
-        electronProcess = null;
-        startElectron();
-
-        setTimeout(() => {
-          manualRestart = false;
-        }, 5000);
-      }
+          setTimeout(() => {
+            manualRestart = false;
+          }, 5000);
+        }
+      });
 
       resolve();
     });
@@ -127,15 +100,9 @@ function startElectron () {
 }
 
 function init () {
-  console.log("booting up!");
-
   Promise.all([startRenderer(), startMain()])
-    .then(() => {
-      startElectron();
-    })
-    .catch(err => {
-      console.error(err);
-    });
+    .then(startElectron)
+    .catch(console.error);
 }
 
 init();
