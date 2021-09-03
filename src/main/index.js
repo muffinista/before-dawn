@@ -144,8 +144,8 @@ const RELEASE_CHECK_INTERVAL = 1000 * 60 * 60 * 12;
 
 const defaultWebPreferences = {
   enableRemoteModule: false,
-  contextIsolation: !testMode,
-  nodeIntegration: testMode,
+  contextIsolation: true,
+  nodeIntegration: false,
   nativeWindowOpen: true
 };
 

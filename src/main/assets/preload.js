@@ -60,11 +60,4 @@ const api = {
   toggleDevTools: () => ipcRenderer.send("toggle-dev-tools")
 };
 
-const testMode = ( process.env.TEST_MODE !== undefined );
-
-if (testMode) {
-  window.api = api;
-} else {
-  contextBridge.exposeInMainWorld("api", api);
-}
-
+contextBridge.exposeInMainWorld("api", api);
