@@ -137,6 +137,7 @@ let prefs = undefined;
 let savers = undefined;
 let stateManager = undefined;
 
+
 // usually we want to check power state before running, but
 // we'll skip that check depending on the value of this toggle
 // so that manually running screensaver works just fine
@@ -148,7 +149,8 @@ const RELEASE_CHECK_INTERVAL = 1000 * 60 * 60 * 12;
 const defaultWebPreferences = {
   enableRemoteModule: testMode,
   contextIsolation: !testMode,
-  nodeIntegration: testMode
+  nodeIntegration: testMode,
+  nativeWindowOpen: true
 };
 
 const singleLock = app.requestSingleInstanceLock();
