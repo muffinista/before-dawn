@@ -65,10 +65,6 @@ let testMode = ( process.env.TEST_MODE !== undefined );
 
 let cursor;
 
-if ( testMode === true ) {
-  require("@electron/remote/main").initialize();
-}
-
 //
 // don't hide cursor in tests or in windows, since
 // that causes the tray to stop working???
@@ -147,7 +143,7 @@ const RELEASE_CHECK_INTERVAL = 1000 * 60 * 60 * 12;
 
 
 const defaultWebPreferences = {
-  enableRemoteModule: testMode,
+  enableRemoteModule: false,
   contextIsolation: !testMode,
   nodeIntegration: testMode,
   nativeWindowOpen: true

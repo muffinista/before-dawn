@@ -1,5 +1,4 @@
 const { contextBridge, ipcRenderer } = require("electron");
-// const { contextBridge, ipcRenderer } = require('@electron/remote'); //.require("electron");
 
 const fs = require("fs");
 const path = require("path");
