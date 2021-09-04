@@ -23,4 +23,4 @@ jobs:
       - name: Setup code
         run: yarn
       - name: Run eslint
-        run: yarn eslint
+        run: yarn eslint-all

@@ -65,10 +65,6 @@ let testMode = ( process.env.TEST_MODE !== undefined );
 
 let cursor;
 
-if ( testMode === true ) {
-  require("@electron/remote/main").initialize();
-}
-
 //
 // don't hide cursor in tests or in windows, since
 // that causes the tray to stop working???
@@ -137,6 +133,7 @@ let prefs = undefined;
 let savers = undefined;
 let stateManager = undefined;
 
+
 // usually we want to check power state before running, but
 // we'll skip that check depending on the value of this toggle
 // so that manually running screensaver works just fine
@@ -146,9 +143,10 @@ const RELEASE_CHECK_INTERVAL = 1000 * 60 * 60 * 12;
 
 
 const defaultWebPreferences = {
-  enableRemoteModule: testMode,
-  contextIsolation: !testMode,
-  nodeIntegration: testMode
+  enableRemoteModule: false,
+  contextIsolation: true,
+  nodeIntegration: false,
+  nativeWindowOpen: true
 };
 
 const singleLock = app.requestSingleInstanceLock();

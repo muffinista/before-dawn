@@ -8,18 +8,14 @@ var workingDir;
 var saversDir;
 const SaverPrefs = require("../../src/lib/prefs.js");
 
-// process.setMaxListeners(0);
-
 describe("Prefs", function() { 
   helpers.setupTest(this);
-
-  let pickPrefsWindow = function() {
-    return helpers.getWindowByTitle(app, "Before Dawn: Preferences");
-  };
 
   let currentPrefs = function() {
     return new SaverPrefs(workingDir);
   };
+
+  let window;
 
   beforeEach(async function() {
     workingDir = helpers.getTempDir();
@@ -29,70 +25,61 @@ describe("Prefs", function() {
     helpers.addLocalSource(workingDir, saversDir);
     helpers.addSaver(saversDir, "saver-one", "saver.json");
 
-    app = helpers.application(workingDir, true);
-    await app.start();
-    await helpers.waitUntilBooted(app);
+    app = await helpers.application(workingDir, true);
     await helpers.callIpc(app, "open-window prefs");
-    await helpers.waitForWindow(app, "Before Dawn: Preferences");
-    await pickPrefsWindow();
+    window = await helpers.waitFor(app, "prefs");
 	});
 
 	afterEach(async function() {
-    if (this.currentTest.state === "failed") {
-      helpers.outputLogs(app);
-    }
-
     await helpers.stopApp(app);
 	});
 
   it("lists screensavers", async function() {
-    await helpers.waitForText(app, "body", "Screensaver One", true);
+    await helpers.waitForText(window, "body", "Screensaver One", true);
   });
 
   it("allows picking a screensaver", async function() {
-    await helpers.waitForText(app, "body", "Screensaver One", true);
-    await app.webContents.executeJavaScript("document.querySelector(\"[type='radio'][data-name='Screensaver One']\").click()");
-    await helpers.waitForText(app, ".saver-description", "A Screensaver", true);
-    await helpers.click(app, "button.save");
-    await helpers.waitForText(app, "body", "Changes saved!", true);
+    await helpers.waitForText(window, "body", "Screensaver One", true);
+    await window.click("text=Screensaver One");
+    await helpers.waitForText(window, ".saver-description", "A Screensaver", true);
+    await window.click("button.save");
+
+    await helpers.waitForText(window, "body", "Changes saved!", true);
 
     assert(currentPrefs().saver.lastIndexOf("saver-one") !== -1);
   });
 
   it("sets options for screensaver", async function() {
-    await helpers.waitForText(app, "body", "Screensaver One", true);
-    await app.webContents.executeJavaScript("document.querySelector(\"[type='radio'][data-name='Screensaver One']\").click()");
-    await helpers.waitForText(app, "body", "Load the specified URL", true);
+    await helpers.waitForText(window, "body", "Screensaver One", true);
+    await window.click("text=Screensaver One");
 
-    await app.webContents.executeJavaScript("document.querySelector(\"[name='sound']\").scrollIntoView()");
-    await helpers.click(app, "[name='sound'][value='false']");
+    await helpers.waitForText(window, "body", "Load the specified URL", true);
+    await window.click("[name='sound'][value='false']");
 
-    await helpers.setValue(app, "[name='load_url']", "barfoo");
-    await helpers.click(app, "button.save");
-    await helpers.waitForText(app, "body", "Changes saved!", true);
+    await window.fill("[name='load_url']", "barfoo");
+    await window.click("button.save");
+
+    await helpers.waitForText(window, "body", "Changes saved!", true);
 
     var options = currentPrefs().options;
     var k = Object.keys(options).find((i) => {
       return i.indexOf("saver-one") !== -1;
     });
 
-    assert.equal("barfoo", options[k].load_url);
+    assert.strictEqual("barfoo", options[k].load_url);
     assert(!options[k].sound);
   });
 
   it("sets timing options", async function() {
-    await helpers.waitForText(app, "body", "Activate after", true);
+    await helpers.waitForText(window, "body", "Activate after", true);
 
-    let el = await app.client.$("[name=delay]");
-    await el.selectByVisibleText("30 minutes");
+    await window.selectOption("[name=delay]", {label: "30 minutes"});
+    await window.selectOption("[name=sleep]", {label: "15 minutes"});
 
-    el = await app.client.$("[name=sleep]");
-    await el.selectByVisibleText("15 minutes");
+    await window.click("button.save");
+    await helpers.waitForText(window, "body", "Changes saved!", true);
 
-    await helpers.click(app, "button.save");
-    await helpers.waitForText(app, "body", "Changes saved!", true);
-
-    assert.equal(30, currentPrefs().delay);
-    assert.equal(15, currentPrefs().sleep);
+    assert.strictEqual(30, currentPrefs().delay);
+    assert.strictEqual(15, currentPrefs().sleep);
   });
 });

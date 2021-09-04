@@ -7,6 +7,8 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
         node-version: [14.x]
+    env:
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
     steps:
     - name: Install ubuntu requirements
       if: ${{ matrix.os == 'ubuntu-latest' }}
@@ -31,4 +33,6 @@ jobs:
     - name: Setup
       run: yarn
     - run: yarn test-lib
-    - run: yarn test-ui
+    - name: Run integration tests
+      if: ${{ matrix.os != 'ubuntu-latest' }}
+      run: yarn test-ui
