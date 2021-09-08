@@ -8,7 +8,7 @@ import About from "./About";
 
 import "@/../css/styles.scss";
 
-var actions = {
+const actions = {
   "prefs": { components: { Prefs }, template: "<Prefs/>" },
   "settings": { components: { Settings }, template: "<Settings/>" },
   "editor": { components: { Editor }, template: "<Editor/>" },
@@ -17,7 +17,7 @@ var actions = {
 };
 
 
-var id = document.querySelector("body").dataset.id;
-var opts = actions[id];
+const id = document.querySelector("body").dataset.id;
+const opts = actions[id];
 
 createApp(opts).mount("body");
