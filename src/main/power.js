@@ -11,10 +11,19 @@ module.exports = class Power {
       this.platform = process.platform;
     }
 
+    // https://stackoverflow.com/questions/651563/getting-the-last-element-of-a-split-string-array
     this.commands = {
       linux: {
-        cmd: "upower",
-        opts: ["-i", "/org/freedesktop/UPower/devices/battery_BAT0"]
+        cmd: "dbus-send",
+        opts: [
+          "--print-reply",
+          "--system",
+          "--dest=org.freedesktop.UPower",
+          "/org/freedesktop/UPower",
+          "org.freedesktop.DBus.Properties.Get",
+          "string:org.freedesktop.UPower",
+          "string:OnBattery" 
+        ]
       },
     };
     this.default = true;
@@ -50,26 +59,15 @@ module.exports = class Power {
     }
 
     try {
-      let hasBattery = false;
-      let state = undefined;
-      const lines = raw.split("\n").map((line) => line.trim());
+      // method return time=1630857381.345226 sender=:1.59 -> destination=:1.1404 serial=30 reply_serial=2
+      // variant       boolean false      
+      const result = raw.split("\n").find((line) => line.indexOf("variant") !== -1);
 
-      lines.forEach((l) => {
-        if ( l === "battery") {
-          hasBattery = true;
-        }
-
-        if ( hasBattery && state === undefined && l.indexOf("state:") === 0 ) {
-          state = l.split(/:\s+(?=[\w\d'])/)[1];
-        }
-      });
-
-      if ( state ) {
-        return (state !== "discharging");
-      }
-      return this.default;
+      // OnBattery == false means we're plugged in
+      return result.indexOf("false") !== -1;
     }
     catch(e) {
+      console.log(e);
       return this.default; 
     }
   }
