@@ -528,8 +528,7 @@ var getWindowOpts = function(s) {
     roundedCorners: false,
     titleBarStyle: "customButtonsOnHover",
     webPreferences: {
-      contextIsolation: true,
-      nodeIntegration: false
+      ...defaultWebPreferences
     }
   };
 
@@ -557,7 +556,7 @@ var applyScreensaverWindowEvents = function(w) {
     windows.forceWindowClose(w);
   });
   
-  // inject our custom JS and CSS into the screensaver window
+  // inject our custom CSS into the screensaver window
   w.webContents.on("did-finish-load", function() {
     log.info("did-finish-load");
     if (!w.isDestroyed()) {
