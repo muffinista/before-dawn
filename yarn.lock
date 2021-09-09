@@ -939,13 +939,12 @@
   resolved "https://registry.yarnpkg.com/@istanbuljs/schema/-/schema-0.1.2.tgz#26520bf09abe4a5644cd5414e37125a8954241dd"
   integrity sha512-tsAQNx32a8CoFhjhijUIhI4kccIAgmGhy8LZMZgGfmXcpMbPRUqn5LWmgRttILi6yeGmBJd2xsPkFMs0PzgPCw==
 
-"@muffinista/goto-sleep@^0.0.4":
-  version "0.0.4"
-  resolved "https://registry.yarnpkg.com/@muffinista/goto-sleep/-/goto-sleep-0.0.4.tgz#daeeec1300d5c1a8124cb08b2bc327709147039d"
-  integrity sha512-bBDZ4fpDuQEOezLxmEhvNddauzs+jNmc75yV37tkQTgHB+9a8RXEah/YRDreJaMRMapF3kWdjdZEyeiRZBQU2A==
+"@muffinista/goto-sleep@muffinista/goto-sleep":
+  version "0.0.5"
+  resolved "https://codeload.github.com/muffinista/goto-sleep/tar.gz/c20cbd502c1db2cd166453346b689e24f6439101"
   dependencies:
     bindings "^1.5.0"
-    nan "^2.14.0"
+    nan "^2.15.0"
 
 "@nodelib/fs.scandir@2.1.4":
   version "2.1.4"
@@ -6183,6 +6182,11 @@ nan@^2.12.1, nan@^2.14.0:
   version "2.14.2"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.14.2.tgz#f5376400695168f4cc694ac9393d0c9585eeea19"
   integrity sha512-M2ufzIiINKCuDfBSAUr1vWQ+vuVcA9kqx8JJUsbQi6yf1uGRyb7HfpdfUr5qLXf3B/t8dPvcjhKMmlfnP47EzQ==
+
+nan@^2.15.0:
+  version "2.15.0"
+  resolved "https://registry.yarnpkg.com/nan/-/nan-2.15.0.tgz#3f34a473ff18e15c1b5626b62903b5ad6e665fee"
+  integrity sha512-8ZtvEnA2c5aYCZYd1cvgdnU6cqwixRoYg70xPLWUws5ORTa/lnw+u4amixRS/Ac5U5mQVgp9pnlSUnbNWFaWZQ==
 
 nanoid@3.1.23, nanoid@^3.1.23:
   version "3.1.23"
