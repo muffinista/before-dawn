@@ -11,7 +11,7 @@ const outputDir = path.join(__dirname, "output");
 
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 
-const releaseName = `${packageJSON.productName} ${packageJSON.version}`;
+const COMMIT_SHA = process.env.SENTRY_RELEASE || process.env.GITHUB_SHA;
 
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const SentryWebpackPlugin = require("@sentry/webpack-plugin");
@@ -130,13 +130,12 @@ if (process.env.NODE_ENV === "production") {
   mainConfig.plugins.push(
     new webpack.DefinePlugin({
       "process.env.NODE_ENV": JSON.stringify("production"),
-      "process.env.BEFORE_DAWN_RELEASE_NAME": JSON.stringify(releaseName)
+      "process.env.BEFORE_DAWN_RELEASE_NAME": JSON.stringify(COMMIT_SHA),
     })
   );
 
   if ( process.env.SENTRY_AUTH_TOKEN ) {
     console.log("Using SentryWebpackPlugin");
-    const COMMIT_SHA = process.env.SENTRY_RELEASE || process.env.GITHUB_SHA;
     mainConfig.plugins.push(
       new SentryWebpackPlugin({
         include: "src",

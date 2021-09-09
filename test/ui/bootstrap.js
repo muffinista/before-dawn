@@ -7,7 +7,6 @@ const path = require("path");
 const helpers = require("../helpers.js");
 
 describe("bootstrap", function() {
-  const prefsWindowTitle = "Before Dawn: Preferences";
   const saverZip = path.join(__dirname, "..", "fixtures", "test-savers.zip");
   const saverData = path.join(__dirname, "..", "fixtures", "test-savers.json");
 
@@ -16,15 +15,7 @@ describe("bootstrap", function() {
   let app;
 
   helpers.setupTest(this);
-
-  /* before(function() {
-   *   if ( process.env.CI) {
-   *     // eslint-disable-next-line no-console
-   *     console.log("Cowardly skipping test in CI");
-   *     this.skip();
-   *   }
-   * });
-   */
+ 
 
   beforeEach(() => {
     workingDir = helpers.getTempDir();
@@ -32,25 +23,18 @@ describe("bootstrap", function() {
   });
 
 	afterEach(async function() {
-    if (this.currentTest.state === "failed") {
-      helpers.outputLogs(app);
-    }
-
     await helpers.stopApp(app);
 	});
 
 
   describe("without config", () => {
     beforeEach(async () => {
-      app = helpers.application(workingDir, false, saverZip, saverData);
-
       assert(!fs.existsSync(configDest));
-      await app.start();
-      await helpers.waitUntilBooted(app);
+      app = await helpers.application(workingDir, false, saverZip, saverData);
     });
 
     it("creates config file and shows prefs", async function() {
-      await helpers.waitForWindow(app, prefsWindowTitle);
+      await helpers.waitFor(app, "prefs");
       assert(fs.existsSync(configDest));
     });
   });
@@ -63,17 +47,15 @@ describe("bootstrap", function() {
         dest
       );
 
-      app = helpers.application(workingDir, true);
-
-      await app.start();
-      await helpers.waitUntilBooted(app);
+      app = await helpers.application(workingDir, true);
     });
 
     it("creates config file and shows prefs", async function() {
-      await helpers.waitForWindow(app, prefsWindowTitle);
+      await helpers.waitFor(app, "prefs");
       assert(fs.existsSync(configDest));
+
       const data = JSON.parse(fs.readFileSync(configDest));
-      assert.equal(5, data.delay);
+      assert.deepStrictEqual(5, data.delay);
     });
   });
 });

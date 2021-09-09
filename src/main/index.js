@@ -65,10 +65,6 @@ let testMode = ( process.env.TEST_MODE !== undefined );
 
 let cursor;
 
-if ( testMode === true ) {
-  require("@electron/remote/main").initialize();
-}
-
 //
 // don't hide cursor in tests or in windows, since
 // that causes the tray to stop working???
@@ -137,6 +133,7 @@ let prefs = undefined;
 let savers = undefined;
 let stateManager = undefined;
 
+
 // usually we want to check power state before running, but
 // we'll skip that check depending on the value of this toggle
 // so that manually running screensaver works just fine
@@ -146,9 +143,10 @@ const RELEASE_CHECK_INTERVAL = 1000 * 60 * 60 * 12;
 
 
 const defaultWebPreferences = {
-  enableRemoteModule: testMode,
-  contextIsolation: !testMode,
-  nodeIntegration: testMode
+  enableRemoteModule: false,
+  contextIsolation: true,
+  nodeIntegration: false,
+  nativeWindowOpen: true
 };
 
 const singleLock = app.requestSingleInstanceLock();
@@ -530,8 +528,7 @@ var getWindowOpts = function(s) {
     roundedCorners: false,
     titleBarStyle: "customButtonsOnHover",
     webPreferences: {
-      contextIsolation: true,
-      nodeIntegration: false
+      ...defaultWebPreferences
     }
   };
 
@@ -559,7 +556,7 @@ var applyScreensaverWindowEvents = function(w) {
     windows.forceWindowClose(w);
   });
   
-  // inject our custom JS and CSS into the screensaver window
+  // inject our custom CSS into the screensaver window
   w.webContents.on("did-finish-load", function() {
     log.info("did-finish-load");
     if (!w.isDestroyed()) {
@@ -777,7 +774,7 @@ var runScreenSaver = function() {
             // make sure we have something to display
             if ( typeof(saver) === "undefined" ) {
               log.info("No screensaver defined! Just blank everything");
-              blanks = getDisplays();
+              blanks = getDisplays().concat(getNonPrimaryDisplays());
             }
             else {
               displays = getDisplays();
@@ -867,20 +864,6 @@ var getSystemDir = function() {
 
   return path.join(app.getAppPath(), "output");
 };
-
-
-// /**
-//  * determine the path to any assets we need
-//  */
-// var getAssetDir = function() {
-//   if ( process.env.TEST_MODE) {
-//     return path.join(__dirname, "data");
-//   }
-//   if ( global.IS_DEV ) {
-//     return path.join(__dirname, "..", "..", "data");
-//   }
-//   return path.join(app.getAppPath(), "data");
-// };
 
 
 /**

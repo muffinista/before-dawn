@@ -12,6 +12,7 @@
 
 
     <input id="ipc" value="" />
+    <input id="ipcopts" value="" />
     <button id="ipcSend">go</button>
 
     <div id="currentState"></div>
@@ -43,7 +44,15 @@
 
       document.querySelector('#ipcSend').addEventListener("click", async () => {
         const vals = document.querySelector('#ipc').value.split(' ');
-        await window.shimApi.send(vals[0], vals[1]);
+        let opts;
+
+        if (document.querySelector('#ipcopts').value) {
+          opts = JSON.parse(document.querySelector('#ipcopts').value);
+        }
+        else {
+          opts = {};
+        }
+        await window.shimApi.send(vals[0], vals[1], opts);
       });
 
      setInterval(function() {

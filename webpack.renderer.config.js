@@ -5,7 +5,6 @@ const packageJSON = require(`${"./package.json"}`);
 
 const productName = packageJSON.productName;
 const dependencies = packageJSON.dependencies;
-//const optionalDependencies = packageJSON.optionalDependencies || {};
 
 const webpack = require("webpack");
 
@@ -17,8 +16,7 @@ const { VueLoaderPlugin } = require("vue-loader");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const SentryWebpackPlugin = require("@sentry/webpack-plugin");
 
-// const devMode = (process.env.NODE_ENV !== "production");
-const releaseName = `${packageJSON.productName} ${packageJSON.version}`;
+const COMMIT_SHA = process.env.SENTRY_RELEASE || process.env.GITHUB_SHA;
 
 var htmlPageOptions = function(id, title) {
   return {
@@ -59,11 +57,7 @@ let rendererConfig = {
         test: /\.(js|vue)$/,
         enforce: "pre",
         exclude: /node_modules/,
-        include: [
-          // use `include` vs `exclude` to white-list vs black-list
-          //path.resolve(__dirname, "src"), // white-list your app source files
-          // require.resolve("bootstrap-vue"), // white-list bootstrap-vue
-        ],
+        include: [],
         use: {
           loader: "eslint-loader",
           options: {
@@ -140,7 +134,7 @@ let rendererConfig = {
     library: "[name]",
     libraryTarget: "var",
     path: outputDir,
-    publicPath: "."
+    publicPath: ""
   },
   mode: (process.env.NODE_ENV === "production" ? "production" : "development"),
   resolve: {
@@ -164,7 +158,7 @@ if (process.env.NODE_ENV === "production") {
   rendererConfig.plugins.push(
     new webpack.DefinePlugin({
       "process.env.NODE_ENV": JSON.stringify("production"),
-      "process.env.BEFORE_DAWN_RELEASE_NAME": JSON.stringify(releaseName),
+      "process.env.BEFORE_DAWN_RELEASE_NAME": JSON.stringify(COMMIT_SHA),
       "__VUE_OPTIONS_API__": true,
       "__VUE_PROD_DEVTOOLS__": false
     }),
@@ -175,7 +169,6 @@ if (process.env.NODE_ENV === "production") {
 
   if ( process.env.SENTRY_AUTH_TOKEN ) {
     console.log("Using SentryWebpackPlugin");
-    const COMMIT_SHA = process.env.SENTRY_RELEASE || process.env.GITHUB_SHA;
 
     rendererConfig.plugins.push(
       new SentryWebpackPlugin({
@@ -194,8 +187,7 @@ if (process.env.NODE_ENV === "production") {
     new webpack.DefinePlugin({
       "__VUE_OPTIONS_API__": true,
       "__VUE_PROD_DEVTOOLS__": false
-    }),
-    new webpack.HotModuleReplacementPlugin()
+    })
   );
 }
 
