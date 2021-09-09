@@ -63,7 +63,7 @@
     "@octokit/rest": "^18.1.0",
     "@sentry/cli": "^1.64.2",
     "@sentry/webpack-plugin": "^1.9.3",
-    "@vue/compiler-sfc": "^3.0.11",
+    "@vue/compiler-sfc": "^3.2.8",
     "babel-loader": "^8.0.6",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "caniuse-lite": "^1.0.30001154",
