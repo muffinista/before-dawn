@@ -103,7 +103,7 @@
     "xvfb-maybe": "^0.2.1"
   },
   "optionalDependencies": {
-    "forcefocus": "^1.1.0"
+    "@muffinista/forcefocus": "muffinista/forcefocus#electron-14"
   },
   "build": {
     "files": [
