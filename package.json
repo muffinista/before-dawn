@@ -33,7 +33,8 @@
     "url": "git://github.com/muffinista/before-dawn.git"
   },
   "dependencies": {
-    "@muffinista/goto-sleep": "muffinista/goto-sleep",
+    "forcefocus": "muffinista/forcefocus#remove-build-deps",
+    "@muffinista/goto-sleep": "^0.0.5",
     "@sentry/electron": "^2.4.1",
     "async-mutex": "^0.3.0",
     "auto-launch": "^5.0.5",
@@ -101,9 +102,6 @@
     "webpack-dev-server": "^4.1.0",
     "webpack-hot-middleware": "^2.25.0",
     "xvfb-maybe": "^0.2.1"
-  },
-  "optionalDependencies": {
-    "@muffinista/forcefocus": "muffinista/forcefocus#electron-14"
   },
   "build": {
     "files": [
