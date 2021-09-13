@@ -101,8 +101,6 @@ section where you can add custom options for your screensaver:
 
 ![editor window](assets/editor.png "Editor Window")
 
-![editor window](assets/editor-2.png "Editor Window")
-
 
 ## Contributing
 

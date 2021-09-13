@@ -17,7 +17,6 @@ describe("Editor", function() {
     workingDir = helpers.getTempDir();
     
     var saversDir = helpers.getTempDir();
-
     saverJSON = helpers.addSaver(saversDir, "saver-one", "saver.json");
 
     app = await helpers.application(workingDir, true);
