@@ -17,11 +17,19 @@ jobs:
         sudo apt-get install -y libx11-dev libxss-dev icnsutils graphicsmagick libappindicator1 libxtst-dev
     - uses: actions/checkout@v2
     - name: Use Node.js
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v2
       with:
         node-version: ${{ matrix.node-version }}
-    - name: Install node-gyp
-      run: npm install -g node-gyp
+        cache: 'yarn'
+    - name: Patch node-gyp
+      if: ${{ matrix.os == 'windows-latest' }}
+      shell: powershell
+      run: |
+        npm install --global node-gyp@latest
+        npm prefix -g | % {npm config set node_gyp "$_\node_modules\node-gyp\bin\node-gyp.js"}
+    # https://github.com/actions/setup-node/issues/68
+    # - name: Install node-gyp
+    #   run: npm install -g node-gyp
     # - name: Get yarn cache directory
     #   id: yarn-cache
     #   run: |
