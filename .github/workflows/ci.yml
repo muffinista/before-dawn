@@ -22,16 +22,16 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - name: Install node-gyp
       run: npm install -g node-gyp
-    - name: Get yarn cache directory
-      id: yarn-cache
-      run: |
-        echo "::set-output name=dir::$(yarn config get cache)"
-    - uses: actions/cache@v1
-      with:
-        path: ${{ steps.yarn-cache.outputs.dir }}
-        key: ${{ runner.os }}-node-${{ hashFiles('**/yarn-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-node-
+    # - name: Get yarn cache directory
+    #   id: yarn-cache
+    #   run: |
+    #     echo "::set-output name=dir::$(yarn config get cache)"
+    # - uses: actions/cache@v1
+    #   with:
+    #     path: ${{ steps.yarn-cache.outputs.dir }}
+    #     key: ${{ runner.os }}-node-${{ hashFiles('**/yarn-lock.json') }}
+    #     restore-keys: |
+    #       ${{ runner.os }}-node-
     - name: Setup
       run: yarn
     - run: yarn test-lib
