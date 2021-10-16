@@ -20,6 +20,8 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
+    - name: Install node-gyp
+      run: npm install -g node-gyp
     - name: Get yarn cache directory
       id: yarn-cache
       run: |
