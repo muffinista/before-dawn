@@ -308,23 +308,6 @@ exports.callIpc = async(_app, method, opts={}) => {
   await window.click("text=go");
 };
 
-// exports.outputLogs = function(app) {
-//   return app.client.getMainProcessLogs().
-//   then(function (logs) {
-//     logs.forEach(function (log) {
-//       // eslint-disable-next-line no-console
-//       console.log(log);
-//     });
-//   }).
-//   then(() => app.client.getRenderProcessLogs()).
-//   then(function (logs) {
-//     logs.forEach(function (log) {
-//       // eslint-disable-next-line no-console
-//       console.log(log.message);
-//     });
-//   });
-// };
-
 exports.setupTest = function (test) {
   test.timeout(testTimeout);
   test.retries(testRetryCount);
