@@ -4,11 +4,12 @@
       <div class="form-group">
         <label for="name">Name:</label>
         <input
-          v-model="saver.name"
+          :value="name"
           type="text"
           name="name"
           class="form-control"
           required
+          @change="$emit('update', 'name', $event.target.value)"
         >
         <div class="hint">
           The name of your screensaver.
@@ -18,11 +19,12 @@
       <div class="form-group">
         <label for="name">Description:</label>
         <input
-          v-model="saver.description"
+          :value="description"
           type="text"
           name="description"
           class="form-control"
           required
+          @change="$emit('update', 'description', $event.target.value)"
         >
         <div class="hint">
           A brief description of your screensaver.
@@ -31,10 +33,11 @@
       <div class="form-group">
         <label for="aboutUrl">About URL:</label>
         <input
-          v-model="saver.aboutUrl"
+          :value="aboutUrl"
           type="text"
           name="aboutUrl"
           class="form-control"
+          @change="$emit('update', 'aboutUrl', $event.target.value)"
         >
         <div class="hint">
           If you have a URL with more details about your work, put it here!
@@ -43,7 +46,7 @@
       <div class="form-group">
         <label for="author">Author:</label>
         <input
-          v-model="saver.author"
+          :value="author"
           type="text"
           name="author"
           class="form-control"
@@ -57,9 +60,10 @@
         <h3>Requirements:</h3>
         <input
           id="screen"
-          v-model="saver.requirements"
+          :checked="screen"
           type="checkbox"
           value="screen"
+          @change="$emit('update', 'screen', $event.target.checked)"
         >
         <label for="screen">Screen capture</label>
         <div class="hint">
@@ -74,7 +78,34 @@
   export default {
     name: "SaverForm",
     components: { },
-    props: ["saver"],
+    props: {
+      name: {
+        type: String,
+        required: false,
+        default: ""
+      },
+      description: {
+        type: String,
+        required: false,
+        default: ""
+      },
+      aboutUrl: {
+        type: String,
+        required: false,
+        default: ""
+      },
+      author: {
+        type: String,
+        required: false,
+        default: ""
+      },
+      screen: {
+        type: Boolean,
+        required: false,
+        default: false
+      }
+    },
+    emits: ["update"],
     methods: {
     }
   };

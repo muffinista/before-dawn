@@ -8,12 +8,13 @@
       <label class="col-sm-2 col-form-label">Name</label>
       <div class="col-sm-10">
         <input
-          v-model="option.name"
+          :value="option.name"
           type="text"
           name="name"
           class="form-control"
           placeholder="Pick a name for this option"
           required
+          @change="emitChange('name', $event.target.value)"
         >
       </div>
     </div>
@@ -21,12 +22,13 @@
       <label class="col-sm-2 col-form-label">Description</label>
       <div class="col-sm-10">
         <input
-          v-model="option.description"
+          :value="option.description"
           type="text"
           name="description"
           placeholder="Describe what this option does"
           class="form-control"
           required
+          @change="emitChange('description', $event.target.value)"
         >
       </div>
     </div>       
@@ -34,8 +36,9 @@
       <label class="col-sm-2 col-form-label">Type</label>
       <div class="col-sm-10">
         <select
-          v-model="option.type"
+          :value="inputType"
           class="form-control"
+          @change="changeInputType($event.target.value)"
         >
           <option value="slider">
             slider
@@ -55,28 +58,31 @@
         <div class="form-group">
           <label class="col-sm-2 col-form-label">Min</label>
           <input
-            v-model="option.min"
+            :value="option.min"
             type="number"
             class="form-control"
+            @change="emitChange('min', $event.target.value)"
           >
         </div>
           
         <div class="form-group">
           <label class="col-sm-2 col-form-label">Max</label>
           <input
-            v-model="option.max"
+            :value="option.max"
             type="number"
             class="form-control"
+            @change="emitChange('max', $event.target.value)"
           >
         </div>
         
         <div class="form-group">
           <label class="col-sm-2 col-form-label">Default</label>
           <input
-            v-model="option.default"
+            :value="option.default"
             type="text"
             placeholder="Default value of this option"
             class="form-control"
+            @change="emitChange('default', $event.target.value)"
           >
         </div>
       </div>
@@ -86,10 +92,11 @@
         <label class="col-sm-2 col-form-label">Default</label>
         <div class="col-sm-10">
           <input
-            v-model="option.default"
+            :value="option.default"
             type="text"
             placeholder="Default value of this option"
             class="form-control"
+            @change="emitChange('default', $event.target.value)"
           >
         </div>
       </div>
@@ -99,8 +106,9 @@
         <label class="col-sm-2 col-form-label">Default</label>
         <div class="col-sm-2">
           <select
-            v-model="option.default"
+            :value="option.default"
             class="form-control"
+            @change="emitChange('default', $event.target.value)"
           >
             <option
               disabled
@@ -134,9 +142,19 @@
   export default {
     name: "SaverOptionInput",
     components: { },
-    props: ["option", "index"],
+    props: {
+      option: {
+        type: Object,
+        default: function() { return {}; }
+      },
+      index: {
+        type: Number,
+        default: 0
+      }
+    },
     computed: {
       formType: function() {
+        console.log(`formType: ${this.option.type}`);
         if ( this.option.type === "slider" ) {
           return "entry option-range";
         }
@@ -145,10 +163,21 @@
         }
 
         return "entry option-text";
+      },
+      inputType() {
+        return this.option.type;
       }
     },
     methods: {
       noop() {},
+      emitChange(key, value) {
+        this.$emit("saverOptionAttr", this.index, key, value);
+      },
+      changeInputType(value) {
+        // console.log(value);
+        // this.option.type = value;
+        this.$emit("saverOptionAttr", this.index, "type", value);
+      },
       onDeleteClick() {
         this.$emit("deleteOption");
       },

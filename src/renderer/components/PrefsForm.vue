@@ -9,9 +9,10 @@
           <label class="form-check-label">
             <input
               id="lock"
-              v-model="prefs.lock"
+              :checked="lock"
               type="checkbox"
               class="form-check-input"
+              @change="$emit('update', 'lock', $event.target.checked)"
             >
             Lock screen after running?
           </label>
@@ -24,9 +25,10 @@
           <label class="form-check-label">
             <input
               id="disableOnBattery"
-              v-model="prefs.disableOnBattery"
+              :checked="disableOnBattery"
               type="checkbox"
               class="form-check-input"
+              @change="$emit('update', 'disableOnBattery', $event.target.checked)"
             >
             Disable when on battery?
           </label>
@@ -41,9 +43,10 @@
         <div class="form-check">
           <label class="form-check-label">
             <input
-              v-model="prefs.auto_start"
+              :checked="auto_start"
               type="checkbox"
               class="form-check-input"
+              @change="$emit('update', 'auto_start', $event.target.checked)"
             >
             Auto start on login?
           </label>
@@ -56,9 +59,10 @@
           <label class="form-check-label">
             <input
               id="primary-display"
-              v-model="prefs.runOnSingleDisplay"
+              :checked="runOnSingleDisplay"
               type="checkbox"
               class="form-check-input"
+              @change="$emit('update', 'runOnSingleDisplay', $event.target.checked)"
             >
             Only run on the primary display?
           </label>
@@ -75,8 +79,25 @@
 export default {
   name: "PrefsForm",
   components: {},
-  props: ["prefs"],
-  methods: {
-  }
+  props: {
+    lock: {
+      type: Boolean,
+      default: true
+    },
+    disableOnBattery: {
+      type: Boolean,
+      default: true
+    },
+    // eslint-disable-next-line vue/prop-name-casing
+    auto_start: {
+      type: Boolean,
+      default: false
+    },
+    runOnSingleDisplay: {
+      type: Boolean,
+      default: true
+    }
+  },
+  emits: ["update"],
 };
 </script>

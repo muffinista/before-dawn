@@ -286,10 +286,10 @@ export default {
       await window.api.deleteSaver(s);
       await this.getData();
     },
-    updateSaverOption(saver, name, value) {
+    updateSaverOption(name, value) {
       var tmp = JSON.parse(JSON.stringify(this.options));
       var update = {};
-
+      const saver = this.saverObj.key;
       update[saver] = Object.assign({}, tmp[saver]);    
       update[saver][name] = value;
     

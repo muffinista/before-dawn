@@ -139,7 +139,6 @@
               to your preview.
             </small>
             <saver-options
-              :saver="saver"
               :options="validOptions"
               :values="optionDefaults"
               @change="onOptionsChange"
@@ -158,7 +157,12 @@
         <template v-if="saver !== undefined">
           <saver-form
             v-if="isLoaded"
-            :saver="saver"
+            :name="saver.name"
+            :description="saver.description"
+            :author="saver.author"
+            :about-url="saver.aboutUrl"
+            :screen="saver.requirements.screen"
+            @update="updateSaverAttr"
           />
         </template>
       </div>
@@ -179,6 +183,7 @@
               :option="option"
               :index="index"
               @deleteOption="deleteOption(option)"
+              @saverOptionAttr="updateOptionAttr"
             />      
           </div>
           
@@ -343,6 +348,30 @@ export default {
 
       this.lastIndex = this.lastIndex + 1;
     },   
+    updateOptionAttr(index, key, value) {
+      // debugger;
+      // this.options[key] = value;
+      var update = this.options[index];
+      update[key] = value;
+
+      this.options[index] = Object.assign(this.options[index], update);
+
+      console.log(update);
+      // this.options = Object.assign({}, this.options, update);
+      console.log(this.options);
+      // console.log(this.options[saver]);
+    },
+    updateSaverAttr(key, value) {
+      var tmp = {
+      };
+      tmp[key] = value;
+      if ( key === "screen" ) {
+        tmp = {
+          requirements: tmp
+        };
+      }
+      this.saver = Object.assign(this.saver, tmp);      
+    },
     closeWindow() {
       window.api.closeWindow("editor");
     },

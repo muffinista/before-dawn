@@ -26,7 +26,17 @@
 export default {
   name: "LocalFolderInput",
   components: { },
-  props: ["name", "value", "handler"],
+  props: {
+    name: {
+      type: String,
+      required: true
+    },
+    value: {
+      type: String,
+      required: false,
+      default: undefined
+    }
+  },
   emits: ["update"],
   computed: {
   },

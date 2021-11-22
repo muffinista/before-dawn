@@ -28,7 +28,17 @@
 <script>
 export default {
   name: "SaverListItem",
-  props: ["saver", "checked"],
+  props: {
+    saver: {
+      type: Object,
+      required: true
+    },
+    checked: {
+      type: Boolean,
+      required: true,
+      default: false
+    }
+  },
   computed: {
     classes() {
       let base = "list-group-item flex-column entry";
@@ -39,8 +49,8 @@ export default {
     }
   },
   methods: {
-    pickSaver(s) {
-      document.querySelector(`input[name='screensaver'][value='${s.key}']`).click();
+    pickSaver() {
+      // document.querySelector(`input[name='screensaver'][value='${s.key}']`).click();
     }
   }
 };
