@@ -1,6 +1,6 @@
 <template>
   <div id="saver-form">
-    <form >
+    <form>
       <div class="form-group">
         <label for="name">Name:</label>
         <input

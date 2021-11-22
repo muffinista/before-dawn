@@ -5,9 +5,10 @@
       <saver-list-item
         
         v-for="saver in savers"
-        v-bind:saver="saver"
+        :key="saver.url"
+        :saver="saver"
         :checked="saver.key == current"
-        :key="saver.url"></saver-list-item>
+      />
     </ul>
   </div>
 </template>
@@ -16,8 +17,8 @@
   import SaverListItem from "./SaverListItem";
 
   export default {
-    name: "saver-list",
+    name: "SaverList",
     components: {saverListItem: SaverListItem},
     props: ["savers", "current"],
-  }
+  };
 </script>

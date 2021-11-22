@@ -1,17 +1,22 @@
 <template>
-  <li :class="classes" v-on:click="pickSaver(saver)">
+  <li
+    :class="classes"
+    @click="pickSaver(saver)"
+  >
     <div class="d-flex w-100 justify-content-between">
       <label>
         <div class="body">
-          <input type="radio" 
+          <input
+            type="radio" 
             name="screensaver" 
             :data-name="saver.name" 
-            v-bind:value="saver.key" 
+            :value="saver.key" 
              
-            :checked="checked"/>
-          <b>{{saver.name}}</b>
+            :checked="checked"
+          >
+          <b>{{ saver.name }}</b>
           <div class="description">
-            <small>{{saver.description}}</small>
+            <small>{{ saver.description }}</small>
           </div>
         </div>
       </label>
@@ -22,7 +27,7 @@
 
 <script>
 export default {
-  name: "saver-list-item",
+  name: "SaverListItem",
   props: ["saver", "checked"],
   computed: {
     classes() {

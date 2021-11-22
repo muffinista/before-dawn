@@ -264,7 +264,7 @@ var grabScreen = function(s) {
  */
 var openTestShim = function() {
   var testWindow = new BrowserWindow({
-    width: 200,
+    width: 400,
     height: 400,
     webPreferences: {
       ...defaultWebPreferences,

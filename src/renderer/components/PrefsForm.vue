@@ -3,7 +3,6 @@
     <h1>Settings</h1>
     <form
       class="grid"
-      
     >
       <div class="options">
         <div class="form-check">
