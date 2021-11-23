@@ -4,7 +4,13 @@
   >
     <template v-if="prefs !== undefined">
       <div class="container-fluid">
-        <prefs-form :prefs="prefs" />
+        <prefs-form
+          :lock="prefs.lock"
+          :disable-on-battery="prefs.disableOnBattery"
+          :auto_start="prefs.auto_start"
+          :run-on-single-display="prefs.runOnSingleDisplay"
+          @update="updatePrefsAttr"
+        />
       </div>
       <div class="container-fluid">
         <template v-if="hasScreensaverUpdate === true">
@@ -106,7 +112,6 @@ export default {
       try {
         // https://forum.vuejs.org/t/how-to-clone-property-value-as-simple-object/40032/2
         const clone = JSON.parse(JSON.stringify(this.prefs));
-
         await window.api.updatePrefs(clone);
         await window.api.saversUpdated();
 
@@ -152,6 +157,12 @@ export default {
       var tmp = {
         localSource: ls
       };
+      this.prefs = Object.assign(this.prefs, tmp);
+    },
+    updatePrefsAttr(key, value) {
+      var tmp = {
+      };
+      tmp[key] = value;
       this.prefs = Object.assign(this.prefs, tmp);
     }
   }

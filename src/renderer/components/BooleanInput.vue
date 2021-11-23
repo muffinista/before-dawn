@@ -30,12 +30,27 @@
     name: "BooleanInput",
   
     components: { },
-    props: ["saver", "option", "name", "value"],
+    props: {
+      name: {
+        type: String,
+        required: true
+      },
+      option: {
+        type: Object,
+        required: true,
+        default: function() { return {}; }
+      },
+      value: {
+        type: String,
+        required: false,
+        default: undefined
+      }
+    },
     computed: {
     },
     methods: {
       emitChange(name, value) {
-        this.$emit("saverOption", this.saver, name, value);
+        this.$emit("saverOption", name, value);
       },
     },
   };

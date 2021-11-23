@@ -42,7 +42,12 @@
             added to the system that you can fill in with your code.
           </p>
           <saver-form
-            :saver="saver"
+            :name="saver.name"
+            :description="saver.description"
+            :author="saver.author"
+            :about-url="saver.aboutUrl"
+            :screen="saver.requirements.screen"
+            @update="updateSaverAttr"
           />
         </template>
       </div>
@@ -116,6 +121,17 @@ export default {
       this.disabled = false;
 
       window.api.updateLocalSource(ls);
+    },
+    updateSaverAttr(key, value) {
+      var tmp = {
+      };
+      tmp[key] = value;
+      if ( key === "screen" ) {
+        tmp = {
+          requirements: tmp
+        };
+      }
+      this.saver = Object.assign(this.saver, tmp);
     },
     async saveData() {
       if ( document.querySelectorAll(":invalid").length > 0 ) {

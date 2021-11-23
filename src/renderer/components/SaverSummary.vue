@@ -42,7 +42,12 @@ const ipcRenderer = window.ipcRenderer;
 export default {
   name: "SaverSummary",
   components: { },
-  props: ["saver"],
+  props: {
+    saver: {
+      type: Object,
+      required: true
+    }
+  },
   computed: {
     name() {
       return this.saver.name;

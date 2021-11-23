@@ -8,9 +8,8 @@
         :min="option.min"
         :max="option.max"
         :value="value"
-        :saver="saver"
         :class="inputClass"
-        @change="emitChange(saver, option.name, $event.target.value)"
+        @change="emitChange(option.name, $event.target.value)"
       >
       <small class="form-text text-muted">{{ option.description }}</small>
     </form>
@@ -21,7 +20,18 @@
   export default {
     name: "OptionInput",
     components: { },
-    props: ["saver", "option", "value"],
+    props: {
+      option: {
+        type: Object,
+        required: true,
+        default: function() { return {}; }
+      },
+      value: {
+        type: String,
+        required: false,
+        default: undefined
+      }
+    },
     emits: ["saverOption"],
     computed: {
       renderType: function() {
@@ -38,8 +48,8 @@
       }
     },
     methods: {
-      emitChange(saver, name, value) {
-        this.$emit("saverOption", saver, name, value);
+      emitChange(name, value) {
+        this.$emit("saverOption", name, value);
       },
     },
   };
