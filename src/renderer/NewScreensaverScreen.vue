@@ -77,7 +77,7 @@ import SaverForm from "@/components/SaverForm";
 import LocalFolderInput from "@/components/LocalFolderInput";
 
 export default {
-  name: "NewScreensaver",
+  name: "NewScreensaverScreen",
   components: {
     SaverForm,
     LocalFolderInput

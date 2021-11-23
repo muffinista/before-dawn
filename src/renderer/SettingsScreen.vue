@@ -19,7 +19,7 @@
             @click="downloadScreensaverUpdates"
           >
             Download screensaver updates
-            <Spinner
+            <spinner-component
               v-if="downloadingUpdates === true"
               small
             />
@@ -67,13 +67,13 @@
 <script>
 import AdvancedPrefsForm from "@/components/AdvancedPrefsForm";
 import PrefsForm from "@/components/PrefsForm";
-import Spinner from "@/components/Spinner";
+import SpinnerComponent from "@/components/SpinnerComponent";
 import Notarize from "@/components/Notarize";
 
 export default {
-  name: "Settings",
+  name: "SettingsScreen",
   components: {
-    AdvancedPrefsForm, PrefsForm, Spinner
+    AdvancedPrefsForm, PrefsForm, SpinnerComponent
   },
   data() {
     return {

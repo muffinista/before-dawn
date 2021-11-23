@@ -235,7 +235,7 @@ import Notarize from "@/components/Notarize";
 
 
 export default {
-  name: "Editor",
+  name: "EditorScreen",
   components: {
     SaverForm, SaverOptionInput, SaverOptions
   },

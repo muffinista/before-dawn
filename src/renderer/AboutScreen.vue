@@ -105,7 +105,7 @@
 
 <script>
 export default {
-  name: "About",
+  name: "AboutScreen",
   components: {},
   data() {
     return {
