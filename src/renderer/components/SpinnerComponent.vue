@@ -7,7 +7,7 @@
 <script>
   // https://loading.io/css/
   export default {
-    name: "Spinner",
+    name: "SpinnerComponent",
     components: { },
     props: [],
     computed: {

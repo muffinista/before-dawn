@@ -77,7 +77,7 @@ import SaverSummary from "@/components/SaverSummary";
 import Notarize from "@/components/Notarize";
 
 export default {
-  name: "Prefs",
+  name: "PrefsScreen",
   components: {
     BasicPrefsForm, SaverList, SaverOptions, SaverSummary
   },
