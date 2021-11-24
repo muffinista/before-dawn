@@ -240,6 +240,11 @@ var grabScreen = function(s) {
           }
         }
 
+        // rewrite file paths to always have unix slashes instead
+        // of windows slashes. sometimes windows slashes are fine, but
+        // there's a few situations where they won't render properly.
+        message.url = message.url.split(path.sep).join(path.posix.sep);
+
         resolve(message);
       });
 
@@ -320,7 +325,7 @@ var openPrefsWindow = function() {
         icon: path.join(__dirname, "assets", "iconTemplate.png")
       });
 
-      if ( handles.prefs.window.removeMenu !== undefined ) {
+      if ( !global.IS_DEV && handles.prefs.window.removeMenu !== undefined ) {
         handles.prefs.window.removeMenu();
       }
       
@@ -369,7 +374,7 @@ var openSettingsWindow = function() {
   });
 
   // hide the file menu
-  if ( handles.settings.window.removeMenu !== undefined ) {
+  if ( !global.IS_DEV && handles.settings.window.removeMenu !== undefined ) {
     handles.settings.window.removeMenu();
   }
 
@@ -442,7 +447,7 @@ var openAboutWindow = function() {
     }
   });
 
-  if ( handles.about.window.removeMenu !== undefined ) {
+  if ( !global.IS_DEV && handles.about.window.removeMenu !== undefined ) {
     handles.about.window.removeMenu();
   }
 
