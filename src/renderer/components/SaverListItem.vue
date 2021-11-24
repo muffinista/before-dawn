@@ -1,7 +1,6 @@
 <template>
   <li
     :class="classes"
-    @click="pickSaver(saver)"
   >
     <div class="d-flex w-100 justify-content-between">
       <label>
@@ -11,10 +10,13 @@
             name="screensaver" 
             :data-name="saver.name" 
             :value="saver.key" 
-             
             :checked="checked"
           >
           <b>{{ saver.name }}</b>
+          <template v-if="saver.editable === true">
+            &nbsp;(<small>custom</small>)
+          </template>
+
           <div class="description">
             <small>{{ saver.description }}</small>
           </div>
@@ -49,9 +51,6 @@ export default {
     }
   },
   methods: {
-    pickSaver() {
-      // document.querySelector(`input[name='screensaver'][value='${s.key}']`).click();
-    }
   }
 };
 </script>
