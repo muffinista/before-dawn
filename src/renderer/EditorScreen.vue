@@ -182,8 +182,8 @@
               :key="option.index"
               :option="option"
               :index="index"
-              @deleteOption="deleteOption(option)"
-              @saverOptionAttr="updateOptionAttr"
+              @delete-option="deleteOption(option)"
+              @saver-option-attr="updateOptionAttr"
             />      
           </div>
           

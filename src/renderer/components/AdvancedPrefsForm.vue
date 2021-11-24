@@ -53,6 +53,7 @@ export default {
       default: undefined
    }
   },
+  emits: ["update:localSource", "update:launchShortcut"],
   methods: {
     updateHotkey(event) {
       if ( event.key == "Control" || event.key == "Shift" || event.key == "Alt" || event.key == "Meta" ) {

@@ -20,7 +20,7 @@
                   :value="prefs.localSource"
                   handler="localSourceChange"
                   name="localSource"
-                  @localSourceChange="localSourceChange"
+                  @local-source-change="localSourceChange"
                 />
               </template>
 

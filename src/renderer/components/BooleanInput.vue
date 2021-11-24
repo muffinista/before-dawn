@@ -28,7 +28,6 @@
 <script>
   export default {
     name: "BooleanInput",
-  
     components: { },
     props: {
       name: {
@@ -46,6 +45,7 @@
         default: undefined
       }
     },
+    emits: ["saverOption"],
     computed: {
     },
     methods: {
