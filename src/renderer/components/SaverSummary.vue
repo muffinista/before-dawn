@@ -48,6 +48,7 @@ export default {
       required: true
     }
   },
+  emits: ["editSaver", "deleteSaver"],
   computed: {
     name() {
       return this.saver.name;

@@ -152,6 +152,7 @@
         default: 0
       }
     },
+    emits: ["saverOptionAttr", "deleteOption"],
     computed: {
       formType: function() {
         console.log(`formType: ${this.option.type}`);

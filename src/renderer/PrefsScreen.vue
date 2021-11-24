@@ -11,15 +11,15 @@
       <div class="saver-info space-at-top">
         <saver-summary 
           :saver="saverObj"
-          @editSaver="editSaver"
-          @deleteSaver="deleteSaver"
+          @edit-saver="editSaver"
+          @delete-saver="deleteSaver"
         />
         <saver-options
           :saver="saver"
           :options="saverOptions"
           :values="options[saver]"
           @change="onOptionsChange"
-          @saverOption="updateSaverOption"
+          @saver-option="updateSaverOption"
         />
       </div>
     </template>

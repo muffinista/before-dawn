@@ -11,7 +11,7 @@
             :option="option"
             :value="values[option.name]"
             :name="option.name"
-            @saverOption="handleOptionUpdate"
+            @saver-option="handleOptionUpdate"
           />
         </template>
         <template v-else>
@@ -19,7 +19,7 @@
             :key="option.name"
             :option="option"
             :value="values[option.name]"
-            @saverOption="handleOptionUpdate"
+            @saver-option="handleOptionUpdate"
           />
         </template>
       </li>

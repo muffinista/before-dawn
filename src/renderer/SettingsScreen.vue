@@ -30,8 +30,8 @@
         <advanced-prefs-form
           :local-source="prefs.localSource"
           :launch-shortcut="prefs.launchShortcut"
-          @update:localSource="localSourceChange"
-          @update:launchShortcut="prefs.launchShortcut=$event"
+          @update:local-source="localSourceChange"
+          @update:launch-shortcut="prefs.launchShortcut=$event"
         />
       </div>
     </template>
