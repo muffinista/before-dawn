@@ -141,12 +141,15 @@ let checkPowerState = true;
 
 const RELEASE_CHECK_INTERVAL = 1000 * 60 * 60 * 12;
 
+// load a few global variables
+require("./bootstrap.js");
 
 const defaultWebPreferences = {
   enableRemoteModule: false,
   contextIsolation: true,
   nodeIntegration: false,
-  nativeWindowOpen: true
+  nativeWindowOpen: true,
+  webSecurity: !global.IS_DEV
 };
 
 const singleLock = app.requestSingleInstanceLock();
@@ -190,8 +193,7 @@ var openGrabberWindow = function() {
       y: 2000,
       webPreferences: {
         ...defaultWebPreferences,
-        preload: path.join(__dirname, "assets", "grabber.js"),
-        webSecurity: false
+        preload: path.join(__dirname, "assets", "grabber.js")
       }
     });
     grabberWindow.noTray = true;
@@ -273,8 +275,7 @@ var openTestShim = function() {
     height: 400,
     webPreferences: {
       ...defaultWebPreferences,
-      preload: path.join(__dirname, "assets", "shim.js"),
-      webSecurity: false
+      preload: path.join(__dirname, "assets", "shim.js")
     }
   });
 
@@ -319,7 +320,6 @@ var openPrefsWindow = function() {
         resizable: true,
         webPreferences: {
           ...defaultWebPreferences,
-          webSecurity: false,
           preload: path.join(__dirname, "assets", "preload.js")
         },
         icon: path.join(__dirname, "assets", "iconTemplate.png")
@@ -368,7 +368,6 @@ var openSettingsWindow = function() {
     icon: path.join(__dirname, "assets", "iconTemplate.png"),
     webPreferences: {
       ...defaultWebPreferences,
-      webSecurity: false,
       preload: path.join(__dirname, "assets", "preload.js"),
     }
   });
@@ -410,7 +409,6 @@ var addNewSaver = function() {
       resizable:true,
       webPreferences: {
         ...defaultWebPreferences,
-        webSecurity: false,
         preload: path.join(__dirname, "assets", "preload.js"),
       },
       icon: path.join(__dirname, "assets", "iconTemplate.png")
@@ -486,7 +484,6 @@ var openEditor = (args) => {
       show: false,
       webPreferences: {
         ...defaultWebPreferences,
-        webSecurity: false,
         preload: path.join(__dirname, "assets", "preload.js"),
       },
     });  
@@ -1722,9 +1719,6 @@ let toggleSaversUpdated = (arg) => {
     handles.prefs.window.send("savers-updated", arg);
   }
 };
-
-// load a few global variables
-require("./bootstrap.js");
 
 log.transports.file.level = "debug";
 log.transports.file.maxSize = 1 * 1024 * 1024;
