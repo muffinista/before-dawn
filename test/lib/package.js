@@ -110,9 +110,9 @@ describe("Package", function() {
   });
 
   describe("downloadFile", () => {
-    var testUrl = "http://test.file/savers.zip";
+    var testUrl = "https://test.file/savers.zip";
     beforeEach(() => {
-      nock("http://test.file").
+      nock("https://test.file").
         get("/savers.zip").
         reply(200, () => {
           return fs.createReadStream(zipPath);
