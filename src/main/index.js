@@ -880,8 +880,18 @@ var getUrl = function(dest) {
   let baseUrl;
   if ( !testMode && process.env.NODE_ENV === "development" ) {
     if ( ! process.env.DISABLE_RELOAD ) {
-      baseUrl = "http://localhost:9080";
-      return url.resolve(baseUrl, dest);
+      let devPort;
+
+      try {
+        let packageJSON = require("../../package.json");
+        devPort = packageJSON.devport;
+      }
+      catch(e) {
+        devPort = 9080;
+      }
+      
+      baseUrl = `http://localhost:${devPort}`;
+      return new URL(dest, new URL(baseUrl)).toString(); // url.resolve(baseUrl, dest);
     }
     
     return `${__dirname}/../../output/${dest}`;

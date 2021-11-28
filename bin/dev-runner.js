@@ -9,6 +9,17 @@ const WebpackDevServer = require("webpack-dev-server");
 const mainConfig = require("../webpack.main.config");
 const rendererConfig = require("../webpack.renderer.config");
 
+let devPort;
+
+try {
+  let packageJSON = require("../package.json");
+  devPort = packageJSON.devport;
+}
+catch(e) {
+  devPort = 9080;
+}
+
+
 let electronProcess = null;
 let manualRestart = false;
 let skipMainRestart = true;
@@ -23,7 +34,7 @@ function startRenderer () {
     const compiler = webpack(rendererConfig);
     const serverOptions = {
       host: "localhost",
-      port: 9080,
+      port: devPort,
       hot: true,
       onListening: function (devServer) {
         const port = devServer.server.address().port;
