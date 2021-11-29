@@ -11,6 +11,7 @@
   "engines": {
     "node": ">= 14.16.0"
   },
+  "devport": 9081,
   "scripts": {
     "dev": "node bin/dev-runner.js",
     "dev-no-reload": "cross-env DISABLE_RELOAD=1 node bin/dev-runner.js",
@@ -88,6 +89,7 @@
     "node-loader": "^2.0.0",
     "nyc": "^15.0.0",
     "playwright": "^1.14.1",
+    "png-to-ico": "^2.1.2",
     "sass": "^1.26",
     "sass-loader": "^12.0.0",
     "sinon": "^12.0.1",
