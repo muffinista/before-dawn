@@ -9,7 +9,7 @@
   "release_server": "https://before-dawn-updates.muffinlabs.com",
   "main": "output/main.js",
   "engines": {
-    "node": ">= 14.16.0"
+    "node": ">= 16.9.1"
   },
   "devport": 9081,
   "scripts": {
