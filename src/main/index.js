@@ -931,6 +931,9 @@ var setupMenuAndTray = function() {
   appIcon.on("right-click", () => {
     appIcon.popUpContextMenu();
   });
+  appIcon.on("click", () => {
+    appIcon.popUpContextMenu();
+  });
 };
 
 /**
