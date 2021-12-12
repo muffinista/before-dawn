@@ -1319,10 +1319,9 @@
     lodash "^4.17.15"
     tmp-promise "^3.0.2"
 
-"@muffinista/goto-sleep@^0.0.5":
+"@muffinista/goto-sleep@muffinista/goto-sleep#osx-cleanup":
   version "0.0.5"
-  resolved "https://registry.yarnpkg.com/@muffinista/goto-sleep/-/goto-sleep-0.0.5.tgz#8ededc59ae858c4ace646b9259e12e583ec0604f"
-  integrity sha512-iqDwmowf7iloT8bDm8wfttlKvg7fwvuiekCSxapYZdjmDBPvQ3sjtln+zJdHGoYDjSkeCmE2tNJN4k0G3KfwxQ==
+  resolved "https://codeload.github.com/muffinista/goto-sleep/tar.gz/79d8721f490982697db4c414142db0fe4003d85e"
   dependencies:
     bindings "^1.5.0"
     nan "^2.15.0"

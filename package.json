@@ -9,7 +9,7 @@
   "release_server": "https://before-dawn-updates.muffinlabs.com",
   "main": "output/main.js",
   "engines": {
-    "node": ">= 14.16.0"
+    "node": ">= 16.9.1"
   },
   "devport": 9081,
   "scripts": {
@@ -34,7 +34,7 @@
     "url": "git://github.com/muffinista/before-dawn.git"
   },
   "dependencies": {
-    "@muffinista/goto-sleep": "^0.0.5",
+    "@muffinista/goto-sleep": "muffinista/goto-sleep#osx-cleanup",
     "@sentry/electron": "^2.4.1",
     "async-mutex": "^0.3.0",
     "auto-launch": "^5.0.5",
