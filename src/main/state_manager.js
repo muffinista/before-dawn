@@ -213,6 +213,8 @@ class StateManager {
       const hadActivity = (i < this.lastTime ||
         (this.currentState === STATES.STATE_RUNNING && i <= 10  && this.currentTimeStamp - i - IDLE_PADDING_CHECK > this.enteredStateTimestamp));
 
+      // console.log(`${i} ${this.lastTime} -- ${this.currentStateString}`);
+
       if ( hadActivity && this.currentState !== STATES.STATE_IDLE ) {
         // we won't actually reset the state while a screensaver is
         // loading, because sometimes we get zombie electron windows
@@ -221,12 +223,17 @@ class StateManager {
           this.reset();
         }
       }
-      else if ( i >= nextTime ) {
+      else if ( i >= nextTime && this.currentState !== STATES.STATE_BLANKED ) {
         if ( this.currentState === STATES.STATE_IDLE) {
+          // console.log(`${i} >= ${nextTime} -- switch from ${this.currentStateString} to loading`);
           this.switchState(STATES.STATE_LOADING);
         }
         else if ( this.currentState === STATES.STATE_RUNNING) {
+          // console.log(`${i} >= ${nextTime} -- switch from ${this.currentStateString} to blanked`);
           this.switchState(STATES.STATE_BLANKED);
+        }
+        else {
+          // console.log(`${i} >= ${nextTime} -- switch from ${this.currentStateString} to ????`);
         }
       }
 

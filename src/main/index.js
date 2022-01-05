@@ -722,7 +722,7 @@ var getNonPrimaryDisplays = function() {
 var setStateToRunning = function() {
   // disable power state check
   checkPowerState = false;
-  stateManager.run();
+  stateManager.running();
 };
 
 var setStateToPaused = function() {
@@ -1631,11 +1631,14 @@ var blankScreenIfNeeded = function() {
  * timeout values, etc
  */
 var updateStateManager = function() {
-  log.info(`updateStateManager idleTime: ${prefs.delay} blankTime: ${(prefs.delay + prefs.sleep)}`);
+  const delayTime = prefs.delay > 0 ? prefs.delay * 60 : Number.POSITIVE_INFINITY;
+  const blankOffset = process.platform === "win32" ? 0 : prefs.delay;
+  const blankTime = prefs.sleep > 0 ? (blankOffset + prefs.sleep) * 60 : Number.POSITIVE_INFINITY;
+  log.info(`updateStateManager idleTime: ${delayTime} blankTime: ${blankTime}`);
 
   stateManager.setup({
-    idleTime: prefs.delay > 0 ? prefs.delay * 60 : Number.POSITIVE_INFINITY,
-    blankTime: prefs.sleep > 0 ? (prefs.delay + prefs.sleep) * 60 : Number.POSITIVE_INFINITY,
+    idleTime: delayTime,
+    blankTime: blankTime,
     onIdleTime: runScreenSaverIfPowered, 
     onBlankTime: blankScreenIfNeeded,
     onReset: windows.closeRunningScreensavers
