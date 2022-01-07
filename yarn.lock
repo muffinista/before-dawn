@@ -1320,8 +1320,8 @@
     tmp-promise "^3.0.2"
 
 "@muffinista/goto-sleep@muffinista/goto-sleep#osx-cleanup":
-  version "0.0.5"
-  resolved "https://codeload.github.com/muffinista/goto-sleep/tar.gz/79d8721f490982697db4c414142db0fe4003d85e"
+  version "0.0.6"
+  resolved "https://codeload.github.com/muffinista/goto-sleep/tar.gz/30b7c135e773dcf193e0157cc9f8d3f1f59e89c8"
   dependencies:
     bindings "^1.5.0"
     nan "^2.15.0"
