@@ -20,7 +20,7 @@ let tag_name = `v${pjson.version}`;
 let draft = true;
 let releaseName = `${pjson.productName} ${pjson.version}`;
 
-const sentryCli = new SentryCli("./sentry.properties");
+const sentryCli = new SentryCli(path.join(__dirname, "sentry.properties"));
 
 async function main() {
   let release = {
