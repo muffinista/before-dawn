@@ -720,9 +720,10 @@ var getNonPrimaryDisplays = function() {
  * manually trigger screensaver by setting state to run
  */
 var setStateToRunning = function() {
+  log.info("setStateToRunning");
   // disable power state check
   checkPowerState = false;
-  stateManager.running();
+  stateManager.run();
 };
 
 var setStateToPaused = function() {

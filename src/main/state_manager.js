@@ -29,7 +29,6 @@ class StateManager {
     this._idleTime = () => {};
     this._blankTime = () => {};
     this._onIdleTime = () => {};
-    this._onIdleTimeRunning = () => {};
     this._onBlankTime = () => {};
     this._onReset = () => {};
 
@@ -71,9 +70,6 @@ class StateManager {
 
     if ( opts.onReset ) {
       this._onReset = opts.onReset;
-    }
-    if ( opts.onIdleTimeRunning ) {
-      this._onIdleTimeRunning = opts.onIdleTimeRunning;
     }
 
     if ( opts.state ) {
@@ -131,10 +127,6 @@ class StateManager {
     this._onReset();
   }
 
-  onIdleTimeRunning() {
-    this._onIdleTimeRunning();
-  }
-
   /**
    * switch to a new state. if we're not already in that state, or if
    * force == true, call onEnterState
@@ -165,9 +157,6 @@ class StateManager {
         break;
       case STATES.STATE_LOADING:
         this.onIdleTime();
-        break;
-      case STATES.STATE_RUNNING:
-        this.onIdleTimeRunning();
         break;
       case STATES.STATE_BLANKED:
         this.onBlankTime();
