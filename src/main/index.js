@@ -1642,7 +1642,8 @@ var updateStateManager = function() {
     blankTime: blankTime,
     onIdleTime: runScreenSaverIfPowered, 
     onBlankTime: blankScreenIfNeeded,
-    onReset: windows.closeRunningScreensavers
+    onReset: windows.closeRunningScreensavers,
+    logger: log.info
   });
 };
 
