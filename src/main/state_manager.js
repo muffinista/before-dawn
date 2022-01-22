@@ -31,6 +31,7 @@ class StateManager {
     this._onIdleTime = () => {};
     this._onBlankTime = () => {};
     this._onReset = () => {};
+    this.logger = function() {};
 
     this.lastTime = -1;
     this.enteredStateTimestamp = -1;
@@ -39,6 +40,7 @@ class StateManager {
     this.keepTicking = true;  
 
     this._idleFn = fn;
+
 
     this.rates = {
       idle: IDLE_CHECK_RATE,
@@ -58,6 +60,13 @@ class StateManager {
    * setup timing/callbacks
    */
   setup(opts) {
+    if ( opts.logger !== undefined ) {
+      this.logger = opts.logger;
+    }
+    else {
+      this.logger = function() {};
+    }
+
     if ( opts.idleTime && opts.onIdleTime ) {
       this._idleTime = opts.idleTime;
       this._onIdleTime = opts.onIdleTime;
@@ -186,6 +195,7 @@ class StateManager {
   }
 
   ignoreReset(val) {
+    this.logger(`set ignoreReset to ${val}`);
     this._ignoreReset = val;
     if ( this._ignoreReset === false ) {
       this.lastTime = -1;
@@ -202,27 +212,31 @@ class StateManager {
       const hadActivity = (i < this.lastTime ||
         (this.currentState === STATES.STATE_RUNNING && i <= 10  && this.currentTimeStamp - i - IDLE_PADDING_CHECK > this.enteredStateTimestamp));
 
-      // console.log(`${i} ${this.lastTime} -- ${this.currentStateString}`);
+      // this.logger(`${i} ${this.lastTime} -- ${this.currentStateString}`);
 
       if ( hadActivity && this.currentState !== STATES.STATE_IDLE ) {
         // we won't actually reset the state while a screensaver is
         // loading, because sometimes we get zombie electron windows
         // when we do that
         if ( ! this._ignoreReset ) {
+          this.logger(`Current idle: ${i} Last idle: ${this.lastTime} -- ${this.currentStateString} -- reset`);
           this.reset();
+        }
+        else {
+          this.logger(`Current idle: ${i} Last idle: ${this.lastTime} -- but ignoreReset is true`);
         }
       }
       else if ( i >= nextTime && this.currentState !== STATES.STATE_BLANKED ) {
         if ( this.currentState === STATES.STATE_IDLE) {
-          // console.log(`${i} >= ${nextTime} -- switch from ${this.currentStateString} to loading`);
+          this.logger(`${i} >= ${nextTime} -- switch from ${this.currentStateString} to loading`);
           this.switchState(STATES.STATE_LOADING);
         }
         else if ( this.currentState === STATES.STATE_RUNNING) {
-          // console.log(`${i} >= ${nextTime} -- switch from ${this.currentStateString} to blanked`);
+          this.logger(`${i} >= ${nextTime} -- switch from ${this.currentStateString} to blanked`);
           this.switchState(STATES.STATE_BLANKED);
         }
         else {
-          // console.log(`${i} >= ${nextTime} -- switch from ${this.currentStateString} to ????`);
+          this.logger(`${i} >= ${nextTime} -- switch from ${this.currentStateString} to ????`);
         }
       }
 
