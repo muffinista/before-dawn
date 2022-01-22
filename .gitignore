@@ -55,3 +55,9 @@ data/*.*
 TODO
 notes.txt
 bin/sentry.properties
+
+# ignore some assets i don't want in git
+assets/noun*
+
+# ignore VS code file
+*.code-workspace
