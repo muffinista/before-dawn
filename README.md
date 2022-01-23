@@ -124,7 +124,7 @@ suggestion, please feel free to open an issue here.
 
 ## Copyright/License
 
-Unless otherwise stated, Copyright (c) 2019 [Colin
+Unless otherwise stated, Copyright (c) 2022 [Colin
 Mitchell](http://muffinlabs.com).
 
 Before Dawn is is distributed under the MIT licence -- Please see LICENSE.txt
