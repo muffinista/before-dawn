@@ -803,10 +803,7 @@ var runScreenSaver = function() {
                 blanks.map((d) => blankScreen(d))
               );
 
-            Promise.all(promises).then(() => {
-              log.info("our work is done, set state to running");
-              stateManager.running(); 
-            }).catch((e) => {
+            Promise.all(promises).then(setRunningInABit).catch((e) => {
               log.info("running screensaver failed");
               log.info(e);
 
@@ -816,7 +813,16 @@ var runScreenSaver = function() {
           });
 };
 
-
+/**
+ * After a short delay, set state manager to running. This should
+ * help with mouse wiggle/etc
+ */
+var setRunningInABit = function() {
+  setTimeout(function() {
+    log.info("our work is done, set state to running");
+    stateManager.running();
+  }, 1500);
+};
 
 /**
  * should we lock the user's screen when returning from running the saver?
@@ -853,7 +859,6 @@ var stopScreenSaver = function(fromBlank) {
  * other critical files exist.
  */
 var getSystemDir = function() {
-
   if ( process.env.BEFORE_DAWN_SYSTEM_DIR !== undefined ) {
     return process.env.BEFORE_DAWN_SYSTEM_DIR;
   }
