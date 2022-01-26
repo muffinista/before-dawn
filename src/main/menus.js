@@ -3,6 +3,9 @@
 const main = require("./index.js");
 const path = require("path");
 
+const nativeImage = require("electron").nativeImage;
+
+
 const icons = {
   "win32" : {
     active: path.join(__dirname , "assets", "icon.ico"),
@@ -293,23 +296,36 @@ var getIcons = function() {
   return icons.default;
 };
 
+var trayIconImage = function() {
+  var icons = getIcons();
+  let stateManager = main.getStateManager();
+
+  let iconPath;
+  if ( stateManager.currentState === stateManager.STATES.STATE_PAUSED ) {
+    iconPath = icons.paused;
+
+  }
+  else {
+    iconPath = icons.active;
+  }
+
+  return nativeImage.createFromPath(iconPath);
+};
+
 /**
  * update tray icon to match our current state
  */
 var updateTrayIcon = function() {
-  var icons = getIcons();
-  let stateManager = main.getStateManager();
   let appIcon = main.getAppIcon();
 
-  if ( stateManager.currentState === stateManager.STATES.STATE_PAUSED ) {
-    appIcon.setImage(icons.paused);
-  }
-  else {
-    appIcon.setImage(icons.active);
+  const iconImage = trayIconImage();
+  if ( !iconImage.isEmpty() ) {
+    appIcon.setImage(iconImage);
   }
 };
 
 
 exports.getIcons = getIcons;
+exports.trayIconImage = trayIconImage;
 exports.buildMenuTemplate = buildMenuTemplate;
 exports.trayMenuTemplate = trayMenuTemplate;
