@@ -38,15 +38,16 @@ async function main() {
   let result = await octokit.repos.getLatestRelease({owner, repo});
   if ( result.data.tag_name === tag_name ) {
     console.log("release already created!");
-    return;
+  }
+  else {
+    console.log(release);
+
+    // Create a release
+    result = await octokit.repos.createRelease(release);
+    console.log(result);
   }
 
-  console.log(release);
-  result = await octokit.repos.createRelease(release);
 
-  console.log(result);
-
-  // Create a release
 
   console.log("Create new release on sentry");
   await sentryCli.execute(["releases", "new", releaseName], true);
