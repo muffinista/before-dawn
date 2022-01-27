@@ -916,7 +916,6 @@ var setupForTesting = function() {
  * build and apply an application menu and tray menu
  */
 var setupMenuAndTray = function() {
-  var icons = menusAndTrays.getIcons();
   var menu = Menu.buildFromTemplate(menusAndTrays.buildMenuTemplate(app));
 
   Menu.setApplicationMenu(menu);
@@ -928,7 +927,9 @@ var setupMenuAndTray = function() {
 
   trayMenu.items[3].visible = global.NEW_RELEASE_AVAILABLE;
 
-  appIcon = new Tray(icons.active);
+  const iconImage = menusAndTrays.trayIconImage();
+
+  appIcon = new Tray(iconImage);
   appIcon.setToolTip(global.APP_NAME);
   appIcon.setContextMenu(trayMenu); 
   
