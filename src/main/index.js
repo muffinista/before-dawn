@@ -22,14 +22,15 @@ const electron = require("electron");
 const log = require("electron-log");
 
 const {app,
-  globalShortcut,
   BrowserWindow,
+  desktopCapturer,
+  dialog,
+  globalShortcut,
   ipcMain,
   Menu,
-  Tray,
-  dialog,
   shell,
-  systemPreferences} = require("electron");
+  systemPreferences,
+  Tray} = require("electron");
 
 const fs = require("fs");
 const path = require("path");
@@ -174,6 +175,20 @@ const power = new Power({
 });
 
 
+let screenData = [];
+var listScreens = async function() {
+  const sources = await desktopCapturer.getSources({
+    types: ["screen"],
+    thumbnailSize: { width: 0, height: 0 }
+  });
+  
+  console.log("screen data", sources);
+  screenData = sources;
+
+  return sources;
+};
+
+
 /**
  * Open the screengrab window
  * 
@@ -187,6 +202,8 @@ var openGrabberWindow = function() {
     var grabberWindow = new BrowserWindow({
       show: false,
       skipTaskbar: true,
+      // width: 500,
+      // height: 500,
       width: 100,
       height: 100,
       x: 6000,
@@ -214,6 +231,13 @@ var openGrabberWindow = function() {
  */
 var grabScreen = function(s) {
   log.info(`grab screen ${s.id}`);
+
+  let screen = screenData.find((s) => { return s.display_id.toString() === s.id.toString(); });
+  if ( ! screen ) {
+    screen = screenData[0];
+  }
+  log.info(screen);
+
   return new Promise((resolve) => {
     //
     // bypass screen capture in test mode
@@ -228,7 +252,7 @@ var grabScreen = function(s) {
     }
     else {
       let windowRef;
-      ipcMain.once(`screenshot-${s.id}`, function(_e, message) {
+      ipcMain.once(`screenshot-${screen.id}`, function(_e, message) {
         // log.info("got screenshot!", message);
 
         // close the screen grabber window
@@ -253,8 +277,10 @@ var grabScreen = function(s) {
       openGrabberWindow().then((w) => {
         windowRef = w;
         log.info("send screengrab request");
+
         windowRef.webContents.send("request-screenshot", { 
-          id: s.id, 
+          // id: s.id, 
+          id: screen.id, 
           width: s.bounds.width, 
           height: s.bounds.height});  
       });
@@ -1522,6 +1548,7 @@ var bootApp = async function() {
     prefs: prefs
   });
 
+  await listScreens();
 
   //
   // setup some event handlers for when screen count changes, mostly
@@ -1529,7 +1556,8 @@ var bootApp = async function() {
   // monitor
   //
   ["display-added", "display-removed"].forEach((type) => {
-    electronScreen.on(type, () => {
+    electronScreen.on(type, async () => {
+      await listScreens();
       windows.handleDisplayChange();
     });
   });
