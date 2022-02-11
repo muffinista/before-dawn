@@ -4,7 +4,7 @@
  */
 
 
-const { contextBridge, ipcRenderer, desktopCapturer } = require("electron");
+const { contextBridge, ipcRenderer } = require("electron");
 
 const temp = require("temp");
 const os = require("os");
@@ -118,18 +118,7 @@ var captureScreen = async function(id, width, height) {
     }
   };
   
-  const sources = await desktopCapturer.getSources({
-    types: ["screen"],
-    thumbnailSize: { width: 0, height: 0 }
-  });
-
-  let screen = sources.find((s) => { return s.display_id.toString() === id.toString(); });
-  if ( ! screen ) {
-    screen = sources[0];
-  }
-  screen_opts.video.mandatory.chromeMediaSourceId = screen.id;
-
- 
+  screen_opts.video.mandatory.chromeMediaSourceId = id;
   
   const video = findOrCreate("video", id);
 
