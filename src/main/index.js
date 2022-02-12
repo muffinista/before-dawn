@@ -236,7 +236,7 @@ var grabScreen = function(s) {
   if ( ! screen ) {
     screen = screenData[0];
   }
-  log.info(screen);
+  // log.info(screen);
 
   return new Promise((resolve) => {
     //

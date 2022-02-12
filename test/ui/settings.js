@@ -80,7 +80,6 @@ describe("Settings", function() {
       window.waitForEvent("filechooser"),
       window.click("button.pick")
     ]);
-    console.log(fileChooser);
     await fileChooser.setFiles("/not/a/real/path");
 
     await window.click("button.save");
@@ -101,7 +100,7 @@ describe("Settings", function() {
 
     await helpers.sleep(closeWindowDelay);
 
-    assert.strictEqual(currentPrefs().localSource, "");
+    assert.strictEqual("", currentPrefs().localSource);
 
     await helpers.waitFor(app, "prefs");
   });

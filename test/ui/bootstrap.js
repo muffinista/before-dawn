@@ -36,6 +36,9 @@ describe("bootstrap", function() {
     it("creates config file and shows prefs", async function() {
       await helpers.waitFor(app, "prefs");
       assert(fs.existsSync(configDest));
+
+      // the test was crashing without waiting here a bit
+      await helpers.sleep(1000);
     });
   });
 
