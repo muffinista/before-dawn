@@ -23,7 +23,7 @@
     "dist": "npm run compile && electron-builder --x64",
     "test": "npm run compile && mocha -b test/**/*.js",
     "test-ui": "npm run compile && mocha -b test/ui/**/*.js",
-    "test-lib": "nyc --reporter=html mocha test test/lib/**/*.js test/main/**/*.js",
+    "test-lib": "mocha test test/lib/**/*.js test/main/**/*.js",
     "run-local": "node bin/build-icon.js && npm run compile && electron output/main.js",
     "grab-screens": "bin/capture-screens.js",
     "release": "node bin/build-icon.js && node bin/download-screensavers.js && npm run dist",
