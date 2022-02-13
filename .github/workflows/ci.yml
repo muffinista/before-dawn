@@ -28,7 +28,7 @@ jobs:
         npm install --global node-gyp@latest
         npm prefix -g | % {npm config set node_gyp "$_\node_modules\node-gyp\bin\node-gyp.js"}
     - name: Setup
-      run: npm run
+      run: npm i
     - run: npm run test-lib
     - name: Run integration tests
       if: ${{ matrix.os != 'ubuntu-latest' }}
