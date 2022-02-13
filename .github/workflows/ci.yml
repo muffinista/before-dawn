@@ -20,7 +20,7 @@ jobs:
       uses: actions/setup-node@v2
       with:
         node-version: ${{ matrix.node-version }}
-        cache: 'yarn'
+        cache: 'npm'
     - name: Patch node-gyp
       if: ${{ matrix.os == 'windows-latest' }}
       shell: powershell
@@ -28,8 +28,8 @@ jobs:
         npm install --global node-gyp@latest
         npm prefix -g | % {npm config set node_gyp "$_\node_modules\node-gyp\bin\node-gyp.js"}
     - name: Setup
-      run: yarn
-    - run: yarn test-lib
+      run: npm i
+    - run: npm run test-lib
     - name: Run integration tests
       if: ${{ matrix.os != 'ubuntu-latest' }}
-      run: yarn test-ui
+      run: npm run test-ui

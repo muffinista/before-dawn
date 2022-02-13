@@ -16,19 +16,4 @@ pre-commit:
   commands:
     eslint:
       glob: "*.{js,ts}"
-      run: yarn eslint {staged_files}
-#     rubocop:
-#       tags: backend style
-#       glob: "*.rb"
-#       exclude: "application.rb|routes.rb"
-#       run: bundle exec rubocop --force-exclusion {all_files}
-#     govet:
-#       tags: backend style
-#       files: git ls-files -m
-#       glob: "*.go"
-#       run: go vet {files}
-#   scripts:
-#     "hello.js":
-#       runner: node
-#     "any.go":
-#       runner: go run
+      run: npm run eslint {staged_files}
