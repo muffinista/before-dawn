@@ -182,7 +182,6 @@ var listScreens = async function() {
     thumbnailSize: { width: 0, height: 0 }
   });
   
-  console.log("screen data", sources);
   screenData = sources;
 
   return sources;
