@@ -40,11 +40,12 @@ function startRenderer () {
         const port = devServer.server.address().port;
         console.log("Listening on port:", port);
       },
-      onAfterSetupMiddleware: function (server) {
+      setupMiddlewares: function (middlewares, server) {
         server.middleware.waitUntilValid(() => {
           console.log("startRenderer finished");
           resolve();
         });
+        return  middlewares;
       }
     };
 
