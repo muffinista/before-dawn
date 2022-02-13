@@ -92,7 +92,7 @@
       <p>
         <small>
           Powered by <a
-            href="http://electron.atom.io/"
+            href="https://www.electronjs.org/"
             @click="open"
           >
             Electron

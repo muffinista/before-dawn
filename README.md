@@ -14,7 +14,7 @@ Before Dawn is definitely a bit of a experiment -- to actually use it, you need
 to run it as a separate application on your computer and disable whatever
 screensaver you have running in your OS, but it is fun and definitely works.
 
-The core of the app is built on [Electron](http://electron.atom.io/), a system
+The core of the app is built on [Electron](https://www.electronjs.org/), a system
 that allows you to build desktop applications that run on
 [node.js](https://nodejs.org/) and are rendered via Chrome.
 
