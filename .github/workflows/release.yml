@@ -21,7 +21,7 @@ jobs:
       uses: actions/setup-node@v2
       with:
         node-version: ${{ matrix.node-version }}
-        cache: 'yarn'
+        cache: 'npm'
     - name: Patch node-gyp
       if: ${{ matrix.os == 'windows-latest' }}
       shell: powershell
@@ -29,10 +29,10 @@ jobs:
         npm install --global node-gyp@latest
         npm prefix -g | % {npm config set node_gyp "$_\node_modules\node-gyp\bin\node-gyp.js"}
     - name: Build
-      run: yarn
+      run: npm i
     - name: Release
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GITHUB_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-      run: yarn release
+      run: npm run release
