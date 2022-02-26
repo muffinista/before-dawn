@@ -349,7 +349,6 @@ export default {
       this.lastIndex = this.lastIndex + 1;
     },   
     updateOptionAttr(index, key, value) {
-      // debugger;
       // this.options[key] = value;
       var update = this.options[index];
       update[key] = value;

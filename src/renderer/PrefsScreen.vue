@@ -118,6 +118,7 @@ export default {
     },
     previewUrl: function() {
       const urlParams = new URLSearchParams(this.urlOpts(this.saver));
+      console.log(`${this.saverObj.url}?${urlParams.toString()}`);
       return `${this.saverObj.url}?${urlParams.toString()}`;
     },
     platformClass: function() {
@@ -246,7 +247,7 @@ export default {
       // However, new properties added to the object will not
       // trigger changes. In such cases, create a fresh object
       // with properties from both the original object and the mixin object:
-      this.prefs = Object.assign(this.prefs, tmp);
+      // this.prefs = Object.assign(this.prefs, tmp);
 
       // pick the first screensaver if nothing picked yet
       if ( this.prefs.saver === undefined || this.saverObj === undefined ) {
@@ -293,10 +294,7 @@ export default {
       update[saver] = Object.assign({}, tmp[saver]);    
       update[saver][name] = value;
     
-      console.log(update);
       this.options = Object.assign({}, this.options, update);
-      console.log(this.options);
-      console.log(this.options[saver]);
     },
     async saveData() {
       // @todo should this use Object.assign?
@@ -305,10 +303,9 @@ export default {
 
       // https://forum.vuejs.org/t/how-to-clone-property-value-as-simple-object/40032/2
       const clone = JSON.parse(JSON.stringify(this.prefs));
-      console.log(clone);
-      // clone.saver = JSON.parse(JSON.stringify(this.prefs.saver));
-      // clone.options = JSON.parse(JSON.stringify(this.options));
 
+      clone.saver = JSON.parse(JSON.stringify(this.prefs.saver));
+      clone.options = JSON.parse(JSON.stringify(this.options));
       return await window.api.updatePrefs(clone);
     },
     async saveDataClick() {
