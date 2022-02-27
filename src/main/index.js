@@ -642,15 +642,7 @@ var runSaver = function(screenshot, saver, s, url_opts, tickCount) {
         url_opts.screenshot = encodeURIComponent("file://" + screenshot);
       }
       
-      const urlParams = new URLSearchParams(url_opts);
-      if ( saver.settings ) {
-        const keys = Object.keys(saver.settings);
-        keys.forEach((k) => {
-          urlParams.append(k, saver.settings[k]);
-        }); 
-      }
-
-      let url = `${saver.url}?${urlParams.toString()}`;
+      const url = saver.urlWithParams(url_opts);
       
       log.info("Loading " + url, s.id);
       
