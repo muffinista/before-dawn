@@ -91,6 +91,25 @@ module.exports = class Saver {
     } // if valid
   }
 
+  urlWithParams(opts={}) {
+    if ( !this.url.match(/^file:/) ) {
+      return this.url;
+    }
+
+    const urlParams = new URLSearchParams(opts);
+
+    if ( this.settings ) {
+      const keys = Object.keys(this.settings);
+      keys.forEach((k) => {
+        urlParams.append(k, this.settings[k]);
+      }); 
+    }
+
+    return `${this.url}?${urlParams.toString()}`; 
+  }
+
+
+
   toHash() {
     return this.attrs;   
   }

@@ -642,8 +642,7 @@ var runSaver = function(screenshot, saver, s, url_opts, tickCount) {
         url_opts.screenshot = encodeURIComponent("file://" + screenshot);
       }
       
-      const urlParams = new URLSearchParams(url_opts);
-      let url = `${saver.url}?${urlParams.toString()}`;
+      const url = saver.urlWithParams(url_opts);
       
       log.info("Loading " + url, s.id);
       
@@ -798,7 +797,6 @@ var runScreenSaver = function() {
           then((saver) => {
             let displays = [];
             let blanks = [];
-            
             // make sure we have something to display
             if ( typeof(saver) === "undefined" ) {
               log.info("No screensaver defined! Just blank everything");
@@ -811,8 +809,8 @@ var runScreenSaver = function() {
               }
             }
 
-            log.info("displays", displays);
-            log.info("blanks", blanks);
+            // log.info("displays", displays);
+            // log.info("blanks", blanks);
 
             // turn off idle checks for a couple seconds while loading savers
             stateManager.ignoreReset(true);

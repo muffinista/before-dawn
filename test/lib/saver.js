@@ -111,7 +111,24 @@ describe("Saver", function() {
       assert.deepEqual(attrs, s.toHash());
     });
   });
-  
+
+  describe("urlWithParams", function() {
+    it("returns url if it is remote", function() {
+      var s = loadSaver({url: "http://muffinlabs.com"});
+      assert.deepEqual("http://muffinlabs.com", s.urlWithParams({foo: "bar"}));
+    });
+
+    it("returns url if not remote but no params", function() {
+      var s = loadSaver({path: "path", settings: {}});
+      assert.deepEqual("file://path/index.html?New+Option+I+Guess=50&New+Option=75", s.urlWithParams());
+    });
+
+    it("includes params", function() {
+      var s = loadSaver({path: "path", settings: {}});
+      assert.deepEqual("file://path/index.html?foo=bar&New+Option+I+Guess=50&New+Option=75", s.urlWithParams({foo: "bar"}));
+    });
+  });
+
   describe("write", function() {
     it("should write some output", function() {
       var dest = tmp.fileSync().name;
