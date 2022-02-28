@@ -641,8 +641,11 @@ var runSaver = function(screenshot, saver, s, url_opts, tickCount) {
         log.info(`pass screenshot ${screenshot}`);
         url_opts.screenshot = encodeURIComponent("file://" + screenshot);
       }
-      
-      const url = saver.urlWithParams(url_opts);
+   
+
+      // generate screensaver object, then get url to load
+      const saverObj = new Saver(saver);
+      const url = saverObj.urlWithParams(url_opts);
       
       log.info("Loading " + url, s.id);
       
