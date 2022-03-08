@@ -28,6 +28,7 @@ const {app,
   globalShortcut,
   ipcMain,
   Menu,
+  session,
   shell,
   systemPreferences,
   Tray} = require("electron");
@@ -567,6 +568,9 @@ var getWindowOpts = function(s) {
 
   if ( testMode === true ) {
     opts.fullscreen = false;
+    // opts.x = 100;
+    // opts.y = 100;
+    opts.show = true;
     opts.width = 400;
     opts.height = 400;
   }
@@ -641,7 +645,8 @@ var runSaver = function(screenshot, saver, s, url_opts, tickCount) {
         log.info(`pass screenshot ${screenshot}`);
         url_opts.screenshot = encodeURIComponent("file://" + screenshot);
       }
-   
+      // w.webContents.openDevTools();
+
 
       // generate screensaver object, then get url to load
       const saverObj = new Saver(saver);
@@ -805,7 +810,9 @@ var runScreenSaver = function() {
               log.info("No screensaver defined! Just blank everything");
               blanks = getDisplays().concat(getNonPrimaryDisplays());
             }
-            else {
+            else if ( testMode === true ) {
+              blanks = [];
+            } else {
               displays = getDisplays();
               if ( debugMode !== true && testMode !== true && prefs.runOnSingleDisplay === true ) {
                 blanks = getNonPrimaryDisplays();
@@ -868,7 +875,7 @@ var stopScreenSaver = function(fromBlank) {
   if ( fromBlank !== true ) {
     stateManager.reset();
   }
-  
+
   // trigger lock screen before actually closing anything
   else if ( shouldLockScreen() && screenLock.doLockScreen ) {
     screenLock.doLockScreen();
@@ -1496,6 +1503,11 @@ let setupIPC = function() {
  * handle initial startup of app
  */
 var bootApp = async function() {
+  session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+    // console.log(details);
+    callback({responseHeaders: Object.fromEntries(Object.entries(details.responseHeaders).filter(header => !/x-frame-options/i.test(header[0])))});
+  });
+
   electronScreen = electron.screen;
 
   askAboutApplicationsFolder();
