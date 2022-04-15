@@ -1814,14 +1814,19 @@ const windowMethods = {
  */
 if ( testMode !== true ) {
   app.on("second-instance", () => {
-    if ( handles.prefs.window === null && handles.prefs.window !== undefined ) {
-      openPrefsWindow();
-    }
-    else {
-      if ( handles.prefs.window.isMinimized() ) {
-        handles.prefs.window.restore();
+    try {
+      if ( handles.prefs.window === null && handles.prefs.window !== undefined ) {
+        openPrefsWindow();
       }
-      handles.prefs.window.focus();
+      else {
+        if ( handles.prefs.window.isMinimized() ) {
+          handles.prefs.window.restore();
+        }
+        handles.prefs.window.focus();
+      }
+    }
+    catch(e) {
+      console.log(e);
     }
   });
 }
