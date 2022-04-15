@@ -9,7 +9,7 @@
   "release_server": "https://before-dawn-updates.muffinlabs.com",
   "main": "output/main.js",
   "engines": {
-    "node": ">= 16.13.0"
+    "node": ">= 16.13.2"
   },
   "devport": 9081,
   "scripts": {
@@ -73,7 +73,7 @@
     "cross-env": "^7.0.0",
     "css-loader": "^6.2.0",
     "dotenv": "^16.0.0",
-    "electron": "^17.0.0",
+    "electron": "^18.0.0",
     "electron-builder": "^22.3.2",
     "eslint": "^7.12.1",
     "eslint-config-standard": "^16.0.0",
