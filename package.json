@@ -9,7 +9,7 @@
   "release_server": "https://before-dawn-updates.muffinlabs.com",
   "main": "output/main.js",
   "engines": {
-    "node": ">= 16.13.0"
+    "node": ">= 16.13.2"
   },
   "devport": 9081,
   "scripts": {
@@ -67,13 +67,12 @@
     "@sentry/webpack-plugin": "^1.9.3",
     "babel-loader": "^8.0.6",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
-    "caniuse-lite": "^1.0.30001154",
     "clean-webpack-plugin": "^4.0.0",
     "copy-webpack-plugin": "^9.0.0",
     "cross-env": "^7.0.0",
     "css-loader": "^6.2.0",
     "dotenv": "^16.0.0",
-    "electron": "^17.0.0",
+    "electron": "^18.0.0",
     "electron-builder": "^22.3.2",
     "eslint": "^7.12.1",
     "eslint-config-standard": "^16.0.0",
