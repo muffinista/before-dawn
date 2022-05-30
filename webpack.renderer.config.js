@@ -10,7 +10,6 @@ const webpack = require("webpack");
 
 const outputDir = path.join(__dirname, "output");
 
-const CopyWebpackPlugin = require("copy-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { VueLoaderPlugin } = require("vue-loader");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
@@ -109,17 +108,6 @@ let rendererConfig = {
     new HtmlWebpackPlugin(htmlPageOptions("editor", "Editor")),    
     new HtmlWebpackPlugin(htmlPageOptions("new", "Create Screensaver!")),
     new HtmlWebpackPlugin(htmlPageOptions("about", "About!")),
-    new CopyWebpackPlugin({
-      patterns: [
-        {
-          from: path.join(__dirname, "src", "main", "system-savers"),
-          to: path.join(outputDir, "system-savers"),
-          globOptions: {
-            ignore: [".*"]
-          }
-        }
-      ]
-    }),
     new MiniCssExtractPlugin({
       filename: "[name].css",
       chunkFilename: "[id].css"

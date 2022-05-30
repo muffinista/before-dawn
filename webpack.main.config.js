@@ -101,16 +101,16 @@ let mainConfig = {
         {
           from: path.join(__dirname, "src", "main", "assets"),
           to: path.join(outputDir, "assets"),
-          globOptions: {
-            ignore: [".*"]
-          }
+          // globOptions: {
+          //   ignore: [".*"]
+          // }
         },
         {
           from: path.join(__dirname, "src", "main", "system-savers"),
           to: path.join(outputDir, "system-savers"),
-          globOptions: {
-            ignore: [".*"]
-          }
+          // globOptions: {
+          //   ignore: [".*"]
+          // }
         }
       ]
     })
