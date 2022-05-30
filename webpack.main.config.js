@@ -92,28 +92,28 @@ let mainConfig = {
     new CleanWebpackPlugin({
       cleanOnceBeforeBuildPatterns: []
     }),
-    new CopyWebpackPlugin({
-      patterns: [
-        {
-          from: path.join(__dirname, "package.json"),
-          to: path.join(outputDir)
-        },
-        {
-          from: path.join(__dirname, "src", "main", "assets"),
-          to: path.join(outputDir, "assets"),
-          // globOptions: {
-          //   ignore: [".*"]
-          // }
-        },
-        {
-          from: path.join(__dirname, "src", "main", "system-savers"),
-          to: path.join(outputDir, "system-savers"),
-          // globOptions: {
-          //   ignore: [".*"]
-          // }
-        }
-      ]
-    })
+    // new CopyWebpackPlugin({
+    //   patterns: [
+    //     {
+    //       from: path.join(__dirname, "package.json"),
+    //       to: path.join(outputDir)
+    //     },
+    //     {
+    //       from: path.join(__dirname, "src", "main", "assets"),
+    //       to: path.join(outputDir, "assets"),
+    //       // globOptions: {
+    //       //   ignore: [".*"]
+    //       // }
+    //     },
+    //     {
+    //       from: path.join(__dirname, "src", "main", "system-savers"),
+    //       to: path.join(outputDir, "system-savers"),
+    //       // globOptions: {
+    //       //   ignore: [".*"]
+    //       // }
+    //     }
+    //   ]
+    // })
   ],
   resolve: {
     extensions: [".js", ".json", ".node"]
