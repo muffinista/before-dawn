@@ -7,7 +7,7 @@ const dependencies = packageJSON.dependencies;
 const optionalDependencies = packageJSON.optionalDependencies || {};
 const webpack = require("webpack");
 
-const outputDir = path.join(__dirname, "output");
+const outputDir = path.posix.join(__dirname, "output");
 
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 
@@ -39,7 +39,7 @@ let mainConfig = {
   devtool: "inline-source-map",
   mode: (process.env.NODE_ENV === "production" ? "production" : "development"),
   entry: {
-    main: path.join(__dirname, "src", "main", "index.js")
+    main: path.posix.join(__dirname, "src", "main", "index.js")
   },
   externals: deps,
   module: {
@@ -95,16 +95,16 @@ let mainConfig = {
     new CopyWebpackPlugin({
       patterns: [
         {
-          from: path.join(__dirname, "package.json"),
-          to: path.join(outputDir)
+          from: path.posix.join(__dirname, "package.json"),
+          to: path.posix.join(outputDir)
         },
         {
-          from: path.join(__dirname, "src", "main", "assets"),
-          to: path.join(outputDir, "assets"),
+          from: path.posix.join(__dirname, "src", "main", "assets"),
+          to: path.posix.join(outputDir, "assets"),
         },
         {
-          from: path.join(__dirname, "src", "main", "system-savers"),
-          to: path.join(outputDir, "system-savers"),
+          from: path.posix.join(__dirname, "src", "main", "system-savers"),
+          to: path.posix.join(outputDir, "system-savers"),
         }
       ]
     })
@@ -142,11 +142,10 @@ if (process.env.NODE_ENV === "production") {
       })
     );
   }
-
 } else {
   mainConfig.plugins.push(
     new webpack.DefinePlugin({
-      "__static": `"${path.join(__dirname, "..", "static").replace(/\\/g, "\\\\")}"`
+      "__static": `"${path.posix.join(__dirname, "..", "static").replace(/\\/g, "\\\\")}"`
     })
   );
 }
