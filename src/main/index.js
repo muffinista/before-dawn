@@ -269,7 +269,7 @@ var grabScreen = function(s) {
         // rewrite file paths to always have unix slashes instead
         // of windows slashes. sometimes windows slashes are fine, but
         // there's a few situations where they won't render properly.
-        message.url = message.url.split(path.sep).join(path.join.sep);
+        message.url = message.url.split(path.sep).join(path.posix.sep);
 
         resolve(message);
       });
@@ -693,6 +693,7 @@ var runScreenSaverOnDisplay = function(saver, s) {
   const reqs = saver.requirements;
   if ( reqs !== undefined && reqs.findIndex((x) => { return x === "screen"; }) > -1 ) {
     return grabScreen(s).then((message) => {
+      console.log(message);
       runSaver(message.url, saver, s, url_opts, tickCount);
     });
   }
