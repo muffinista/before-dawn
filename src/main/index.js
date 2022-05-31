@@ -269,7 +269,7 @@ var grabScreen = function(s) {
         // rewrite file paths to always have unix slashes instead
         // of windows slashes. sometimes windows slashes are fine, but
         // there's a few situations where they won't render properly.
-        message.url = message.url.split(path.sep).join(path.posix.sep);
+        message.url = message.url.split(path.sep).join(path.join.sep);
 
         resolve(message);
       });

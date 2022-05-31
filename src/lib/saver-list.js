@@ -122,6 +122,11 @@ module.exports = class SaverListManager {
     });
 
     folders.forEach((sourceFolder) => {
+      // glob doesn't work with windows style file paths, so convert
+      // to posix
+      if ( path.sep !== path.posix.sep ) {
+        sourceFolder = sourceFolder.split(path.sep).join(path.posix.sep);
+      }
       pattern = `${sourceFolder}/*/saver.json`;
       savers = glob.sync(pattern);
 
