@@ -3,7 +3,6 @@ const { contextBridge, ipcRenderer } = require("electron");
 const fs = require("fs");
 const path = require("path");
 
-console.log("hey!!!", global.SENTRY_DSN);
 if ( global.SENTRY_DSN !== undefined ) {
   console.log(`setting up sentry with ${global.SENTRY_DSN}`);
   const { init } = require("@sentry/electron");

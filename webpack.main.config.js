@@ -15,6 +15,7 @@ const COMMIT_SHA = process.env.SENTRY_RELEASE || process.env.GITHUB_SHA;
 
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const SentryWebpackPlugin = require("@sentry/webpack-plugin");
+const ESLintPlugin = require("eslint-webpack-plugin");
 
 //
 // get a list of node dependencies, and then
@@ -44,20 +45,6 @@ let mainConfig = {
   externals: deps,
   module: {
     rules: [
-      {
-        test: /\.(js)$/,
-        enforce: "pre",
-        exclude: [
-          /node_modules/,
-          /lib/
-        ],
-        use: {
-          loader: "eslint-loader",
-          options: {
-            formatter: require("eslint-friendly-formatter")
-          }
-        }
-      },
       {
         test: /\.js$/,
         exclude: /node_modules/,
@@ -89,6 +76,9 @@ let mainConfig = {
     sourceMapFilename: "[name].js.map"
   },
   plugins: [
+    new ESLintPlugin({
+      fix: false
+    }),
     new CleanWebpackPlugin({
       cleanOnceBeforeBuildPatterns: []
     }),
