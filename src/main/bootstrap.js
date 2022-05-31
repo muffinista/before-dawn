@@ -39,7 +39,8 @@ if ( packageJSON.release_server && ! global.IS_DEV ) {
 // the app that gets distributed, so i'm committing it to the repo for now
 if ( process.env.TEST_MODE === undefined && ! global.IS_DEV && global.SENTRY_DSN !== undefined ) {
   console.log(`setting up sentry with ${global.SENTRY_DSN}`);
-  const { init } = require("@sentry/electron/dist/main");
+  const { init } = require("@sentry/electron");
+  
   init({
     dsn: global.SENTRY_DSN,
     onFatalError: (error) => {
