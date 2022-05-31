@@ -46,7 +46,7 @@ exports.specifyConfig = (dest, name) => {
 exports.setupConfig = (workingDir, name="config", attrs={}) => {
   const dest = path.join(workingDir, "config.json");
   fs.copySync(
-    path.join.join(__dirname, "fixtures", name + ".json"),
+    path.join(__dirname, "fixtures", name + ".json"),
     dest
   );
 
