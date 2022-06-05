@@ -10,11 +10,11 @@ const webpack = require("webpack");
 
 const outputDir = path.join(__dirname, "output");
 
-const CopyWebpackPlugin = require("copy-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { VueLoaderPlugin } = require("vue-loader");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const SentryWebpackPlugin = require("@sentry/webpack-plugin");
+const ESLintPlugin = require("eslint-webpack-plugin");
 
 const COMMIT_SHA = process.env.SENTRY_RELEASE || process.env.GITHUB_SHA;
 
@@ -54,18 +54,6 @@ let rendererConfig = {
   module: {
     rules: [
       {
-        test: /\.(js|vue)$/,
-        enforce: "pre",
-        exclude: /node_modules/,
-        include: [],
-        use: {
-          loader: "eslint-loader",
-          options: {
-            formatter: require("eslint-friendly-formatter")
-          }
-        }
-      },
-      {
         test: /\.(sa|sc|c)ss$/,
         use: [
           MiniCssExtractPlugin.loader,
@@ -103,23 +91,16 @@ let rendererConfig = {
     __filename: false
   },
   plugins: [
+    new ESLintPlugin({
+      fix: false,
+      extensions: ["js", "vue"]
+    }),
     new VueLoaderPlugin(),
     new HtmlWebpackPlugin(htmlPageOptions("prefs", "Preferences")),
     new HtmlWebpackPlugin(htmlPageOptions("settings", "Settings")),
     new HtmlWebpackPlugin(htmlPageOptions("editor", "Editor")),    
     new HtmlWebpackPlugin(htmlPageOptions("new", "Create Screensaver!")),
     new HtmlWebpackPlugin(htmlPageOptions("about", "About!")),
-    new CopyWebpackPlugin({
-      patterns: [
-        {
-          from: path.join(__dirname, "src", "main", "system-savers"),
-          to: path.join(outputDir, "system-savers"),
-          globOptions: {
-            ignore: [".*"]
-          }
-        }
-      ]
-    }),
     new MiniCssExtractPlugin({
       filename: "[name].css",
       chunkFilename: "[id].css"

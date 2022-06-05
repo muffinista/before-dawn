@@ -693,6 +693,7 @@ var runScreenSaverOnDisplay = function(saver, s) {
   const reqs = saver.requirements;
   if ( reqs !== undefined && reqs.findIndex((x) => { return x === "screen"; }) > -1 ) {
     return grabScreen(s).then((message) => {
+      console.log(message);
       runSaver(message.url, saver, s, url_opts, tickCount);
     });
   }

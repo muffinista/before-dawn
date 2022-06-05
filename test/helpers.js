@@ -46,7 +46,7 @@ exports.specifyConfig = (dest, name) => {
 exports.setupConfig = (workingDir, name="config", attrs={}) => {
   const dest = path.join(workingDir, "config.json");
   fs.copySync(
-    path.join(__dirname, "fixtures/" + name + ".json"),
+    path.join(__dirname, "fixtures", name + ".json"),
     dest
   );
 
@@ -89,6 +89,7 @@ exports.addSaver = function(dest, name, source) {
   }
 
   fs.mkdirSync(testSaverDir);
+
   fs.copySync(src, saverJSONFile);
   fs.copySync(htmlSrc, saverHTMLFile);    
 
@@ -163,7 +164,7 @@ exports.application = async function(workingDir, quietMode=false) {
 
   let a = await electron.launch({
     path: appPath,
-    args: [path.join(__dirname, "..", "output/main.js")],
+    args: [path.join(__dirname, "..", "output", "main.js")],
     env: env
   });
 
