@@ -879,6 +879,7 @@ var stopScreenSaver = function(fromBlank) {
 
   // trigger lock screen before actually closing anything
   else if ( shouldLockScreen() && screenLock.doLockScreen ) {
+    log.info("lock the screen");
     screenLock.doLockScreen();
   }
 
