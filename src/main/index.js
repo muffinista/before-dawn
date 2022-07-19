@@ -48,8 +48,6 @@ const SaverListManager = require("../lib/saver-list.js");
 const Package = require("../lib/package.js");
 const Power = require("../main/power.js");
 
-const idler = require("desktop-idle");
-
 var releaseChecker;
 
 const menusAndTrays = require("./menus.js");
@@ -1583,10 +1581,15 @@ var bootApp = async function() {
     }); 
   });
 
+  electron.powerMonitor.on("on-ac", () => {
+    log.info("system on-ac event, reset state manager");
+    stateManager.reset();
+  }); 
+
   setupIPC();
 
   stateManager = new StateManager();
-  stateManager.idleFn = idler.getIdleTime;
+  stateManager.idleFn = electron.powerMonitor.getSystemIdleTime;
 
   updateStateManager();
 
@@ -1654,6 +1657,7 @@ var runScreenSaverIfPowered = async function() {
     }
     else {
       log.info("I would run, but we're on battery :(");
+      stateManager.unrunnable();
     }
   }
   else {

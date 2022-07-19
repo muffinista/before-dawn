@@ -9,7 +9,8 @@ const STATES = {
   STATE_LOADING: Symbol("loading"), // the liminal state when a screesaver is loaded but not 100%
   STATE_RUNNING: Symbol("running"), // running a screensaver
   STATE_BLANKED: Symbol("blanked"), // long idle, screen is blanked
-  STATE_PAUSED: Symbol("paused") // screensaver is paused
+  STATE_PAUSED: Symbol("paused"), // screensaver is paused,
+  STATE_UNRUNNABLE: Symbol("unrunnable")
 };
 
 // check for updates every 5 seconds when idle
@@ -98,6 +99,9 @@ class StateManager {
     this.ignoreReset(false);
   }
 
+  unrunnable() {
+    this.switchState(STATES.STATE_UNRUNNABLE);
+  }
 
   /**
    * pause the state machine
@@ -236,7 +240,7 @@ class StateManager {
           this.switchState(STATES.STATE_BLANKED);
         }
         else {
-          this.logger(`${i} >= ${nextTime} -- switch from ${this.currentStateString} to ????`);
+          // this.logger(`${i} >= ${nextTime} -- switch from ${this.currentStateString} to ????`);
         }
       }
 
