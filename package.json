@@ -48,7 +48,6 @@
     "hide-cursor": "muffinista/hide-cursor",
     "mkdirp": "^1.0.0",
     "node-fetch": "^2.6.7",
-    "node-gyp": "^9.0.0",
     "normalize.css": "^8.0.1",
     "proper-lockfile": "^4.1.1",
     "rimraf": "^3.0.0",
