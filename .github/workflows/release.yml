@@ -8,8 +8,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-11]
-        node-version: [16.x]
+        os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
     - name: Install ubuntu requirements
       if: ${{ matrix.os == 'ubuntu-latest' }}
@@ -20,7 +19,7 @@ jobs:
     - name: Use Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: ${{ matrix.node-version }}
+        node-version-file: '.nvmrc'
     - name: Patch node-gyp
       if: ${{ matrix.os == 'windows-latest' }}
       shell: powershell
