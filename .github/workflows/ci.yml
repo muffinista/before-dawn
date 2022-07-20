@@ -5,7 +5,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-2019, macos-11, macos-12]
+        os: [ubuntu-latest, windows-latest, macos-11, macos-12]
         node-version: [16.x]
     env:
       PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
@@ -20,6 +20,12 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
+    - name: Patch node-gyp
+      if: ${{ matrix.os == 'windows-latest' }}
+      shell: powershell
+      run: |
+        npm install --global node-gyp@latest
+        npm prefix -g | % {npm config set node_gyp "$_\node_modules\node-gyp\bin\node-gyp.js"}
     - run: npm ci
     - run: npm run test-lib
     - name: Run integration tests
