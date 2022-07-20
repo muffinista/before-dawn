@@ -15,13 +15,13 @@ jobs:
       run: |
         sudo apt-get -qq update
         sudo apt-get install -y libx11-dev libxss-dev icnsutils graphicsmagick libappindicator1 libxtst-dev
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Use Node.js
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
-    - name: Setup
-      run: npm i
+    # - name: Setup
+    #   run: npm i
     - run: npm run test-lib
     - name: Run integration tests
       if: ${{ matrix.os != 'ubuntu-latest' }}
