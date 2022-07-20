@@ -20,8 +20,7 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
-    # - name: Setup
-    #   run: npm i
+    - run: npm ci
     - run: npm run test-lib
     - name: Run integration tests
       if: ${{ matrix.os != 'ubuntu-latest' }}
