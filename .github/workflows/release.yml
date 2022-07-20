@@ -8,7 +8,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-2019, macos-11]
+        os: [ubuntu-latest, windows-latest, macos-11]
         node-version: [16.x]
     steps:
     - name: Install ubuntu requirements
@@ -16,13 +16,18 @@ jobs:
       run: |
         sudo apt-get -qq update
         sudo apt-get install -y libx11-dev libxss-dev icnsutils graphicsmagick libappindicator1 libxtst-dev
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Use Node.js
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
-    - name: Build
-      run: npm i
+    - name: Patch node-gyp
+      if: ${{ matrix.os == 'windows-latest' }}
+      shell: powershell
+      run: |
+        npm install --global node-gyp@latest
+        npm prefix -g | % {npm config set node_gyp "$_\node_modules\node-gyp\bin\node-gyp.js"}
+    - run: npm ci
     - name: Release
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
