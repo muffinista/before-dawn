@@ -23,9 +23,7 @@ jobs:
       if: ${{ matrix.os == 'windows-latest' }}
       shell: powershell
       run: |
-        Remove-Item 'C:\Users\runneradmin\.electron-gyp' -Recurse
-        npm install --global node-gyp@latest
-        npm prefix -g | % {npm config set node_gyp "$_\node_modules\node-gyp\bin\node-gyp.js"}
+        npm config set msvs_version 2017
     - uses: c-hive/gha-npm-cache@v1
     - run: npm ci
     - run: npm run test-lib
