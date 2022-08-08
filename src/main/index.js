@@ -152,6 +152,13 @@ const defaultWebPreferences = {
   webSecurity: !global.IS_DEV
 };
 
+const defaultPreloadPrefrences = {
+  ...defaultWebPreferences,
+  sandbox: false,
+  preload: path.join(__dirname, "assets", "preload.js")  
+}
+
+
 const singleLock = app.requestSingleInstanceLock();
 if (! singleLock ) {
   // eslint-disable-next-line no-console
@@ -208,6 +215,7 @@ var openGrabberWindow = function() {
       y: 2000,
       webPreferences: {
         ...defaultWebPreferences,
+        sandbox: false,
         preload: path.join(__dirname, "assets", "grabber.js")
       }
     });
@@ -342,10 +350,7 @@ var openPrefsWindow = function() {
         maxWidth: 910,
         minHeight: 600,
         resizable: true,
-        webPreferences: {
-          ...defaultWebPreferences,
-          preload: path.join(__dirname, "assets", "preload.js")
-        },
+        webPreferences: defaultPreloadPrefrences,
         icon: path.join(__dirname, "assets", "iconTemplate.png")
       });
 
@@ -390,10 +395,7 @@ var openSettingsWindow = function() {
     parent: handles.prefs.window,
     modal: true,
     icon: path.join(__dirname, "assets", "iconTemplate.png"),
-    webPreferences: {
-      ...defaultWebPreferences,
-      preload: path.join(__dirname, "assets", "preload.js"),
-    }
+    webPreferences: defaultPreloadPrefrences,
   });
 
   // hide the file menu
@@ -431,10 +433,7 @@ var addNewSaver = function() {
       width: 450,
       height: 700,
       resizable:true,
-      webPreferences: {
-        ...defaultWebPreferences,
-        preload: path.join(__dirname, "assets", "preload.js"),
-      },
+      webPreferences: defaultPreloadPrefrences,
       icon: path.join(__dirname, "assets", "iconTemplate.png")
     });
 
@@ -463,10 +462,7 @@ var openAboutWindow = function() {
     height:600,
     resizable:false,
     icon: path.join(__dirname, "assets", "iconTemplate.png"),
-    webPreferences: {
-      ...defaultWebPreferences,
-      preload: path.join(__dirname, "assets", "preload.js"),
-    }
+    webPreferences: defaultPreloadPrefrences,
   });
 
   if ( !global.IS_DEV && handles.about.window.removeMenu !== undefined ) {
@@ -506,10 +502,7 @@ var openEditor = (args) => {
   if ( handles.editor.window == null ) {
     handles.editor.window = new BrowserWindow({
       show: false,
-      webPreferences: {
-        ...defaultWebPreferences,
-        preload: path.join(__dirname, "assets", "preload.js"),
-      },
+      webPreferences: defaultPreloadPrefrences,
     });  
   }
 
@@ -553,9 +546,7 @@ var getWindowOpts = function(s) {
     show: false,
     roundedCorners: false,
     titleBarStyle: "customButtonsOnHover",
-    webPreferences: {
-      ...defaultWebPreferences
-    }
+    webPreferences: defaultWebPreferences
   };
 
   // osx will display window immediately if fullscreen is true
