@@ -155,9 +155,8 @@ const defaultWebPreferences = {
 const defaultPreloadPrefrences = {
   ...defaultWebPreferences,
   sandbox: false,
-  preload: path.join(__dirname, "assets", "preload.js")  
-}
-
+  preload: path.join(__dirname, "assets", "preload.js")
+};
 
 const singleLock = app.requestSingleInstanceLock();
 if (! singleLock ) {
