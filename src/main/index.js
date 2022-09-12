@@ -1576,8 +1576,9 @@ var bootApp = async function() {
 
   ["suspend", "resume", "lock-screen", "unlock-screen"].forEach((type) => {
     electron.powerMonitor.on(type, () => {
-      log.info(`system ${type} event, stop screensavers`);
+      log.info(`system ${type} event, stop screensavers, reset stateManager`);
       windows.closeRunningScreensavers();
+      stateManager.reset();
     }); 
   });
 
