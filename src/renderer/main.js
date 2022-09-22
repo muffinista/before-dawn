@@ -1,12 +1,10 @@
-import "@/../css/styles.scss";
+import "~/css/styles.scss";
 
 import PrefsScreen from "./PrefsScreen.svelte";
 import SettingsScreen from "./SettingsScreen.svelte";
 import AboutScreen from "./AboutScreen.svelte";
 import NewScreensaverScreen from "./NewScreensaverScreen.svelte";
 import EditorScreen from "./EditorScreen.svelte";
-
-import "~/css/styles.scss";
 
 const actions = {
   "prefs": PrefsScreen,
