@@ -501,7 +501,8 @@ var openEditor = (args) => {
   var editorUrl = getUrl("editor.html");
   
   var target = editorUrl + "?" +
-               "src=" + encodeURIComponent(key);
+               "src=" + encodeURIComponent(key) +
+               "&screenshot=" + encodeURIComponent(screenshot);
 
   if ( handles.editor.window == null ) {
     handles.editor.window = new BrowserWindow({
@@ -515,7 +516,9 @@ var openEditor = (args) => {
 
   handles.editor.window.screenshot = screenshot;
 
+
   handles.editor.window.once("ready-to-show", () => {
+    handles.editor.window.send("args", args);
     handles.editor.window.show();
 
     if (process.env.NODE_ENV === "test") {
@@ -1367,10 +1370,10 @@ let setupIPC = function() {
   ipcMain.on("open-folder", (_event, src) => {
     var cmd;
     var args = [];
-    
+
     // figure out the path to the screensaver folder. use
     // decodeURIComponent to convert %20 to spaces
-    var filePath = path.dirname(decodeURIComponent(url.parse(src).path));
+    const filePath = path.dirname(decodeURIComponent(url.parse(src).path)).split(path.posix.sep).join(path.sep);
 
     switch(process.platform) {
     case "darwin":
@@ -1384,7 +1387,7 @@ let setupIPC = function() {
       else {
         cmd = "explorer.exe";
       }
-      args = [`/select,${filePath}`];
+      args = [`${filePath}`];
       break;
     default:
       // # Strip the filename from the path to make sure we pass a directory

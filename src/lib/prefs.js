@@ -64,6 +64,10 @@ class SaverPrefs {
     if ( this.firstLoad === true ) {
       this.store.set("firstLoad", false);
     }
+
+    if (this.saver) {
+      this.saver = this.saver.split(path.sep).join(path.posix.sep);
+    }
   }
 
   reset() {

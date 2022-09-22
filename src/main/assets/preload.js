@@ -26,6 +26,7 @@ const api = {
   removeListener: (key, fn) => ipcRenderer.removeListener(key, fn),
   getPrefs: async() => ipcRenderer.invoke("get-prefs"),
   getDefaults: async() => ipcRenderer.invoke("get-defaults"),
+  // todo dump this
   updatePreview: (opts) => ipcRenderer.send("update-preview", opts),
   openWindow: (name, opts) => ipcRenderer.send("open-window", name, opts),
   closeWindow: (name) => ipcRenderer.send("close-window", name),

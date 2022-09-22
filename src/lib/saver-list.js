@@ -229,17 +229,18 @@ module.exports = class SaverListManager {
   }
 
   loadFromData(contents, stub, settings) {
-    var src = this.prefs.localSource;
+    var src = this.prefs.localSource.split(path.sep).join(path.posix.sep);
 
     if ( typeof(stub) !== "undefined" ) {
       contents.path = stub;
-      contents.key = path.join(stub, "saver.json");
+      contents.key = path.join(stub, "saver.json").split(path.sep).join(path.posix.sep);
     }
 
     contents.editable = false;
     if ( typeof(src) !== "undefined" && src !== "" ) {
       contents.editable = (contents.key.indexOf(src) === 0);
     }
+    console.log(`${src} -- ${contents.key} -- ${contents.editable}`);
 
     if ( typeof(contents.settings) === "undefined" ) {
       if ( settings === undefined ) {
