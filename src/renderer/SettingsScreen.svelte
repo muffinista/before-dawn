@@ -1,12 +1,12 @@
 <div id="settings">
   {#if prefs}
-  <div class="container-fluid">
+  <div>
     <div id="prefs-form">
       <h1>Settings</h1>
       <form class="grid">
         <div class="options">
           <div class="form-check">
-            <label class="form-check-label">
+            <label>
               <input
                 id="lock"
                 :checked="lock"
@@ -22,7 +22,7 @@
           </div>
   
           <div class="form-check">
-            <label class="form-check-label">
+            <label>
               <input
                 id="disableOnBattery"
                 :checked="disableOnBattery"
@@ -41,7 +41,7 @@
           </div>
           <!-- ' -->
           <div class="form-check">
-            <label class="form-check-label">
+            <label>
               <input
                 :checked="auto_start"
                 type="checkbox"
@@ -56,7 +56,7 @@
           </div>
   
           <div class="form-check">
-            <label class="form-check-label">
+            <label>
               <input
                 id="primary-display"
                 :checked="runOnSingleDisplay"
@@ -74,10 +74,10 @@
       </form>
     </div> 
   </div>
-  <div class="container-fluid">
+  <div>
     {#if hasScreensaverUpdate === true}
       <button
-        class="btn btn-large btn-primary reset-to-defaults"
+        class="btn reset-to-defaults"
         on:click="{downloadScreensaverUpdates}"
       >
         Download screensaver updates
@@ -87,7 +87,7 @@
       </button>
     {/if}
   </div>
-  <div class="container-fluid">
+  <div>
     <div id="advanced-prefs-form">
       <h1>Advanced Options</h1>
       <p class="form-text text-muted">
@@ -141,10 +141,10 @@
   </div>
   {/if}
 
-  <footer class="footer d-flex justify-content-between">
+  <footer class="footer ">
     <div>
       <button
-        class="btn btn-large btn-primary reset-to-defaults"
+        class="btn reset-to-defaults"
         on:click="{resetToDefaults}"
       >
       Reset to Defaults
@@ -152,14 +152,14 @@
     </div>
     <div>
       <button
-        class="btn btn-large btn-primary close-window"
+        class="btn close-window"
         disabled="{disabled}"
         on:click="{closeWindow}"
       >
       Cancel
       </button>
       <button
-        class="btn btn-large btn-primary save"
+        class="btn save"
         disabled="{disabled}"
         on:click="{saveDataClick}"
       >

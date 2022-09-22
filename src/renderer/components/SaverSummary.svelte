@@ -8,14 +8,14 @@
     {#if saver.editable}
       <div class="actions">
         <button
-          class="btn btn-outline-secondary btn-sm edit" 
+          class="btn edit" 
           href="#"
           on:click="{onEditClick}"
         >
         edit
         </button>
         <button
-          class="btn btn-outline-secondary btn-sm" 
+          class="btn" 
           href="#"
           on:click="{onDeleteClick}"
         >

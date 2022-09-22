@@ -1,37 +1,34 @@
 <form>
-  <div class="form-group row">
-    <label class="col-sm-2 col-form-label" for="name">Name</label>
-    <div class="col-sm-10">
+  <div class="form-group">
+    <label for="name">Name</label>
+    <div>
       <input
         bind:value="{option.name}"
         type="text"
         name="name"
-        class="form-control"
         placeholder="Pick a name for this option"
         required
       >
     </div>
   </div>
-  <div class="form-group row">
-    <label class="col-sm-2 col-form-label" for="description">Description</label>
-    <div class="col-sm-10">
+  <div class="form-group">
+    <label for="description">Description</label>
+    <div>
       <input
         bind:value="{option.description}"
         type="text"
         name="description"
         placeholder="Describe what this option does"
-        class="form-control"
         required
       >
     </div>
   </div>       
-  <div class="form-group row">
-    <label class="col-sm-2 col-form-label" for="inputType">Type</label>
-    <div class="col-sm-10">
+  <div class="form-group">
+    <label for="inputType">Type</label>
+    <div>
       <select
         name="type"
         bind:value="{option.type}"
-        class="form-control"
       >
       <option value="slider">
           slider
@@ -49,57 +46,52 @@
   {#if option.type === "slider"}
     <div class="space-evenly">
       <div class="form-group">
-        <label class="col-sm-2 col-form-label" for="min">Min</label>
+        <label for="min">Min</label>
         <input
           name="min"
           bind:value="{option.min}"
           type="number"
-          class="form-control"
         >
       </div>
         
       <div class="form-group">
-        <label class="col-sm-2 col-form-label" for="max">Max</label>
+        <label for="max">Max</label>
         <input
           name="max"
           bind:value="{option.max}"
           type="number"
-          class="form-control"
         >
       </div>
       
       <div class="form-group">
-        <label class="col-sm-2 col-form-label" for="default">Default</label>
+        <label for="default">Default</label>
         <input
           name="default"
           bind:value="{option.default}"
           type="text"
           placeholder="Default value of this option"
-          class="form-control"
         >
       </div>
     </div>
   {:else if option.type === "text"}
-    <div class="form-group row">
-      <label class="col-sm-2 col-form-label" for="default">Default</label>
-      <div class="col-sm-10">
+    <div class="form-group">
+      <label for="default">Default</label>
+      <div>
         <input
           name="default"
           bind:value="{option.default}"
           type="text"
           placeholder="Default value of this option"
-          class="form-control"
         >
       </div>
     </div>
     {:else if option.type === "boolean"}
-    <div class="form-group row">
-      <label class="col-sm-2 col-form-label" for="default">Default</label>
-      <div class="col-sm-2">
+    <div class="form-group">
+      <label for="default">Default</label>
+      <div>
         <select
           name="default"
           bind:value="{option.default}"
-          class="form-control"
         >
         <option
             disabled

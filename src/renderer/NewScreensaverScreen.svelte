@@ -1,6 +1,6 @@
 <div id="new">
   <div class="content">
-    <div class="container-fluid">
+    <div>
       <h1>New Screensaver</h1>
       {#if canAdd}
       <p>
@@ -21,7 +21,7 @@
               bind:value="{saver.name}"
               type="text"
               name="name"
-              class="form-control"
+      
               required
             >
             <div class="hint">
@@ -35,7 +35,7 @@
               bind:value="{saver.description}"
               type="text"
               name="description"
-              class="form-control"
+      
               required
             >
             <div class="hint">
@@ -48,7 +48,7 @@
               bind:value="{saver.aboutUrl}"
               type="text"
               name="aboutUrl"
-              class="form-control"
+      
             >
             <div class="hint">
               If you have a URL with more details about your work, put it here!
@@ -60,7 +60,7 @@
               bind:value="{saver.author}"
               type="text"
               name="author"
-              class="form-control"
+      
             >
             <div class="hint">
               The author of this screensaver.
@@ -93,16 +93,16 @@
       {/if}
     </div>
   </div>
-  <footer class="footer d-flex justify-content-between">
+  <footer class="footer">
     <div>
       <button
-        class="btn btn-large btn-secondary cancel"
+        class="btn cancel"
         on:click="{closeWindow}"
       >
         Cancel
       </button>
       <button
-        class="btn btn-large btn-primary save"
+        class="btn save"
         disabled="{disabled || !canAdd}"
         on:click="{saveData}"
       >

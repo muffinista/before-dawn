@@ -1,5 +1,5 @@
 <div id="about">
-  <div class="container-fluid">
+  <div>
     <h1>Before Dawn</h1>
     <h2>// screensaver fun //</h2>
     <h3>{globals.APP_VERSION}</h3>

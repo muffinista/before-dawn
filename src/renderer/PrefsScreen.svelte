@@ -19,7 +19,7 @@
   <div class="basic-prefs space-at-top">
     <h1>Settings</h1>
     <form class="grid">
-      <div class="times">
+      <div>
         <div class="form-group">
           <label for="delay">Activate after:</label>
           <select
@@ -96,7 +96,7 @@
   <footer class="footer">
     <div>
       <button
-        class="align-middle btn btn-large btn-primary create"
+        class="align-middle btn create"
         on:click="{createNewScreensaver}"
       >
         Create Screensaver
@@ -105,13 +105,13 @@
 
     <div>
       <button
-        class="btn btn-large btn-primary settings"
+        class="btn settings"
         on:click="{openSettings}"
       >
         Advanced Settings
       </button>
       <button
-        class="btn btn-large btn-primary save"
+        class="btn save"
         disabled="{disabled}"
         on:click="{saveDataClick}"
       >

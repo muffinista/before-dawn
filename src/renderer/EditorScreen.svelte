@@ -121,7 +121,7 @@ c0.5522461,0,1-0.4477539,1-1C20,10.4476929,19.5522461,10,19,10z"
 
   {#if saver !== undefined}
   <div id="preview">
-    <div class="container-fluid space-at-bottom">     
+    <div class="space-at-bottom">     
       <h3>Preview</h3>
       <div class="saver-detail">
         <iframe
@@ -144,7 +144,7 @@ c0.5522461,0,1-0.4477539,1-1C20,10.4476929,19.5522461,10,19,10z"
     </div>
   </div>
   <div id="description">
-    <div class="container-fluid">
+    <div>
       <h2>Description</h2>
       <small>
         You can enter the basics about this screensaver here.
@@ -157,7 +157,7 @@ c0.5522461,0,1-0.4477539,1-1C20,10.4476929,19.5522461,10,19,10z"
               bind:value="{saver.name}"
               type="text"
               name="name"
-              class="form-control"
+      
               required
             >
             <div class="hint">
@@ -171,7 +171,7 @@ c0.5522461,0,1-0.4477539,1-1C20,10.4476929,19.5522461,10,19,10z"
               bind:value="{saver.description}"
               type="text"
               name="description"
-              class="form-control"
+      
               required
             >
             <div class="hint">
@@ -184,7 +184,7 @@ c0.5522461,0,1-0.4477539,1-1C20,10.4476929,19.5522461,10,19,10z"
               bind:value="{saver.aboutUrl}"
               type="text"
               name="aboutUrl"
-              class="form-control"
+      
             >
             <div class="hint">
               If you have a URL with more details about your work, put it here!
@@ -196,7 +196,7 @@ c0.5522461,0,1-0.4477539,1-1C20,10.4476929,19.5522461,10,19,10z"
               bind:value="{saver.author}"
               type="text"
               name="author"
-              class="form-control"
+      
             >
             <div class="hint">
               The author of this screensaver.
@@ -221,7 +221,7 @@ c0.5522461,0,1-0.4477539,1-1C20,10.4476929,19.5522461,10,19,10z"
     </div>
   </div>
   <div id="options">
-    <div class="container-fluid">
+    <div>
       <h2>Configurable Options</h2>
       <small>
         You can offer users configurable options to control
@@ -235,7 +235,7 @@ c0.5522461,0,1-0.4477539,1-1C20,10.4476929,19.5522461,10,19,10z"
       <div class="padded-top padded-bottom">
         <button
           type="button"
-          class="btn btn-primary add-option"
+          class="btn add-option"
           on:click="{addSaverOption}"
         >
           Add Option
@@ -248,20 +248,20 @@ c0.5522461,0,1-0.4477539,1-1C20,10.4476929,19.5522461,10,19,10z"
   <footer class="footer">
     <div>
       <button
-        class="btn btn-large btn-secondary cancel"
+        class="btn cancel"
         on:click="{closeWindow}"
       >
         Cancel
       </button>
       <button
-        class="btn btn-large btn-primary save"
+        class="btn save"
         disabled="{disabled}"
         on:click="{saveData}"
       >
         Save
       </button>
       <button
-        class="btn btn-large btn-primary save"
+        class="btn save"
         disabled="{disabled}"
         on:click="{saveDataAndClose}"
       >

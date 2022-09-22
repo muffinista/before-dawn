@@ -3,7 +3,7 @@
   <ul class="saver-list list-group-flush">
     {#each savers as saver}
       <li class="{saver.key == current ? CHECKED_CLASS : UNCHECKED_CLASS}">
-        <div class="d-flex w-100 justify-content-between">
+        <div>
           <label>
             <div class="body">
               <input
