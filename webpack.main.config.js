@@ -132,12 +132,6 @@ if (process.env.NODE_ENV === "production") {
       })
     );
   }
-} else {
-  mainConfig.plugins.push(
-    new webpack.DefinePlugin({
-      "__static": `"${path.join(__dirname, "..", "static").replace(/\\/g, "\\\\")}"`
-    })
-  );
 }
 
 module.exports = mainConfig;

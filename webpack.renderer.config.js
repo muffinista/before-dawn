@@ -152,13 +152,6 @@ if (process.env.NODE_ENV === "production") {
       })
     );
   }
-} else {
-  rendererConfig.plugins.push(
-    new webpack.DefinePlugin({
-      "__VUE_OPTIONS_API__": true,
-      "__VUE_PROD_DEVTOOLS__": false
-    })
-  );
 }
 
 module.exports = rendererConfig;

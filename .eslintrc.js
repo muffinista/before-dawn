@@ -18,7 +18,6 @@ module.exports = {
     "eslint:recommended"
   ],
   globals: {
-    __static: true
   },
   plugins: [
     "svelte3"
