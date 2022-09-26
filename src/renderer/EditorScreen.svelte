@@ -1,9 +1,227 @@
+<!-- #editor -->
+<script>
+  import Notarize from "@/components/Notarize";
+  import SaverOptions from "@/components/SaverOptions.svelte";
+  import SaverOptionInput from "@/components/SaverOptionInput.svelte";
+
+  import { onMount } from "svelte";
+
+  let size = undefined;
+  let saver = undefined;
+  let options = [];
+  let optionValues = {};
+  let disabled = false;
+  let lastIndex = 0;
+  let previewUrl = undefined;
+
+  $: validOptions = saver?.options?.filter((o) => o.name !== "");
+  $: params = new URLSearchParams(document.location.search);
+  $: src = params.get("src");
+  $: screenshot = params.get("screenshot");
+
+  onMount(async () => {
+    size = await window.api.getDisplayBounds();
+    saver = await window.api.loadSaver(src);
+
+    if (saver.settings === undefined) {
+      saver.settings = {};
+    }
+
+    options = saver.options;
+    lastIndex = saver.options.length;
+
+    window.api.watchFolder(src, updatePreview);
+    addEventListener('resize', updatePreview);
+
+    // wait a tick so that all our required elements actually exist
+    setTimeout(() => {
+      updatePreview();
+    }, 0);
+  });
+
+  function closeWindow() {
+    window.api.closeWindow("editor");
+  }
+  function addSaverOption() {
+    saver.options.push({
+      index: lastIndex + 1,
+      name: "New Option", //New Option,
+      type: "slider",
+      description: "", //Description,
+      min: "1",
+      max: "100",
+      default: "75",
+    });
+
+    lastIndex += 1;
+    saver = saver;
+  }
+
+  function optionDefaults() {
+    var result = {};
+    for (var i = 0; i < options.length; i++) {
+      var opt = options[i];
+      result[opt.name] = opt.default;
+    }
+
+    return result;
+  }
+
+  function urlOpts(s) {
+    var base = {
+      width: size.width,
+      height: size.height,
+      preview: 1,
+      platform: window.api.platform(),
+      screenshot: screenshot,
+    };
+
+    if (typeof s === "undefined") {
+      s = saver;
+    }
+
+    const mergedOpts = Object.assign(
+      base,
+      optionValues,
+      optionDefaults(),
+      saver.settings
+    );
+
+    return mergedOpts;
+  }
+
+  function resizePreview() {
+    const wrapper = document.querySelector('#preview');
+
+    const docStyle = getComputedStyle(document.documentElement);
+    const sidebarWidth = Number(docStyle.getPropertyValue('--sidebar-width').replace('px', ''));
+
+    const maxWidth = window.innerWidth - sidebarWidth - 50;
+    const maxHeight = wrapper.clientHeight;
+
+    document.documentElement.style.setProperty(
+      "--preview-width",
+      `${size.width}px`
+    );
+    document.documentElement.style.setProperty(
+      "--preview-height",
+      `${size.height}px`
+    );
+    const scale = maxWidth / size.width;
+
+    document.documentElement.style.setProperty(
+      "--preview-wrapper-width",
+      `${size.width * scale}px`
+    );
+    document.documentElement.style.setProperty(
+      "--preview-wrapper-height",
+      `${size.height * scale}px`
+    );
+
+    document.documentElement.style.setProperty("--preview-scale", `${scale}`);
+  }
+
+  function updatePreview() {
+    resizePreview();
+
+    const urlParams = new URLSearchParams(urlOpts(saver));
+    previewUrl = `${saver.url}?${urlParams.toString()}`;
+
+    const el = document.getElementById("saver-preview");
+    if (el) {
+      // force a reload (just binding it doesnt work)
+      el.src = previewUrl;
+    }
+  }
+
+  function openFolder() {
+    window.api.openFolder(src);
+  }
+
+  function openConsole() {
+    window.api.toggleDevTools();
+  }
+
+  function onOptionsChange() {
+    updatePreview();
+  }
+
+  async function saveData() {
+    if (document.querySelectorAll(":invalid").length > 0) {
+      var form = document.querySelector("form");
+      form.classList.add("submit-attempt");
+
+      return;
+    }
+
+    disabled = true;
+    // https://forum.vuejs.org/t/how-to-clone-property-value-as-simple-object/40032/2
+    const clone = JSON.parse(JSON.stringify(saver));
+    await window.api.saveScreensaver(clone, src);
+    window.api.saversUpdated(src);
+
+    new Notarize({ timeout: 1000 }).show("Changes saved!");
+
+    disabled = false;
+  }
+</script>
+
+<style>
+  :root {
+    --sidebar-width: 500px;
+  }
+
+  #editor {
+    overflow-x: hidden;
+
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 40px auto 40px;
+    grid-template-areas: 
+    'header'
+    'main'
+    'footer';
+  }
+
+  main {
+    display: grid;
+    grid-template-columns: 1fr var(--sidebar-width);
+  }
+
+  .button-group {
+    grid-area: header;
+  }
+
+  main {
+    grid-area: main;
+    height: 100vh;
+  }
+
+  footer {
+    grid-area: footer;
+  }
+
+  summary {
+    font-size: 1.5em;
+    font-weight: bold;
+  }
+
+  .saver-detail {
+    width: var(--preview-wrapper-width);
+    height: var(--preview-wrapper-height);
+  }
+
+  footer.footer {
+    justify-content: flex-end;
+  }
+</style>
+
 <div id="editor">
   <div class="button-group">
     <button
       variant="default"
       title="Open screensaver folder"
-      on:click="{openFolder}"
+      on:click={openFolder}
     >
       <span class="icon">
         <svg
@@ -24,11 +242,7 @@
         </svg>
       </span>
     </button>
-    <button
-      variant="default"
-      title="Save changes"
-      on:click="{saveData}"
-    >
+    <button variant="default" title="Save changes" on:click={saveData}>
       <span class="icon">
         <svg
           id="Save"
@@ -50,11 +264,7 @@ C6.45,9,6,8.549,6,8V3h8V8z M13,4h-2v4h2V4z"
         </svg>
       </span>
     </button>
-    <button
-      variant="default"
-      title="Reload preview"
-      on:click="{updatePreview}"
-    >
+    <button variant="default" title="Reload preview" on:click={updatePreview}>
       <span class="icon">
         <svg
           id="Cycle"
@@ -65,7 +275,6 @@ C6.45,9,6,8.549,6,8V3h8V8z M13,4h-2v4h2V4z"
           y="0px"
           width="14"
           height="14"
-
           viewBox="0 0 20 20"
           enable-background="new 0 0 20 20"
           xml:space="preserve"
@@ -82,7 +291,7 @@ c1.755-0.213,3.452-0.996,4.798-2.35c3.148-3.172,3.186-8.291,0.122-11.531l1.741-1
     <button
       variant="default"
       title="View Developer Console"
-      on:click="{openConsole}"
+      on:click={openConsole}
     >
       <span class="icon">
         <svg
@@ -114,297 +323,120 @@ c-0.0395508-0.0396729-0.0900879-0.0575562-0.1342773-0.0891724C15.84375,13.520813
 c0.5522461,0,1-0.4477539,1-1C20,10.4476929,19.5522461,10,19,10z"
           />
         </svg>
-
       </span>
     </button>
   </div>
 
-  {#if saver !== undefined}
-  <div id="preview">
-    <div class="space-at-bottom">     
-      <h3>Preview</h3>
-      <div class="saver-detail">
-        <iframe
-          id="saver-preview"
-          title="preview"
-          src="{previewUrl}"
-          scrolling="no"
-          class="saver-preview"
-        />
-      </div>
+  <main>
+    {#if saver !== undefined}
+      <div id="preview">
+        <div class="saver-detail">
+          <iframe
+            id="saver-preview"
+            title="preview"
+            src={previewUrl}
+            scrolling="no"
+            class="saver-preview"
+          />
+        </div>
 
-      {#if validOptions.length > 0}
-        <h3>Options</h3>
-        <small>
-          Tweak the values here and they will be sent along
-          to your preview.
-        </small>
-        <SaverOptions bind:saver="{saver}" on:optionsChanged="{onOptionsChange}" />
-      {/if}  
-    </div>
-  </div>
-  <div id="description">
-    <div>
-      <h2>Description</h2>
-      <small>
-        You can enter the basics about this screensaver here.
-      </small>
-      <div id="saver-form">
-        <form>
-          <div class="form-group">
-            <label for="name">Name:</label>
-            <input
-              bind:value="{saver.name}"
-              type="text"
-              name="name"
-      
-              required
-            >
-            <div class="hint">
-              The name of your screensaver.
-            </div>
-          </div>
-          
-          <div class="form-group">
-            <label for="name">Description:</label>
-            <input
-              bind:value="{saver.description}"
-              type="text"
-              name="description"
-      
-              required
-            >
-            <div class="hint">
-              A brief description of your screensaver.
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="aboutUrl">About URL:</label>
-            <input
-              bind:value="{saver.aboutUrl}"
-              type="text"
-              name="aboutUrl"
-      
-            >
-            <div class="hint">
-              If you have a URL with more details about your work, put it here!
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="author">Author:</label>
-            <input
-              bind:value="{saver.author}"
-              type="text"
-              name="author"
-      
-            >
-            <div class="hint">
-              The author of this screensaver.
-            </div>
-          </div>
-    
-          <div class="form-group">
-            <h3>Requirements:</h3>
-            <input
-              type="checkbox"
-              name="requirements"
-              bind:group="{saver.requirements}"
-              value="screen"
-            >
-            <label for="screen">Screen capture</label>
-            <div class="hint">
-              This screensaver will be sent an image of the desktop
-            </div>
-          </div>
-        </form>
+        {#if validOptions.length > 0}
+          <h3>Options</h3>
+          <small>
+            Tweak the values here and they will be sent along to your preview.
+          </small>
+          <SaverOptions bind:saver on:optionsChanged={onOptionsChange} />
+        {/if}
       </div>
-    </div>
-  </div>
-  <div id="options">
-    <div>
-      <h2>Configurable Options</h2>
-      <small>
-        You can offer users configurable options to control
-        your screensaver. Manage those here.
-      </small>
+      <div class="description-and-options">
+        <details id="description">
+          <summary>Screensaver Details</summary>
+          <div>
+            <small> You can enter the basics about this screensaver here.</small>
+            <div id="saver-form">
+              <form>
+                <div class="form-group">
+                  <label for="name">Name:</label>
+                  <input bind:value={saver.name} type="text" name="name" required />
+                  <div class="hint">The name of your screensaver.</div>
+                </div>
 
-      {#each saver.options as _option, index}
-        <SaverOptionInput bind:saver="{saver}" bind:option="{saver.options[index]}" on:optionsChanged="{updatePreview}" />
-      {/each}
+                <div class="form-group">
+                  <label for="name">Description:</label>
+                  <input
+                    bind:value={saver.description}
+                    type="text"
+                    name="description"
+                    required
+                  />
+                  <div class="hint">A brief description of your screensaver.</div>
+                </div>
+                <div class="form-group">
+                  <label for="aboutUrl">About URL:</label>
+                  <input bind:value={saver.aboutUrl} type="text" name="aboutUrl" />
+                  <div class="hint">
+                    If you have a URL with more details about your work, put it
+                    here!
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="author">Author:</label>
+                  <input bind:value={saver.author} type="text" name="author" />
+                  <div class="hint">The author of this screensaver.</div>
+                </div>
 
-      <div class="padded-top padded-bottom">
-        <button
-          type="button"
-          class="btn add-option"
-          on:click="{addSaverOption}"
-        >
-          Add Option
-        </button>
+                <div class="form-group">
+                  <h3>Requirements:</h3>
+                  <input
+                    type="checkbox"
+                    name="requirements"
+                    bind:group={saver.requirements}
+                    value="screen"
+                  />
+                  <label for="screen">Screen capture</label>
+                  <div class="hint">
+                    This screensaver will be sent an image of the desktop
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </details>
+        <details id="options">
+          <summary>Configurable Options</summary>
+          <div>
+            <small>
+              You can offer users configurable options to control your screensaver.
+              Manage those here.
+            </small>
+
+            {#each saver.options as _option, index}
+              <SaverOptionInput
+                bind:saver
+                bind:option={saver.options[index]}
+                on:optionsChanged={updatePreview}
+              />
+            {/each}
+
+            <div class="padded-top padded-bottom">
+              <button
+                type="button"
+                class="btn add-option"
+                on:click={addSaverOption}
+              >
+                Add Option
+              </button>
+            </div>
+          </div>
+        </details>
       </div>
-    </div>
-  </div>
-  {/if}
+    {/if}
+  </main>
 
   <footer class="footer">
     <div>
-      <button
-        class="btn cancel"
-        on:click="{closeWindow}"
-      >
-        Cancel
-      </button>
-      <button
-        class="btn save"
-        disabled="{disabled}"
-        on:click="{saveData}"
-      >
-        Save
-      </button>
-      <button
-        class="btn save"
-        disabled="{disabled}"
-        on:click="{saveDataAndClose}"
-      >
-        Save and Close
-      </button>        
+      <button class="btn cancel" on:click={closeWindow}> Close </button>
+      <button class="btn save" {disabled} on:click={saveData}> Save </button>
     </div>
   </footer>
-</div> <!-- #editor -->
-
-<script>
-import Notarize from "@/components/Notarize";
-import SaverOptions from "@/components/SaverOptions.svelte";
-import SaverOptionInput from "@/components/SaverOptionInput.svelte";
-
-import { onMount } from "svelte";
-
-let size = undefined;
-let saver = undefined;
-let options = [];
-let optionValues = {};
-let disabled = false;
-let lastIndex = 0;
-let previewUrl = undefined;
-
-$: validOptions = saver?.options?.filter(o => o.name !== "");
-$: params = new URLSearchParams(document.location.search);
-$: src = params.get("src");
-$: screenshot = params.get("screenshot");
-
-onMount(async () => {
-  size = await window.api.getDisplayBounds();
-  screenshot = await window.api.getScreenshot();
-
-  saver = await window.api.loadSaver(src);
-
-  if ( saver.settings === undefined ) {
-    saver.settings = {};
-  }
-
-  options = saver.options;
-  lastIndex = saver.options.length;
-
-  window.api.watchFolder(src, updatePreview);
-
-  updatePreview();
-});
-
-function closeWindow() {
-  window.api.closeWindow("editor");
-}
-function addSaverOption() {
-  saver.options.push({
-    "index": lastIndex + 1,
-    "name": "New Option", //New Option,
-    "type": "slider",
-    "description": "", //Description,
-    "min": "1",
-    "max": "100",
-    "default": "75"
-  });
-
-  lastIndex += 1;
-  saver = saver;
-}
-
-function optionDefaults() {
-  var result = {};
-  for ( var i = 0; i < options.length; i++ ) {
-    var opt = options[i];
-    result[opt.name] = opt.default;
-  }
-
-  return result;
-}
-
-function urlOpts(s) {
-  var base = {
-    width: size.width,
-    height: size.height,
-    preview: 1,
-    platform: window.api.platform(),
-    screenshot: screenshot
-  };
-
-  if ( typeof(s) === "undefined" ) {
-    s = saver;
-  }
-
-  const mergedOpts = Object.assign(
-    base,
-    saver.settings,
-    optionDefaults(),
-    optionValues);
-
-  return mergedOpts;
-}
-
-function updatePreview() {
-  const urlParams = new URLSearchParams(urlOpts(saver));
-  previewUrl = `${saver.url}?${urlParams.toString()}`;
-  new Notarize({timeout: 250}).show("Preview updated!");
-
-  const el = document.getElementById("saver-preview");
-  if ( el ) {
-    // force a reload (just binding it doesnt work)
-    el.src = previewUrl;
-  }
-}
-
-function openFolder() {
-  window.api.openFolder(src);
-}
-
-function openConsole() {
-  window.api.toggleDevTools();
-}
-
-function onOptionsChange() {
-  updatePreview();
-}
-
-async function saveData() {
-  if ( document.querySelectorAll(":invalid").length > 0 ) {
-    var form = document.querySelector("form");
-    form.classList.add("submit-attempt");
-
-    return;
-  }
-
-  disabled = true;
-  // https://forum.vuejs.org/t/how-to-clone-property-value-as-simple-object/40032/2
-  const clone = JSON.parse(JSON.stringify(saver));
-  await window.api.saveScreensaver(clone, src);
-  window.api.saversUpdated(src);
-
-  new Notarize({timeout: 1000}).show("Changes saved!");
-
-  disabled = false;
-}
-
-async function saveDataAndClose() {
-  await saveData();
-  closeWindow();
-}
-
-</script>
+</div>

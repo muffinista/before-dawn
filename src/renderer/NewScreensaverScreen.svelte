@@ -21,7 +21,6 @@
               bind:value="{saver.name}"
               type="text"
               name="name"
-      
               required
             >
             <div class="hint">
@@ -35,7 +34,6 @@
               bind:value="{saver.description}"
               type="text"
               name="description"
-      
               required
             >
             <div class="hint">
@@ -48,7 +46,6 @@
               bind:value="{saver.aboutUrl}"
               type="text"
               name="aboutUrl"
-      
             >
             <div class="hint">
               If you have a URL with more details about your work, put it here!
@@ -60,7 +57,6 @@
               bind:value="{saver.author}"
               type="text"
               name="author"
-      
             >
             <div class="hint">
               The author of this screensaver.
@@ -89,6 +85,16 @@
           CSS, and/or Javascript, you can make your own screensaver. But before 
           you can do that, you'll need to set a local directory!
         </p>
+
+        <form>
+          <div class="form-group full-width">
+            <label for="localSource">Local Source:</label>
+            <FolderChooser bind:source="{prefs.localSource}" on:picked="{updatePrefs}" />
+            <small class="form-text text-muted">
+              We will load screensavers from any directories listed here. Use this to add your own screensavers!
+            </small>
+          </div>
+        </form>
       </div>
       {/if}
     </div>
@@ -113,6 +119,7 @@
 </div> <!-- #new -->
 
 <script>
+import FolderChooser from "@/components/FolderChooser.svelte";
 import { onMount } from "svelte";
 
 let prefs = {};
@@ -123,9 +130,6 @@ let saver = {
 let disabled = false;
 
 $: canAdd = prefs !== undefined && prefs.localSource !== undefined && prefs.localSource !== "";
-// $: {
-//   console.log(saver);
-// }
 
 onMount(async () => {
   prefs = await window.api.getPrefs();
@@ -135,6 +139,12 @@ onMount(async () => {
 function closeWindow() {
   window.api.closeWindow("addNew");
 }
+
+async function updatePrefs() {
+  const clone = JSON.parse(JSON.stringify(prefs));   
+  return await window.api.updatePrefs(clone);
+}
+
 async function saveData() {
   if ( document.querySelectorAll(":invalid").length > 0 ) {
     var form = document.querySelector("form");

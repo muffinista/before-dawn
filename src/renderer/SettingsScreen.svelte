@@ -13,7 +13,6 @@
                 type="checkbox"
                 class="form-check-input"
               >
-              <!-- @change="$emit('update', 'lock', $event.target.checked)" -->
               Lock screen after running?
             </label>
             <small class="form-text text-muted">
@@ -29,7 +28,6 @@
                 type="checkbox"
                 class="form-check-input"
               >
-              <!-- @change="$emit('update', 'disableOnBattery', $event.target.checked)" -->
               Disable when on battery?
             </label>
             <small class="form-text text-muted">
@@ -47,7 +45,6 @@
                 type="checkbox"
                 class="form-check-input"
               >
-              <!-- @change="$emit('update', 'auto_start', $event.target.checked)" -->
               Auto start on login?
             </label>
             <small class="form-text text-muted">
@@ -63,7 +60,6 @@
                 type="checkbox"
                 class="form-check-input"
               >
-              <!-- @change="$emit('update', 'runOnSingleDisplay', $event.target.checked)" -->
               Only run on the primary display?
             </label>
             <small class="form-text text-muted">
@@ -96,27 +92,7 @@
       <form>
         <div class="form-group full-width">
           <label for="localSource">Local Source:</label>
-          <div class="input-group">
-            <input
-              type="text"
-              readonly="readonly"
-              bind:value="{prefs.localSource}"
-            >
-            <button
-              type="button"
-              class="pick"
-              on:click="{showPathChooser}"
-            >
-              ...
-            </button>
-            <button
-              type="button"
-              class="clear"
-              on:click="{clearLocalSource}"
-            >
-              X
-            </button>
-          </div>
+          <FolderChooser bind:source="{prefs.localSource}" />
           <small class="form-text text-muted">
             We will load screensavers from any directories listed here. Use this to add your own screensavers!
           </small>
@@ -173,6 +149,7 @@
 import { onMount } from "svelte";
 import Spinner from "@/components/Spinner.svelte";
 import Notarize from "@/components/Notarize";
+import FolderChooser from "@/components/FolderChooser.svelte";
 
 let prefs = undefined;
 let release = undefined;

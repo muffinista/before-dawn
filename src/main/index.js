@@ -418,38 +418,39 @@ var openSettingsWindow = function() {
 /**
  * handle new screensaver event. open the window to create a screensaver
  */
-var addNewSaver = function() {
+var addNewSaver = async function(opts) {
   var newUrl = getUrl("new.html");
   var primary = electronScreen.getPrimaryDisplay();
 
   // take a screenshot of the main screen for use in previews
-  grabScreen(primary).then((grab) => {
-    screenshots[primary.id] = grab.url;
+  if ( !opts.screenshot) {
+    const grab = await grabScreen(primary);
+    opts.screenshot = grab.url;
+  }
 
-    handles.addNew.window = new BrowserWindow({
-      show: false,
-      width: 450,
-      height: 700,
-      resizable:true,
-      webPreferences: {
-        ...defaultWebPreferences,
-        preload: path.join(__dirname, "assets", "preload.js"),
-      },
-      icon: path.join(__dirname, "assets", "iconTemplate.png")
-    });
-
-    handles.addNew.window.on("closed", () => {
-      handles.addNew.window = null;
-      dock.hideDockIfInactive(app);
-    });
-
-    handles.addNew.window.once("ready-to-show", () => {
-      handles.addNew.window.show();
-      dock.showDock(app);
-    });
-
-    handles.addNew.window.loadURL(newUrl);
+  handles.addNew.window = new BrowserWindow({
+    show: false,
+    width: 450,
+    height: 700,
+    resizable:true,
+    webPreferences: {
+      ...defaultWebPreferences,
+      preload: path.join(__dirname, "assets", "preload.js"),
+    },
+    icon: path.join(__dirname, "assets", "iconTemplate.png")
   });
+
+  handles.addNew.window.on("closed", () => {
+    handles.addNew.window = null;
+    dock.hideDockIfInactive(app);
+  });
+
+  handles.addNew.window.once("ready-to-show", () => {
+    handles.addNew.window.show();
+    dock.showDock(app);
+  });
+
+  handles.addNew.window.loadURL(newUrl);
 };
 
 /**
@@ -495,6 +496,8 @@ var openAboutWindow = function() {
  * @param {string} args.screenshot path to the screenshot to use when editing
  */
 var openEditor = (args) => {
+  console.log("openEditor", args);
+
   var key = args.src;
   var screenshot = args.screenshot;
   
@@ -515,7 +518,6 @@ var openEditor = (args) => {
   }
 
   handles.editor.window.screenshot = screenshot;
-
 
   handles.editor.window.once("ready-to-show", () => {
     handles.editor.window.send("args", args);

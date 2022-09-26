@@ -240,7 +240,6 @@
 
   async function saveData() {
     const clone = JSON.parse(JSON.stringify(prefs));   
-    //clone.options = JSON.parse(JSON.stringify(options));
     return await window.api.updatePrefs(clone);
   }
 
@@ -265,7 +264,7 @@
     document.documentElement.style
       .setProperty("--preview-width", `${size.width}px`);
     document.documentElement.style
-      .setProperty("--preview-height", `${  size.height}px`);
+      .setProperty("--preview-height", `${size.height}px`);
     const scale = 500 / (size.width + 40);
 
     document.documentElement.style
