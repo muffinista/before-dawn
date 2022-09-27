@@ -240,7 +240,6 @@ module.exports = class SaverListManager {
     if ( typeof(src) !== "undefined" && src !== "" ) {
       contents.editable = (contents.key.indexOf(src) === 0);
     }
-    console.log(`${src} -- ${contents.key} -- ${contents.editable}`);
 
     if ( typeof(contents.settings) === "undefined" ) {
       if ( settings === undefined ) {

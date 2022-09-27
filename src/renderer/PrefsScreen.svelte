@@ -292,8 +292,6 @@
 
     savers.splice(index, 1);
 
-    console.log(saver);
-
     await window.api.deleteSaver(saverToDelete);
     await getData();
 

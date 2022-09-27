@@ -210,7 +210,6 @@ function clearLocalSource() {
 }
 
 function updateHotkey(event) {
-  console.log(event);
   if ( event.key == "Control" || event.key == "Shift" || event.key == "Alt" || event.key == "Meta" ) {
     return;
   }

@@ -176,11 +176,10 @@
 
     display: grid;
     grid-template-columns: 1fr;
-    grid-template-rows: 40px auto 40px;
+    grid-template-rows: 40px auto;
     grid-template-areas: 
     'header'
-    'main'
-    'footer';
+    'main';
   }
 
   main {
@@ -197,22 +196,22 @@
     height: 100vh;
   }
 
-  footer {
-    grid-area: footer;
+  details {
+    width: var(--sidebar-width);
+  }
+
+  details > * {
+    max-width: 95%;
   }
 
   summary {
-    font-size: 1.5em;
+    font-size: 1.2em;
     font-weight: bold;
   }
 
   .saver-detail {
     width: var(--preview-wrapper-width);
     height: var(--preview-wrapper-height);
-  }
-
-  footer.footer {
-    justify-content: flex-end;
   }
 </style>
 
@@ -350,7 +349,7 @@ c0.5522461,0,1-0.4477539,1-1C20,10.4476929,19.5522461,10,19,10z"
       </div>
       <div class="description-and-options">
         <details id="description">
-          <summary>Screensaver Details</summary>
+          <summary>Details</summary>
           <div>
             <small> You can enter the basics about this screensaver here.</small>
             <div id="saver-form">
@@ -403,7 +402,7 @@ c0.5522461,0,1-0.4477539,1-1C20,10.4476929,19.5522461,10,19,10z"
           </div>
         </details>
         <details id="options">
-          <summary>Configurable Options</summary>
+          <summary>Custom Options</summary>
           <div>
             <small>
               You can offer users configurable options to control your screensaver.
@@ -432,11 +431,4 @@ c0.5522461,0,1-0.4477539,1-1C20,10.4476929,19.5522461,10,19,10z"
       </div>
     {/if}
   </main>
-
-  <footer class="footer">
-    <div>
-      <button class="btn cancel" on:click={closeWindow}> Close </button>
-      <button class="btn save" {disabled} on:click={saveData}> Save </button>
-    </div>
-  </footer>
 </div>

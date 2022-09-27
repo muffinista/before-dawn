@@ -1,6 +1,5 @@
 <div class="saver-description">
   {#if saver}
-    {saver.name}
     <h1>
       {saver.name} 
       {#if saver.aboutUrl && saver.aboutUrl !== ""}<small><a href="{saver.aboutUrl}" on:click={open}>learn more</a></small>{/if}
