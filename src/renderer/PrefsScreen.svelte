@@ -127,7 +127,7 @@
   import SaverList from "@/components/SaverList.svelte";
   import SaverOptions from "@/components/SaverOptions.svelte";
   import SaverSummary from "@/components/SaverSummary.svelte";
-	import { onMount, onDestroy } from "svelte";
+	import { onMount, onDestroy, tick } from "svelte";
 
 	let savers = [];
   let prefs = {};
@@ -150,6 +150,12 @@
     setPreviewUrl();
 
     window.api.addListener("savers-updated", onSaversUpdated);
+
+    const globals = await window.api.getGlobals();
+    if ( globals.NEW_RELEASE_AVAILABLE ) {
+      await tick();
+      window.api.displayUpdateDialog();
+    }
   });
 
   onDestroy(() => {
