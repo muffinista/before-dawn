@@ -19,7 +19,6 @@
         type="text"
         name="description"
         placeholder="Describe what this option does"
-        required
       >
     </div>
   </div>       
