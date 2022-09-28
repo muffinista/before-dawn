@@ -1,6 +1,7 @@
 <!-- #editor -->
 <script>
   import Notarize from "@/components/Notarize";
+  import SaverForm from './components/SaverForm.svelte';
   import SaverOptions from "@/components/SaverOptions.svelte";
   import SaverOptionInput from "@/components/SaverOptionInput.svelte";
 
@@ -185,33 +186,31 @@
   main {
     display: grid;
     grid-template-columns: 1fr var(--sidebar-width);
+    grid-area: main;
+    height: 100vh;
   }
 
   .button-group {
     grid-area: header;
   }
-
-  main {
-    grid-area: main;
-    height: 100vh;
-  }
-
-  details {
-    width: var(--sidebar-width);
-  }
-
-  details > * {
-    max-width: 95%;
-  }
-
-  summary {
-    font-size: 1.2em;
-    font-weight: bold;
-  }
-
   .saver-detail {
     width: var(--preview-wrapper-width);
     height: var(--preview-wrapper-height);
+  }
+
+  .sidebar {
+    width: var(--sidebar-width);
+  }
+  .sidebar > * {
+    width: 95%;
+  }
+
+  section {
+    font-size: 90%;
+  }
+  section > h2 {
+    margin-top: 0px;
+    font-size: 140%;
   }
 </style>
 
@@ -244,94 +243,45 @@
         </div>
 
         {#if validOptions.length > 0}
-          <h3>Options</h3>
+          <h3>Preview settings</h3>
           <small>
             Tweak the values here and they will be sent along to your preview.
           </small>
           <SaverOptions bind:saver on:optionsChanged={onOptionsChange} />
         {/if}
       </div>
-      <div class="description-and-options">
-        <details id="description">
-          <summary>Details</summary>
-          <div>
-            <small> You can enter the basics about this screensaver here.</small>
-            <div id="saver-form">
-              <form>
-                <div class="form-group">
-                  <label for="name">Name:</label>
-                  <input bind:value={saver.name} type="text" name="name" required />
-                  <div class="hint">The name of your screensaver.</div>
-                </div>
+      <div class="sidebar">
+        <section id="description">
+          <h2>Details</h2>
+          <small> You can enter the basics about this screensaver here.</small>
+          <SaverForm bind:saver></SaverForm>
+        </section>
+        <hr />
+        <section id="options">
+          <h2>Custom Options</h2>
+          <small>
+            You can offer users configurable options to control your screensaver.
+            Add and remove those here.
+          </small>
 
-                <div class="form-group">
-                  <label for="name">Description:</label>
-                  <input
-                    bind:value={saver.description}
-                    type="text"
-                    name="description"
-                    required
-                  />
-                  <div class="hint">A brief description of your screensaver.</div>
-                </div>
-                <div class="form-group">
-                  <label for="aboutUrl">About URL:</label>
-                  <input bind:value={saver.aboutUrl} type="text" name="aboutUrl" />
-                  <div class="hint">
-                    If you have a URL with more details about your work, put it
-                    here!
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label for="author">Author:</label>
-                  <input bind:value={saver.author} type="text" name="author" />
-                  <div class="hint">The author of this screensaver.</div>
-                </div>
+          {#each saver.options as _option, index}
+            <SaverOptionInput
+              bind:saver
+              bind:option={saver.options[index]}
+              on:optionsChanged={updatePreview}
+            />
+          {/each}
 
-                <div class="form-group">
-                  <h3>Requirements:</h3>
-                  <input
-                    type="checkbox"
-                    name="requirements"
-                    bind:group={saver.requirements}
-                    value="screen"
-                  />
-                  <label for="screen">Screen capture</label>
-                  <div class="hint">
-                    This screensaver will be sent an image of the desktop
-                  </div>
-                </div>
-              </form>
-            </div>
+          <div class="padded-top padded-bottom">
+            <button
+              type="button"
+              class="btn add-option"
+              on:click={addSaverOption}
+            >
+              Add Option
+            </button>
           </div>
-        </details>
-        <details id="options">
-          <summary>Custom Options</summary>
-          <div>
-            <small>
-              You can offer users configurable options to control your screensaver.
-              Manage those here.
-            </small>
-
-            {#each saver.options as _option, index}
-              <SaverOptionInput
-                bind:saver
-                bind:option={saver.options[index]}
-                on:optionsChanged={updatePreview}
-              />
-            {/each}
-
-            <div class="padded-top padded-bottom">
-              <button
-                type="button"
-                class="btn add-option"
-                on:click={addSaverOption}
-              >
-                Add Option
-              </button>
-            </div>
-          </div>
-        </details>
+        </section>
       </div>
     {/if}
   </main>
