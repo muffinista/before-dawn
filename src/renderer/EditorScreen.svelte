@@ -180,6 +180,11 @@
 
   #editor {
     overflow-x: hidden;
+    overflow-y: hidden;
+    padding-left: 7px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    padding-right: 0px;
   }
   nav {
     position: fixed;
@@ -192,6 +197,8 @@
   main {
     position: absolute;
     top: var(--navbar-height);
+    left: 7;
+    width: 99%;
     display: grid;
     grid-template-columns: 1fr var(--sidebar-width);
     grid-area: main;
@@ -203,10 +210,16 @@
     height: var(--preview-wrapper-height);
   }
 
-  .sidebar {
-    width: var(--sidebar-width);
+  #preview {
+    max-width: calc(100vw - var(--sidebar-width)) - 10;
+    overflow-y: scroll;
   }
-  .sidebar > * {
+  #sidebar {
+    width: var(--sidebar-width);
+    overflow-y: scroll;
+  }
+  #sidebar > * {
+    padding-left: 7px;
     width: 95%;
   }
 
@@ -255,7 +268,7 @@
           <SaverOptions bind:saver on:optionsChanged={onOptionsChange} />
         {/if}
       </div>
-      <div class="sidebar">
+      <div id="sidebar">
         <section id="description">
           <h2>Details</h2>
           <small> You can enter the basics about this screensaver here.</small>
