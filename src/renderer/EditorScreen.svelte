@@ -149,9 +149,11 @@
   }
 
   async function saveData() {
+    console.log("saveData");
     if (document.querySelectorAll(":invalid").length > 0) {
-      var form = document.querySelector("form");
-      form.classList.add("submit-attempt");
+      document.querySelectorAll("form:invalid").forEach((el) => el.classList.add('submit-attempt'));
+      // var form = document.querySelector("form");
+      // form.classList.add("submit-attempt");
 
       return;
     }
@@ -164,6 +166,8 @@
 
     new Notarize({ timeout: 1000 }).show("Changes saved!");
 
+    document.querySelectorAll("form:invalid").forEach((el) => el.classList.remove('submit-attempt'));
+
     disabled = false;
   }
 </script>
@@ -171,28 +175,29 @@
 <style>
   :root {
     --sidebar-width: 500px;
+    --navbar-height: 25px;
   }
 
   #editor {
     overflow-x: hidden;
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: 40px auto;
-    grid-template-areas: 
-    'header'
-    'main';
   }
-
+  nav {
+    position: fixed;
+    top: 0px;
+    height: var(--navbar-height);
+    z-index: 1000;
+    background-color: white;
+    width: 100%;
+  }
   main {
+    position: absolute;
+    top: var(--navbar-height);
     display: grid;
     grid-template-columns: 1fr var(--sidebar-width);
     grid-area: main;
-    height: 100vh;
+    height: calc(100vh - var(--navbar-height));
   }
 
-  .button-group {
-    grid-area: header;
-  }
   .saver-detail {
     width: var(--preview-wrapper-width);
     height: var(--preview-wrapper-height);
@@ -215,11 +220,11 @@
 </style>
 
 <div id="editor">
-  <div class="button-group">
+  <nav>
     <button variant="default" title="Open screensaver folder" on:click={openFolder}>
       <FolderIcon />
     </button>
-    <button variant="default" title="Save changes" disabled={disabled} on:click={saveData}>
+    <button variant="default" title="Save changes" disabled="{disabled}" on:click={saveData}>
       <SaveIcon />
     </button>
     <button variant="default" title="Reload preview" on:click={updatePreview}>
@@ -228,7 +233,7 @@
     <button variant="default" title="View Developer Console" on:click={openConsole}>
       <BugIcon />
     </button>
-  </div>
+  </nav>
   <main>
     {#if saver !== undefined}
       <div id="preview">
@@ -265,11 +270,13 @@
           </small>
 
           {#each saver.options as _option, index}
-            <SaverOptionInput
-              bind:saver
-              bind:option={saver.options[index]}
-              on:optionsChanged={updatePreview}
-            />
+            <div class="saver-option-input">
+              <SaverOptionInput
+                bind:saver
+                bind:option={saver.options[index]}
+                on:optionsChanged={updatePreview}
+              />
+            </div>
           {/each}
 
           <div class="padded-top padded-bottom">

@@ -410,7 +410,7 @@ input[type="checkbox"] + label {
 
 
 div.notarize-wrapper {
-  position: absolute;
+  position: fixed;
   top: 10px;
   right: 10px;
   background: white;
@@ -424,6 +424,7 @@ div.notarize-wrapper {
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 100000;
 }
 
 @keyframes fadeIn {
