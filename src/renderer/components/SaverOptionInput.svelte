@@ -119,6 +119,19 @@
   </div>
 </form>
 
+<style>
+div.space-evenly {
+  display: flex;
+  justify-content: space-between;
+  max-width: 95%;
+}
+
+div.space-evenly > .form-group {
+  max-width: 25%;
+}
+
+</style>
+
 <script>
 export let saver;
 export let option;

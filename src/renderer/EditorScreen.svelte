@@ -47,9 +47,9 @@
   function addSaverOption() {
     saver.options.push({
       index: lastIndex + 1,
-      name: "New Option", //New Option,
+      name: `New Option ${lastIndex + 1}`,
       type: "slider",
-      description: "", //Description,
+      description: "",
       min: "1",
       max: "100",
       default: "75",
@@ -229,6 +229,10 @@
   section > h2 {
     margin-top: 0px;
     font-size: 140%;
+  }
+
+  .saver-option-input {
+    margin-bottom: 25px;
   }
 </style>
 

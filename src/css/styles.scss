@@ -333,12 +333,6 @@ input[type="range"] {
   max-width: 250px;
 }
 
-div.space-evenly {
-  display: flex;
-  justify-content: space-between;
-  max-width: 95%;
-}
-
 div.form-group {
   margin-bottom: 1rem;
   max-width: 95%;
@@ -357,7 +351,6 @@ div.form-group {
   }
   input {
     width: 100%;
-    max-width: 50%;
   }
   input[type=checkbox] {
     width: initial;
