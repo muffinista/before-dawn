@@ -187,24 +187,6 @@ async function resetToDefaults() {
   }
 }
 
-async function showPathChooser() {
-  const result = await window.api.showOpenDialog();
-  handlePathChoice(result);
-}
-
-function handlePathChoice(result) {
-  if ( result === undefined || result.canceled ) {
-    return;
-  }
-
-  const choice = result.filePaths[0];
-  prefs.localSource = choice;
-}
-
-function clearLocalSource() {
-  prefs.localSource = "";
-}
-
 function updateHotkey(event) {
   if ( event.key == "Control" || event.key == "Shift" || event.key == "Alt" || event.key == "Meta" ) {
     return;

@@ -1,14 +1,14 @@
 <!-- #editor -->
 <script>
   import Notarize from "@/components/Notarize";
-  import SaverForm from './components/SaverForm.svelte';
+  import SaverForm from "./components/SaverForm.svelte";
   import SaverOptions from "@/components/SaverOptions.svelte";
   import SaverOptionInput from "@/components/SaverOptionInput.svelte";
 
-  import ReloadIcon from './components/icons/ReloadIcon.svelte';
+  import ReloadIcon from "./components/icons/ReloadIcon.svelte";
   import FolderIcon from "@/components/icons/FolderIcon.svelte";
   import SaveIcon from "./components/icons/SaveIcon.svelte";
-  import BugIcon from './components/icons/BugIcon.svelte';
+  import BugIcon from "./components/icons/BugIcon.svelte";
 
   import { onMount } from "svelte";
   let size = undefined;
@@ -36,7 +36,7 @@
     lastIndex = saver.options.length;
 
     window.api.watchFolder(src, updatePreview);
-    addEventListener('resize', updatePreview);
+    addEventListener("resize", updatePreview);
 
     // wait a tick so that all our required elements actually exist
     setTimeout(() => {
@@ -93,13 +93,11 @@
   }
 
   function resizePreview() {
-    const wrapper = document.querySelector('#preview');
-
     const docStyle = getComputedStyle(document.documentElement);
-    const sidebarWidth = Number(docStyle.getPropertyValue('--sidebar-width').replace('px', ''));
+    const sidebarWidth = Number(docStyle.getPropertyValue("--sidebar-width").replace("px", ""));
 
     const maxWidth = window.innerWidth - sidebarWidth - 50;
-    const maxHeight = wrapper.clientHeight;
+    // const maxHeight = wrapper.clientHeight;
 
     document.documentElement.style.setProperty(
       "--preview-width",
@@ -151,10 +149,7 @@
   async function saveData() {
     console.log("saveData");
     if (document.querySelectorAll(":invalid").length > 0) {
-      document.querySelectorAll("form:invalid").forEach((el) => el.classList.add('submit-attempt'));
-      // var form = document.querySelector("form");
-      // form.classList.add("submit-attempt");
-
+      document.querySelectorAll("form:invalid").forEach((el) => el.classList.add("submit-attempt"));
       return;
     }
 
@@ -166,7 +161,7 @@
 
     new Notarize({ timeout: 1000 }).show("Changes saved!");
 
-    document.querySelectorAll("form:invalid").forEach((el) => el.classList.remove('submit-attempt'));
+    document.querySelectorAll("form:invalid").forEach((el) => el.classList.remove("submit-attempt"));
 
     disabled = false;
   }

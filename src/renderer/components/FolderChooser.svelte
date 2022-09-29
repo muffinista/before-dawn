@@ -21,7 +21,7 @@
 </div>
 
 <script>
-import { createEventDispatcher } from 'svelte';
+import { createEventDispatcher } from "svelte";
 
 const dispatch = createEventDispatcher();
 export let source;
@@ -39,7 +39,7 @@ function handlePathChoice(result) {
   const choice = result.filePaths[0];
   source = choice;
 
-  dispatch('picked', {
+  dispatch("picked", {
     folder: source
   });
 }

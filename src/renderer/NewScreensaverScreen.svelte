@@ -54,7 +54,7 @@
 </div> <!-- #new -->
 
 <script>
-import SaverForm from './components/SaverForm.svelte';
+import SaverForm from "./components/SaverForm.svelte";
 import FolderChooser from "@/components/FolderChooser.svelte";
 import { onMount } from "svelte";
 

@@ -49,7 +49,7 @@ class StateManager {
     };
 
     // every minute or so, output the current state
-    setInterval(() => {
+    this.loggingInterval = setInterval(() => {
       this.logger(`Current idle: ${this._idleFn()} Last idle: ${this.lastTime} -- ${this.currentStateString}`);
     }, 60000);
 
@@ -278,6 +278,7 @@ class StateManager {
   }
   stopTicking() {
     this.keepTicking = false;
+    clearInterval(this.loggingInterval);
   }
 }
 

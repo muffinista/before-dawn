@@ -90,7 +90,7 @@
     "png-to-ico": "^2.1.2",
     "sass": "^1.26",
     "sass-loader": "^13.0.0",
-    "sinon": "^12.0.1",
+    "sinon": "^14.0.0",
     "style-loader": "^3.0.0",
     "svelte": "^3.50.1",
     "svelte-loader": "^3.1.3",
