@@ -117,7 +117,7 @@
   </div>
   {/if}
 
-  <footer class="footer ">
+  <footer class="footer">
     <div>
       <button
         class="btn reset-to-defaults"
@@ -156,10 +156,6 @@ let release = undefined;
 let disabled = false;
 let hasScreensaverUpdate = false;
 let downloadingUpdates = false;
-
-// $: {
-//   console.log(prefs);
-// }
 
 onMount(async () => {
   prefs = await window.api.getPrefs();
