@@ -267,7 +267,7 @@ var grabScreen = function(s) {
         // rewrite file paths to always have unix slashes instead
         // of windows slashes. sometimes windows slashes are fine, but
         // there's a few situations where they won't render properly.
-        message.url = message.url.split(path.sep).join(path.posix.sep);
+        // message.url = message.url.split(path.sep).join(path.posix.sep);
 
         resolve(message);
       });
@@ -1375,7 +1375,7 @@ let setupIPC = function() {
 
     // figure out the path to the screensaver folder. use
     // decodeURIComponent to convert %20 to spaces
-    const filePath = path.dirname(decodeURIComponent(url.parse(src).path)).split(path.posix.sep).join(path.sep);
+    const filePath = path.dirname(decodeURIComponent(url.parse(src).path)); //.split(path.posix.sep).join(path.sep);
 
     switch(process.platform) {
     case "darwin":

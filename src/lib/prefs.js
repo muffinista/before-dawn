@@ -65,9 +65,9 @@ class SaverPrefs {
       this.store.set("firstLoad", false);
     }
 
-    if (this.saver) {
-      this.saver = this.saver.split(path.sep).join(path.posix.sep);
-    }
+    // if (this.saver) {
+    //   this.saver = this.saver.split(path.sep).join(path.posix.sep);
+    // }
   }
 
   reset() {
