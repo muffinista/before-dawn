@@ -12,7 +12,7 @@
 
   import { onMount } from "svelte";
   let size = undefined;
-  let saver = undefined;
+  let saver = {options: [], requirements: []};
   let options = [];
   let optionValues = {};
   let disabled = false;
@@ -247,61 +247,59 @@
     </button>
   </nav>
   <main>
-    {#if saver !== undefined}
-      <div id="preview">
-        <div class="saver-detail">
-          <iframe
-            id="saver-preview"
-            title="preview"
-            src={previewUrl}
-            scrolling="no"
-            class="saver-preview"
-          />
-        </div>
-
-        {#if validOptions.length > 0}
-          <h3>Preview settings</h3>
-          <small>
-            Tweak the values here and they will be sent along to your preview.
-          </small>
-          <SaverOptions bind:saver on:optionsChanged={onOptionsChange} />
-        {/if}
+    <div id="preview">
+      <div class="saver-detail">
+        <iframe
+          id="saver-preview"
+          title="preview"
+          src={previewUrl}
+          scrolling="no"
+          class="saver-preview"
+        />
       </div>
-      <div id="sidebar">
-        <section id="description">
-          <h2>Details</h2>
-          <small> You can enter the basics about this screensaver here.</small>
-          <SaverForm bind:saver></SaverForm>
-        </section>
-        <hr />
-        <section id="options">
-          <h2>Custom Options</h2>
-          <small>
-            You can offer users configurable options to control your screensaver.
-            Add and remove those here.
-          </small>
 
-          {#each saver.options as _option, index}
-            <div class="saver-option-input">
-              <SaverOptionInput
-                bind:saver
-                bind:option={saver.options[index]}
-                on:optionsChanged={updatePreview}
-              />
-            </div>
-          {/each}
+      {#if validOptions && validOptions.length > 0}
+        <h3>Preview settings</h3>
+        <small>
+          Tweak the values here and they will be sent along to your preview.
+        </small>
+        <SaverOptions bind:saver on:optionsChanged={onOptionsChange} />
+      {/if}
+    </div>
+    <div id="sidebar">
+      <section id="description">
+        <h2>Details</h2>
+        <small> You can enter the basics about this screensaver here.</small>
+        <SaverForm bind:saver></SaverForm>
+      </section>
+      <hr />
+      <section id="options">
+        <h2>Custom Options</h2>
+        <small>
+          You can offer users configurable options to control your screensaver.
+          Add and remove those here.
+        </small>
 
-          <div class="padded-top padded-bottom">
-            <button
-              type="button"
-              class="btn add-option"
-              on:click={addSaverOption}
-            >
-              Add Option
-            </button>
+        {#each saver.options as _option, index}
+          <div class="saver-option-input">
+            <SaverOptionInput
+              bind:saver
+              bind:option={saver.options[index]}
+              on:optionsChanged={updatePreview}
+            />
           </div>
-        </section>
-      </div>
-    {/if}
+        {/each}
+
+        <div class="padded-top padded-bottom">
+          <button
+            type="button"
+            class="btn add-option"
+            on:click={addSaverOption}
+          >
+            Add Option
+          </button>
+        </div>
+      </section>
+    </div>
   </main>
 </div>

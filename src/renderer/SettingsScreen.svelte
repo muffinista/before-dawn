@@ -1,75 +1,72 @@
 <div id="settings">
-  {#if prefs}
-  <div>
-    <div id="prefs-form">
-      <h1>Settings</h1>
-      <form class="grid">
-        <div class="options">
-          <div class="form-check">
-            <label>
-              <input
-                id="lock"
-                :checked="lock"
-                type="checkbox"
-                class="form-check-input"
-              >
-              Lock screen after running?
-            </label>
-            <small class="form-text text-muted">
-              When the screen saver turns off, the user will need to enter their password.
-            </small>
-          </div>
-  
-          <div class="form-check">
-            <label>
-              <input
-                id="disableOnBattery"
-                :checked="disableOnBattery"
-                type="checkbox"
-                class="form-check-input"
-              >
-              Disable when on battery?
-            </label>
-            <small class="form-text text-muted">
-              If checked, Before Dawn won't
-              activate when you're not plugged in -- your
-              computer's power settings can blank the screen
-              instead.
-            </small>
-          </div>
-          <!-- ' -->
-          <div class="form-check">
-            <label>
-              <input
-                :checked="auto_start"
-                type="checkbox"
-                class="form-check-input"
-              >
-              Auto start on login?
-            </label>
-            <small class="form-text text-muted">
-              If checked, Before Dawn will start when your computer starts.
-            </small>
-          </div>
-  
-          <div class="form-check">
-            <label>
-              <input
-                id="primary-display"
-                :checked="runOnSingleDisplay"
-                type="checkbox"
-                class="form-check-input"
-              >
-              Only run on the primary display?
-            </label>
-            <small class="form-text text-muted">
-              If you have multiple displays, only run on the primary one.
-            </small>
-          </div>
+  <div id="prefs-form">
+    <h1>Settings</h1>
+    <form class="grid">
+      <div class="options">
+        <div class="form-check">
+          <label>
+            <input
+              id="lock"
+              bind:checked="{prefs.lock}"
+              type="checkbox"
+              class="form-check-input"
+            >
+            Lock screen after running?
+          </label>
+          <small class="form-text text-muted">
+            When the screen saver turns off, the user will need to enter their password.
+          </small>
         </div>
-      </form>
-    </div> 
-  </div>
+
+        <div class="form-check">
+          <label>
+            <input
+              id="disableOnBattery"
+              bind:checked="{prefs.disableOnBattery}"
+              type="checkbox"
+              class="form-check-input"
+            >
+            Disable when on battery?
+          </label>
+          <small class="form-text text-muted">
+            If checked, Before Dawn won't
+            activate when you're not plugged in -- your
+            computer's power settings can blank the screen
+            instead.
+          </small>
+        </div>
+        <!-- ' -->
+        <div class="form-check">
+          <label>
+            <input
+              bind:checked="{prefs.auto_start}"
+              type="checkbox"
+              class="form-check-input"
+            >
+            Auto start on login?
+          </label>
+          <small class="form-text text-muted">
+            If checked, Before Dawn will start when your computer starts.
+          </small>
+        </div>
+
+        <div class="form-check">
+          <label>
+            <input
+              id="primary-display"
+              bind:checked="{prefs.runOnSingleDisplay}"
+              type="checkbox"
+              class="form-check-input"
+            >
+            Only run on the primary display?
+          </label>
+          <small class="form-text text-muted">
+            If you have multiple displays, only run on the primary one.
+          </small>
+        </div>
+      </div>
+    </form>
+  </div> 
   <div>
     {#if hasScreensaverUpdate === true}
       <button
@@ -83,39 +80,36 @@
       </button>
     {/if}
   </div>
-  <div>
-    <div id="advanced-prefs-form">
-      <h1>Advanced Options</h1>
-      <p class="form-text text-muted">
-        Be careful with these!
-      </p>
-      <form>
-        <div class="form-group full-width">
-          <label for="localSource">Local Source:</label>
-          <FolderChooser bind:source="{prefs.localSource}" />
-          <small class="form-text text-muted">
-            We will load screensavers from any directories listed here. Use this to add your own screensavers!
-          </small>
-        </div>
-  
-        <div class="form-group">
-          <label for="hotkey">Global hotkey:</label>
-          <input
-            bind:value="{prefs.launchShortcut}"
-            type="text"
-            name="hotkey"
-            readonly="readonly"
-            class="form-control form-control-sm"
-            on:keydown="{updateHotkey}"
-          >
-          <small class="form-text text-muted">
-            Enter a key combination that will be used to run a screensaver.
-          </small>
-        </div>
-      </form>
-    </div>
+  <div id="advanced-prefs-form">
+    <h1>Advanced Options</h1>
+    <p class="form-text text-muted">
+      Be careful with these!
+    </p>
+    <form>
+      <div class="form-group full-width">
+        <label for="localSource">Local Source:</label>
+        <FolderChooser bind:source="{prefs.localSource}" />
+        <small class="form-text text-muted">
+          We will load screensavers from any directories listed here. Use this to add your own screensavers!
+        </small>
+      </div>
+
+      <div class="form-group">
+        <label for="hotkey">Global hotkey:</label>
+        <input
+          bind:value="{prefs.launchShortcut}"
+          type="text"
+          name="hotkey"
+          readonly="readonly"
+          class="form-control form-control-sm"
+          on:keydown="{updateHotkey}"
+        >
+        <small class="form-text text-muted">
+          Enter a key combination that will be used to run a screensaver.
+        </small>
+      </div>
+    </form>
   </div>
-  {/if}
 
   <footer class="footer">
     <div>
@@ -151,7 +145,7 @@ import Spinner from "@/components/Spinner.svelte";
 import Notarize from "@/components/Notarize";
 import FolderChooser from "@/components/FolderChooser.svelte";
 
-let prefs = undefined;
+let prefs = {};
 let release = undefined;
 let disabled = false;
 let hasScreensaverUpdate = false;
