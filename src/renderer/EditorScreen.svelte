@@ -236,7 +236,7 @@
     <button variant="default" title="Open screensaver folder" on:click={openFolder}>
       <FolderIcon />
     </button>
-    <button variant="default" title="Save changes" disabled="{disabled}" on:click={saveData}>
+    <button variant="default" title="Save changes" disabled="{disabled}" class="save" on:click={saveData}>
       <SaveIcon />
     </button>
     <button variant="default" title="Reload preview" on:click={updatePreview}>

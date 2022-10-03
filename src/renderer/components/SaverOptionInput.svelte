@@ -1,4 +1,4 @@
-<form>
+<form data-index="{index}">
   <div class="form-group">
     <label for="name">Name</label>
     <div>
@@ -135,8 +135,11 @@ div.space-evenly > .form-group {
 <script>
 export let saver;
 export let option;
+
+$: index = saver.options.indexOf(option);
+
 function onDeleteClick() {
-  const index = saver.options.indexOf(option);
+  // const index = saver.options.indexOf(option);
   saver.options.splice(index, 1);
   saver = saver;
 }
