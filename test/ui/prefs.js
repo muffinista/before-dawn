@@ -45,7 +45,7 @@ describe("Prefs", function() {
     await window.click("button.save");
 
     await helpers.waitForText(window, "body", "Changes saved!", true);
-
+    console.log(currentPrefs().saver);
     assert(currentPrefs().saver.lastIndexOf("saver-one") !== -1);
   });
 

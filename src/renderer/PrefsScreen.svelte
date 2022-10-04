@@ -245,6 +245,12 @@
   }
 
   async function saveData() {
+    // copy in some data (not sure we really need this)
+    if (saverIndex !== -1 ) {
+      prefs.saver = saver;
+      prefs.options[saver] = savers[saverIndex].settings;
+    }
+
     const clone = JSON.parse(JSON.stringify(prefs));   
     return await window.api.updatePrefs(clone);
   }

@@ -18,7 +18,7 @@
               <label>No
                 <input
                   type="radio"
-                  :name="name"
+                  name="{option.name}"
                   value="false"
                   checked="{saver.settings[option.name] == false || saver.settings[option.name] === 'false'}"
                   on:change={notifyPreviewChange}
