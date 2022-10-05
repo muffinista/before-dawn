@@ -11,7 +11,6 @@ const webpack = require("webpack");
 const outputDir = path.join(__dirname, "output");
 
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const { VueLoaderPlugin } = require("vue-loader");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const SentryWebpackPlugin = require("@sentry/webpack-plugin");
 const ESLintPlugin = require("eslint-webpack-plugin");
@@ -39,7 +38,7 @@ var htmlPageOptions = function(id, title) {
  * that provide pure *.vue files that need compiling
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/webpack-configurations.html#white-listing-externals
  */
-let whiteListedModules = ["vue"];
+let whiteListedModules = [];
 
 let externals = [
   ...Object.keys(dependencies || {}).filter(d => !whiteListedModules.includes(d))
@@ -72,17 +71,10 @@ let rendererConfig = {
         }
       },
       {
-        test: /\.vue$/,
+        test: /\.svelte$/,
         use: {
-          loader: "vue-loader",
-          options: {
-            extractCSS: process.env.NODE_ENV === "production",
-            loaders: {
-              sass: "vue-style-loader!css-loader!sass-loader?indentedSyntax=1",
-              scss: "vue-style-loader!css-loader!sass-loader"
-            }
-          }
-        }
+            loader: "svelte-loader",
+        },
       },
     ]
   },
@@ -93,9 +85,8 @@ let rendererConfig = {
   plugins: [
     new ESLintPlugin({
       fix: false,
-      extensions: ["js", "vue"]
+      extensions: ["js"]
     }),
-    new VueLoaderPlugin(),
     new HtmlWebpackPlugin(htmlPageOptions("prefs", "Preferences")),
     new HtmlWebpackPlugin(htmlPageOptions("settings", "Settings")),
     new HtmlWebpackPlugin(htmlPageOptions("editor", "Editor")),    
@@ -122,9 +113,9 @@ let rendererConfig = {
     alias: {
       // handy alias for the root path of render files
       "@": path.join(__dirname, "src", "renderer"),
-      vue: "vue/dist/vue.esm-bundler.js"
+      "~": path.join(__dirname, "src")
     },
-    extensions: [".js", ".vue", ".json", ".css", ".node"]
+    extensions: [".js", ".json", ".css", ".node"]
   },
   target: "web"
 };
@@ -140,8 +131,6 @@ if (process.env.NODE_ENV === "production") {
     new webpack.DefinePlugin({
       "process.env.NODE_ENV": JSON.stringify("production"),
       "process.env.BEFORE_DAWN_RELEASE_NAME": JSON.stringify(COMMIT_SHA),
-      "__VUE_OPTIONS_API__": true,
-      "__VUE_PROD_DEVTOOLS__": false
     }),
     new webpack.LoaderOptionsPlugin({
       minimize: true
@@ -163,13 +152,6 @@ if (process.env.NODE_ENV === "production") {
       })
     );
   }
-} else {
-  rendererConfig.plugins.push(
-    new webpack.DefinePlugin({
-      "__VUE_OPTIONS_API__": true,
-      "__VUE_PROD_DEVTOOLS__": false
-    })
-  );
 }
 
 module.exports = rendererConfig;

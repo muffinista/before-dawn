@@ -128,7 +128,6 @@ small {
     border-color: #007bff;
   }
 
-
   label {
     font-size: 0.9rem;
   }
@@ -161,10 +160,6 @@ div.basic-prefs {
   grid-area: basic-prefs;
   margin-top: 1rem;
   margin-right: 2rem;
-}
-
-#editor .saver-detail {
-  max-width: 500px;
 }
 
 div.saver-info {
@@ -338,12 +333,6 @@ input[type="range"] {
   max-width: 250px;
 }
 
-div.space-evenly {
-  display: flex;
-  justify-content: space-between;
-  max-width: 95%;
-}
-
 div.form-group {
   margin-bottom: 1rem;
   max-width: 95%;
@@ -353,7 +342,7 @@ div.form-group {
     font-weight: bold;
     margin-bottom: 0.5rem;
   }
-  input, button {
+  input, button, select {
     display: block;
     height: auto;
     font-size: 1rem;
@@ -414,7 +403,7 @@ input[type="checkbox"] + label {
 
 
 div.notarize-wrapper {
-  position: absolute;
+  position: fixed;
   top: 10px;
   right: 10px;
   background: white;
@@ -428,6 +417,7 @@ div.notarize-wrapper {
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 100000;
 }
 
 @keyframes fadeIn {

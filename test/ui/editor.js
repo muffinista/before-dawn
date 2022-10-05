@@ -47,20 +47,20 @@ describe("Editor", function() {
   });
 
   it("adds and removes options", async function() {
-    await window.fill(".entry[data-index='0'] [name='name']", "My Option");
-    await window.fill(".entry[data-index='0'] [name='description']", "An Option I Guess?");
+    await window.fill(".saver-option-input [data-index='0'] [name='name']", "My Option");
+    await window.fill(".saver-option-input [data-index='0'] [name='description']", "An Option I Guess?");
     await window.click("button.add-option");
 
-    await window.fill(".entry[data-index='1'] [name='name']", "My Second Option");
-    await window.fill(".entry[data-index='1'] [name='description']", "Another Option I Guess?");
+    await window.fill(".saver-option-input [data-index='1'] [name='name']", "My Second Option");
+    await window.fill(".saver-option-input [data-index='1'] [name='description']", "Another Option I Guess?");
 
-    await window.selectOption(".entry[data-index='1'] select", {label: "yes/no"});
+    await window.selectOption(".saver-option-input [data-index='1'] select", {label: "yes/no"});
 
     await window.click("button.add-option");
-    await window.fill(".entry[data-index='2'] [name='name']", "My Third Option");
-    await window.fill(".entry[data-index='2'] [name='description']", "Here We Go Again");
+    await window.fill(".saver-option-input [data-index='2'] [name='name']", "My Third Option");
+    await window.fill(".saver-option-input [data-index='2'] [name='description']", "Here We Go Again");
 
-    await window.selectOption(".entry[data-index='2'] select", {label: "slider"});
+    await window.selectOption(".saver-option-input [data-index='2'] select", {label: "slider"});
 
     await window.click("button.save");
 
@@ -83,7 +83,7 @@ describe("Editor", function() {
     assert.strictEqual("Here We Go Again", opt.description);
     assert.strictEqual("slider", opt.type);
 
-    await window.click(".entry[data-index='1'] button.remove-option");
+    await window.click(".saver-option-input [data-index='1'] button.remove-option");
     await window.click("button.save");
 
     await helpers.sleep(100);

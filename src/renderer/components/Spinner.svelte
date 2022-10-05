@@ -1,19 +1,6 @@
-<template>
-  <div class="wrapper">
-    <div class="lds-dual-ring" />
-  </div>
-</template>
-
-<script>
-  // https://loading.io/css/
-  export default {
-    name: "SpinnerComponent",
-    components: { },
-    props: [],
-    computed: {
-    },
-  };
-</script>
+<div class="wrapper">
+  <div class="lds-dual-ring" />
+</div>
 
 <style>
 .lds-dual-ring {

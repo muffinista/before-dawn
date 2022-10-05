@@ -92,6 +92,10 @@ module.exports = class SaverListManager {
     this.loadedScreensavers = [];
   }
 
+  normalizePath(p) {
+    return p.split(path.sep).join(path.posix.sep);
+  }
+
   /**
    * search for all screensavers we can find on the filesystem. if cb is specified,
    * call it with data when done. if reload == true, don't use cached data.
@@ -124,14 +128,13 @@ module.exports = class SaverListManager {
     folders.forEach((sourceFolder) => {
       // glob doesn't work with windows style file paths, so convert
       // to posix
-      if ( path.sep !== path.posix.sep ) {
-        sourceFolder = sourceFolder.split(path.sep).join(path.posix.sep);
-      }
+      sourceFolder = this.normalizePath(sourceFolder);
+
       pattern = `${sourceFolder}/*/saver.json`;
       savers = glob.sync(pattern);
 
       for ( var i = 0; i < savers.length; i++ ) {
-        var f = savers[i];
+        var f = this.normalizePath(savers[i]);
         var folder = path.dirname(f);
 
         // exclude skippable folders
@@ -182,6 +185,7 @@ module.exports = class SaverListManager {
    * look up a screensaver by key, and return it
    */
   getByKey(key) {
+    key = this.normalizePath(key);
     var result = this.loadedScreensavers.find((obj) => {
       return obj.key === key;
     });
@@ -194,6 +198,7 @@ module.exports = class SaverListManager {
    */
   loadFromFile(src, settings) {
     let _self = this;
+    src = this.normalizePath(src);
 
     return new Promise(function (resolve, reject) {
       fs.readFile(src, {encoding: "utf8"}, (err, content) => {
@@ -229,11 +234,11 @@ module.exports = class SaverListManager {
   }
 
   loadFromData(contents, stub, settings) {
-    var src = this.prefs.localSource;
+    var src = this.normalizePath(this.prefs.localSource);
 
     if ( typeof(stub) !== "undefined" ) {
       contents.path = stub;
-      contents.key = path.join(stub, "saver.json");
+      contents.key = this.normalizePath(path.join(stub, "saver.json"));
     }
 
     contents.editable = false;

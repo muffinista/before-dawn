@@ -267,7 +267,7 @@ var grabScreen = function(s) {
         // rewrite file paths to always have unix slashes instead
         // of windows slashes. sometimes windows slashes are fine, but
         // there's a few situations where they won't render properly.
-        message.url = message.url.split(path.sep).join(path.posix.sep);
+        // message.url = message.url.split(path.sep).join(path.posix.sep);
 
         resolve(message);
       });
@@ -418,38 +418,39 @@ var openSettingsWindow = function() {
 /**
  * handle new screensaver event. open the window to create a screensaver
  */
-var addNewSaver = function() {
+var addNewSaver = async function(opts) {
   var newUrl = getUrl("new.html");
   var primary = electronScreen.getPrimaryDisplay();
 
   // take a screenshot of the main screen for use in previews
-  grabScreen(primary).then((grab) => {
-    screenshots[primary.id] = grab.url;
+  if ( !opts.screenshot) {
+    const grab = await grabScreen(primary);
+    opts.screenshot = grab.url;
+  }
 
-    handles.addNew.window = new BrowserWindow({
-      show: false,
-      width: 450,
-      height: 700,
-      resizable:true,
-      webPreferences: {
-        ...defaultWebPreferences,
-        preload: path.join(__dirname, "assets", "preload.js"),
-      },
-      icon: path.join(__dirname, "assets", "iconTemplate.png")
-    });
-
-    handles.addNew.window.on("closed", () => {
-      handles.addNew.window = null;
-      dock.hideDockIfInactive(app);
-    });
-
-    handles.addNew.window.once("ready-to-show", () => {
-      handles.addNew.window.show();
-      dock.showDock(app);
-    });
-
-    handles.addNew.window.loadURL(newUrl);
+  handles.addNew.window = new BrowserWindow({
+    show: false,
+    width: 450,
+    height: 700,
+    resizable:true,
+    webPreferences: {
+      ...defaultWebPreferences,
+      preload: path.join(__dirname, "assets", "preload.js"),
+    },
+    icon: path.join(__dirname, "assets", "iconTemplate.png")
   });
+
+  handles.addNew.window.on("closed", () => {
+    handles.addNew.window = null;
+    dock.hideDockIfInactive(app);
+  });
+
+  handles.addNew.window.once("ready-to-show", () => {
+    handles.addNew.window.show();
+    dock.showDock(app);
+  });
+
+  handles.addNew.window.loadURL(newUrl);
 };
 
 /**
@@ -495,13 +496,16 @@ var openAboutWindow = function() {
  * @param {string} args.screenshot path to the screenshot to use when editing
  */
 var openEditor = (args) => {
+  console.log("openEditor", args);
+
   var key = args.src;
   var screenshot = args.screenshot;
   
   var editorUrl = getUrl("editor.html");
   
   var target = editorUrl + "?" +
-               "src=" + encodeURIComponent(key);
+               "src=" + encodeURIComponent(key) +
+               "&screenshot=" + encodeURIComponent(screenshot);
 
   if ( handles.editor.window == null ) {
     handles.editor.window = new BrowserWindow({
@@ -516,6 +520,7 @@ var openEditor = (args) => {
   handles.editor.window.screenshot = screenshot;
 
   handles.editor.window.once("ready-to-show", () => {
+    handles.editor.window.send("args", args);
     handles.editor.window.show();
 
     if (process.env.NODE_ENV === "test") {
@@ -1367,10 +1372,10 @@ let setupIPC = function() {
   ipcMain.on("open-folder", (_event, src) => {
     var cmd;
     var args = [];
-    
+
     // figure out the path to the screensaver folder. use
     // decodeURIComponent to convert %20 to spaces
-    var filePath = path.dirname(decodeURIComponent(url.parse(src).path));
+    const filePath = path.dirname(decodeURIComponent(url.parse(src).path)); //.split(path.posix.sep).join(path.sep);
 
     switch(process.platform) {
     case "darwin":
@@ -1384,7 +1389,7 @@ let setupIPC = function() {
       else {
         cmd = "explorer.exe";
       }
-      args = [`/select,${filePath}`];
+      args = [`${filePath}`];
       break;
     default:
       // # Strip the filename from the path to make sure we pass a directory
@@ -1578,6 +1583,10 @@ var bootApp = async function() {
     electron.powerMonitor.on(type, () => {
       log.info(`system ${type} event, stop screensavers`);
       windows.closeRunningScreensavers();
+      if ( type === "resume" || type === "unlock-screen" ) {
+        log.info(`system ${type}, reset stateManager`);
+        stateManager.reset();
+      }
     }); 
   });
 

@@ -170,20 +170,16 @@ describe("SaverListManager", function() {
   });
 
   describe("confirmExists", function() {
-    it("returns true if present", function(done) {
+    it("returns true if present", async function() {
       let key = path.join(saversDir, "saver2", "saver.json");    
-      savers.confirmExists(key).then((result) => {
-        assert(result);
-        done();
-      });
+      const result = await savers.confirmExists(key);
+      assert(result);
     });
 
-    it("returns false if not present", function(done) {
+    it("returns false if not present", async function() {
       let key = "junk";
-      savers.confirmExists(key).then((result) => {
-        assert(!result);
-        done();
-      });
+      const result = await savers.confirmExists(key);
+      assert(!result);
     });
   });
 

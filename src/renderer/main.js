@@ -1,23 +1,24 @@
-import { createApp } from "vue";
+import "~/css/styles.scss";
 
-import PrefsScreen from "./PrefsScreen";
-import SettingsScreen from "./SettingsScreen";
-import EditorScreen from "./EditorScreen";
-import NewScreensaverScreen from "./NewScreensaverScreen";
-import AboutScreen from "./AboutScreen";
-
-import "@/../css/styles.scss";
+import PrefsScreen from "./PrefsScreen.svelte";
+import SettingsScreen from "./SettingsScreen.svelte";
+import AboutScreen from "./AboutScreen.svelte";
+import NewScreensaverScreen from "./NewScreensaverScreen.svelte";
+import EditorScreen from "./EditorScreen.svelte";
 
 const actions = {
-  "prefs": { components: { PrefsScreen }, template: "<PrefsScreen/>" },
-  "settings": { components: { SettingsScreen }, template: "<SettingsScreen/>" },
-  "editor": { components: { EditorScreen }, template: "<EditorScreen/>" },
-  "new": { components: { NewScreensaverScreen }, template: "<NewScreensaverScreen/>" },
-  "about": { components: { AboutScreen }, template: "<AboutScreen/>" }
+  "prefs": PrefsScreen,
+  "settings": SettingsScreen,
+  "about": AboutScreen,
+  "new": NewScreensaverScreen,
+  "editor": EditorScreen
 };
 
-
 const id = document.querySelector("body").dataset.id;
-const opts = actions[id];
+const klass = actions[id];
 
-createApp(opts).mount("body");
+const app = new klass({
+  target: document.getElementById("root"), // entry point in ../public/index.html
+});
+
+export default app;
