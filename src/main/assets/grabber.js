@@ -6,14 +6,6 @@
 
 const { contextBridge, ipcRenderer } = require("electron");
 
-const temp = require("temp");
-const os = require("os");
-const fs = require("fs");
-const fsPromises = fs.promises;
-const asyncMutex = require("async-mutex").Mutex;
-
-const mutex = new asyncMutex();
-
 /** 
  * look for an element in the DOM and create it if it doesn't exist 
  */
@@ -53,12 +45,10 @@ var applyVideoToCanvas = function(video, canvas) {
   return context;
 };
 
-/**
- * Given a media stream, take a screenshot and save it to a file
- * @param {*} video 
- */
-var screenToFile = async function(video) {
-  const tempName = temp.path({dir: os.tmpdir(), suffix:".png"});
+let captureIndex = 0;
+
+var screenToBuffer = async function(video) {
+  const tempName = `capture-index-${captureIndex}`;
   const canvas = findOrCreate("canvas", tempName);
   const context = applyVideoToCanvas(video, canvas);
   
@@ -67,12 +57,12 @@ var screenToFile = async function(video) {
   context.clearRect(0, 0, canvas.width, canvas.height);
     
   const buffer = Buffer.from(data.split(",")[1], "base64");
-  await fsPromises.writeFile(tempName, buffer);
 
   canvas.remove();
 
-  return tempName;
-}; // screenToFile
+  return buffer;
+};
+
 
 /**
  * cleanup video/media stream
@@ -132,7 +122,7 @@ var captureScreen = async function(id, width, height) {
 
   await video.play();
   
-  const result = await screenToFile(video, mediaStream);
+  const result = await screenToBuffer(video, mediaStream);
 
   cleanup(video, mediaStream);
 
@@ -145,14 +135,8 @@ contextBridge.exposeInMainWorld(
   {
     init: () => {
       ipcRenderer.on("request-screenshot", async (_event, opts) => {
-        const release = await mutex.acquire();
-        try {
-          const result = await captureScreen(opts.id, opts.width, opts.height);
-          ipcRenderer.send("screenshot-" + opts.id, {url:result});
-        }
-        finally {
-          release();
-        }
+        const result = await captureScreen(opts.id, opts.width, opts.height);
+        ipcRenderer.send("screenshot-" + opts.id, {buffer: result});
       });
     }
   }

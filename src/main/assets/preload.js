@@ -1,22 +1,5 @@
 const { contextBridge, ipcRenderer } = require("electron");
 
-const fs = require("fs");
-const path = require("path");
-
-if ( global.SENTRY_DSN !== undefined ) {
-  console.log(`setting up sentry with ${global.SENTRY_DSN}`);
-  const { init } = require("@sentry/electron");
-  init({
-    dsn: global.SENTRY_DSN,
-    enableNative: false,
-    release: process.env.BEFORE_DAWN_RELEASE_NAME,
-    onFatalError: (error) => {
-      // eslint-disable-next-line no-console
-      console.log(error);
-    },
-  }); 
-}
-
 const api = {
   platform: () => process.platform,
   getDisplayBounds: async() => ipcRenderer.invoke("get-primary-display-bounds"),
@@ -46,17 +29,9 @@ const api = {
   downloadScreensaverPackage: () => ipcRenderer.invoke("download-screensaver-package"),
   showOpenDialog: () => ipcRenderer.invoke("show-open-dialog"),
   openFolder: (path) => ipcRenderer.send("open-folder", path),
-  watchFolder: (src, cb) => {
-    const folderPath = path.dirname(src);
-    // make sure folder actually exists
-    if ( fs.existsSync(folderPath) ) {
-      fs.watch(folderPath, (eventType, filename) => {
-        if (filename) {
-          cb(eventType, filename);
-        }
-      });
-    }
-  },
+  watchFolder: (src) => ipcRenderer.send("watch-folder", src),
+  unwatchFolder: (src) => ipcRenderer.send("unwatch-folder", src),
+  onFolderUpdate: (cb) => ipcRenderer.on("folder-update", cb),
   toggleDevTools: () => ipcRenderer.send("toggle-dev-tools")
 };
 

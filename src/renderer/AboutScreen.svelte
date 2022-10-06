@@ -102,10 +102,6 @@ import { onMount } from "svelte";
 
 let globals = {};
 
-// $: {
-//   console.log(prefs);
-// }
-
 onMount(async () => {
   globals = await window.api.getGlobals();
 });
