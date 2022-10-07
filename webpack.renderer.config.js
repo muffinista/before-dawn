@@ -95,7 +95,6 @@ let rendererConfig = {
     new HtmlWebpackPlugin(htmlPageOptions("editor", "Editor")),    
     new HtmlWebpackPlugin(htmlPageOptions("new", "Create Screensaver!")),
     new HtmlWebpackPlugin(htmlPageOptions("about", "About!")),
-    new webpack.EnvironmentPlugin(["SENTRY_DSN"]),
     new MiniCssExtractPlugin({
       filename: "[name].css",
       chunkFilename: "[id].css"
@@ -131,7 +130,9 @@ let rendererConfig = {
 if (process.env.NODE_ENV === "production") {
   rendererConfig.devtool = "source-map";
 
+
   rendererConfig.plugins.push(
+    new webpack.EnvironmentPlugin(["SENTRY_DSN"]),
     new webpack.DefinePlugin({
       "process.env.NODE_ENV": JSON.stringify("production"),
       "process.env.BEFORE_DAWN_RELEASE_NAME": JSON.stringify(COMMIT_SHA),
