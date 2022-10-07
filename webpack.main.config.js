@@ -3,6 +3,8 @@
 const path = require("path");
 const packageJSON = require("./package.json");
 
+require("dotenv").config();
+
 const dependencies = packageJSON.dependencies;
 const optionalDependencies = packageJSON.optionalDependencies || {};
 const webpack = require("webpack");
@@ -100,7 +102,7 @@ let mainConfig = {
     })
   ],
   resolve: {
-    extensions: [".js", ".json", ".node"]
+    extensions: [".js", ".json"]
   },
   target: "electron-main"
 };

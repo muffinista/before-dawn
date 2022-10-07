@@ -4,7 +4,8 @@ const path = require("path");
 const packageJSON = require(`${"./package.json"}`);
 
 const productName = packageJSON.productName;
-const dependencies = packageJSON.dependencies;
+
+require("dotenv").config();
 
 const webpack = require("webpack");
 
@@ -38,18 +39,20 @@ var htmlPageOptions = function(id, title) {
  * that provide pure *.vue files that need compiling
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/webpack-configurations.html#white-listing-externals
  */
-let whiteListedModules = [];
+// let whiteListedModules = [];
 
-let externals = [
-  ...Object.keys(dependencies || {}).filter(d => !whiteListedModules.includes(d))
-];
+// let externals = [
+//   ...Object.keys(dependencies || {}).filter(d => !whiteListedModules.includes(d))
+// ];
+
+// console.log("EXTERNALS", externals);
 
 let rendererConfig = {
   devtool: "inline-source-map",
   entry: {
     renderer: path.join(__dirname, "src", "renderer", "main.js")
   },
-  externals: externals,
+  // externals: externals,
   module: {
     rules: [
       {
@@ -92,6 +95,7 @@ let rendererConfig = {
     new HtmlWebpackPlugin(htmlPageOptions("editor", "Editor")),    
     new HtmlWebpackPlugin(htmlPageOptions("new", "Create Screensaver!")),
     new HtmlWebpackPlugin(htmlPageOptions("about", "About!")),
+    new webpack.EnvironmentPlugin(["SENTRY_DSN"]),
     new MiniCssExtractPlugin({
       filename: "[name].css",
       chunkFilename: "[id].css"
@@ -115,7 +119,7 @@ let rendererConfig = {
       "@": path.join(__dirname, "src", "renderer"),
       "~": path.join(__dirname, "src")
     },
-    extensions: [".js", ".json", ".css", ".node"]
+    extensions: [".js", ".json", ".css"]
   },
   target: "web"
 };

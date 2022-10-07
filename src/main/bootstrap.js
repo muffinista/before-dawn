@@ -26,8 +26,6 @@ global.NEW_RELEASE_AVAILABLE = false;
 global.HELP_URL = "https://muffinista.github.io/before-dawn/";
 global.ISSUES_URL = "https://github.com/muffinista/before-dawn/issues";
 global.APP_CREDITS = "by Colin Mitchell // muffinlabs.com";
-global.SENTRY_DSN = "https://b86f7b0ac5604b55b4fd03adedc5d205@sentry.io/172824";
-
 
 if ( packageJSON.release_server && ! global.IS_DEV ) {
   global.RELEASE_SERVER = packageJSON.release_server;
@@ -35,17 +33,17 @@ if ( packageJSON.release_server && ! global.IS_DEV ) {
   global.PACKAGE_DOWNLOAD_URL = `https://github.com/${global.APP_REPO}/releases/latest`;
 }
 
-// this is a free sentry account and the URL will be in every copy of
-// the app that gets distributed, so i'm committing it to the repo for now
-if ( process.env.TEST_MODE === undefined && ! global.IS_DEV && global.SENTRY_DSN !== undefined ) {
-  console.log(`setting up sentry with ${global.SENTRY_DSN}`);
-  const { init } = require("@sentry/electron");
-  
-  init({
-    dsn: global.SENTRY_DSN,
-    onFatalError: (error) => {
+if ( process.env.TEST_MODE === undefined && !global.IS_DEV &&  process.env.SENTRY_DSN !== undefined ) {
+  console.log(`setting up sentry with ${process.env.SENTRY_DSN}`);
+  try {
+    const { init } = require("@sentry/electron"); 
+    init({
+      dsn: process.env.SENTRY_DSN,
       // eslint-disable-next-line no-console
-      console.log(error);
-    },
-  });
+      onFatalError: console.log
+    });  
+  }
+  catch(e) {
+    console.log(e);
+  }
 }

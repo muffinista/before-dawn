@@ -12,10 +12,7 @@ if ( process.env.SENTRY_DSN !== undefined ) {
   Sentry.init({
     dsn: process.env.SENTRY_DSN,
     enableNative: false,
-    onFatalError: (error) => {
-      // eslint-disable-next-line no-console
-      console.log(error);
-    }
+    onFatalError: console.log
   });  
 }
 
