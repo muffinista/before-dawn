@@ -130,9 +130,13 @@ let rendererConfig = {
 if (process.env.NODE_ENV === "production") {
   rendererConfig.devtool = "source-map";
 
+  if ( process.env.SENTRY_DSN ) {
+    rendererConfig.plugins.push(
+      new webpack.EnvironmentPlugin(["SENTRY_DSN"])
+    );
+  }
 
   rendererConfig.plugins.push(
-    new webpack.EnvironmentPlugin(["SENTRY_DSN"]),
     new webpack.DefinePlugin({
       "process.env.NODE_ENV": JSON.stringify("production"),
       "process.env.BEFORE_DAWN_RELEASE_NAME": JSON.stringify(COMMIT_SHA),
