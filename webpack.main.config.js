@@ -113,6 +113,12 @@ let mainConfig = {
 if (process.env.NODE_ENV === "production") {
   mainConfig.devtool = "source-map";
   
+  if ( process.env.SENTRY_DSN ) {
+    mainConfig.plugins.push(
+      new webpack.EnvironmentPlugin(["SENTRY_DSN"])
+    );
+  }
+
   mainConfig.plugins.push(
     new webpack.DefinePlugin({
       "process.env.NODE_ENV": JSON.stringify("production"),

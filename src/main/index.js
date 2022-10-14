@@ -67,6 +67,11 @@ let testMode = ( process.env.TEST_MODE !== undefined );
 
 let cursor;
 
+if (testMode || debugMode) {
+  log.transports.console.format = "{h}:{i}:{s} {text}";
+  log.catchErrors();
+}
+
 //
 // don't hide cursor in tests or in windows, since
 // that causes the tray to stop working???
@@ -1368,6 +1373,10 @@ let setupIPC = function() {
     if ( handles.editor.window !== null ) {
       handles.editor.window.webContents.openDevTools();
     }
+  });
+
+  ipcMain.on("console-log", (_event, payload) => {
+    log.info(payload);
   });
 
   /**

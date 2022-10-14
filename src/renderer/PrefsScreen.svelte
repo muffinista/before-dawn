@@ -129,6 +129,7 @@
   import SaverSummary from "@/components/SaverSummary.svelte";
 	import { onMount, onDestroy, tick } from "svelte";
 
+
 	let savers = [];
   let prefs = {};
   let saver = undefined;
@@ -141,6 +142,10 @@
   $: saverObj = savers[saverIndex];
 
 	onMount(async () => {
+    console.log = window.api.log;
+    window.addEventListener('error', console.log);
+    window.addEventListener('unhandledrejection', console.log);
+
     size = await window.api.getDisplayBounds();
     screenshot = await window.api.getScreenshot();
 

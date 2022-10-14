@@ -32,7 +32,8 @@ const api = {
   watchFolder: (src) => ipcRenderer.send("watch-folder", src),
   unwatchFolder: (src) => ipcRenderer.send("unwatch-folder", src),
   onFolderUpdate: (cb) => ipcRenderer.on("folder-update", cb),
-  toggleDevTools: () => ipcRenderer.send("toggle-dev-tools")
+  toggleDevTools: () => ipcRenderer.send("toggle-dev-tools"),
+  log: (payload) => ipcRenderer.send("console-log", payload)
 };
 
 contextBridge.exposeInMainWorld("api", api);
