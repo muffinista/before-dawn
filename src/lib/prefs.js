@@ -81,7 +81,6 @@ class SaverPrefs {
       this.saver === "";
   }
 
-
   get defaultSaversDir() {
     return this.saversDir;
   }
