@@ -34,6 +34,6 @@ jobs:
       with:
         name: logs
         path: |
-          ~/.config/Before Dawn/logs/
+          # ~/.config/Before Dawn/logs/
           /Users/runner/Library/Logs/mocha/
-          C:\Users\runneradmin\AppData\Roaming\mocha\logs\
+          # C:\Users\runneradmin\AppData\Roaming\mocha\logs\
