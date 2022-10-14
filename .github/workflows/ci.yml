@@ -28,12 +28,12 @@ jobs:
     - run: npm ci
     - run: npm run test-lib
     - name: Run integration tests
-      if: ${{ matrix.os != 'ubuntu-latest' }}
+      # if: ${{ matrix.os != 'ubuntu-latest' }}
       run: npm run test-ui
     - uses: actions/upload-artifact@v3
       with:
         name: logs
         path: |
           ~/.config/Before Dawn/logs/
-          ~/Library/Logs/Before Dawn/
-          %USERPROFILE%\AppData\Roaming\Before Dawn\logs\
+          /Users/runner/Library/Logs/mocha/
+          C:\Users\runneradmin\AppData\Roaming\mocha\logs\
