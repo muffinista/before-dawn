@@ -14,6 +14,8 @@ let windowCheckDelay = 5000;
 let testTimeout = 25000;
 let testRetryCount = 0;
 
+let app;
+
 if (process.env.CI) {
   windowCheckDelay = 10000;
   testTimeout = 60000;
@@ -159,7 +161,8 @@ exports.application = async function(workingDir, quietMode=false) {
     CONFIG_DIR: workingDir,
     SAVERS_DIR: workingDir,
     TEST_MODE: true,
-    QUIET_MODE: quietMode
+    QUIET_MODE: quietMode,
+    ELECTRON_ENABLE_LOGGING: true
   };
 
   let a = await electron.launch({
@@ -168,13 +171,26 @@ exports.application = async function(workingDir, quietMode=false) {
     env: env
   });
 
+  a.logData = [];
+
+  a.on("window", (w) => {
+    // w.on("console", console.log);
+    w.on("console", (payload) => {
+      a.logData.push(payload);
+    });
+  });
+
   // wait for the first window (our test shim) to open, and
   // hang onto it for later use
   exports.shim = await a.firstWindow();
 
+  app = a;
   return a;
 };
 
+exports.dumpOutput = async(app) => {
+  console.log(app.logData);
+};
 
 /**
  * 
@@ -315,4 +331,12 @@ exports.callIpc = async(_app, method, opts={}) => {
 exports.setupTest = function (test) {
   test.timeout(testTimeout);
   test.retries(testRetryCount);
+
+	afterEach(async function () {
+    if (this.currentTest.state !== "passed") {
+      await exports.dumpOutput(app);
+    }
+
+    await exports.stopApp(app);
+	});
 };

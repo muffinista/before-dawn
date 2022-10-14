@@ -36,10 +36,6 @@ describe("Settings", function() {
     window = await helpers.waitFor(app, "settings");
   });
 
-	afterEach(async function() {
-    await helpers.stopApp(app);
-	});
-
   it("toggles checkboxes", async function() {
     let oldConfig = currentPrefs();
 

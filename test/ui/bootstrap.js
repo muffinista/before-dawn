@@ -22,10 +22,6 @@ describe("bootstrap", function() {
     configDest = path.join(workingDir, "config.json");  
   });
 
-	afterEach(async function() {
-    await helpers.stopApp(app);
-	});
-
 
   describe("without config", () => {
     beforeEach(async () => {

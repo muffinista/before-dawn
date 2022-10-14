@@ -18,10 +18,6 @@ describe("About", function() {
     await helpers.callIpc(app, "open-window about");
   });
 
-	afterEach(async function () {
-    await helpers.stopApp(app);
-	});
-
   it("has some text and current version number", async function() {
     const window = await helpers.waitFor(app, "about");
 

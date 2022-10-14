@@ -27,10 +27,6 @@ describe("Editor", function() {
 
     window = await helpers.waitFor(app, "editor");
   });
-
-  afterEach(function() {
-    return helpers.stopApp(app);
-  });
     
   it("edits basic settings", async function() {
     const val = await window.inputValue("#saver-form [name='name']");
