@@ -30,10 +30,6 @@ describe("Prefs", function() {
     window = await helpers.waitFor(app, "prefs");
 	});
 
-	afterEach(async function() {
-    await helpers.stopApp(app);
-	});
-
   it("lists screensavers", async function() {
     await helpers.waitForText(window, "body", "Screensaver One", true);
   });

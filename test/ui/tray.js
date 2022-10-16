@@ -27,10 +27,6 @@ describe("tray", function() {
     window = helpers.shim;
   });
 
-	afterEach(async function() {
-    await helpers.stopApp(app);
-	});
-
   describe("run now", function() {
    it("opens screensaver", async function() {
     await window.click("button.RunNow");

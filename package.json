@@ -1,7 +1,7 @@
 {
   "name": "before-dawn",
   "productName": "Before Dawn",
-  "version": "0.19.0",
+  "version": "0.21.0",
   "description": "A desktop screensaver app using web technologies",
   "author": "Colin Mitchell <colin@muffinlabs.com> (http://muffinlabs.com)",
   "license": "MIT",
@@ -9,7 +9,7 @@
   "release_server": "https://before-dawn-updates.muffinlabs.com",
   "main": "output/main.js",
   "engines": {
-    "node": ">= 16.14.2"
+    "node": ">= 16.16.0"
   },
   "devport": 9081,
   "scripts": {
@@ -35,18 +35,18 @@
     "url": "git://github.com/muffinista/before-dawn.git"
   },
   "dependencies": {
-    "@sentry/electron": "^3.0.7",
+    "@sentry/electron": "^4.0.2",
     "async-mutex": "^0.3.0",
     "auto-launch": "^5.0.5",
     "conf": "^10.0.0",
-    "detect-fullscreen": "muffinista/detect-fullscreen",
+    "detect-fullscreen": "github:muffinista/detect-fullscreen",
     "electron-is-dev": "^2.0.0",
     "electron-log": "^4.0.6",
-    "forcefocus": "muffinista/forcefocus",
+    "forcefocus": "github:muffinista/forcefocus",
     "fs-extra": "^10.0.0",
     "glob": "^8.0.3",
-    "goto-sleep": "muffinista/goto-sleep",
-    "hide-cursor": "muffinista/hide-cursor",
+    "goto-sleep": "github:muffinista/goto-sleep",
+    "hide-cursor": "github:muffinista/hide-cursor",
     "mkdirp": "^1.0.0",
     "node-fetch": "^2.6.7",
     "normalize.css": "^8.0.1",
@@ -71,9 +71,9 @@
     "cross-env": "^7.0.0",
     "css-loader": "^6.2.0",
     "dotenv": "^16.0.0",
-    "electron": "^19.0.0",
+    "electron": "^21.0.0",
     "electron-builder": "^23.0.3",
-    "electron-rebuild": "^3.2.8",
+    "electron-rebuild": "^3.2.9",
     "eslint": "^8.16.0",
     "eslint-config-standard": "^17.0.0",
     "eslint-friendly-formatter": "^4.0.1",
@@ -84,6 +84,7 @@
     "mini-css-extract-plugin": "^2.0.0",
     "mocha": "^9.0.1",
     "nock": "^13.0.2",
+    "node-abi": "^3.25.0",
     "node-loader": "^2.0.0",
     "nyc": "^15.0.0",
     "playwright": "^1.22.2",

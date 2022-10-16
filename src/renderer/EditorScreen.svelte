@@ -1,5 +1,7 @@
 <!-- #editor -->
 <script>
+  import { onMount, onDestroy } from "svelte";
+
   import Notarize from "@/components/Notarize";
   import SaverForm from "./components/SaverForm.svelte";
   import SaverOptions from "@/components/SaverOptions.svelte";
@@ -10,7 +12,11 @@
   import SaveIcon from "./components/icons/SaveIcon.svelte";
   import BugIcon from "./components/icons/BugIcon.svelte";
 
-  import { onMount } from "svelte";
+  console.log = window.api.log;
+  window.addEventListener('error', console.log);
+  window.addEventListener('unhandledrejection', console.log);
+
+
   let size = undefined;
   let saver = {options: [], requirements: []};
   let options = [];
@@ -35,7 +41,10 @@
     options = saver.options;
     lastIndex = saver.options.length;
 
-    window.api.watchFolder(src, updatePreview);
+    window.api.onFolderUpdate(() => {
+      updatePreview()
+    });
+    window.api.watchFolder(src);
     addEventListener("resize", updatePreview);
 
     // wait a tick so that all our required elements actually exist
@@ -43,6 +52,10 @@
       updatePreview();
     }, 0);
   });
+
+  onDestroy(() => {
+    window.api.unwatchFolder(src);
+  })
 
   function addSaverOption() {
     saver.options.push({
@@ -147,7 +160,6 @@
   }
 
   async function saveData() {
-    console.log("saveData");
     if (document.querySelectorAll(":invalid").length > 0) {
       document.querySelectorAll("form:invalid").forEach((el) => el.classList.add("submit-attempt"));
       return;

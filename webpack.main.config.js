@@ -3,6 +3,8 @@
 const path = require("path");
 const packageJSON = require("./package.json");
 
+require("dotenv").config();
+
 const dependencies = packageJSON.dependencies;
 const optionalDependencies = packageJSON.optionalDependencies || {};
 const webpack = require("webpack");
@@ -100,7 +102,7 @@ let mainConfig = {
     })
   ],
   resolve: {
-    extensions: [".js", ".json", ".node"]
+    extensions: [".js", ".json"]
   },
   target: "electron-main"
 };
@@ -111,6 +113,12 @@ let mainConfig = {
 if (process.env.NODE_ENV === "production") {
   mainConfig.devtool = "source-map";
   
+  if ( process.env.SENTRY_DSN ) {
+    mainConfig.plugins.push(
+      new webpack.EnvironmentPlugin(["SENTRY_DSN"])
+    );
+  }
+
   mainConfig.plugins.push(
     new webpack.DefinePlugin({
       "process.env.NODE_ENV": JSON.stringify("production"),

@@ -34,6 +34,8 @@ const {app,
   Tray} = require("electron");
 
 const fs = require("fs");
+const os = require("os");
+const temp = require("temp");
 const path = require("path");
 const url = require("url");
 const exec = require("child_process").execFile;
@@ -64,6 +66,11 @@ let debugMode = ( process.env.DEBUG_MODE !== undefined );
 let testMode = ( process.env.TEST_MODE !== undefined );
 
 let cursor;
+
+if (testMode || debugMode) {
+  log.transports.console.format = "{h}:{i}:{s} {text}";
+  log.catchErrors();
+}
 
 //
 // don't hide cursor in tests or in windows, since
@@ -252,6 +259,12 @@ var grabScreen = function(s) {
       let windowRef;
       ipcMain.once(`screenshot-${screen.id}`, function(_e, message) {
         // log.info("got screenshot!", message);
+        const tempName = temp.path({dir: os.tmpdir(), suffix:".png"});
+
+        fs.writeFileSync(tempName, message.buffer);
+        resolve({
+          url: tempName
+        });
 
         // close the screen grabber window
         try {
@@ -496,8 +509,6 @@ var openAboutWindow = function() {
  * @param {string} args.screenshot path to the screenshot to use when editing
  */
 var openEditor = (args) => {
-  console.log("openEditor", args);
-
   var key = args.src;
   var screenshot = args.screenshot;
   
@@ -696,7 +707,6 @@ var runScreenSaverOnDisplay = function(saver, s) {
   const reqs = saver.requirements;
   if ( reqs !== undefined && reqs.findIndex((x) => { return x === "screen"; }) > -1 ) {
     return grabScreen(s).then((message) => {
-      console.log(message);
       runSaver(message.url, saver, s, url_opts, tickCount);
     });
   }
@@ -1142,7 +1152,6 @@ let setupIPC = function() {
    * open the window specified by 'key', passing args along
    */
   ipcMain.on("open-window", (_event, key, args) => {
-    console.log(key, args);
     windowMethods[key](args);
   });
 
@@ -1366,6 +1375,10 @@ let setupIPC = function() {
     }
   });
 
+  ipcMain.on("console-log", (_event, payload) => {
+    log.info(payload);
+  });
+
   /**
    * open a folder
    */
@@ -1400,6 +1413,28 @@ let setupIPC = function() {
     }
     
     exec(cmd, args, function() {});
+  });
+
+  ipcMain.on("watch-folder", (event, src) => {
+    const webContents = event.sender;
+    const win = BrowserWindow.fromWebContents(webContents);
+
+    const folderPath = path.dirname(src);
+    // make sure folder actually exists
+    if ( fs.existsSync(folderPath) ) {
+      win.fsWatcher = fs.watch(folderPath, (eventType, filename) => {
+        if (filename) {
+          win.webContents.send("folder-update", filename);
+        }
+      });
+    }
+  });
+
+  ipcMain.on("unwatch-folder", (event) => {
+    const webContents = event.sender;
+    const win = BrowserWindow.fromWebContents(webContents);
+
+    win.fsWatcher.close();
   });
 
   /**
@@ -1509,7 +1544,6 @@ let setupIPC = function() {
  */
 var bootApp = async function() {
   session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
-    // console.log(details);
     callback({responseHeaders: Object.fromEntries(Object.entries(details.responseHeaders).filter(header => !/x-frame-options/i.test(header[0])))});
   });
 

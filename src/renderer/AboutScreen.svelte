@@ -100,11 +100,11 @@
 <script>
 import { onMount } from "svelte";
 
-let globals = {};
+console.log = window.api.log;
+window.addEventListener('error', console.log);
+window.addEventListener('unhandledrejection', console.log);
 
-// $: {
-//   console.log(prefs);
-// }
+let globals = {};
 
 onMount(async () => {
   globals = await window.api.getGlobals();

@@ -13,10 +13,6 @@ let app;
 describe("Add New", function() {
   const screensaverUrl = "file://" + path.join(__dirname, "../fixtures/screenshot.png");
 
-  // let currentPrefs = function() {
-  //   return JSON.parse(fs.readFileSync(`${workingDir}/config.json`));
-  // };
-
   helpers.setupTest(this);
 
   beforeEach(async () => {
@@ -24,10 +20,6 @@ describe("Add New", function() {
     workingDir = helpers.getTempDir();
 
     app = await helpers.application(workingDir, true);
-  });
-
-  afterEach(async function() {
-    await helpers.stopApp(app);
   });
 
   describe("when not setup", function() {
