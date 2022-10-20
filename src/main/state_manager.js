@@ -273,10 +273,17 @@ class StateManager {
     }
   }
 
+  isTicking() {
+    return this.keepTicking === true;
+  }
+
   startTicking() {
+    this.logger("startTicking");
+    this.keepTicking = true;
     this.scheduleTick();
   }
   stopTicking() {
+    this.logger("stopTicking");
     this.keepTicking = false;
     clearInterval(this.loggingInterval);
   }

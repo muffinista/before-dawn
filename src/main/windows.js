@@ -37,7 +37,7 @@ var handleDisplayChange = function() {
  * close any running screensavers
  */
 var closeRunningScreensavers = function() {
-  // main.log.info("closeRunningScreensavers");
+  main.log.info("closeRunningScreensavers");
   attemptToStopScreensavers();
 
   // be really aggressive about closing lagging windows

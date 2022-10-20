@@ -31,7 +31,8 @@ const {app,
   session,
   shell,
   systemPreferences,
-  Tray} = require("electron");
+  Tray,
+  powerMonitor} = require("electron");
 
 const fs = require("fs");
 const os = require("os");
@@ -177,7 +178,7 @@ catch(e) {
 
 const power = new Power({
   platform: process.platform,
-  method: electron.powerMonitor.isOnBatteryPower
+  method: powerMonitor.isOnBatteryPower
 });
 
 
@@ -1608,23 +1609,35 @@ var bootApp = async function() {
   //
   ["display-added", "display-removed"].forEach((type) => {
     electronScreen.on(type, async () => {
+      log.info(type);
+
       await listScreens();
       windows.handleDisplayChange();
     });
   });
 
-  ["suspend", "resume", "lock-screen", "unlock-screen"].forEach((type) => {
-    electron.powerMonitor.on(type, () => {
-      log.info(`system ${type} event, stop screensavers`);
-      windows.closeRunningScreensavers();
-      if ( type === "resume" || type === "unlock-screen" ) {
-        log.info(`system ${type}, reset stateManager`);
-        stateManager.reset();
+  ["suspend", "lock-screen"].forEach((type) => {
+    powerMonitor.on(type, (ev) => {
+      if ( stateManager.isTicking() ) {
+        log.info(`system ${type} event, stop screensavers`);
+        ev.preventDefault();
+        stateManager.stopTicking();
       }
     }); 
   });
 
-  electron.powerMonitor.on("on-ac", () => {
+  ["resume", "unlock-screen"].forEach((type) => {
+    powerMonitor.on(type, (ev) => {
+      if ( !stateManager.isTicking() ) {
+        log.info(`system ${type} event, restart state manager`);
+        ev.preventDefault();
+        stateManager.reset();
+        stateManager.startTicking();
+      }
+    }); 
+  });
+
+  powerMonitor.on("on-ac", () => {
     log.info("system on-ac event, reset state manager");
     stateManager.reset();
   }); 
@@ -1632,7 +1645,7 @@ var bootApp = async function() {
   setupIPC();
 
   stateManager = new StateManager();
-  stateManager.idleFn = electron.powerMonitor.getSystemIdleTime;
+  stateManager.idleFn = powerMonitor.getSystemIdleTime;
 
   updateStateManager();
 
