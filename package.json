@@ -72,7 +72,6 @@
     "dotenv": "^16.0.0",
     "electron": "21.0.1",
     "electron-builder": "electron-userland/electron-builder#v24.0.0-alpha.1",
-    "electron-rebuild": "^3.2.9",
     "eslint": "^8.16.0",
     "eslint-config-standard": "^17.0.0",
     "eslint-friendly-formatter": "^4.0.1",
