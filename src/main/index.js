@@ -1622,20 +1622,26 @@ var bootApp = async function() {
         log.info(`system ${type} event, stop screensavers`);
         ev.preventDefault();
         stateManager.stopTicking();
+        windows.closeRunningScreensavers();
       }
     }); 
   });
 
-  ["resume", "unlock-screen"].forEach((type) => {
-    powerMonitor.on(type, (ev) => {
-      if ( !stateManager.isTicking() ) {
-        log.info(`system ${type} event, restart state manager`);
-        ev.preventDefault();
-        stateManager.reset();
-        stateManager.startTicking();
-      }
-    }); 
-  });
+  setInterval(() => {
+    if ( stateManager.isTicking() ) {
+      return;
+    }
+
+    const delayTime = prefs.delay > 0 ? prefs.delay * 60 : Number.POSITIVE_INFINITY;
+    const idleState = powerMonitor.getSystemIdleState(delayTime);
+
+    log.info(`wakeup check ${delayTime} ${idleState}`);
+    if ( ! stateManager.isTicking() && idleState === "active" ) {
+      log.info("looks like we are awake again lets go");
+      stateManager.reset();
+      stateManager.startTicking();
+    }
+  }, 10000);
 
   powerMonitor.on("on-ac", () => {
     log.info("system on-ac event, reset state manager");

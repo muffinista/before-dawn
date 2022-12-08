@@ -48,11 +48,7 @@ class StateManager {
       active: ACTIVE_CHECK_RATE
     };
 
-    // every minute or so, output the current state
-    this.loggingInterval = setInterval(() => {
-      this.logger(`Current idle: ${this._idleFn()} Last idle: ${this.lastTime} -- ${this.currentStateString}`);
-    }, 60000);
-
+    this.setupLogging();
   }
 
   get currentTimeStamp() {
@@ -268,9 +264,19 @@ class StateManager {
       }
 
       setTimeout(() => {
-        this.tick();
+        this.tick(true);
       }, rate);
     }
+  }
+
+  setupLogging() {
+    this.logger("setupLogging");
+    // clearInterval(this.loggingInterval);
+
+    // every minute or so, output the current state
+    this.loggingInterval = setInterval(() => {
+      this.logger(`Current idle: ${this._idleFn()} Last idle: ${this.lastTime} -- ${this.currentStateString}`);
+    }, 60000);
   }
 
   isTicking() {
@@ -285,7 +291,7 @@ class StateManager {
   stopTicking() {
     this.logger("stopTicking");
     this.keepTicking = false;
-    clearInterval(this.loggingInterval);
+    // clearInterval(this.loggingInterval);
   }
 }
 
