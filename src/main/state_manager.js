@@ -47,9 +47,7 @@ class StateManager {
       idle: IDLE_CHECK_RATE,
       active: ACTIVE_CHECK_RATE
     };
-
-    this.setupLogging();
-  }
+ }
 
   get currentTimeStamp() {
     return process.hrtime()[0];
@@ -286,12 +284,13 @@ class StateManager {
   startTicking() {
     this.logger("startTicking");
     this.keepTicking = true;
+    this.setupLogging();
     this.scheduleTick();
   }
   stopTicking() {
     this.logger("stopTicking");
     this.keepTicking = false;
-    // clearInterval(this.loggingInterval);
+    clearInterval(this.loggingInterval);
   }
 }
 
