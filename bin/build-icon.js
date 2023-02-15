@@ -4,7 +4,6 @@
 
 require("dotenv").config();
 
-const rimraf = require("rimraf");
 const tmp = require("tmp");
 const path = require("path");
 const fs = require("fs");
@@ -22,7 +21,6 @@ async function main() {
   const pauseImage = await jimp.read("assets/icon-paused.png");
 
   const tmpDir = tmp.dirSync().name;
-  rimraf.sync(tmpDir);
 
   for ( let index in sizes ) {
     const size = sizes[index];

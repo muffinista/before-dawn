@@ -23,7 +23,7 @@ let repo = "before-dawn-screensavers";
 
 console.log("cleaning up working dir", workingDir);
 mkdirp.sync(workingDir);
-rimraf.sync(`${workingDir}/*`);
+rimraf.sync(workingDir);
 
 async function main() {
   let result = await octokit.repos.getLatestRelease({owner, repo});
