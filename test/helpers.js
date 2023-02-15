@@ -165,10 +165,6 @@ exports.application = async function(workingDir, quietMode=false) {
     ELECTRON_ENABLE_LOGGING: true
   };
 
-  const log = require("electron-log");
-  const logDest = log.transports.file.getFile().path;
-  console.log(`I am writing logs to ${logDest}`); 
-
   let a = await electron.launch({
     path: appPath,
     args: [path.join(__dirname, "..", "output", "main.js")],

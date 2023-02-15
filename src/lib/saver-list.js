@@ -288,34 +288,16 @@ module.exports = class SaverListManager {
    * delete a screensaver -- this removes the directory that contains all files
    * for the screensaver.
    */
-  delete(s) {
+  async delete(s) {
     var k = s.key;
     var p = path.dirname(k);
-    let _self = this;
 
-    return new Promise(function (resolve, reject) {
-      if ( typeof(s) !== "undefined" && s.editable === true ) {
-        rimraf(p, () => { 
-          _self.reload();
-          resolve(true);
-        });
-      }
-      else {
-        reject(false);
-      }
-    });
-
-    // var cbWrapped = function(result) {
-    //   _self.reload().then(() => cb(result));
-    // };
-    
-    // // make sure we're deleting a screensaver that exists and is
-    // // actually editable
-    // if ( typeof(s) !== "undefined" && s.editable === true ) {
-    //   rimraf(p, () => { cbWrapped(true); });
-    // }
-    // else {
-    //   cb(false);
-    // }
+    if ( typeof(s) !== "undefined" && s.editable === true ) {
+      await rimraf(p);
+      return true;
+    }
+    else {
+      return false;
+    }
   }
 };

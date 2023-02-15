@@ -1424,7 +1424,7 @@ let setupIPC = function() {
     // make sure folder actually exists
     if ( fs.existsSync(folderPath) ) {
       win.fsWatcher = fs.watch(folderPath, (eventType, filename) => {
-        if (filename) {
+        if (filename && win?.webContents) {
           win.webContents.send("folder-update", filename);
         }
       });
