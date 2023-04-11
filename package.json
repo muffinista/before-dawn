@@ -88,7 +88,7 @@
     "node-loader": "^2.0.0",
     "nyc": "^15.0.0",
     "playwright": "^1.22.2",
-    "png-to-ico": "^2.1.2",
+    "png-to-ico": "^2.1.8",
     "sass": "^1.26",
     "sass-loader": "^13.0.0",
     "sinon": "^14.0.0",
