@@ -168,14 +168,6 @@ if (! singleLock ) {
   process.exit();
 }
 
-try {
-  const logDest = log.transports.file.getFile().path;
-  console.log(`I am writing logs to ${logDest}`); 
-}
-catch(e) {
-  console.log(e);
-}
-
 const power = new Power({
   platform: process.platform,
   method: powerMonitor.isOnBatteryPower
