@@ -68,6 +68,9 @@ describe("SaverFactory", function() {
       let data = await savers.list();
       let oldCount = data.length;
 
+      console.log(saversDir);
+      console.log(savers);
+
       const result = factory.create(templateSrc, saversDir, attrs);
 
       data = await savers.list();
