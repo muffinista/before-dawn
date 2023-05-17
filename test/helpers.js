@@ -69,7 +69,7 @@ exports.setConfigValue = (workingDir, name, value) => {
 
 exports.getTempDir = function() {
   const tmpDir = tmp.dirSync().name;
-  rimraf.sync(tmpDir);
+  rimraf.sync(`${tmpDir}/`);
   return tmpDir;
 };
 
