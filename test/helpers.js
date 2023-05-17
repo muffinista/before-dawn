@@ -1,7 +1,7 @@
 const tmp = require("tmp");
 const path = require("path");
 const fs = require("fs-extra");
-const rimraf = require("rimraf");
+const { rimraf } = require("rimraf");
 
 const { _electron: electron } = require("playwright");
 

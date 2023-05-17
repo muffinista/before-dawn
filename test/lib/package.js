@@ -3,7 +3,7 @@
 const assert = require("assert");
 const path = require("path");
 const fs = require("fs");
-const rimraf = require("rimraf");
+const { rimraf } = require("rimraf");
 const sinon = require("sinon");
 const nock = require("nock");
 

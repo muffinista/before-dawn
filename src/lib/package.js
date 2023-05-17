@@ -4,8 +4,8 @@ const fs = require("fs");
 const path = require("path");
 const fetch = require("node-fetch");
 const yauzl = require("yauzl");
-const mkdirp = require("mkdirp");
-const rimraf = require("rimraf");
+const { mkdirp } = require("mkdirp");
+const { rimraf } = require("rimraf");
 const lockfile = require("proper-lockfile");
 
 const temp = require("temp");

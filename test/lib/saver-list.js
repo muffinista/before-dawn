@@ -4,7 +4,7 @@ const assert = require("assert");
 const sinon = require("sinon");
 const helpers = require("../helpers.js");
 
-const rimraf = require("rimraf");
+const { rimraf } = require("rimraf");
 const fs = require("fs-extra");
 const path = require("path");
 

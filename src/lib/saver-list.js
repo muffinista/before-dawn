@@ -2,9 +2,9 @@
 
 const fs = require("fs-extra");
 const path = require("path");
-const mkdirp = require("mkdirp");
-const rimraf = require("rimraf");
-const glob = require("glob");
+const { mkdirp } = require("mkdirp");
+const { rimraf } = require("rimraf");
+const { glob } = require("glob");
 
 const CONFIG_FILE_NAME = "config.json";
 
