@@ -1,7 +1,7 @@
 const tmp = require("tmp");
 const path = require("path");
 const fs = require("fs-extra");
-const { rimraf } = require("rimraf");
+// const { rimraf } = require("rimraf");
 
 const { _electron: electron } = require("playwright");
 
@@ -69,8 +69,7 @@ exports.setConfigValue = (workingDir, name, value) => {
 
 exports.getTempDir = function() {
   const tmpDir = tmp.dirSync().name;
-  console.log(`temp dir: ${tmpDir}`);
-  rimraf.sync(tmpDir);
+  // rimraf.sync(tmpDir);
   return tmpDir;
 };
 
