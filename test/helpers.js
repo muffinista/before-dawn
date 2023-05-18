@@ -67,12 +67,6 @@ exports.setConfigValue = (workingDir, name, value) => {
   fs.writeFileSync(f, JSON.stringify(currentVals));
 };
 
-exports.getTempDir = function() {
-  const tmpDir = tmp.dirSync().name;
-  // rimraf.sync(tmpDir);
-  return tmpDir;
-};
-
 exports.addSaver = function(dest, name, source) {
   // make a subdir in the savers directory and drop screensaver
   // config there
@@ -113,9 +107,11 @@ exports.prefsToJSON = (tmpdir) => {
 };
 
 exports.getTempDir = function() {
-  var tmpObj = tmp.dirSync();
-  return tmpObj.name;
+  const tmpDir = tmp.dirSync().name;
+  return tmpDir;
 };
+
+
 
 exports.savedConfig = function(p) {
   var data = path.join(p, "config.json");
