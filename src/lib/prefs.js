@@ -151,6 +151,7 @@ Object.keys(DEFAULTS).forEach(function(name) {
         if ( typeof(newval) === "object" && ( name === "sourceUpdatedAt" || name === "updateCheckTimestamp" )) {
           newval = newval.toISOString();
         }
+        console.log(`${name} -> ${newval}`);
         this.store.set(name, newval);
       }
     }

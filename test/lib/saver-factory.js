@@ -1,7 +1,6 @@
 "use strict";
 
 const assert = require("assert");
-const sinon = require("sinon");
 const helpers = require("../helpers.js");
 
 const { rimraf } = require("rimraf");
@@ -12,7 +11,6 @@ const SaverPrefs = require("../../src/lib/prefs.js");
 const SaverFactory = require("../../src/lib/saver-factory.js");
 const SaverListManager = require("../../src/lib/saver-list.js");
 
-var sandbox;
 
 describe("SaverFactory", function() { 
   var savers;
@@ -24,13 +22,12 @@ describe("SaverFactory", function() {
   var systemDir;
   
   beforeEach(function() {
-    sandbox = sinon.createSandbox();
-
     // this will be the working directory of the app
     workingDir = helpers.getTempDir();
 
     // this will be the separate directory to hold screensavers
     saversDir = helpers.getTempDir();
+    console.log(`saversDir: ${saversDir}`);
 
     systemDir = path.join(workingDir, "system-savers");
     fs.mkdirSync(systemDir);
@@ -46,7 +43,6 @@ describe("SaverFactory", function() {
     if ( fs.existsSync(workingDir) ) {
       rimraf.sync(workingDir);
     }
-    sandbox.restore();
   });
 
   
