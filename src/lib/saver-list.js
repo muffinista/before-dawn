@@ -134,11 +134,11 @@ module.exports = class SaverListManager {
       // glob doesn't work with windows style file paths, so convert
       // to posix
       sourceFolder = this.normalizePath(sourceFolder);
-      console.log("glob all", glob.sync(sourceFolder));
+      console.log("glob all", sourceFolder, glob.sync(sourceFolder));
 
       pattern = `${sourceFolder}/*/saver.json`;
       savers = glob.sync(pattern);
-      console.log("glob savers", savers);
+      console.log("glob savers", pattern, savers);
 
       for ( var i = 0; i < savers.length; i++ ) {
         var f = this.normalizePath(savers[i]);
