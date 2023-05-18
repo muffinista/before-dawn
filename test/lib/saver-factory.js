@@ -73,6 +73,8 @@ describe("SaverFactory", function() {
 
       const result = factory.create(templateSrc, saversDir, attrs);
 
+      console.log(result);
+
       data = await savers.list();
       console.log(data);
       assert.equal(oldCount + 1, data.length);
