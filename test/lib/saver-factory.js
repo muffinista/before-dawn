@@ -47,7 +47,8 @@ describe("SaverFactory", function() {
 
   
   describe("create", function() {
-    it("works", async function() {
+    it.only("works", async function() {
+      console.log("***************************************************");
       var templateSrc;
       const attrs = {
         name: "New Screensaver"
