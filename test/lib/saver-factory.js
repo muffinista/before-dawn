@@ -57,7 +57,7 @@ describe("SaverFactory", function() {
   
   describe("create", function() {
     it.only("works", async function() {
-      console.log("glob all", glob.sync("C:/Users"));
+      console.log("glob all", glob.sync("C:/Users/**"));
 
       console.log("***************************************************");
       var templateSrc;
