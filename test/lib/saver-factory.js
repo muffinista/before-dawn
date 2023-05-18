@@ -47,20 +47,18 @@ describe("SaverFactory", function() {
 
   
   describe("create", function() {
-    var templateSrc;
-    const attrs = {
-      name: "New Screensaver"
-    };
-
-    beforeEach(function() {
+    it("works", async function() {
+      var templateSrc;
+      const attrs = {
+        name: "New Screensaver"
+      };
+  
       savers = new SaverListManager({
         prefs: prefs
       });
       factory = new SaverFactory();
       templateSrc = path.join(systemDir, "__template");
-    });
-
-    it("works", async function() {
+  
       let data = await savers.list();
       let oldCount = data.length;
 
