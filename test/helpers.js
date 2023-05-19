@@ -2,6 +2,7 @@ const tmp = require("tmp");
 const path = require("path");
 const fs = require("fs-extra");
 // const { rimraf } = require("rimraf");
+const os = require("os");
 
 const { _electron: electron } = require("playwright");
 
@@ -107,6 +108,9 @@ exports.prefsToJSON = (tmpdir) => {
 };
 
 exports.getTempDir = function() {
+  console.log("!!!!!!!!!!!!!!!!");
+  console.log(os.tmpdir());
+  console.log(JSON.stringify(process.env));
   const tmpDir = tmp.dirSync().name;
   return tmpDir;
 };
