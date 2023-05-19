@@ -7,7 +7,6 @@ const { rimraf } = require("rimraf");
 const fs = require("fs-extra");
 const path = require("path");
 const { mkdirp } = require("mkdirp");
-const { glob } = require("glob");
 
 const SaverPrefs = require("../../src/lib/prefs.js");
 const SaverFactory = require("../../src/lib/saver-factory.js");
@@ -33,19 +32,14 @@ describe("SaverFactory", function() {
     mkdirp.sync(workingDir);
     mkdirp.sync(saversDir);
 
-    console.log(`saversDir: ${saversDir}`);
-
     systemDir = path.join(workingDir, "system-savers");
     fs.mkdirSync(systemDir);
 
     helpers.addSaver(systemDir, "random-saver");
     helpers.addSaver(systemDir, "__template");    
 
-    console.log("a");
     prefs = new SaverPrefs(workingDir);
-    console.log("b");
     prefs.localSource = saversDir;
-    console.log("ok");
   });
 
   afterEach(function() {
@@ -56,10 +50,7 @@ describe("SaverFactory", function() {
 
   
   describe("create", function() {
-    it.only("works", async function() {
-      console.log("glob all", glob.sync("C:/Users/runneradmin/AppData/Local/Temp/**"));
-
-      console.log("***************************************************");
+    it("works", async function() {
       var templateSrc;
       const attrs = {
         name: "New Screensaver"
@@ -74,15 +65,9 @@ describe("SaverFactory", function() {
       let data = await savers.list();
       let oldCount = data.length;
 
-      console.log(saversDir);
-      console.log(savers);
-
       const result = factory.create(templateSrc, saversDir, attrs);
 
-      console.log(result);
-
       data = await savers.list();
-      console.log(data);
       assert.equal(oldCount + 1, data.length);
 
       assert.equal("new-screensaver", result.key);

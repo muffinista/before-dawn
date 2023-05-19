@@ -114,11 +114,8 @@ module.exports = class SaverListManager {
     // use cached data if available
     if ( this.loadedScreensavers.length > systemScreensaverCount &&
         ( typeof(force) === "undefined" || force === false ) ) {
-      console.log("returning cached data");
       return this.loadedScreensavers;
     }
-
-    console.log(`load from ${folders}`);
 
     // note: using /**/ here instead of /*/ would
     // also match all subdirectories, which might be desirable
@@ -128,17 +125,13 @@ module.exports = class SaverListManager {
       return el !== undefined && el !== "" && fs.existsSync(el);
     });
 
-    console.log(`cleaned load from ${folders}`);
-
     folders.forEach((sourceFolder) => {
       // glob doesn't work with windows style file paths, so convert
       // to posix
       sourceFolder = this.normalizePath(sourceFolder);
-      console.log("glob all", sourceFolder, glob.sync(sourceFolder));
 
       pattern = `${sourceFolder}/*/saver.json`;
       savers = glob.sync(pattern);
-      console.log("glob savers", pattern, savers);
 
       for ( var i = 0; i < savers.length; i++ ) {
         var f = this.normalizePath(savers[i]);

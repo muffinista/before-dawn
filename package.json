@@ -44,7 +44,7 @@
     "electron-log": "5.0.0-beta.16",
     "forcefocus": "muffinista/forcefocus",
     "fs-extra": "^11.1.0",
-    "glob": "^10.2.4",
+    "glob": "^9.3.5",
     "goto-sleep": "muffinista/goto-sleep",
     "hide-cursor": "muffinista/hide-cursor",
     "mkdirp": "^3.0.1",
