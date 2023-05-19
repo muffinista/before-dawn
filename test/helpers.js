@@ -1,7 +1,7 @@
 const tmp = require("tmp");
 const path = require("path");
 const fs = require("fs-extra");
-const os = require("os");
+// const os = require("os");
 
 const { _electron: electron } = require("playwright");
 
@@ -106,23 +106,27 @@ exports.prefsToJSON = (tmpdir) => {
   return data;
 };
 
-const getTempBase = function() {
-  // if we're on windows and the tmp dir base has a ~ in it,
-  // try and generate an expanded path since glob really dislikes 8.3 filenames
+// const getTempBase = function() {
+//   // if we're on windows and the tmp dir base has a ~ in it,
+//   // try and generate an expanded path since glob really dislikes 8.3 filenames
 
-  const base = os.tmpdir();
-  if ( process.platform === "win32" && base.lastIndexOf("~") !== -1) {
-    if ( process.env.HOME ) {
-      return `${process.env.home}\\AppData\\Local\\Temp`;
-    }
-    return `${process.env.USERPROFILE}\\AppData\\Local\\Temp`;
-  }
+//   const base = os.tmpdir();
+//   if ( process.platform === "win32" && base.lastIndexOf("~") !== -1) {
+//     if ( process.env.HOME ) {
+//       return `${process.env.home}\\AppData\\Local\\Temp`;
+//     }
+//     return `${process.env.USERPROFILE}\\AppData\\Local\\Temp`;
+//   }
 
-  return base;
-};
+//   return base;
+// };
 
 exports.getTempDir = function() {
-  return tmp.dirSync({ dir: getTempBase() }).name;
+  const base = tmp.dirSync().name;
+  if ( process.platform === "win32" && base.lastIndexOf("~") !== -1) {
+    return base.replace("RUNNER~1", "runneradmin");
+  }
+  return base;
 };
 
 exports.savedConfig = function(p) {
