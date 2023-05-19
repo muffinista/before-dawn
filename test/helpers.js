@@ -1,6 +1,7 @@
 const tmp = require("tmp");
 const path = require("path");
 const fs = require("fs-extra");
+const os = require("os");
 
 const { _electron: electron } = require("playwright");
 
@@ -105,12 +106,24 @@ exports.prefsToJSON = (tmpdir) => {
   return data;
 };
 
-exports.getTempDir = function() {
-  const tmpDir = tmp.dirSync().name;
-  return tmpDir;
+const getTempBase = function() {
+  // if we're on windows and the tmp dir base has a ~ in it,
+  // try and generate an expanded path since glob really dislikes 8.3 filenames
+
+  const base = os.tmpdir();
+  if ( process.platform === "win32" && base.lastIndexOf("~") !== -1) {
+    if ( process.env.HOME ) {
+      return `${process.env.home}\\AppData\\Local\\Temp`;
+    }
+    return `${process.env.USERPROFILE}\\AppData\\Local\\Temp`;
+  }
+
+  return base;
 };
 
-
+exports.getTempDir = function() {
+  return tmp.dirSync({ dir: getTempBase() }).name;
+};
 
 exports.savedConfig = function(p) {
   var data = path.join(p, "config.json");
