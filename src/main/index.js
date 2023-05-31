@@ -632,6 +632,12 @@ var runSaver = function(screenshot, saver, s, url_opts, tickCount) {
     try {
       applyScreensaverWindowEvents(w);
       
+      w.webContents.once("did-fail-load", (_event, _code, description) => {
+        log.info(`did-fail-load: ${description}`);
+        windows.forceWindowClose(w);
+        reject(s.id, description);  
+      });
+
       w.once("ready-to-show", () => {
         log.info("ready-to-show", s.id);
         if ( testMode !== true ) {
@@ -812,6 +818,7 @@ var runScreenSaver = function() {
           then((saver) => {
             let displays = [];
             let blanks = [];
+
             // make sure we have something to display
             if ( typeof(saver) === "undefined" ) {
               log.info("No screensaver defined! Just blank everything");
@@ -825,9 +832,6 @@ var runScreenSaver = function() {
                 blanks = getNonPrimaryDisplays();
               }
             }
-
-            // log.info("displays", displays);
-            // log.info("blanks", blanks);
 
             // turn off idle checks for a couple seconds while loading savers
             stateManager.ignoreReset(true);
@@ -843,7 +847,10 @@ var runScreenSaver = function() {
                 blanks.map((d) => blankScreen(d))
               );
 
-            Promise.all(promises).then(setRunningInABit).catch((e) => {
+            Promise.allSettled(promises).then((values) => {
+              log.info("final result", values);
+              setRunningInABit();
+            }).catch((e) => {
               log.info("running screensaver failed");
               log.info(e);
 
