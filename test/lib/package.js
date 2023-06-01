@@ -6,6 +6,7 @@ const fs = require("fs");
 const { rimraf } = require("rimraf");
 const sinon = require("sinon");
 const nock = require("nock");
+const fetch = require("node-fetch");
 
 const Package = require("../../src/lib/package.js");
 
@@ -29,7 +30,8 @@ describe("Package", function() {
 
     attrs = {
       repo: "muffinista/before-dawn-screensavers",
-      dest:workingDir
+      dest: workingDir,
+      fetch: fetch
     };
   });
   afterEach(function () {

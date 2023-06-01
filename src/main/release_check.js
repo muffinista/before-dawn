@@ -1,12 +1,10 @@
 "use strict";
-
-const fetch = require("node-fetch");
-
 module.exports = class ReleaseCheck {
-  constructor() {
+  constructor(_attrs = {}) {
     this.onUpdateCallback = () => {};
     this.onNoUpdateCallback = () => {};
-    this.logger = () => {};   
+    this.logger = () => {};
+    this.fetch = _attrs.fetch || global.fetch || require("node-fetch");
   }
 
   setFeed(u) {
@@ -26,7 +24,7 @@ module.exports = class ReleaseCheck {
   checkLatestRelease() {
     this.logger(`check ${this.url} for new release`);
     let _self = this;
-    fetch(this.url, {
+    this.fetch(this.url, {
       timeout: 5000,
       headers: {
         "User-Agent": "Before Dawn"

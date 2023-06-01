@@ -2,7 +2,7 @@
 
 const fs = require("fs");
 const path = require("path");
-const fetch = require("node-fetch");
+// const fetch = require("node-fetch");
 const yauzl = require("yauzl");
 const { mkdirp } = require("mkdirp");
 const { rimraf } = require("rimraf");
@@ -43,6 +43,8 @@ module.exports = class Package {
     this.defaultHeaders = {
       "User-Agent": "Before Dawn"
     };  
+
+    this.fetch = _attrs.fetch || global.fetch || require("node-fetch");
   }
   
   attrs() {
@@ -59,7 +61,7 @@ module.exports = class Package {
       return this.data;
     }
 
-    this.data = await fetch(this.url, this.defaultHeaders)
+    this.data = await this.fetch(this.url, this.defaultHeaders)
       .then(res => res.json())
       .then((json) => {
         const remoteVersion = json.tag_name.replace(/^v/, "");
@@ -121,7 +123,7 @@ module.exports = class Package {
       dest = temp.path({dir: os.tmpdir(), suffix: ".zip"});
     }
 
-    const res = await fetch(url, this.defaultHeaders);
+    const res = await this.fetch(url, this.defaultHeaders);
     return await new Promise((resolve, reject) => {
       const fileStream = fs.createWriteStream(dest);
       res.body.pipe(fileStream);

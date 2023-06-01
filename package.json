@@ -9,7 +9,7 @@
   "release_server": "https://before-dawn-updates.muffinlabs.com",
   "main": "output/main.js",
   "engines": {
-    "node": ">= 16.16.0"
+    "node": ">= 18.15.0"
   },
   "devport": 9081,
   "scripts": {
@@ -48,8 +48,6 @@
     "goto-sleep": "muffinista/goto-sleep",
     "hide-cursor": "muffinista/hide-cursor",
     "mkdirp": "^3.0.1",
-    "node-fetch": "^2.6.7",
-    "normalize.css": "^8.0.1",
     "proper-lockfile": "^4.1.1",
     "rimraf": "^5.0.0",
     "temp": "^0.9.0",
@@ -86,7 +84,9 @@
     "mocha": "^10.2.0",
     "nock": "^13.0.2",
     "node-abi": "^3.40.0",
+    "node-fetch": "^2.6.7",
     "node-loader": "^2.0.0",
+    "normalize.css": "^8.0.1",
     "nyc": "^15.0.0",
     "playwright": "^1.22.2",
     "png-to-ico": "^2.1.8",

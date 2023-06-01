@@ -3,7 +3,6 @@
 /* eslint-disable no-console */
 
 require("dotenv").config();
-const fetch = require("node-fetch");
 
 const apiUrl = "https://ci.appveyor.com/api/account/muffinista/builds";
 const travisApiUrl = "https://api.travis-ci.org/repo/muffinista%2Fbefore-dawn/requests";

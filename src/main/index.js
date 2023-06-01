@@ -28,6 +28,7 @@ const {app,
   globalShortcut,
   ipcMain,
   Menu,
+  net,
   session,
   shell,
   systemPreferences,
@@ -1049,7 +1050,7 @@ var setupReleaseCheck = function() {
 
   const ReleaseCheck = require("./release_check.js");
   
-  releaseChecker = new ReleaseCheck();
+  releaseChecker = new ReleaseCheck({fetch: net.fetch});
 
   releaseChecker.setFeed(global.RELEASE_CHECK_URL);
   releaseChecker.setLogger(log.info);
@@ -1135,7 +1136,8 @@ const getPackage = function() {
   const attrs = {
     repo: prefs.sourceRepo,
     dest: prefs.defaultSaversDir,
-    log: log.info
+    log: log.info,
+    fetch: net.fetch
   };
 
   console.log(attrs);
