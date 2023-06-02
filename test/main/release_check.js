@@ -4,7 +4,7 @@ const ReleaseCheck = require("../../src/main/release_check.js");
 const path = require("path");
 const nock = require("nock");
 const assert = require("assert");
-// const helpers = require("../helpers.js");
+const fetch = require("node-fetch");
 
 describe("ReleaseCheck", function() {
   let releaseChecker;
@@ -14,11 +14,9 @@ describe("ReleaseCheck", function() {
   let url = `${server}${uriPath}`;
   let fixturePath;
 
-  // helpers.setupTest(this);
-
   beforeEach(() => {
     fixturePath = path.join(__dirname, "../fixtures/releases/updates.json");
-    releaseChecker = new ReleaseCheck();  
+    releaseChecker = new ReleaseCheck({fetch: fetch});  
   });
 
   it("handles updates", (done) => {
