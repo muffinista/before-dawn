@@ -77,7 +77,17 @@ let rendererConfig = {
         test: /\.svelte$/,
         use: {
             loader: "svelte-loader",
+            options: {
+              emitCss: true,
+            }
         },
+      },
+      {
+        // required to prevent errors from Svelte on Webpack 5+, omit on Webpack 4
+        test: /node_modules\/svelte\/.*\.mjs$/,
+        resolve: {
+          fullySpecified: false
+        }
       },
     ]
   },
@@ -118,7 +128,8 @@ let rendererConfig = {
       "@": path.join(__dirname, "src", "renderer"),
       "~": path.join(__dirname, "src")
     },
-    extensions: [".js", ".json", ".css"]
+    extensions: [".js", ".json", ".css", ".svelte"],
+    conditionNames: ["svelte", "browser", "import"]
   },
   target: "web"
 };
