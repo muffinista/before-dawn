@@ -13,8 +13,8 @@
   import BugIcon from "./components/icons/BugIcon.svelte";
 
   console.log = window.api.log;
-  window.addEventListener('error', console.log);
-  window.addEventListener('unhandledrejection', console.log);
+  window.addEventListener("error", console.log);
+  window.addEventListener("unhandledrejection", console.log);
 
 
   let size = undefined;
@@ -42,7 +42,7 @@
     lastIndex = saver.options.length;
 
     window.api.onFolderUpdate(() => {
-      updatePreview()
+      updatePreview();
     });
     window.api.watchFolder(src);
     addEventListener("resize", updatePreview);
@@ -55,7 +55,7 @@
 
   onDestroy(() => {
     window.api.unwatchFolder(src);
-  })
+  });
 
   function addSaverOption() {
     saver.options.push({
@@ -292,6 +292,7 @@
           Add and remove those here.
         </small>
 
+        <!-- eslint-disable no-unused-vars -->
         {#each saver.options as _option, index}
           <div class="saver-option-input">
             <SaverOptionInput

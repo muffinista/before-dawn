@@ -146,8 +146,8 @@ import Notarize from "@/components/Notarize";
 import FolderChooser from "@/components/FolderChooser.svelte";
 
 console.log = window.api.log;
-window.addEventListener('error', console.log);
-window.addEventListener('unhandledrejection', console.log);
+window.addEventListener("error", console.log);
+window.addEventListener("unhandledrejection", console.log);
 
 let prefs = {};
 let release = undefined;

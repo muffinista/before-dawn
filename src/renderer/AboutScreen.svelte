@@ -101,8 +101,8 @@
 import { onMount } from "svelte";
 
 console.log = window.api.log;
-window.addEventListener('error', console.log);
-window.addEventListener('unhandledrejection', console.log);
+window.addEventListener("error", console.log);
+window.addEventListener("unhandledrejection", console.log);
 
 let globals = {};
 

@@ -12,7 +12,7 @@
                   type="radio"
                   name="{option.name}"
                   value="true"
-                  checked="{saver.settings[option.name] == true || saver.settings[option.name] === 'true'}"
+                  checked="{saver.settings[option.name] == true || saver.settings[option.name] === "true"}"
                   on:change={notifyPreviewChange}
                 ></label>
               <label>No
@@ -20,7 +20,7 @@
                   type="radio"
                   name="{option.name}"
                   value="false"
-                  checked="{saver.settings[option.name] == false || saver.settings[option.name] === 'false'}"
+                  checked="{saver.settings[option.name] == false || saver.settings[option.name] === "false"}"
                   on:change={notifyPreviewChange}
                 ></label>
               </div>
