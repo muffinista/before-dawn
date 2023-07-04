@@ -1,7 +1,7 @@
 module.exports = {
   root: true,
+  parser: "@babel/eslint-parser",
   parserOptions: {
-    parser: "@babel/eslint-parser",
     ecmaVersion: 2022,
     ecmaFeatures: {
       "spread": true
@@ -14,18 +14,18 @@ module.exports = {
     mocha: true,
     es6: true
   },
-  "extends": [
-    "eslint:recommended"
+  extends: [
+    "eslint:recommended",
+    "plugin:svelte/recommended"
   ],
   globals: {
   },
   plugins: [
-    "svelte3"
   ],
   overrides: [
     {
       files: ["*.svelte"],
-      processor: "svelte3/svelte3"
+      parser: "svelte-eslint-parser"
     }
   ],
   "rules": {

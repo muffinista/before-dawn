@@ -143,8 +143,8 @@
 
 	onMount(async () => {
     console.log = window.api.log;
-    window.addEventListener('error', console.log);
-    window.addEventListener('unhandledrejection', console.log);
+    window.addEventListener("error", console.log);
+    window.addEventListener("unhandledrejection", console.log);
 
     size = await window.api.getDisplayBounds();
     screenshot = await window.api.getScreenshot();
