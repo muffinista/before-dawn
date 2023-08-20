@@ -773,7 +773,9 @@ var setStateToRunning = function() {
 };
 
 var setStateToPaused = function() {
+  log.info("setStateToPaused");
   stateManager.pause();
+  stateManager.stopTicking();
 };
 var resetState = function() {
   stateManager.reset();
@@ -1637,8 +1639,8 @@ var bootApp = async function() {
       const delayTime = prefs.delay > 0 ? prefs.delay * 60 : Number.POSITIVE_INFINITY;
       const idleState = powerMonitor.getSystemIdleState(delayTime);
 
-      log.info(`wakeup check ${delayTime} ${idleState}`);
-      if ( ! stateManager.isTicking() && idleState === "active" ) {
+      // don't restart state manager if we're paused
+      if ( ! stateManager.isTicking() && !stateManager.paused() && idleState === "active" ) {
         log.info("looks like we are awake again lets go");
         stateManager.reset();
         stateManager.startTicking();

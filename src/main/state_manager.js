@@ -110,6 +110,10 @@ class StateManager {
     this.switchState(STATES.STATE_PAUSED);
   }
 
+  paused() {
+    return this.currentState === STATES.STATE_PAUSED;
+  }
+
   /**
    * start running the state machine
    */
@@ -218,7 +222,9 @@ class StateManager {
 
       // this.logger(`${i} ${this.lastTime} -- ${this.currentStateString}`);
 
-      if ( hadActivity && this.currentState !== STATES.STATE_IDLE ) {
+      if ( this.currentState === STATES.STATE_PAUSED ) {
+        // do nothing
+      } else if ( hadActivity && this.currentState !== STATES.STATE_IDLE ) {
         // we won't actually reset the state while a screensaver is
         // loading, because sometimes we get zombie electron windows
         // when we do that
