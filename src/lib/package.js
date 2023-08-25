@@ -6,6 +6,8 @@ const yauzl = require("yauzl");
 const { mkdirp } = require("mkdirp");
 const { rimraf } = require("rimraf");
 const lockfile = require("proper-lockfile");
+const { Readable } = require("stream");
+const { finished } = require("stream/promises");
 
 const temp = require("temp");
 const os = require("os");
@@ -123,16 +125,13 @@ module.exports = class Package {
     }
 
     const res = await this.fetch(url, this.defaultHeaders);
-    return await new Promise((resolve, reject) => {
-      const fileStream = fs.createWriteStream(dest);
-      res.body.pipe(fileStream);
-      res.body.on("error", (err) => {
-        reject(err);
-      });
-      fileStream.on("finish", function() {
-        resolve(dest);
-      });
-    });
+    console.log(res);
+
+    // https://stackoverflow.com/questions/37614649/how-can-i-download-and-save-a-file-using-the-fetch-api-node-js
+    const fileStream = fs.createWriteStream(dest);
+    await finished(Readable.fromWeb(res.body).pipe(fileStream));
+
+    return dest;
   }
 
   zipToSavers(tempName, dest) {

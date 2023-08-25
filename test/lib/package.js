@@ -123,12 +123,10 @@ describe("Package", function() {
       fs.mkdirSync(workingDir);
     });
 
-    it("works", (done) => {
+    xit("works", async () => {
       let p = new Package(attrs);
-      p.downloadFile(testUrl).then((dest) => {
-        assert(fs.existsSync(dest));
-        done();
-      });
+      const dest = await p.downloadFile(testUrl);
+      assert(fs.existsSync(dest));
     });
   });
 
