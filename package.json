@@ -69,7 +69,7 @@
     "cross-env": "^7.0.0",
     "css-loader": "^6.2.0",
     "dotenv": "^16.0.0",
-    "electron": "^26.0.0",
+    "electron": "^26.2.1",
     "electron-builder": "24.4.0",
     "electron-rebuild": "electron/electron-rebuild",
     "eslint": "^8.44.0",
