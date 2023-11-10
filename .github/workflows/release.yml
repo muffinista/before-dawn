@@ -4,11 +4,15 @@ on:
     branches:
       - main
 jobs:
+
   build:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
+    env:
+      # https://stackoverflow.com/questions/77251296/distutils-not-found-when-running-npm-install
+      PYTHON: 3.11
     steps:
     - name: Install ubuntu requirements
       if: ${{ matrix.os == 'ubuntu-latest' }}
