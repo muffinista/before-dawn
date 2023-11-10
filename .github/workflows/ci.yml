@@ -19,6 +19,7 @@ jobs:
         sudo apt-get install -y libx11-dev libxss-dev icnsutils graphicsmagick libappindicator1 libxtst-dev
     # https://github.com/nodejs/node-gyp/issues/2869
     - name: Hack node-gyp
+      if: ${{ matrix.os != 'windows-latest' }}
       run: |
         sudo -H python3 -m pip install packaging
     - uses: actions/checkout@v3
