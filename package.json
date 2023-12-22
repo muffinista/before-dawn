@@ -40,7 +40,7 @@
     "detect-fullscreen": "^0.0.8",
     "electron-is-dev": "^2.0.0",
     "electron-log": "5.0.1",
-    "forcefocus": "muffinista/forcefocus",
+    "forcefocus": "github:muffinista/forcefocus",
     "fs-extra": "^11.1.0",
     "glob": "^9.3.5",
     "goto-sleep": "muffinista/goto-sleep",
