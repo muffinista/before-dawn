@@ -40,6 +40,7 @@ jobs:
     #   run: |
     #     npm config set msvs_version 2022
     - run: npm ci
+    - run: npm rebuild
     - run: npm run test-lib
     - name: Run integration tests
       if: ${{ matrix.os != 'ubuntu-latest' }}

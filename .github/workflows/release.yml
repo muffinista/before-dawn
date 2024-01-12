@@ -41,6 +41,7 @@ jobs:
     #   run: |
     #     npm config set msvs_version 2022
     - run: npm ci
+    - run: npm rebuild
     - name: Release
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
