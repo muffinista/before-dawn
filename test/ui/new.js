@@ -1,10 +1,12 @@
 "use strict";
 
-const assert = require("assert");
-const fs = require("fs-extra");
-const path = require("path");
+import assert from 'assert';
+import path from "path";
+import fs from "fs-extra";
+import * as helpers from "../helpers.js";
+import { fileURLToPath } from 'url';
 
-const helpers = require("../helpers.js");
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 var saversDir;
 var workingDir;
@@ -15,7 +17,7 @@ describe("Add New", function() {
 
   helpers.setupTest(this);
 
-  beforeEach(async () => {
+  beforeEach(async function() {
     saversDir = helpers.getTempDir();
     workingDir = helpers.getTempDir();
 
@@ -23,7 +25,7 @@ describe("Add New", function() {
   });
 
   describe("when not setup", function() {
-    beforeEach(async () => {
+    beforeEach(async function() {
       await helpers.callIpc(app, `open-window add-new ${screensaverUrl}`);
     });
 
@@ -52,7 +54,7 @@ describe("Add New", function() {
   describe("when setup", function() {
     let window;
 
-    beforeEach(async () => {
+    beforeEach(async function() {
       helpers.addLocalSource(workingDir, saversDir);
       await helpers.callIpc(app, `open-window add-new ${screensaverUrl}`);
       window = await helpers.waitFor(app, "new");

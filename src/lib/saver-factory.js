@@ -1,9 +1,9 @@
 "use strict";
 
-const fs = require("fs-extra");
-const path = require("path");
+import * as path from "path";
+import fs from 'fs-extra'
 
-module.exports = class SaverFactory {
+export default class SaverFactory {
   constructor(prefs, logger) {
     this.prefs = prefs;
     if ( logger !== undefined ) {
@@ -58,4 +58,4 @@ module.exports = class SaverFactory {
     
     return opts;
   }
-};
+}

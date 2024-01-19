@@ -1,7 +1,7 @@
 "use strict";
 
-const assert = require("assert");
-const helpers = require("../helpers.js");
+import assert from 'assert';
+import * as helpers from "../helpers.js";
 
 describe("tray", function() {
   var workingDir;

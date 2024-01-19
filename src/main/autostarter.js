@@ -1,9 +1,9 @@
 "use strict";
 
-const main = require("./index.js");
+import * as main from "./index.js";
+import AutoLaunch from "auto-launch";
 
-var toggle = function(appName, value) {
-  var AutoLaunch = require("auto-launch");
+export function toggle(appName, value) {
   var appLauncher = new AutoLaunch({
     name: appName
   });
@@ -39,6 +39,4 @@ var toggle = function(appName, value) {
         });
     });
   }
-};
-
-exports.toggle = toggle;
+}

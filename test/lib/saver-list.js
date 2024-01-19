@@ -1,17 +1,20 @@
 "use strict";
 
-const assert = require("assert");
-const sinon = require("sinon");
-const helpers = require("../helpers.js");
+import assert from 'assert';
+import path from "path";
+import fs from "fs-extra";
+import { rimrafSync } from 'rimraf'
+import sinon from "sinon";
+import * as helpers from "../helpers.js";
 
-const { rimraf } = require("rimraf");
-const fs = require("fs-extra");
-const path = require("path");
-
-const SaverPrefs = require("../../src/lib/prefs.js");
-const SaverListManager = require("../../src/lib/saver-list.js");
+import SaverPrefs from "../../src/lib/prefs.js";
+import SaverListManager from "../../src/lib/saver-list.js";
 
 var sandbox;
+
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 describe("SaverListManager", function() { 
   var savers;
@@ -49,13 +52,13 @@ describe("SaverListManager", function() {
 
   afterEach(function() {
     if ( fs.existsSync(workingDir) ) {
-      rimraf.sync(workingDir);
+      rimrafSync(workingDir);
     }
     sandbox.restore();
   });
 
-  describe("setup", () => {
-    it("works", (done) => {
+  describe("setup", function() {
+    it("works", function(done) {
       savers.setup().then((results) => {
         assert(results.first);
         assert(results.setup);
@@ -65,8 +68,8 @@ describe("SaverListManager", function() {
     });
   });
 
-  describe("reload", () => {
-    it("works", (done) => {
+  describe("reload", function() {
+    it("works", function(done) {
       savers.reload(true).then(() => {
         done();
       });
@@ -101,7 +104,7 @@ describe("SaverListManager", function() {
              catch(done);
     });
 
-    it("rejects invalid savers", (done) => {
+    it("rejects invalid savers", function(done) {
       var f = path.join(__dirname, "../fixtures/invalid.json");
       savers.loadFromFile(f, false, {}).
         then(() => {
@@ -112,7 +115,7 @@ describe("SaverListManager", function() {
         });
     });
 
-    it("adds requirements if missing", (done) => {
+    it("adds requirements if missing", function(done) {
       var f = path.join(__dirname, "../fixtures/no-requirements.json");
       savers.loadFromFile(f, false, {}).then((s) => {
         assert.deepEqual(["screen"], s.requirements);
@@ -127,20 +130,20 @@ describe("SaverListManager", function() {
       assert.equal(3, data.length);
     });
 
-    it("handles bad data", async () => {
+    it("handles bad data", async function() {
       helpers.addSaver(saversDir, "invalid", "invalid.json");
       const data = await savers.list();
       assert.equal(3, data.length);
     });
 
-    it("uses cache", async () => {
+    it("uses cache", async function() {
       let cache = [0, 1, 2, 3, 4, 5];
       savers.loadedScreensavers = cache;
       const data = await savers.list();
       assert.deepEqual(cache, data);
     });
 
-    it("forces reset", async () => {
+    it("forces reset", async function() {
       let cache = [0, 1, 2, 3, 4, 5];
       savers.loadedScreensavers = cache;
       const data = await savers.list(true);
@@ -192,7 +195,7 @@ describe("SaverListManager", function() {
     });
   });
 
-  describe("delete", () => {
+  describe("delete", function() {
     it("can delete if editable", async function() {
       const data = await savers.list();
 

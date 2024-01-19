@@ -1,12 +1,12 @@
 "use strict";
 
-const assert = require("assert");
-const helpers = require("../helpers.js");
+import assert from 'assert';
+import * as helpers from "../helpers.js";
+import SaverPrefs from "../../src/lib/prefs.js";
 
 let app;
 var workingDir;
 var saversDir;
-const SaverPrefs = require("../../src/lib/prefs.js");
 
 describe("Prefs", function() { 
   helpers.setupTest(this);

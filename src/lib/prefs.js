@@ -1,9 +1,62 @@
 "use strict";
 
-const path = require("path");
-const Conf = require("conf");
+import * as path from "path";
+import Conf from "conf";
 
-const DEFAULTS = require("./prefs-schema.json");
+const DEFAULTS = {
+  "saver": {
+    "type": "string",
+    "default": ""
+  },
+  "sourceRepo": {
+    "type": "string",
+    "default": "muffinista/before-dawn-screensavers"
+  },
+  "delay": {
+    "type": "number",
+    "default": 5
+  },
+  "sleep": {
+    "type": "number",
+    "default": 10
+  },
+  "lock": {
+    "type": "boolean",
+    "default": false
+  },
+  "disableOnBattery": {
+    "type": "boolean",
+    "default": true
+  },
+  "auto_start": {
+    "type": "boolean",
+    "default": false
+  },
+  "runOnSingleDisplay": {
+    "type": "boolean",
+    "default": true
+  },
+  "localSource": {
+    "type": "string",
+    "default": ""
+  },
+  "options": {
+    "default": {}
+  },
+  "sourceUpdatedAt": {
+    "default": "1970-01-01T00:00:00.000Z"
+  },
+  "updateCheckTimestamp": {
+    "default": "1970-01-01T00:00:00.000Z"
+  },
+  "launchShortcut": {
+    "type": "string",
+    "default": ""
+  },
+  "firstLoad": {
+    "type": "boolean"
+  }
+};
 
 class SaverPrefs {
   constructor(baseConfigDir, rootDir=undefined, saversDir=undefined) {
@@ -157,4 +210,4 @@ Object.keys(DEFAULTS).forEach(function(name) {
   });
 });
 
-module.exports = SaverPrefs;
+export default SaverPrefs;

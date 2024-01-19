@@ -1,12 +1,12 @@
 "use strict";
 
-const {app, BrowserWindow} = require("electron");
+import {app, BrowserWindow} from "electron";
 
 /**
  * if we're using the dock, and all our windows are closed, hide the
  * dock icon
  */
-var hideDockIfInactive = function() {
+export const hideDockIfInactive = function() {
   let openWindowCount = BrowserWindow.getAllWindows().
                                       filter(win => (win !== undefined && win.noTray !== true) ).length;
 
@@ -18,11 +18,8 @@ var hideDockIfInactive = function() {
 /**
  * show the dock if it's available
  */
-var showDock = function() {
+export const showDock = function() {
   if ( typeof(app.dock) !== "undefined" ) {
     app.dock.show();
   }
 };
-
-exports.hideDockIfInactive = hideDockIfInactive;
-exports.showDock = showDock;

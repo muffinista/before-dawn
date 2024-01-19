@@ -1,16 +1,16 @@
 "use strict";
 
-const fs = require("fs");
-const path = require("path");
-const yauzl = require("yauzl");
-const { mkdirp } = require("mkdirp");
-const { rimraf } = require("rimraf");
-const lockfile = require("proper-lockfile");
-const { Readable } = require("stream");
-const { finished } = require("stream/promises");
+import fs from 'fs-extra';
+import path from "path";
+import temp from "temp";
+import os from "os";
+import { mkdirp } from "mkdirp";
+import { rimrafSync } from "rimraf";
+import * as yauzl from "yauzl"
+import * as lockfile from "proper-lockfile";
+import Readable from "stream";
+import finished from "stream/promises";
 
-const temp = require("temp");
-const os = require("os");
 
 
 /**
@@ -20,7 +20,7 @@ const os = require("os");
  * if it's after stored value, download it!
  */
 
-module.exports = class Package {
+export default class Package {
   constructor(_attrs) {
     this.repo = _attrs.repo;
     this.dest = _attrs.dest;
@@ -45,7 +45,7 @@ module.exports = class Package {
       "User-Agent": "Before Dawn"
     };  
 
-    this.fetch = _attrs.fetch || global.fetch || require("node-fetch");
+    this.fetch = _attrs.fetch || global.fetch;
   }
   
   attrs() {
@@ -152,7 +152,7 @@ module.exports = class Package {
             // clean out existing files
             //
             try {
-              rimraf.sync(self.dest);
+              rimrafSync(self.dest);
             }
             catch (err) {
               self.logger(err);
@@ -218,4 +218,4 @@ module.exports = class Package {
       });
     });
   }
-};
+}

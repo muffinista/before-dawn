@@ -1,7 +1,7 @@
 "use strict";
 
-process.traceDeprecation = true;
-process.traceProcessWarnings = true;
+// process.traceDeprecation = true;
+// process.traceProcessWarnings = true;
 
 
 /***
@@ -18,10 +18,8 @@ process.traceProcessWarnings = true;
    
  */
 
-const electron = require("electron");
-const log = require("electron-log");
 
-const {app,
+import {app,
   BrowserWindow,
   desktopCapturer,
   dialog,
@@ -33,32 +31,56 @@ const {app,
   shell,
   systemPreferences,
   Tray,
-  powerMonitor} = require("electron");
+  powerMonitor} from "electron";
 
-const fs = require("fs");
-const os = require("os");
-const temp = require("temp");
-const path = require("path");
-const url = require("url");
-const exec = require("child_process").execFile;
+import log from 'electron-log';
 
-const screenLock = require("./screen.js");
+import { screen as electronScreen } from "electron";
 
-const StateManager = require("./state_manager.js");
-const SaverPrefs = require("../lib/prefs.js");
-const SaverFactory = require("../lib/saver-factory.js");
-const Saver = require("../lib/saver.js");
-const SaverListManager = require("../lib/saver-list.js");
-const Package = require("../lib/package.js");
-const Power = require("../main/power.js");
+import * as fs from "fs";
+import { readFile } from 'fs/promises';
+import * as os from "os";
+import * as path from "path";
+import * as temp from "temp";
+import * as url from "url";
+import { execFile as exec } from "child_process";
+
+import * as screenLock  from "./screen.js";
+
+import StateManager from "./state_manager.js";
+import SaverPrefs from "../lib/prefs.js";
+import SaverFactory from "../lib/saver-factory.js";
+import Saver from "../lib/saver.js";
+import SaverListManager from "../lib/saver-list.js";
+import Package from "../lib/package.js";
+import Power from "../main/power.js";
+
+import * as menusAndTrays from "./menus.js";
+import * as dock from "./dock.js";
+import * as windows from "./windows.js";
+
+import * as forcefocus from "forcefocus";
+import ReleaseCheck from "./release_check.js";
+import * as autostarter from "./autostarter.js";
+
+/**
+ * try and guess if we are in fullscreen mode or not
+ */
+import FullScreen from "detect-fullscreen";
+const { isFullscreen } = FullScreen;
+
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+const packageJSON = JSON.parse(
+  await readFile(
+    new URL('../../package.json', import.meta.url)
+  )
+);
 
 var releaseChecker;
 
-const menusAndTrays = require("./menus.js");
-const dock = require("./dock.js");
-const windows = require("./windows.js");
-
-const forcefocus = require("forcefocus");
 
 // NOTE -- this needs to be global, otherwise the app icon gets
 // garbage collected and won't show up in the system tray
@@ -85,7 +107,8 @@ if ( testMode || process.platform === "win32" ) {
   };
 }
 else {
-  cursor = require("hide-cursor");
+  cursor = await import("hide-cursor");
+  cursor = cursor.default;
 }
 
 let exitOnQuit = false;
@@ -136,8 +159,6 @@ let handles = {
 
 let trayMenu;
 
-let electronScreen;
-
 let prefs = undefined;
 let savers = undefined;
 let stateManager = undefined;
@@ -151,7 +172,8 @@ let checkPowerState = true;
 const RELEASE_CHECK_INTERVAL = 1000 * 60 * 60 * 12;
 
 // load a few global variables
-require("./bootstrap.js");
+import bootstrapApp from "./bootstrap.js";
+await bootstrapApp();
 
 const defaultWebPreferences = {
   enableRemoteModule: false,
@@ -201,25 +223,23 @@ var openGrabberWindow = function() {
     var grabberWindow = new BrowserWindow({
       show: false,
       skipTaskbar: true,
-      // width: 500,
-      // height: 500,
       width: 100,
       height: 100,
       x: 6000,
       y: 2000,
       webPreferences: {
         ...defaultWebPreferences,
-        preload: path.join(__dirname, "assets", "grabber.js")
+        preload: path.join(__dirname, "assets", "grabber.mjs")
       }
     });
-    grabberWindow.noTray = true;
+    // grabberWindow.noTray = true;
     
     grabberWindow.once("ready-to-show", () => {
-      log.info("grabber open");
       resolve(grabberWindow);
     });
 
     grabberWindow.loadURL(grabberUrl); 
+
   });
 };
 
@@ -235,7 +255,6 @@ var grabScreen = function(s) {
   if ( ! screen ) {
     screen = screenData[0];
   }
-  // log.info(screen);
 
   return new Promise((resolve) => {
     //
@@ -252,7 +271,6 @@ var grabScreen = function(s) {
     else {
       let windowRef;
       ipcMain.once(`screenshot-${screen.id}`, function(_e, message) {
-        // log.info("got screenshot!", message);
         const tempName = temp.path({dir: os.tmpdir(), suffix:".png"});
 
         fs.writeFileSync(tempName, message.buffer);
@@ -281,10 +299,7 @@ var grabScreen = function(s) {
 
       openGrabberWindow().then((w) => {
         windowRef = w;
-        log.info("send screengrab request");
-
         windowRef.webContents.send("request-screenshot", { 
-          // id: s.id, 
           id: screen.id, 
           width: s.bounds.width, 
           height: s.bounds.height});  
@@ -312,8 +327,6 @@ var openTestShim = function() {
 
   const shimUrl = `file://${__dirname}/assets/shim.html`;
   testWindow.loadURL(shimUrl);
-
-  //handles.shim.window = testWindow;
 };
 
 
@@ -351,7 +364,7 @@ var openPrefsWindow = function() {
         resizable: true,
         webPreferences: {
           ...defaultWebPreferences,
-          preload: path.join(__dirname, "assets", "preload.js")
+          preload: path.join(__dirname, "assets", "preload.mjs")
         },
         icon: path.join(__dirname, "assets", "iconTemplate.png")
       });
@@ -399,7 +412,7 @@ var openSettingsWindow = function() {
     icon: path.join(__dirname, "assets", "iconTemplate.png"),
     webPreferences: {
       ...defaultWebPreferences,
-      preload: path.join(__dirname, "assets", "preload.js"),
+      preload: path.join(__dirname, "assets", "preload.mjs"),
     }
   });
 
@@ -442,7 +455,7 @@ var addNewSaver = async function(opts) {
     resizable:true,
     webPreferences: {
       ...defaultWebPreferences,
-      preload: path.join(__dirname, "assets", "preload.js"),
+      preload: path.join(__dirname, "assets", "preload.mjs"),
     },
     icon: path.join(__dirname, "assets", "iconTemplate.png")
   });
@@ -473,7 +486,7 @@ var openAboutWindow = function() {
     icon: path.join(__dirname, "assets", "iconTemplate.png"),
     webPreferences: {
       ...defaultWebPreferences,
-      preload: path.join(__dirname, "assets", "preload.js"),
+      preload: path.join(__dirname, "assets", "preload.mjs"),
     }
   });
 
@@ -517,7 +530,7 @@ var openEditor = (args) => {
       show: false,
       webPreferences: {
         ...defaultWebPreferences,
-        preload: path.join(__dirname, "assets", "preload.js"),
+        preload: path.join(__dirname, "assets", "preload.mjs"),
       },
     });  
   }
@@ -932,12 +945,11 @@ var getSystemDir = function() {
  */
 var getUrl = function(dest) {
   let baseUrl;
-  if ( !testMode && process.env.NODE_ENV === "development" ) {
+  if ( !testMode && (global.IS_DEV || process.env.NODE_ENV === "development") ) {
     if ( ! process.env.DISABLE_RELOAD ) {
       let devPort;
 
       try {
-        let packageJSON = require("../../package.json");
         devPort = packageJSON.devport;
       }
       catch(e) {
@@ -1050,8 +1062,6 @@ var setupReleaseCheck = function() {
     return;
   }
 
-  const ReleaseCheck = require("./release_check.js");
-  
   releaseChecker = new ReleaseCheck({fetch: net.fetch});
 
   releaseChecker.setFeed(global.RELEASE_CHECK_URL);
@@ -1087,8 +1097,6 @@ var askAboutApplicationsFolder = function() {
   }
 
   if ( !app.isInApplicationsFolder() ) {
-    const {dialog} = require("electron");
-
     const chosen = dialog.showMessageBoxSync({
       type: "question",
       buttons: ["Move to Applications", "Do Not Move"],
@@ -1330,7 +1338,6 @@ let setupIPC = function() {
    * load the requested URL in a browser
    */
   ipcMain.on("launch-url", (_event, url) => {
-    const { shell } = require("electron");
     shell.openExternal(url);
   });
   
@@ -1352,7 +1359,6 @@ let setupIPC = function() {
       return;
     }
   
-    const autostarter = require("./autostarter.js");
     autostarter.toggle(global.APP_NAME, value);
   });
 
@@ -1551,8 +1557,6 @@ var bootApp = async function() {
     callback({responseHeaders: Object.fromEntries(Object.entries(details.responseHeaders).filter(header => !/x-frame-options/i.test(header[0])))});
   });
 
-  electronScreen = electron.screen;
-
   askAboutApplicationsFolder();
   await askAboutMediaAccess();
 
@@ -1684,17 +1688,13 @@ var quitApp = () => {
   app.quit(); 
 };
 
-/**
- * try and guess if we are in fullscreen mode or not
- */
-var inFullscreen = require("detect-fullscreen").isFullscreen;
 
 /**
  * run the screensaver, but only if there isn't an app in fullscreen mode right now
  */
 var runScreenSaverIfNotFullscreen = function() {
   log.info("runScreenSaverIfNotFullscreen");
-  if ( ! inFullscreen() ) {
+  if ( ! isFullscreen() ) {
     log.info("I don't think we're in fullscreen mode");
     runScreenSaver();
   }
@@ -1941,16 +1941,18 @@ if ( testMode === true ) {
   };  
 }
 
-exports.log = log;
-exports.setStateToRunning = setStateToRunning;
-exports.setStateToPaused = setStateToPaused;
-exports.resetState = resetState;
-exports.getStateManager = getStateManager;
-exports.getAppIcon = getAppIcon;
-exports.getTrayMenu = getTrayMenu;
-exports.openPrefsWindow = openPrefsWindow;
-exports.openAboutWindow = openAboutWindow;
-exports.addNewSaver = addNewSaver;
-exports.openEditor = openEditor;
-exports.toggleSaversUpdated = toggleSaversUpdated;
-exports.quitApp = quitApp;
+export {
+  log,
+  setStateToRunning,
+  setStateToPaused,
+  resetState,
+  getStateManager,
+  getAppIcon,
+  getTrayMenu,
+  openPrefsWindow,
+  openAboutWindow,
+  addNewSaver,
+  openEditor,
+  toggleSaversUpdated,
+  quitApp,
+};

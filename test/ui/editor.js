@@ -1,9 +1,9 @@
 "use strict";
 
-const assert = require("assert");
-const fs = require("fs-extra");
-const path = require("path");
-const helpers = require("../helpers.js");
+import assert from 'assert';
+import path from "path";
+import fs from "fs-extra";
+import * as helpers from "../helpers.js";
 
 var workingDir;
 let app;
@@ -13,7 +13,7 @@ describe("Editor", function() {
   var saverJSON;
   helpers.setupTest(this);
 
-  beforeEach(async () => {
+  beforeEach(async function() {
     workingDir = helpers.getTempDir();
     
     var saversDir = helpers.getTempDir();

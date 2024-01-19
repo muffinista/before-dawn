@@ -1,14 +1,19 @@
-const tmp = require("tmp");
-const path = require("path");
-const fs = require("fs-extra");
-// const os = require("os");
 
-const { _electron: electron } = require("playwright");
+import * as path from "path";
+import fs from 'fs-extra';
+import * as tmp from "tmp";
 
-const Conf = require("conf");
+import Conf from "conf";
 
-const appPath = require("electron");
-const assert = require("assert");
+import { _electron as playwright } from "playwright";
+import electron from "electron";
+
+import assert from "assert";
+
+
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 let windowCheckDelay = 5000;
 let testTimeout = 25000;
@@ -37,15 +42,14 @@ const delayStep = 10;
 };
 
 
-exports.specifyConfig = (dest, name) => {
+export function specifyConfig(dest, name) {
   fs.copySync(
     path.join(__dirname, "fixtures", name + ".json"),
     dest
   );
-};
+}
 
-
-exports.setupConfig = (workingDir, name="config", attrs={}) => {
+export function setupConfig(workingDir, name="config", attrs={}) {
   const dest = path.join(workingDir, "config.json");
   fs.copySync(
     path.join(__dirname, "fixtures", name + ".json"),
@@ -56,18 +60,17 @@ exports.setupConfig = (workingDir, name="config", attrs={}) => {
     let store = new Conf({cwd: workingDir});
     store.set(attrs);
   }
-};
+}
 
-
-exports.setConfigValue = (workingDir, name, value) => {
+export function setConfigValue(workingDir, name, value) {
   let f = path.join(workingDir, "config.json");
   let currentVals = JSON.parse(fs.readFileSync(f));
   currentVals[name] = value;
 
   fs.writeFileSync(f, JSON.stringify(currentVals));
-};
+}
 
-exports.addSaver = function(dest, name, source) {
+export function addSaver(dest, name, source) {
   // make a subdir in the savers directory and drop screensaver
   // config there
   if ( source === undefined ) {
@@ -90,9 +93,9 @@ exports.addSaver = function(dest, name, source) {
   fs.copySync(htmlSrc, saverHTMLFile);    
 
   return saverJSONFile;
-};
+}
 
-exports.prefsToJSON = (tmpdir) => {
+export function prefsToJSON(tmpdir) {
   let testFile = path.join(tmpdir, "config.json");
   let data = {};
 
@@ -104,60 +107,45 @@ exports.prefsToJSON = (tmpdir) => {
   }
 
   return data;
-};
+}
 
-// const getTempBase = function() {
-//   // if we're on windows and the tmp dir base has a ~ in it,
-//   // try and generate an expanded path since glob really dislikes 8.3 filenames
-
-//   const base = os.tmpdir();
-//   if ( process.platform === "win32" && base.lastIndexOf("~") !== -1) {
-//     if ( process.env.HOME ) {
-//       return `${process.env.home}\\AppData\\Local\\Temp`;
-//     }
-//     return `${process.env.USERPROFILE}\\AppData\\Local\\Temp`;
-//   }
-
-//   return base;
-// };
-
-exports.getTempDir = function() {
+export function getTempDir() {
   const base = tmp.dirSync().name;
   if ( process.platform === "win32" && base.lastIndexOf("~") !== -1) {
     return base.replace("RUNNER~1", "runneradmin");
   }
   return base;
-};
+}
 
-exports.savedConfig = function(p) {
+export function savedConfig(p) {
   var data = path.join(p, "config.json");
   var json = fs.readFileSync(data);
   return JSON.parse(json);
-};
+}
 
 
-exports.setupFullConfig = function(workingDir) {
+export function setupFullConfig(workingDir) {
   let saversDir = exports.getTempDir();
   let saverJSONFile = exports.addSaver(saversDir, "saver");
 
   exports.setupConfig(workingDir, "config", {
     "saver": saverJSONFile 
   });
-};
+}
 
-exports.addLocalSource = function(workingDir, saversDir) {
+export function addLocalSource(workingDir, saversDir) {
   var src = path.join(workingDir, "config.json");
   var data = exports.savedConfig(workingDir);
   data.localSource = saversDir;
   fs.writeFileSync(src, JSON.stringify(data));
-};
+}
 
-exports.removeLocalSource = function(workingDir) {
+export function removeLocalSource(workingDir) {
   var src = path.join(workingDir, "config.json");
   var data = exports.savedConfig(workingDir);
   data.localSource = "";
   fs.writeFileSync(src, JSON.stringify(data));
-};
+}
 
 
 /**
@@ -167,7 +155,7 @@ exports.removeLocalSource = function(workingDir) {
  * @param {boolean} quietMode 
  * @returns application
  */
-exports.application = async function(workingDir, quietMode=false) {
+export async function application(workingDir, quietMode=false) {
   let env = {
     BEFORE_DAWN_DIR: workingDir,
     CONFIG_DIR: workingDir,
@@ -177,8 +165,8 @@ exports.application = async function(workingDir, quietMode=false) {
     ELECTRON_ENABLE_LOGGING: true
   };
 
-  let a = await electron.launch({
-    path: appPath,
+  let a = await playwright.launch({
+    path: electron,
     args: [path.join(__dirname, "..", "output", "main.js")],
     env: env
   });
@@ -197,12 +185,12 @@ exports.application = async function(workingDir, quietMode=false) {
 
   app = a;
   return a;
-};
+}
 
-exports.dumpOutput = async(app) => {
+export async function dumpOutput(app) {
   console.log(app.logData);
   app.logData = [];
-};
+}
 
 /**
  * 
@@ -210,11 +198,11 @@ exports.dumpOutput = async(app) => {
  * @param {string} windowName the name of the window to wait for
  * @returns Page
  */
- exports.waitFor = async (app, windowName) => {
+ export async function waitFor(app, windowName) {
   const title = windowTitles[windowName];
   await exports.waitForWindow(app, title);
   return exports.getWindowByTitle(app, title);
-};
+}
 
 
 /**
@@ -222,7 +210,7 @@ exports.dumpOutput = async(app) => {
  * 
  * @param {application} app 
  */
-exports.stopApp = async function(app) {
+export async function stopApp(app) {
   try {
     if (app ) {
       await app.close();
@@ -231,7 +219,7 @@ exports.stopApp = async function(app) {
   catch(e) {
     console.log(e);
   }
-};
+}
 
 
 /**
@@ -240,7 +228,7 @@ exports.stopApp = async function(app) {
  * @param {*} app 
  * @returns hash of window objects keyed by title
  */
-exports.getWindowLookup = async(app) => {
+export async function getWindowLookup(app) {
   const windows = await app.windows();
   const promises = windows.map(async (window) => {
     try {
@@ -258,7 +246,7 @@ exports.getWindowLookup = async(app) => {
     map[obj[0]] = obj[1];
     return map;
   }, {});
-};
+}
 
 /**
  * Get window with the given title
@@ -267,13 +255,13 @@ exports.getWindowLookup = async(app) => {
  * @param {*} title 
  * @returns 
  */
-exports.getWindowByTitle = async (app, title) => {
+export async function getWindowByTitle(app, title) {
   // make sure the app is open
   await app.firstWindow();
 
   const lookup = await exports.getWindowLookup(app);
   return lookup[title];
-};
+}
 
 /**
  * wait for text on the given window
@@ -282,21 +270,21 @@ exports.getWindowByTitle = async (app, title) => {
  * @param {string} text text to look for
  * @param {boolean} doAssert 
  */
-exports.waitForText = async(window, lookup, text, doAssert) => {
+export async function waitForText(window, lookup, text, doAssert) {
   const content = await window.textContent(lookup);
   if ( doAssert === true ) {
     assert(content.lastIndexOf(text) !== -1);
   }
-};
+}
 
 /**
  * wait for ms milliseconds
  * @param {*} ms 
  * @returns 
  */
-exports.sleep = function sleep(ms) {
+export function sleep (ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
-};
+}
 
 
 /**
@@ -306,7 +294,7 @@ exports.sleep = function sleep(ms) {
  * @param {*} skipAssert 
  * @returns 
  */
-exports.waitForWindow = async (app, title, skipAssert) => {
+export async function waitForWindow(app, title, skipAssert) {
   let result = -1;
   for ( var totalTime = 0; totalTime < windowCheckDelay; totalTime += delayStep ) {
     result = await exports.getWindowByTitle(app, title);
@@ -323,7 +311,7 @@ exports.waitForWindow = async (app, title, skipAssert) => {
   }
 
   return result;
-};
+}
 
 
 /**
@@ -332,15 +320,15 @@ exports.waitForWindow = async (app, title, skipAssert) => {
  * @param {*} method 
  * @param {*} opts 
  */
-exports.callIpc = async(_app, method, opts={}) => {
+export async function callIpc(_app, method, opts={}) {
   const window = exports.shim;
 
   await window.fill("#ipc", method);
   await window.fill("#ipcopts", JSON.stringify(opts));
   await window.click("text=go");
-};
+}
 
-exports.setupTest = function (test) {
+export function setupTest(test) {
   test.timeout(testTimeout);
   test.retries(testRetryCount);
 
@@ -351,4 +339,4 @@ exports.setupTest = function (test) {
 
     await exports.stopApp(app);
 	});
-};
+}

@@ -1,10 +1,10 @@
 "use strict";
 
-const fs = require("fs-extra");
-const path = require("path");
-const { mkdirp } = require("mkdirp");
-const { rimraf } = require("rimraf");
-const { glob } = require("glob");
+import fs from 'fs-extra';
+import path from "path";
+import { mkdirp } from "mkdirp";
+import { rimraf } from "rimraf";
+import glob from "glob";
 
 const CONFIG_FILE_NAME = "config.json";
 
@@ -19,7 +19,7 @@ var skipFolder = function(p) {
 };
 
 
-module.exports = class SaverListManager {
+export default class SaverListManager {
   constructor(opts, logger) {
     this.prefs = opts.prefs;
     this.loadedScreensavers = [];
@@ -45,39 +45,33 @@ module.exports = class SaverListManager {
     return this.prefs.saversDir;
   }
   
-  setup() {
+  async setup() {
     let _self = this;
-    return new Promise(function (resolve, reject) {
-      var configPath = path.join(_self.baseDir, CONFIG_FILE_NAME);
-      var saversDir = _self.defaultSaversDir;
-      var results = {
-        first: false,
-        setup: false
-      };
-  
-      _self.logger("saversDir: " + saversDir, fs.existsSync(saversDir));
-      _self.logger("configPath: " + configPath);
-      
-      // check for/create our main directory
-      // and our savers directory (which is a subdir
-      // of the main dir)
-      mkdirp(saversDir).then((made) => {
- 
-        // check if we just created the folder,
-        // if there's no config yet,
-        // or if the savers folder was empty
-        if ( made === true || ! fs.existsSync(configPath) || fs.readdirSync(saversDir).length === 0 ) {
-          results.first = true;
-        }
-  
-        results.setup = true;
-  
-        resolve(results);
-      }, (err) => {
-          _self.logger("err!", err);
-          return reject(err);
-      });
-    });
+    var configPath = path.join(_self.baseDir, CONFIG_FILE_NAME);
+    var saversDir = _self.defaultSaversDir;
+    var results = {
+      first: false,
+      setup: false
+    };
+
+    _self.logger("saversDir: " + saversDir, fs.existsSync(saversDir));
+    _self.logger("configPath: " + configPath);
+    
+    // check for/create our main directory
+    // and our savers directory (which is a subdir
+    // of the main dir)
+    const made = await mkdirp(saversDir);
+
+    // check if we just created the folder,
+    // if there's no config yet,
+    // or if the savers folder was empty
+    if ( made === true || ! fs.existsSync(configPath) || fs.readdirSync(saversDir).length === 0 ) {
+      results.first = true;
+    }
+
+    results.setup = true;
+
+    return results;
   }
   
   /**
@@ -300,4 +294,4 @@ module.exports = class SaverListManager {
       return false;
     }
   }
-};
+}

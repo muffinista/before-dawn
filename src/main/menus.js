@@ -1,10 +1,13 @@
 "use strict";
 
-const main = require("./index.js");
-const path = require("path");
+import * as main from "./index.js";
 
-const nativeImage = require("electron").nativeImage;
+import * as path from "path";
+import { nativeImage, shell } from "electron";
 
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const icons = {
   "win32" : {
@@ -19,7 +22,7 @@ const icons = {
 
 var openUrl = (url) => {
   try {
-    require("electron").shell.openExternal(url);
+    shell.openExternal(url);
   }
   catch(e) {
     main.log.info(e);
@@ -47,7 +50,7 @@ var openHomepage = () => { openUrl("https://github.com/muffinista/before-dawn");
  * 
  * @param {Application} a the main app instance
  */
-var buildMenuTemplate = function(a) {
+export const buildMenuTemplate = function(a) {
   var app = a;
   var base = [
     {
@@ -217,7 +220,7 @@ var buildMenuTemplate = function(a) {
 /**
  * build the tray menu template for the app
  */
-var trayMenuTemplate = function() {
+export const trayMenuTemplate = function() {
   return [
     {
       label: "Run Now",
@@ -247,7 +250,7 @@ var trayMenuTemplate = function() {
     {
       label: "Update Available!",
       click: function() { 
-        require("electron").shell.openExternal(global.PACKAGE_DOWNLOAD_URL);
+        shell.openExternal(global.PACKAGE_DOWNLOAD_URL);
       },
       visible: (global.NEW_RELEASE_AVAILABLE === true)
     },
@@ -288,7 +291,7 @@ var trayMenuTemplate = function() {
 /**
  * get icons for the current platform
  */
-var getIcons = function() {
+export const getIcons = function() {
   if ( icons[process.platform] ) {
     return icons[process.platform];
   }
@@ -296,7 +299,7 @@ var getIcons = function() {
   return icons.default;
 };
 
-var trayIconImage = function() {
+export const trayIconImage = function() {
   var icons = getIcons();
   let stateManager = main.getStateManager();
 
@@ -323,9 +326,3 @@ var updateTrayIcon = function() {
     appIcon.setImage(iconImage);
   }
 };
-
-
-exports.getIcons = getIcons;
-exports.trayIconImage = trayIconImage;
-exports.buildMenuTemplate = buildMenuTemplate;
-exports.trayMenuTemplate = trayMenuTemplate;

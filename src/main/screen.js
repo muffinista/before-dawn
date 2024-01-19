@@ -1,5 +1,6 @@
 "use strict";
 
-const gotoSleep = require("goto-sleep");
-exports.doLockScreen = gotoSleep.lockScreen;
-exports.doSleep = gotoSleep.gotoSleep;
+import gotoSleep from "goto-sleep";
+
+export const doLockScreen = gotoSleep.lockScreen;
+export const doSleep = gotoSleep.gotoSleep;

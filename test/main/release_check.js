@@ -1,10 +1,17 @@
 "use strict";
 
-const ReleaseCheck = require("../../src/main/release_check.js");
-const path = require("path");
-const nock = require("nock");
-const assert = require("assert");
-const fetch = require("node-fetch");
+
+import assert from 'assert';
+import path from "path";
+import fetch from "node-fetch";
+import nock from "nock";
+
+import ReleaseCheck from "../../src/main/release_check.js";
+
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+  
 
 describe("ReleaseCheck", function() {
   let releaseChecker;
@@ -14,12 +21,12 @@ describe("ReleaseCheck", function() {
   let url = `${server}${uriPath}`;
   let fixturePath;
 
-  beforeEach(() => {
+  beforeEach(function() {
     fixturePath = path.join(__dirname, "../fixtures/releases/updates.json");
     releaseChecker = new ReleaseCheck({fetch: fetch});  
   });
 
-  it("handles updates", (done) => {
+  it("handles updates", function(done) {
     nock(server).
       get(uriPath).
       replyWithFile(200, fixturePath, {
@@ -35,7 +42,7 @@ describe("ReleaseCheck", function() {
     releaseChecker.checkLatestRelease();
   });
 
-  it("handles no updates", (done) => {
+  it("handles no updates", function(done) {
     nock(server).
       get(uriPath).
       reply(204, () => {

@@ -1,11 +1,11 @@
 "use strict";
 
-const assert = require("assert");
-const Saver = require("../../src/lib/saver.js");
-const tmp = require("tmp");
-const path = require("path");
-const fs = require("fs");
+import assert from 'assert';
+import path from "path";
+import fs from "fs-extra";
+import * as tmp from "tmp";
 
+import Saver from "../../src/lib/saver.js";
 
 describe("Saver", function() {
   const testName = "Test Screensaver";
