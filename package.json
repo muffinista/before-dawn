@@ -8,6 +8,7 @@
   "homepage": "https://github.com/muffinista/before-dawn/",
   "release_server": "https://before-dawn-updates.muffinlabs.com",
   "main": "output/main.js",
+  "type": "module",
   "engines": {
     "node": ">= 18.18.2"
   },

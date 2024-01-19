@@ -1,20 +1,26 @@
 "use strict";
 
-const path = require("path");
-const packageJSON = require(`${"./package.json"}`);
+import * as path from "path";
+import webpack from "webpack";
+import "dotenv/config";
+
+import HtmlWebpackPlugin from "html-webpack-plugin";
+import MiniCssExtractPlugin from "mini-css-extract-plugin";
+import SentryWebpackPlugin from "@sentry/webpack-plugin";
+import ESLintPlugin from "eslint-webpack-plugin";
+import { readFile } from 'node:fs/promises';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+const packageJSON = JSON.parse(
+  await readFile(
+    new URL('./package.json', import.meta.url)
+  )
+);
 
 const productName = packageJSON.productName;
-
-require("dotenv").config();
-
-const webpack = require("webpack");
-
 const outputDir = path.join(__dirname, "output");
-
-const HtmlWebpackPlugin = require("html-webpack-plugin");
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const SentryWebpackPlugin = require("@sentry/webpack-plugin");
-const ESLintPlugin = require("eslint-webpack-plugin");
 
 const COMMIT_SHA = process.env.SENTRY_RELEASE || process.env.GITHUB_SHA;
 
@@ -174,4 +180,4 @@ if (process.env.NODE_ENV === "production") {
   }
 }
 
-module.exports = rendererConfig;
+export default rendererConfig;
