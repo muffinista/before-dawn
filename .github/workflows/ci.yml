@@ -49,7 +49,7 @@ jobs:
       if: always()
       with:
         name: logs
+        #/Users/runner/Library/Logs/mocha/
+        # ~/.config/Before Dawn/logs/
         path: |
-          # ~/.config/Before Dawn/logs/
-          /Users/runner/Library/Logs/mocha/
-          # C:\Users\runneradmin\AppData\Roaming\mocha\logs\
+          C:\Users\runneradmin\AppData\Roaming\mocha\logs\
