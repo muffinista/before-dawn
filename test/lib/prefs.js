@@ -179,7 +179,7 @@ describe("SaverPrefs", function() {
   });
 
   // systemSource
-  describe("sources", function() {
+  describe("systemSource", function() {
     beforeEach(function() {
       prefs = new SaverPrefs(tmpdir);
     });
