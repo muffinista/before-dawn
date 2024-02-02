@@ -1881,6 +1881,11 @@ const windowMethods = {
 log.transports.file.level = "debug";
 log.transports.file.maxSize = 1 * 1024 * 1024;
 
+if (process.env.LOG_FILE) {
+  log.transports.file.resolvePathFn = () => process.env.LOG_FILE;
+}
+
+
 log.info(`Hello from version: ${global.APP_VERSION_BASE} running in ${isDev ? "development" : "production"}`);
 
 if ( isDev ) {

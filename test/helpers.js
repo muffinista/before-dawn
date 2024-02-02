@@ -3,6 +3,7 @@
 import * as path from "path";
 import fs from 'fs-extra';
 import * as tmp from "tmp";
+import temp from "temp";
 
 import Conf from "conf";
 
@@ -158,14 +159,15 @@ export function removeLocalSource(workingDir) {
  * @param {boolean} quietMode 
  * @returns application
  */
-export async function application(workingDir, quietMode=false) {
+export async function application(workingDir, quietMode=false, logFile=undefined) {
   let env = {
     BEFORE_DAWN_DIR: workingDir,
     CONFIG_DIR: workingDir,
     SAVERS_DIR: workingDir,
     TEST_MODE: true,
     QUIET_MODE: quietMode,
-    ELECTRON_ENABLE_LOGGING: true
+    ELECTRON_ENABLE_LOGGING: true,
+    LOG_FILE: logFile
   };
 
   let a = await playwright.launch({
@@ -185,14 +187,18 @@ export async function application(workingDir, quietMode=false) {
   // wait for the first window (our test shim) to open, and
   // hang onto it for later use
   shim = await a.firstWindow();
-
   app = a;
+
   return a;
 }
 
 export async function dumpOutput(app) {
   console.log(app.logData);
   app.logData = [];
+
+  if (path.existsSync(logPath)) {
+    console.log(fs.readFileSync(logPath));
+  }
 }
 
 /**
@@ -331,9 +337,16 @@ export async function callIpc(_app, method, opts={}) {
   await window.click("text=go");
 }
 
+let logPath;
+
 export function setupTest(test) {
   test.timeout(testTimeout);
   test.retries(testRetryCount);
+
+	// eslint-disable-next-line mocha/no-top-level-hooks
+  beforeEach(function () {
+    logPath = temp.path();
+  });
 
 	// eslint-disable-next-line mocha/no-top-level-hooks
 	afterEach(async function () {
