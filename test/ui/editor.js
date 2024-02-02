@@ -1,9 +1,14 @@
+/* eslint-disable mocha/no-setup-in-describe */
 "use strict";
 
 import assert from 'assert';
 import path from "path";
 import fs from "fs-extra";
 import * as helpers from "../helpers.js";
+
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 var workingDir;
 let app;

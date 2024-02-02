@@ -53,7 +53,7 @@ let mainConfig = {
   },
   experiments: {
     outputModule: true,
-},
+  },
   externals: deps,
   module: {
     rules: [
@@ -83,9 +83,10 @@ let mainConfig = {
   },
   output: {
     filename: "[name].js",
-    libraryTarget: "commonjs2",
     path: outputDir,
-    sourceMapFilename: "[name].js.map"
+    sourceMapFilename: "[name].js.map",
+    chunkFormat: "module",
+    module: true
   },
   plugins: [
     new ESLintPlugin({
@@ -112,9 +113,18 @@ let mainConfig = {
     })
   ],
   resolve: {
-    extensions: [".js", ".json"]
+    extensions: [".js", ".json"],
+    fallback: {
+      "child_process": false,
+      "url": false,
+      "fs": false,
+      "path": false,
+      "os": false,
+      "stream": false,
+      "stream/promises": false,
+    }
   },
-  // target: "electron-main"
+  target: "electron-main"
 };
 
 /**

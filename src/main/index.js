@@ -33,6 +33,7 @@ import {app,
   Tray,
   powerMonitor} from "electron";
 
+import isDev from 'electron-is-dev';
 import log from 'electron-log';
 
 import { screen as electronScreen } from "electron";
@@ -180,7 +181,7 @@ const defaultWebPreferences = {
   contextIsolation: true,
   nodeIntegration: false,
   nativeWindowOpen: true,
-  webSecurity: !global.IS_DEV
+  webSecurity: !isDev
 };
 
 const singleLock = app.requestSingleInstanceLock();
@@ -317,8 +318,8 @@ var grabScreen = function(s) {
  */
 var openTestShim = function() {
   var testWindow = new BrowserWindow({
-    width: 400,
-    height: 400,
+    width: 800,
+    height: 600,
     webPreferences: {
       ...defaultWebPreferences,
       preload: path.join(__dirname, "assets", "shim.js")
@@ -327,6 +328,8 @@ var openTestShim = function() {
 
   const shimUrl = `file://${__dirname}/assets/shim.html`;
   testWindow.loadURL(shimUrl);
+
+  testWindow.webContents.openDevTools();
 };
 
 
@@ -369,7 +372,7 @@ var openPrefsWindow = function() {
         icon: path.join(__dirname, "assets", "iconTemplate.png")
       });
 
-      if ( !global.IS_DEV && handles.prefs.window.removeMenu !== undefined ) {
+      if ( !isDev && handles.prefs.window.removeMenu !== undefined ) {
         handles.prefs.window.removeMenu();
       }
       
@@ -417,7 +420,7 @@ var openSettingsWindow = function() {
   });
 
   // hide the file menu
-  if ( !global.IS_DEV && handles.settings.window.removeMenu !== undefined ) {
+  if ( !isDev && handles.settings.window.removeMenu !== undefined ) {
     handles.settings.window.removeMenu();
   }
 
@@ -490,7 +493,7 @@ var openAboutWindow = function() {
     }
   });
 
-  if ( !global.IS_DEV && handles.about.window.removeMenu !== undefined ) {
+  if ( !isDev && handles.about.window.removeMenu !== undefined ) {
     handles.about.window.removeMenu();
   }
 
@@ -928,13 +931,14 @@ var getSystemDir = function() {
   }
 
   if ( process.env.TEST_MODE ) {
-    return path.join(__dirname, "..", "output");
-  }
-  if ( global.IS_DEV ) {
     return path.join(__dirname, "..", "..", "output");
   }
+  if ( app.isPackaged ) {
+    return path.join(app.getAppPath(), "output");
+  }
 
-  return path.join(app.getAppPath(), "output");
+  log.info(`dev systemDir: ${__dirname} --> ../../output/${__dirname}`);
+  return path.join(__dirname, "..", "..", "output");
 };
 
 
@@ -945,7 +949,7 @@ var getSystemDir = function() {
  */
 var getUrl = function(dest) {
   let baseUrl;
-  if ( !testMode && (global.IS_DEV || process.env.NODE_ENV === "development") ) {
+  if ( !testMode && isDev ) {
     if ( ! process.env.DISABLE_RELOAD ) {
       let devPort;
 
@@ -963,7 +967,11 @@ var getUrl = function(dest) {
     return `${__dirname}/../../output/${dest}`;
   }
   else {
-    return `file://${__dirname}/${dest}`;
+    if ( app.isPackaged ) {
+      return `file://./${dest}`;
+    }
+
+    return `file://${__dirname}/../../output/${dest}`;
   }
 
 };
@@ -1092,7 +1100,7 @@ var setupReleaseCheck = function() {
  * This is important because the app is pretty fragile on OSX otherwise.
  */
 var askAboutApplicationsFolder = function() {
-  if ( testMode === true || global.IS_DEV === true || app.isInApplicationsFolder === undefined ) {
+  if ( testMode === true || isDev === true || app.isInApplicationsFolder === undefined ) {
     return;
   }
 
@@ -1119,6 +1127,7 @@ var askAboutMediaAccess = async function() {
   }
 
   ["microphone", "camera", "screen"].forEach(async (type) => {
+    log.info(type);
     // note: this might be handy
     //     "mac-screen-capture-permissions": "^1.1.0",
     // if ( type === "screen" ) {
@@ -1304,6 +1313,7 @@ let setupIPC = function() {
     
     let systemPath = getSystemDir();
     const src = path.join(systemPath, "system-savers", "__template");
+    log.info(`create-screensaver from ${src}`);
     const dest = prefs.localSource;
     const data = factory.create(src, dest, attrs);
     
@@ -1553,6 +1563,8 @@ let setupIPC = function() {
  * handle initial startup of app
  */
 var bootApp = async function() {
+  log.info("bootApp");
+
   session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
     callback({responseHeaders: Object.fromEntries(Object.entries(details.responseHeaders).filter(header => !/x-frame-options/i.test(header[0])))});
   });
@@ -1576,7 +1588,7 @@ var bootApp = async function() {
   if ( process.env.SAVERS_DIR ) {
     saversDir = process.env.SAVERS_DIR;
   }
-  else if ( global.IS_DEV ) {
+  else if ( isDev ) {
     saversDir = path.join(__dirname, "..", "..", "data", "savers");
     log.info("hello from dev mode, 'node bin/download-screensavers' to grab screensavers");
   }
@@ -1857,12 +1869,21 @@ let toggleSaversUpdated = (arg) => {
   }
 };
 
+const windowMethods = {
+  editor: openEditor,
+  settings: openSettingsWindow,
+  prefs: openPrefsWindow,
+  about: openAboutWindow,
+  "add-new": addNewSaver
+};
+
+
 log.transports.file.level = "debug";
 log.transports.file.maxSize = 1 * 1024 * 1024;
 
-log.info(`Hello from version: ${global.APP_VERSION_BASE} running in ${global.IS_DEV ? "development" : "production"}`);
+log.info(`Hello from version: ${global.APP_VERSION_BASE} running in ${isDev ? "development" : "production"}`);
 
-if ( global.IS_DEV ) {
+if ( isDev ) {
   app.name = global.APP_NAME;
   log.info(`set app name to ${app.name}`);
 
@@ -1872,15 +1893,6 @@ if ( global.IS_DEV ) {
     app.setPath("userData", userDataPath);
   }
 }
-
-const windowMethods = {
-  editor: openEditor,
-  settings: openSettingsWindow,
-  prefs: openPrefsWindow,
-  about: openAboutWindow,
-  "add-new": addNewSaver
-};
-
 
 /**
  * make sure we're only running a single instance
@@ -1913,8 +1925,8 @@ app.on("before-quit", function() {
 });
 app.on("will-quit", function(e) {
   log.info("will-quit");
-  if ( testMode !== true && global.IS_DEV !== true && exitOnQuit !== true ) {
-    log.info(`don't quit! testMode: ${testMode} IS_DEV ${global.IS_DEV} exitOnQuit ${exitOnQuit}`);
+  if ( testMode !== true && isDev !== true && exitOnQuit !== true ) {
+    log.info(`don't quit! testMode: ${testMode} IS_DEV ${isDev} exitOnQuit ${exitOnQuit}`);
     e.preventDefault();
   }
   else {
@@ -1931,9 +1943,11 @@ process.on("uncaughtException", function (ex) {
   log.info(ex.stack);
 });
 
+log.info("readyto wait for bootApp");
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
-app.once("ready", bootApp);
+app.whenReady().then(bootApp);
 
 if ( testMode === true ) {
   exports.getTrayMenuItems = function() {

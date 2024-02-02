@@ -8,7 +8,6 @@ export default async function bootstrapApp() {
     )
   );
   
-  global.IS_DEV = true; // require("electron-is-dev");
 
   var version = undefined;
 
@@ -34,13 +33,13 @@ export default async function bootstrapApp() {
   global.ISSUES_URL = "https://github.com/muffinista/before-dawn/issues";
   global.APP_CREDITS = "by Colin Mitchell // muffinlabs.com";
 
-  if ( packageJSON.release_server && ! global.IS_DEV ) {
+  if ( packageJSON.release_server ) {
     global.RELEASE_SERVER = packageJSON.release_server;
     global.RELEASE_CHECK_URL = `${global.RELEASE_SERVER}/update/${process.platform}/${global.APP_VERSION_BASE}`;
     global.PACKAGE_DOWNLOAD_URL = `https://github.com/${global.APP_REPO}/releases/latest`;
   }
 
-  if ( process.env.TEST_MODE === undefined && !global.IS_DEV &&  process.env.SENTRY_DSN !== undefined ) {
+  if ( process.env.TEST_MODE === undefined && process.env.SENTRY_DSN !== undefined ) {
     console.log(`setting up sentry with ${process.env.SENTRY_DSN}`);
     try {
       init({

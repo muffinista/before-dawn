@@ -1,4 +1,4 @@
-import { contextBridge, ipcRenderer } from "electron";
+const { contextBridge, ipcRenderer } = require("electron");
 
 const shimApi = {
   send: (cmd, opts, args={}) => ipcRenderer.send(cmd, opts, args),

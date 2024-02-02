@@ -1,3 +1,4 @@
+/* eslint-disable mocha/no-setup-in-describe */
 "use strict";
 
 import assert from 'assert';
@@ -13,11 +14,12 @@ var workingDir;
 let app;
 
 describe("Add New", function() {
-  const screensaverUrl = "file://" + path.join(__dirname, "../fixtures/screenshot.png");
+  let screensaverUrl;
 
   helpers.setupTest(this);
 
   beforeEach(async function() {
+    screensaverUrl = "file://" + path.join(__dirname, "../fixtures/screenshot.png");
     saversDir = helpers.getTempDir();
     workingDir = helpers.getTempDir();
 
@@ -66,8 +68,8 @@ describe("Add New", function() {
       await window.fill("[name='name']", "A New Name");
       await window.fill("[name='description']", "A Thing I Made?");
       await window.click("button.save");
-
       await helpers.waitFor(app, "editor");
+
       assert(fs.existsSync(src));
     });
   });

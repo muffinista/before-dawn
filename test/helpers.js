@@ -1,3 +1,4 @@
+/* eslint-disable mocha/no-exports */
 
 import * as path from "path";
 import fs from 'fs-extra';
@@ -20,6 +21,7 @@ let testTimeout = 25000;
 let testRetryCount = 0;
 
 let app;
+let shim;
 
 if (process.env.CI) {
   windowCheckDelay = 10000;
@@ -41,6 +43,7 @@ const delayStep = 10;
   settings: "Before Dawn: Settings"
 };
 
+export { shim };
 
 export function specifyConfig(dest, name) {
   fs.copySync(
@@ -125,24 +128,24 @@ export function savedConfig(p) {
 
 
 export function setupFullConfig(workingDir) {
-  let saversDir = exports.getTempDir();
-  let saverJSONFile = exports.addSaver(saversDir, "saver");
+  let saversDir = getTempDir();
+  let saverJSONFile = addSaver(saversDir, "saver");
 
-  exports.setupConfig(workingDir, "config", {
+  setupConfig(workingDir, "config", {
     "saver": saverJSONFile 
   });
 }
 
 export function addLocalSource(workingDir, saversDir) {
   var src = path.join(workingDir, "config.json");
-  var data = exports.savedConfig(workingDir);
+  var data = savedConfig(workingDir);
   data.localSource = saversDir;
   fs.writeFileSync(src, JSON.stringify(data));
 }
 
 export function removeLocalSource(workingDir) {
   var src = path.join(workingDir, "config.json");
-  var data = exports.savedConfig(workingDir);
+  var data = savedConfig(workingDir);
   data.localSource = "";
   fs.writeFileSync(src, JSON.stringify(data));
 }
@@ -181,7 +184,7 @@ export async function application(workingDir, quietMode=false) {
 
   // wait for the first window (our test shim) to open, and
   // hang onto it for later use
-  exports.shim = await a.firstWindow();
+  shim = await a.firstWindow();
 
   app = a;
   return a;
@@ -200,8 +203,8 @@ export async function dumpOutput(app) {
  */
  export async function waitFor(app, windowName) {
   const title = windowTitles[windowName];
-  await exports.waitForWindow(app, title);
-  return exports.getWindowByTitle(app, title);
+  await waitForWindow(app, title);
+  return getWindowByTitle(app, title);
 }
 
 
@@ -259,7 +262,7 @@ export async function getWindowByTitle(app, title) {
   // make sure the app is open
   await app.firstWindow();
 
-  const lookup = await exports.getWindowLookup(app);
+  const lookup = await getWindowLookup(app);
   return lookup[title];
 }
 
@@ -297,12 +300,12 @@ export function sleep (ms) {
 export async function waitForWindow(app, title, skipAssert) {
   let result = -1;
   for ( var totalTime = 0; totalTime < windowCheckDelay; totalTime += delayStep ) {
-    result = await exports.getWindowByTitle(app, title);
+    result = await getWindowByTitle(app, title);
     if ( result ) {
       return true;
     }
     else {
-      await exports.sleep(delayStep);
+      await sleep(delayStep);
     }
   }
 
@@ -321,7 +324,7 @@ export async function waitForWindow(app, title, skipAssert) {
  * @param {*} opts 
  */
 export async function callIpc(_app, method, opts={}) {
-  const window = exports.shim;
+  const window = shim;
 
   await window.fill("#ipc", method);
   await window.fill("#ipcopts", JSON.stringify(opts));
@@ -332,11 +335,12 @@ export function setupTest(test) {
   test.timeout(testTimeout);
   test.retries(testRetryCount);
 
+	// eslint-disable-next-line mocha/no-top-level-hooks
 	afterEach(async function () {
     if (this.currentTest.state !== "passed") {
-      await exports.dumpOutput(app);
+      await dumpOutput(app);
     }
 
-    await exports.stopApp(app);
+    await stopApp(app);
 	});
 }

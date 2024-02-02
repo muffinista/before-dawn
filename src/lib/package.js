@@ -8,9 +8,8 @@ import { mkdirp } from "mkdirp";
 import { rimrafSync } from "rimraf";
 import * as yauzl from "yauzl"
 import * as lockfile from "proper-lockfile";
-import Readable from "stream";
-import finished from "stream/promises";
-
+import { Readable } from "stream";
+import { finished } from "stream/promises";
 
 
 /**

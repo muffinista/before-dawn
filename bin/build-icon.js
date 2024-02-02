@@ -1,15 +1,12 @@
 #!/usr/bin/env node
 
 /* eslint-disable no-console */
-
-require("dotenv").config();
-
-const tmp = require("tmp");
-const path = require("path");
-const fs = require("fs");
-const pngToIco = require("png-to-ico");
-const jimp = require("jimp");
-
+import "dotenv/config";
+import * as path from "path";
+import * as tmp from "tmp";
+import * as fs from "fs";
+import pngToIco from "png-to-ico";
+import Jimp from "jimp";
 
 const sizes = [256, 128, 48, 32, 16];
 
@@ -17,8 +14,8 @@ async function main() {
   let outputs = [];
   let pauseOutputs = [];
 
-  const image = await jimp.read("assets/icon.png");
-  const pauseImage = await jimp.read("assets/icon-paused.png");
+  const image = await Jimp.read("assets/icon.png");
+  const pauseImage = await Jimp.read("assets/icon-paused.png");
 
   const tmpDir = tmp.dirSync().name;
 
@@ -28,13 +25,13 @@ async function main() {
 
     // const images = sizes.map(async (s) => {
     const name = path.join(tmpDir, `icon-${size}.png`);
-    await image.resize(size, jimp.AUTO);
+    await image.resize(size, Jimp.AUTO);
     await image.writeAsync(name);
 
     outputs.push(name);
 
     const pausedName = path.join(tmpDir, `icon-paused-${size}.png`);
-    await pauseImage.resize(size, jimp.AUTO);
+    await pauseImage.resize(size, Jimp.AUTO);
     await pauseImage.writeAsync(pausedName);
 
     pauseOutputs.push(pausedName);
