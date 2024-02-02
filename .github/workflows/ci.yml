@@ -45,7 +45,8 @@ jobs:
     - name: Run integration tests
       if: ${{ matrix.os != 'ubuntu-latest' }}
       run: npm run test-ui
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
+      if: always()
       with:
         name: logs
         path: |
