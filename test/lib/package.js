@@ -95,11 +95,11 @@ describe("Package", function() {
       
       it("calls downloadFile", async function() {
         const data = JSON.parse(fs.readFileSync("./test/fixtures/release.json"));
-
         sandbox.stub(p, "getReleaseInfo").
           returns(data);
 
         var df = sandbox.stub(p, "downloadFile").resolves(zipPath);
+        sandbox.stub(p, "zipToSavers").resolves({});
 
         await p.checkLatestRelease();
         assert(df.calledOnce);
