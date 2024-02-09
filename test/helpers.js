@@ -170,14 +170,16 @@ export async function application(workingDir, quietMode=false, logFile=undefined
     LOG_FILE: logFile
   };
 
+
   let a = await playwright.launch({
     path: electron,
     args: [path.join(__dirname, "..", "output", "main.js")],
     env: env
   });
 
+  
   a.logData = [];
-
+  
   a.on("window", (w) => {
     w.on("console", (payload) => {
       a.logData.push(payload);
@@ -193,10 +195,12 @@ export async function application(workingDir, quietMode=false, logFile=undefined
 }
 
 export async function dumpOutput(app) {
-  console.log(app.logData);
-  app.logData = [];
+  if (app) {
+    console.log(app.logData);
+    app.logData = [];
+  }
 
-  if (path.existsSync(logPath)) {
+  if (fs.existsSync(logPath)) {
     console.log(fs.readFileSync(logPath));
   }
 }
