@@ -1,8 +1,11 @@
+/* eslint-disable mocha/no-setup-in-describe */
 "use strict";
 
-const assert = require("assert");
-const helpers = require("../helpers.js");
-const packageJSON = require("../../package.json");
+import assert from 'assert';
+import * as helpers from "../helpers.js";
+import fs from "fs";
+
+const packageJSON = JSON.parse(fs.readFileSync("./package.json"));
 
 var workingDir;
 let app;
@@ -10,7 +13,7 @@ let app;
 describe("About", function() {
   helpers.setupTest(this);
 
-  beforeEach(async () => {
+  beforeEach(async function() {
     workingDir = helpers.getTempDir();
     helpers.setupFullConfig(workingDir);
 

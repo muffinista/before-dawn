@@ -1,7 +1,8 @@
+/* eslint-disable mocha/no-setup-in-describe */
 "use strict";
 
-const assert = require("assert");
-const helpers = require("../helpers.js");
+import assert from 'assert';
+import * as helpers from "../helpers.js";
 
 describe("tray", function() {
   var workingDir;
@@ -24,7 +25,9 @@ describe("tray", function() {
     });
 
     app = await helpers.application(workingDir, true);
-    window = helpers.shim;
+    await helpers.waitForWindow(app, 'test shim');
+
+    window = await helpers.getWindowByTitle(app, 'test shim'); 
   });
 
   describe("run now", function() {

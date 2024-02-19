@@ -1,16 +1,21 @@
 "use strict";
 
-const assert = require("assert");
-const path = require("path");
-const fs = require("fs");
-const { rimraf } = require("rimraf");
-const sinon = require("sinon");
-const nock = require("nock");
-const fetch = require("node-fetch");
+import assert from 'assert';
+import path from "path";
+import fs from "fs";
+import { rimrafSync } from 'rimraf'
+import sinon from "sinon";
+import nock from "nock";
 
-const Package = require("../../src/lib/package.js");
+import fetch from 'node-fetch';
+import Package from "../../src/lib/package.js";
 
-const helpers = require("../helpers.js");
+import * as helpers from "../helpers.js";
+
+
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 var attrs;
 
@@ -21,7 +26,7 @@ var zipPath;
 var sandbox;
 
 describe("Package", function() {
-  beforeEach(() => {
+  beforeEach(function() {
     sandbox = sinon.createSandbox();
 
     workingDir = helpers.getTempDir();
@@ -34,6 +39,7 @@ describe("Package", function() {
       fetch: fetch
     };
   });
+
   afterEach(function () {
     sandbox.restore();
   });
@@ -50,9 +56,9 @@ describe("Package", function() {
 		});
   });
 
-  describe("getReleaseInfo", () => {
-    describe("withValidResponse", () => {
-      it("does stuff", async () => {
+  describe("getReleaseInfo", function() {
+    describe("withValidResponse", function() {
+      it("does stuff", async function() {
         nock("https://api.github.com").
           get("/repos/muffinista/before-dawn-screensavers/releases/latest").
           replyWithFile(200, dataPath, {
@@ -65,8 +71,8 @@ describe("Package", function() {
       });
     });
 
-    describe("withReject", () => {
-      it("survives", async () => {
+    describe("withReject", function() {
+      it("survives", async function() {
         nock("https://api.github.com").
           get("/repos/muffinista/before-dawn-screensavers/releases/latest").
           replyWithError({
@@ -80,27 +86,30 @@ describe("Package", function() {
     });
   });
 
-  describe("checkLatestRelease", () => {
+  describe("checkLatestRelease", function() {
     var p;
 
     describe("remote package", function() {
-      beforeEach(() => {
+      beforeEach(function() {
         p = new Package(attrs);
       });
       
-      it("calls downloadFile", async () => {
+      it("calls downloadFile", async function() {
+        const data = JSON.parse(fs.readFileSync("./test/fixtures/release.json"));
         sandbox.stub(p, "getReleaseInfo").
-          returns(require("../fixtures/release.json"));
+          returns(data);
 
         var df = sandbox.stub(p, "downloadFile").resolves(zipPath);
+        sandbox.stub(p, "zipToSavers").resolves({});
 
         await p.checkLatestRelease();
         assert(df.calledOnce);
       });
 
-      it("doesnt call if not needed", async () => {
+      it("doesnt call if not needed", async function() {
+        const data = JSON.parse(fs.readFileSync("./test/fixtures/release-no-update.json"));
         sandbox.stub(p, "getReleaseInfo").
-          returns(require("../fixtures/release-no-update.json"));
+          returns(data);
 
         var cb = sinon.spy();
         var df = sandbox.stub(p, "downloadFile");
@@ -111,35 +120,35 @@ describe("Package", function() {
     });
   });
 
-  describe("downloadFile", () => {
+  describe("downloadFile", function() {
     var testUrl = "https://test.file/savers.zip";
-    beforeEach(() => {
+    beforeEach(function() {
       nock("https://test.file").
-        get("/savers.zip").
-        reply(200, () => {
-          return fs.createReadStream(zipPath);
-        });
-      rimraf.sync(workingDir);
+                        get("/savers.zip").
+       reply(200, () => {
+         return fs.createReadStream(zipPath);
+       });
+      rimrafSync(workingDir);
       fs.mkdirSync(workingDir);
     });
 
-    xit("works", async () => {
+    it("works", async function() {
       let p = new Package(attrs);
       const dest = await p.downloadFile(testUrl);
       assert(fs.existsSync(dest));
     });
   });
 
-  describe("zipToSavers", () => {
+  describe("zipToSavers", function() {
     var p;
 
-    beforeEach(() => {
+    beforeEach(function() {
       p = new Package(attrs);
-      rimraf.sync(workingDir);
+      rimrafSync(workingDir);
       fs.mkdirSync(workingDir);
     });
 
-    it("unzips files", (done) => {
+    it("unzips files", function(done) {
       p.zipToSavers(zipPath).then(() => {
         var testDest = path.resolve(workingDir, "sparks", "index.html");
         assert(fs.existsSync(testDest));
@@ -147,7 +156,7 @@ describe("Package", function() {
       });
     });
 
-    it("recovers from errors", (done) => {
+    it("recovers from errors", function(done) {
       p.zipToSavers(dataPath).
         then(() => {}).
         catch( () => {
@@ -155,7 +164,7 @@ describe("Package", function() {
         });
     });
 
-    it("keeps files on failure", (done) => {
+    it("keeps files on failure", function(done) {
       helpers.addSaver(workingDir, "saver-one", "saver.json");
       
       var testDest = path.resolve(workingDir, "saver-one", "saver.json");
@@ -168,7 +177,7 @@ describe("Package", function() {
     });
 
 
-    it("removes files that arent needed", (done) => {
+    it("removes files that arent needed", function(done) {
       helpers.addSaver(workingDir, "saver-one", "saver.json");
       
       var testDest = path.resolve(workingDir, "saver-one", "saver.json");

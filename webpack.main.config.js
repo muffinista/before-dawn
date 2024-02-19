@@ -1,23 +1,30 @@
 "use strict";
 
-const path = require("path");
-const packageJSON = require("./package.json");
+import * as path from "path";
+import webpack from "webpack";
+import "dotenv/config";
 
-require("dotenv").config();
+import CopyWebpackPlugin from "copy-webpack-plugin";
+import { CleanWebpackPlugin } from "clean-webpack-plugin";
+import SentryWebpackPlugin from "@sentry/webpack-plugin";
+import ESLintPlugin from "eslint-webpack-plugin";
+import { readFile } from 'fs/promises';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const packageJSON = JSON.parse(
+  await readFile(
+    new URL('./package.json', import.meta.url)
+  )
+);
+
 
 const dependencies = packageJSON.dependencies;
 const optionalDependencies = packageJSON.optionalDependencies || {};
-const webpack = require("webpack");
 
 const outputDir = path.join(__dirname, "output");
 
-const CopyWebpackPlugin = require("copy-webpack-plugin");
-
 const COMMIT_SHA = process.env.SENTRY_RELEASE || process.env.GITHUB_SHA;
-
-const { CleanWebpackPlugin } = require("clean-webpack-plugin");
-const SentryWebpackPlugin = require("@sentry/webpack-plugin");
-const ESLintPlugin = require("eslint-webpack-plugin");
 
 //
 // get a list of node dependencies, and then
@@ -43,6 +50,9 @@ let mainConfig = {
   mode: (process.env.NODE_ENV === "production" ? "production" : "development"),
   entry: {
     main: path.join(__dirname, "src", "main", "index.js")
+  },
+  experiments: {
+    outputModule: true,
   },
   externals: deps,
   module: {
@@ -73,9 +83,10 @@ let mainConfig = {
   },
   output: {
     filename: "[name].js",
-    libraryTarget: "commonjs2",
     path: outputDir,
-    sourceMapFilename: "[name].js.map"
+    sourceMapFilename: "[name].js.map",
+    chunkFormat: "module",
+    module: true
   },
   plugins: [
     new ESLintPlugin({
@@ -102,7 +113,16 @@ let mainConfig = {
     })
   ],
   resolve: {
-    extensions: [".js", ".json"]
+    extensions: [".js", ".json"],
+    fallback: {
+      "child_process": false,
+      "url": false,
+      "fs": false,
+      "path": false,
+      "os": false,
+      "stream": false,
+      "stream/promises": false,
+    }
   },
   target: "electron-main"
 };
@@ -142,4 +162,4 @@ if (process.env.NODE_ENV === "production") {
   }
 }
 
-module.exports = mainConfig;
+export default mainConfig;

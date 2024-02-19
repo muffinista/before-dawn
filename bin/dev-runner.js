@@ -1,18 +1,28 @@
 "use strict";
 
-const electron = require("electron");
-const path = require("path");
-const { spawn } = require("child_process");
-const webpack = require("webpack");
-const WebpackDevServer = require("webpack-dev-server");
+import electron from "electron";
+import * as path from "path";
+import { spawn } from "child_process";
+import webpack from "webpack";
+import WebpackDevServer from "webpack-dev-server";
 
-const mainConfig = require("../webpack.main.config");
-const rendererConfig = require("../webpack.renderer.config");
+import { readFile } from 'fs/promises';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 let devPort;
 
+import mainConfig from "../webpack.main.config.js";
+import rendererConfig from "../webpack.renderer.config.js";
+
 try {
-  let packageJSON = require("../package.json");
+  const packageJSON = JSON.parse(
+    await readFile(
+      new URL('../package.json', import.meta.url)
+    )
+  );
+  
   devPort = packageJSON.devport;
 }
 catch(e) {
@@ -98,7 +108,8 @@ function startRenderer () {
 }
 
 function startElectron () {
-  electronProcess = spawn(electron, ["--inspect=5858", path.join(__dirname, "../src/main/index.dev.js")]);
+  // @todo set environment here
+  electronProcess = spawn(electron, ["--inspect=5858", path.join(__dirname, "../src/main/index.js")]);
 
   electronProcess.stdout.on("data", data => {
     process.stdout.write(data.toString());

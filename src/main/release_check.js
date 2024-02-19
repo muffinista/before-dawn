@@ -1,10 +1,10 @@
 "use strict";
-module.exports = class ReleaseCheck {
+export default class ReleaseCheck {
   constructor(_attrs = {}) {
     this.onUpdateCallback = () => {};
     this.onNoUpdateCallback = () => {};
     this.logger = () => {};
-    this.fetch = _attrs.fetch || global.fetch || require("node-fetch");
+    this.fetch = _attrs.fetch || global.fetch;
   }
 
   setFeed(u) {
@@ -47,4 +47,4 @@ module.exports = class ReleaseCheck {
       this.onNoUpdateCallback();
     });
   }
-};
+}

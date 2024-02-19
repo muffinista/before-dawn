@@ -1,10 +1,14 @@
+/* eslint-disable mocha/no-setup-in-describe */
 "use strict";
 
-const assert = require("assert");
-const fs = require("fs-extra");
-const path = require("path");
+import assert from 'assert';
+import path from "path";
+import fs from "fs-extra";
+import * as helpers from "../helpers.js";
 
-const helpers = require("../helpers.js");
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 describe("bootstrap", function() {
   const saverZip = path.join(__dirname, "..", "fixtures", "test-savers.zip");
@@ -17,14 +21,14 @@ describe("bootstrap", function() {
   helpers.setupTest(this);
  
 
-  beforeEach(() => {
+  beforeEach(function() {
     workingDir = helpers.getTempDir();
     configDest = path.join(workingDir, "config.json");  
   });
 
 
-  describe("without config", () => {
-    beforeEach(async () => {
+  describe("without config", function() {
+    beforeEach(async function() {
       assert(!fs.existsSync(configDest));
       app = await helpers.application(workingDir, false, saverZip, saverData);
     });
@@ -38,8 +42,8 @@ describe("bootstrap", function() {
     });
   });
 
-  describe("with invalid config", () => {
-    beforeEach(async () => {
+  describe("with invalid config", function() {
+    beforeEach(async function() {
       const dest = path.join(workingDir, "config.json");
       fs.copySync(
         path.join(__dirname, "..", "fixtures", "bad-config.json"),

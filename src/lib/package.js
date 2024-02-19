@@ -1,16 +1,15 @@
 "use strict";
 
-const fs = require("fs");
-const path = require("path");
-const yauzl = require("yauzl");
-const { mkdirp } = require("mkdirp");
-const { rimraf } = require("rimraf");
-const lockfile = require("proper-lockfile");
-const { Readable } = require("stream");
-const { finished } = require("stream/promises");
-
-const temp = require("temp");
-const os = require("os");
+import fs from 'fs-extra';
+import path from "path";
+import temp from "temp";
+import os from "os";
+import { mkdirp } from "mkdirp";
+import { rimrafSync } from "rimraf";
+import * as yauzl from "yauzl"
+import * as lockfile from "proper-lockfile";
+import { Readable } from "stream";
+import { finished } from "stream/promises";
 
 
 /**
@@ -20,7 +19,7 @@ const os = require("os");
  * if it's after stored value, download it!
  */
 
-module.exports = class Package {
+export default class Package {
   constructor(_attrs) {
     this.repo = _attrs.repo;
     this.dest = _attrs.dest;
@@ -44,8 +43,6 @@ module.exports = class Package {
     this.defaultHeaders = {
       "User-Agent": "Before Dawn"
     };  
-
-    this.fetch = _attrs.fetch || global.fetch || require("node-fetch");
   }
   
   attrs() {
@@ -62,7 +59,7 @@ module.exports = class Package {
       return this.data;
     }
 
-    this.data = await this.fetch(this.url, this.defaultHeaders)
+    this.data = await fetch(this.url, this.defaultHeaders)
       .then(res => res.json())
       .then((json) => {
         const remoteVersion = json.tag_name.replace(/^v/, "");
@@ -124,7 +121,7 @@ module.exports = class Package {
       dest = temp.path({dir: os.tmpdir(), suffix: ".zip"});
     }
 
-    const res = await this.fetch(url, this.defaultHeaders);
+    const res = await fetch(url, this.defaultHeaders);
 
     // https://stackoverflow.com/questions/37614649/how-can-i-download-and-save-a-file-using-the-fetch-api-node-js
     const fileStream = fs.createWriteStream(dest);
@@ -141,7 +138,7 @@ module.exports = class Package {
 
     return new Promise(function (resolve, reject) {
       lockfile.lock(dest, { realpath: false, stale: 30000 }).then((release) => {
-        yauzl.open(tempName, {lazyEntries: true}, (err, zipfile) => {
+        yauzl.open(tempName, {lazyEntries: true, validateEntrySizes: false}, (err, zipfile) => {
           if (err) {
             release().then(() => {
               reject(err);
@@ -152,7 +149,7 @@ module.exports = class Package {
             // clean out existing files
             //
             try {
-              rimraf.sync(self.dest);
+              rimrafSync(self.dest);
             }
             catch (err) {
               self.logger(err);
@@ -218,4 +215,4 @@ module.exports = class Package {
       });
     });
   }
-};
+}

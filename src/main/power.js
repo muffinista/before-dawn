@@ -1,9 +1,9 @@
 
 "use strict";
 
-const exec = require("child_process").execFile;
+import { execFile } from "child_process";
 
-module.exports = class Power {
+export default class Power {
   constructor(opts = {}) {
     this.method = opts.method;
     this.platform = opts.platform;
@@ -74,7 +74,7 @@ module.exports = class Power {
  
   query(cmd, args) {
     return new Promise((resolve) => {
-      exec(cmd, args, (error, stdout, stderr) => {
+      execFile(cmd, args, (error, stdout, stderr) => {
         if (error) {
           console.warn(error);
         }
@@ -82,4 +82,4 @@ module.exports = class Power {
       });
     });
   }
-};
+}

@@ -9,10 +9,10 @@
 // specified    
 const DEFAULT_REQUIREMENTS = ["screen"];
 
-const _path = require("path");
-const fs = require("fs");
+import fs from 'fs-extra';
+import * as nodePath from "path";
 
-module.exports = class Saver {
+export default class Saver {
   constructor(_attrs) {
     this.UNWRITABLE_KEYS = ["key", "path", "url", "settings", "editable"];
 
@@ -139,9 +139,9 @@ module.exports = class Saver {
       attrs = this.attrs;
     }
     if ( typeof(configDest) === "undefined" ) {
-      configDest = _path.join(this.path, "saver.json");
+      configDest = nodePath.join(this.path, "saver.json");
     }
     fs.writeFileSync(configDest, this.toJSON(attrs));
   }
-};
+}
 

@@ -1,4 +1,3 @@
-var main = require("./webpack.main.config");
-var renderer = require("./webpack.renderer.config");
-
-module.exports = [main, renderer];
+import mainConfig from "./webpack.main.config.js";
+import rendererConfig from "./webpack.renderer.config.js";
+export default [mainConfig, rendererConfig];

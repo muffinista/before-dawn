@@ -9,7 +9,7 @@ jobs:
     env:
       PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
       # https://stackoverflow.com/questions/77251296/distutils-not-found-when-running-npm-install
-      PYTHON: 3.11
+      # PYTHON: 3.11
       # "$Env:GYP_MSVS_VERSION": 2022
     steps:
     - name: Install ubuntu requirements
@@ -18,16 +18,19 @@ jobs:
         sudo apt-get -qq update
         sudo apt-get install -y libx11-dev libxss-dev icnsutils graphicsmagick libappindicator1 libxtst-dev
     # https://github.com/nodejs/node-gyp/issues/2869
-    - name: Hack node-gyp
-      if: ${{ matrix.os != 'windows-latest' }}
-      run: |
-        sudo -H python3 -m pip install packaging
-    - uses: actions/checkout@v3
+    # - name: Hack node-gyp
+    #   if: ${{ matrix.os != 'windows-latest' }}
+    #   run: |
+    #     sudo -H python3 -m pip install packaging
+    - uses: actions/checkout@v4
     - name: Use Node.js
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version-file: '.nvmrc'
         cache: 'npm'
+    - uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
     - name: Specify MSVS version
       if: ${{ matrix.os == 'windows-latest' }}
       shell: powershell
@@ -45,10 +48,11 @@ jobs:
     - name: Run integration tests
       if: ${{ matrix.os != 'ubuntu-latest' }}
       run: npm run test-ui
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
+      if: always()
       with:
         name: logs
+        #/Users/runner/Library/Logs/mocha/
+        # ~/.config/Before Dawn/logs/
         path: |
-          # ~/.config/Before Dawn/logs/
-          /Users/runner/Library/Logs/mocha/
-          # C:\Users\runneradmin\AppData\Roaming\mocha\logs\
+          C:\Users\runneradmin\AppData\Roaming\mocha\logs\

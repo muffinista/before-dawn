@@ -1,12 +1,13 @@
+/* eslint-disable mocha/no-setup-in-describe */
 "use strict";
 
-const assert = require("assert");
-const helpers = require("../helpers.js");
+import assert from 'assert';
+import * as helpers from "../helpers.js";
+import SaverPrefs from "../../src/lib/prefs.js";
 
 let app;
 var workingDir;
 var saversDir;
-const SaverPrefs = require("../../src/lib/prefs.js");
 
 describe("Settings", function() { 
   const closeWindowDelay = 750;
@@ -18,7 +19,7 @@ describe("Settings", function() {
     return new SaverPrefs(workingDir).data;
   };
 
-  beforeEach(async () => {
+  beforeEach(async function() {
     workingDir = helpers.getTempDir();
     saversDir = helpers.getTempDir();
     
@@ -71,20 +72,20 @@ describe("Settings", function() {
     await helpers.waitFor(app, "prefs");
   });
   
-  it.skip("allows setting path via dialog", async function() {
-    const [fileChooser] = await Promise.all([
-      window.waitForEvent("filechooser"),
-      window.click("button.pick")
-    ]);
-    await fileChooser.setFiles("/not/a/real/path");
+  // it.skip("allows setting path via dialog", async function() {
+  //   const [fileChooser] = await Promise.all([
+  //     window.waitForEvent("filechooser"),
+  //     window.click("button.pick")
+  //   ]);
+  //   await fileChooser.setFiles("/not/a/real/path");
 
-    await window.click("button.save");
-    await helpers.sleep(closeWindowDelay);
+  //   await window.click("button.save");
+  //   await helpers.sleep(closeWindowDelay);
 
-    assert.strictEqual("/not/a/real/path", currentPrefs().localSource);
+  //   assert.strictEqual("/not/a/real/path", currentPrefs().localSource);
 
-    await helpers.waitFor(app, "prefs");
-  });
+  //   await helpers.waitFor(app, "prefs");
+  // });
 
   it("clears localSource", async function() {
     let ls = currentPrefs().localSource;
@@ -102,22 +103,22 @@ describe("Settings", function() {
   });
 
 
-  // dialogs don't work yet
-  // @see https://github.com/microsoft/playwright/issues/8278
-  it.skip("resets defaults", async function() {
-    window = await helpers.waitFor(app, "settings");
+  // // dialogs don't work yet
+  // // @see https://github.com/microsoft/playwright/issues/8278
+  // it.skip("resets defaults", async function() {
+  //   window = await helpers.waitFor(app, "settings");
 
-    window.on("dialog", async dialog => {
-      console.log(dialog.message());
-      await dialog.accept();
-    });
+  //   window.on("dialog", async dialog => {
+  //     console.log(dialog.message());
+  //     await dialog.accept();
+  //   });
 
-    await window.click("button.reset-to-defaults");
-    await helpers.waitForText(window, "body", "Settings reset", true);
-    await helpers.sleep(closeWindowDelay);
+  //   await window.click("button.reset-to-defaults");
+  //   await helpers.waitForText(window, "body", "Settings reset", true);
+  //   await helpers.sleep(closeWindowDelay);
 
-    assert.strictEqual("", currentPrefs().localSource);
+  //   assert.strictEqual("", currentPrefs().localSource);
 
-    await helpers.waitFor(app, "prefs");
-  });
+  //   await helpers.waitFor(app, "prefs");
+  // });
 });

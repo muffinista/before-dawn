@@ -1,7 +1,7 @@
 "use strict";
 
-const main = require("./index.js");
-const {BrowserWindow} = require("electron");
+import * as main from "./index.js";
+import { BrowserWindow } from "electron";
 
 var getSaverWindows = function() {
   return BrowserWindow.getAllWindows().filter((w) => {
@@ -13,7 +13,7 @@ var getSaverWindows = function() {
 /**
  * check if the screensaver is still running
  */
-var screenSaverIsRunning = function() {
+export const screenSaverIsRunning = function() {
   return ( getSaverWindows().length > 0 );
 };
 
@@ -28,7 +28,7 @@ var activeWindowHandle = function(w) {
 /**
  * when the display count changes, close any running windows
  */
-var handleDisplayChange = function() {
+export const handleDisplayChange = function() {
   // main.log.info("display change, let's close running screensavers");
   closeRunningScreensavers();
 };
@@ -36,7 +36,7 @@ var handleDisplayChange = function() {
 /**
  * close any running screensavers
  */
-var closeRunningScreensavers = function() {
+export const closeRunningScreensavers = function() {
   main.log.info("closeRunningScreensavers");
   attemptToStopScreensavers();
 
@@ -72,7 +72,7 @@ var forcefullyCloseScreensavers = function() {
 /**
  * forcefully close a screensaver window
  */
-var forceWindowClose = function(w) {
+export const forceWindowClose = function(w) {
   // 100% close/kill this window
   if ( typeof(w) !== "undefined" ) {
     try {
@@ -89,7 +89,7 @@ var forceWindowClose = function(w) {
  * fast/simple fullscreen mode if available.
  * @param {BrowserWindow} w the window to apply
  */
-var setFullScreen = function(w) {
+export const setFullScreen = function(w) {
   if ( process.platform !== "darwin" ) {
     w.setFullScreen(true);
   }
@@ -100,8 +100,3 @@ var setFullScreen = function(w) {
 //  w.moveTop();
 };
 
-exports.screenSaverIsRunning = screenSaverIsRunning;
-exports.handleDisplayChange = handleDisplayChange;
-exports.closeRunningScreensavers = closeRunningScreensavers;
-exports.forceWindowClose = forceWindowClose;
-exports.setFullScreen = setFullScreen;

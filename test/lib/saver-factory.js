@@ -1,16 +1,16 @@
 "use strict";
 
-const assert = require("assert");
-const helpers = require("../helpers.js");
+import assert from 'assert';
+import path from "path";
+import fs from "fs-extra";
+import { rimrafSync } from 'rimraf'
+import * as mkdirp from "mkdirp";
 
-const { rimraf } = require("rimraf");
-const fs = require("fs-extra");
-const path = require("path");
-const { mkdirp } = require("mkdirp");
+import * as helpers from "../helpers.js";
 
-const SaverPrefs = require("../../src/lib/prefs.js");
-const SaverFactory = require("../../src/lib/saver-factory.js");
-const SaverListManager = require("../../src/lib/saver-list.js");
+import SaverPrefs from "../../src/lib/prefs.js";
+import SaverFactory from "../../src/lib/saver-factory.js";
+import SaverListManager from "../../src/lib/saver-list.js";
 
 
 describe("SaverFactory", function() { 
@@ -44,7 +44,7 @@ describe("SaverFactory", function() {
 
   afterEach(function() {
     if ( fs.existsSync(workingDir) ) {
-      rimraf.sync(workingDir);
+      rimrafSync(workingDir);
     }
   });
 
