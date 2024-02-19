@@ -39,6 +39,7 @@ describe("Package", function() {
       fetch: fetch
     };
   });
+
   afterEach(function () {
     sandbox.restore();
   });

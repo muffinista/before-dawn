@@ -140,7 +140,7 @@ export default class Package {
 
     return new Promise(function (resolve, reject) {
       lockfile.lock(dest, { realpath: false, stale: 30000 }).then((release) => {
-        yauzl.open(tempName, {lazyEntries: true}, (err, zipfile) => {
+        yauzl.open(tempName, {lazyEntries: true, validateEntrySizes: false}, (err, zipfile) => {
           if (err) {
             release().then(() => {
               reject(err);
