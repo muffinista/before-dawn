@@ -39,6 +39,7 @@ describe("Package", function() {
       fetch: fetch
     };
   });
+
   afterEach(function () {
     sandbox.restore();
   });
@@ -119,24 +120,24 @@ describe("Package", function() {
     });
   });
 
-  // describe("downloadFile", function() {
-  //   var testUrl = "https://test.file/savers.zip";
-  //   beforeEach(function() {
-  //     nock("https://test.file").
-  //       get("/savers.zip").
-  //       reply(200, () => {
-  //         return fs.createReadStream(zipPath);
-  //       });
-  //     rimrafSync(workingDir);
-  //     fs.mkdirSync(workingDir);
-  //   });
+  describe("downloadFile", function() {
+    var testUrl = "https://test.file/savers.zip";
+    beforeEach(function() {
+      nock("https://test.file").
+                        get("/savers.zip").
+       reply(200, () => {
+         return fs.createReadStream(zipPath);
+       });
+      rimrafSync(workingDir);
+      fs.mkdirSync(workingDir);
+    });
 
-  //   xit("works", async function() {
-  //     let p = new Package(attrs);
-  //     const dest = await p.downloadFile(testUrl);
-  //     assert(fs.existsSync(dest));
-  //   });
-  // });
+    it("works", async function() {
+      let p = new Package(attrs);
+      const dest = await p.downloadFile(testUrl);
+      assert(fs.existsSync(dest));
+    });
+  });
 
   describe("zipToSavers", function() {
     var p;
