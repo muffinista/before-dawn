@@ -43,8 +43,6 @@ export default class Package {
     this.defaultHeaders = {
       "User-Agent": "Before Dawn"
     };  
-
-    this.fetch = _attrs.fetch || global.fetch;
   }
   
   attrs() {
@@ -61,7 +59,7 @@ export default class Package {
       return this.data;
     }
 
-    this.data = await this.fetch(this.url, this.defaultHeaders)
+    this.data = await fetch(this.url, this.defaultHeaders)
       .then(res => res.json())
       .then((json) => {
         const remoteVersion = json.tag_name.replace(/^v/, "");
@@ -123,7 +121,7 @@ export default class Package {
       dest = temp.path({dir: os.tmpdir(), suffix: ".zip"});
     }
 
-    const res = await this.fetch(url, this.defaultHeaders);
+    const res = await fetch(url, this.defaultHeaders);
 
     // https://stackoverflow.com/questions/37614649/how-can-i-download-and-save-a-file-using-the-fetch-api-node-js
     const fileStream = fs.createWriteStream(dest);

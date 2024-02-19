@@ -84,7 +84,7 @@
     "jimp": "^0.22.8",
     "mini-css-extract-plugin": "^2.0.0",
     "mocha": "^10.2.0",
-    "nock": "^13.3.1",
+    "nock": "^14.0.0-beta.3",
     "node-abi": "^3.52.0",
     "node-fetch": "^2.6.7",
     "node-loader": "^2.0.0",
