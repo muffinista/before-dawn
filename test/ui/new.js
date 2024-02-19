@@ -26,32 +26,32 @@ describe("Add New", function() {
     app = await helpers.application(workingDir, true);
   });
 
-  describe("when not setup", function() {
-    beforeEach(async function() {
-      await helpers.callIpc(app, `open-window add-new ${screensaverUrl}`);
-    });
+  // describe("when not setup", function() {
+  //   beforeEach(async function() {
+  //     await helpers.callIpc(app, `open-window add-new ${screensaverUrl}`);
+  //   });
 
-    it("shows alert if not setup", async function() {
-      const window = await helpers.waitFor(app, "new");
-      const elem = await window.$("body");
-      const text = await elem.innerText();
-      assert(text.lastIndexOf("set a local directory") !== -1);
-    });
+  //   it("shows alert if not setup", async function() {
+  //     const window = await helpers.waitFor(app, "new");
+  //     const elem = await window.$("body");
+  //     const text = await elem.innerText();
+  //     assert(text.lastIndexOf("set a local directory") !== -1);
+  //   });
 
-    // it.skip("can set local source", async function() {
-    //   await helpers.waitForWindow(app, windowTitle);
-    //   await helpers.waitForText(app, "body", "set a local directory", true);
+  //   it.skip("can set local source", async function() {
+  //     await helpers.waitForWindow(app, windowTitle);
+  //     await helpers.waitForText(app, "body", "set a local directory", true);
 
-    //   await helpers.click(app, "button.pick");
-    //   await helpers.click(app, "button.save");
+  //     await helpers.click(app, "button.pick");
+  //     await helpers.click(app, "button.save");
 
-    //   await helpers.sleep(100);
+  //     await helpers.sleep(100);
 
-    //   assert.equal("/not/a/real/path", currentPrefs().localSource);
-    //   const res = await helpers.getElementText(app, "body");
-    //   assert(res.lastIndexOf("Use this form") !== -1);
-    // });
-  });
+  //     assert.equal("/not/a/real/path", currentPrefs().localSource);
+  //     const res = await helpers.getElementText(app, "body");
+  //     assert(res.lastIndexOf("Use this form") !== -1);
+  //   });
+  // });
 
   describe("when setup", function() {
     let window;

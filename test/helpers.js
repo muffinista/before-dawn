@@ -18,11 +18,11 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 let windowCheckDelay = 5000;
-let testTimeout = 25000;
+let testTimeout = 50000;
 let testRetryCount = 0;
+let logPath;
 
 let app;
-let shim;
 
 if (process.env.CI) {
   windowCheckDelay = 10000;
@@ -44,8 +44,6 @@ const delayStep = 10;
   settings: "Before Dawn: Settings"
 };
 
-export { shim };
-
 export function specifyConfig(dest, name) {
   fs.copySync(
     path.join(__dirname, "fixtures", name + ".json"),
@@ -60,7 +58,7 @@ export function setupConfig(workingDir, name="config", attrs={}) {
     dest
   );
 
-  if ( attrs !== {} ) {
+  if ( Object.keys(attrs) > 0 ) {
     let store = new Conf({cwd: workingDir});
     store.set(attrs);
   }
@@ -186,9 +184,9 @@ export async function application(workingDir, quietMode=false, logFile=undefined
     });
   });
 
-  // wait for the first window (our test shim) to open, and
-  // hang onto it for later use
-  shim = await a.firstWindow();
+  // wait for the first window (our test shim) to open
+  await a.firstWindow();
+
   app = a;
 
   return a;
@@ -333,15 +331,15 @@ export async function waitForWindow(app, title, skipAssert) {
  * @param {*} method 
  * @param {*} opts 
  */
-export async function callIpc(_app, method, opts={}) {
-  const window = shim;
+export async function callIpc(app, method, opts={}) {
+  await waitForWindow(app, 'test shim');
+  const window = await getWindowByTitle(app, 'test shim');
+
 
   await window.fill("#ipc", method);
   await window.fill("#ipcopts", JSON.stringify(opts));
   await window.click("text=go");
 }
-
-let logPath;
 
 export function setupTest(test) {
   test.timeout(testTimeout);

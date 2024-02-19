@@ -25,7 +25,9 @@ describe("tray", function() {
     });
 
     app = await helpers.application(workingDir, true);
-    window = helpers.shim;
+    await helpers.waitForWindow(app, 'test shim');
+
+    window = await helpers.getWindowByTitle(app, 'test shim'); 
   });
 
   describe("run now", function() {
