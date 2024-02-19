@@ -9,7 +9,7 @@ jobs:
     env:
       PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
       # https://stackoverflow.com/questions/77251296/distutils-not-found-when-running-npm-install
-      PYTHON: 3.11
+      # PYTHON: 3.11
       # "$Env:GYP_MSVS_VERSION": 2022
     steps:
     - name: Install ubuntu requirements
@@ -28,6 +28,9 @@ jobs:
       with:
         node-version-file: '.nvmrc'
         cache: 'npm'
+    - uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
     - name: Specify MSVS version
       if: ${{ matrix.os == 'windows-latest' }}
       shell: powershell

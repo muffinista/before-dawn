@@ -25,6 +25,9 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
       - name: Setup code
         run: npm i
       - name: Run eslint
