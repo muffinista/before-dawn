@@ -61,7 +61,7 @@
     "@babel/preset-env": "^7.7.1",
     "@electron/rebuild": "^3.6.0",
     "octokit": "^3.1.2",
-    "@sentry/cli": "^2.1.0",
+    "@sentry/cli": "^2.30.0",
     "@sentry/webpack-plugin": "^1.18.9",
     "babel-loader": "^9.1.2",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",

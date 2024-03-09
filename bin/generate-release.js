@@ -1,12 +1,20 @@
 #!/usr/bin/env node
 
-/* eslint-disable no-console */
-require("dotenv").config();
+import "dotenv/config";
+import * as path from "path";
+import { Octokit } from "octokit";
+import { readFile } from 'fs/promises';
+import { fileURLToPath } from 'url';
 
-const SentryCli = require("@sentry/cli");
-const { Octokit } = require("@octokit/rest");
-const path = require("path");
-const pjson = require(path.join(__dirname, "..", "package.json"));
+import SentryCli from '@sentry/cli';
+const pjson = JSON.parse(
+  await readFile(
+    new URL('../package.json', import.meta.url)
+  )
+);
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
 
 let opts = {
   auth: `token ${process.env.GITHUB_AUTH_TOKEN}`
@@ -35,7 +43,7 @@ async function main() {
   
   console.log(`checking ${owner}/${repo} for ${tag_name}`);
 
-  let result = await octokit.repos.getLatestRelease({owner, repo});
+  let result = await octokit.rest.repos.getLatestRelease({owner, repo});
   if ( result.data.tag_name === tag_name ) {
     console.log("release already created!");
   }
@@ -43,7 +51,7 @@ async function main() {
     console.log(release);
 
     // Create a release
-    result = await octokit.repos.createRelease(release);
+    result = await octokit.rest.repos.createRelease(release);
     console.log(result);
   }
 
