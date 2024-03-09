@@ -77,7 +77,6 @@ class SaverPrefs {
     }
 
     this.systemSource = path.join(this.rootDir, "system-savers");
-
     this.confOpts = {
       schema: DEFAULTS,
       clearInvalidConfig: true,

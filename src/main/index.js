@@ -1596,7 +1596,7 @@ var bootApp = async function() {
     saversDir = path.join(process.resourcesPath, "savers");
   }
 
-  const systemDir = path.join(getSystemDir(), "system-savers");
+  const systemDir = getSystemDir();
 
   let basePath;
   // store our root path as a global variable so we can access it from screens
