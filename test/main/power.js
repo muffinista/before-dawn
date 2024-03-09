@@ -24,7 +24,7 @@ describe("Power", function() {
 
     describe("unhandled platform", function() {
       it("works", async function() {
-        const power = new Power("beos");
+        const power = new Power({platform: "beos"});
         assert(await power.charging());
       });
     });
