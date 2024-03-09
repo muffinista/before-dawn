@@ -1,14 +1,17 @@
 #!/usr/bin/env node
 
 /* eslint-disable no-console */
-require("dotenv").config();
+import "dotenv/config";
+import * as path from "path";
+import * as fs from "fs";
+import { rimraf } from 'rimraf'
+import * as mkdirp from "mkdirp";
+import { Octokit } from "octokit";
 
-const Package = require("../src/lib/package.js");
-const { Octokit } = require("@octokit/rest");
-const path = require("path");
-const fs = require("fs");
-const { rimraf } = require("rimraf");
-const { mkdirp } = require("mkdirp");
+import Package from "../src/lib/package.js";
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const srcRoot = path.join(__dirname, "..");
 const workingDir = path.join(srcRoot, "data");
@@ -29,7 +32,7 @@ rimraf.sync(workingDir);
 mkdirp.sync(workingDir);
 
 async function main() {
-  let result = await octokit.repos.getLatestRelease({owner, repo});
+  let result = await octokit.rest.repos.getLatestRelease({owner, repo});
 
   const tag_name = result.data.tag_name;
   const jsonFile = `${repo}-${tag_name}.json`;
