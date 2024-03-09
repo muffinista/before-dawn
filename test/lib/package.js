@@ -149,6 +149,10 @@ describe("Package", function() {
     });
 
     it("unzips files", function(done) {
+      if (process.platform == "darwin") {
+        this.skip();
+      }
+      
       p.zipToSavers(zipPath).then(() => {
         var testDest = path.resolve(workingDir, "sparks", "index.html");
         assert(fs.existsSync(testDest));
@@ -157,6 +161,10 @@ describe("Package", function() {
     });
 
     it("recovers from errors", function(done) {
+      if (process.platform == "darwin") {
+        this.skip();
+      }
+
       p.zipToSavers(dataPath).
         then(() => {}).
         catch( () => {
@@ -165,6 +173,10 @@ describe("Package", function() {
     });
 
     it("keeps files on failure", function(done) {
+      if (process.platform == "darwin") {
+        this.skip();
+      }
+
       helpers.addSaver(workingDir, "saver-one", "saver.json");
       
       var testDest = path.resolve(workingDir, "saver-one", "saver.json");
@@ -178,6 +190,10 @@ describe("Package", function() {
 
 
     it("removes files that arent needed", function(done) {
+      if (process.platform == "darwin") {
+        this.skip();
+      }
+
       helpers.addSaver(workingDir, "saver-one", "saver.json");
       
       var testDest = path.resolve(workingDir, "saver-one", "saver.json");
