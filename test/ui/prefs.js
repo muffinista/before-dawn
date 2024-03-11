@@ -35,6 +35,10 @@ describe("Prefs", function() {
     await helpers.waitForText(window, "body", "Screensaver One", true);
   });
 
+  it("lists included default screensavers", async function() {
+    await helpers.waitForText(window, "body", "Random", true);
+  });
+
   it("allows picking a screensaver", async function() {
     await helpers.waitForText(window, "body", "Screensaver One", true);
     await window.click("text=Screensaver One");

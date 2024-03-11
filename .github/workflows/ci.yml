@@ -36,12 +36,6 @@ jobs:
       shell: powershell
       run: |
         echo "GYP_MSVS_VERSION=2022" >> $env:GITHUB_ENV
-
-    # - name: Patch node-gyp
-    #   if: ${{ matrix.os == 'windows-latest' }}
-    #   shell: powershell
-    #   run: |
-    #     npm config set msvs_version 2022
     - run: npm ci
     - run: npm rebuild
     - run: npm run test-lib

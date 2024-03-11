@@ -159,6 +159,7 @@ export function removeLocalSource(workingDir) {
  */
 export async function application(workingDir, quietMode=false, logFile=undefined) {
   let env = {
+    ...process.env,
     BEFORE_DAWN_DIR: workingDir,
     CONFIG_DIR: workingDir,
     SAVERS_DIR: workingDir,
