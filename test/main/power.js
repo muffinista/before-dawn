@@ -56,7 +56,7 @@ describe("Power", function() {
             return false;
           };
 
-          power = new Power(platform, method);
+          power = new Power({platform, method});
         });
 
         it("returns the reverse of the method", async function() {
