@@ -10,7 +10,7 @@ import * as yauzl from "yauzl"
 import * as lockfile from "proper-lockfile";
 import { Readable } from "stream";
 import { finished } from "stream/promises";
-
+import semver from "semver";
 
 /**
  * need source repo url
@@ -63,7 +63,7 @@ export default class Package {
       .then(res => res.json())
       .then((json) => {
         const remoteVersion = json.tag_name.replace(/^v/, "");
-        json.is_update = remoteVersion !== this.version;
+        json.is_update = this.version === undefined || semver.gt(remoteVersion, this.version);
         return json;
       })
       .catch((err) => {

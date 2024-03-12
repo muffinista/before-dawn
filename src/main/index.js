@@ -1070,7 +1070,7 @@ var setupReleaseCheck = function() {
     return;
   }
 
-  releaseChecker = new ReleaseCheck({fetch: net.fetch});
+  releaseChecker = new ReleaseCheck();
 
   releaseChecker.setFeed(global.RELEASE_CHECK_URL);
   releaseChecker.setLogger(log.info);
@@ -1460,20 +1460,22 @@ let setupIPC = function() {
   /**
    * display a dialog about a package update
    */
-  ipcMain.on("display-update-dialog", async () => {
-    const result = await dialog.showMessageBox({
-      type: "info",
-      title: "Update Available!",
-      message: "There's a new update available! Would you like to download it?",
-      buttons: ["No", "Yes"],
-      defaultId: 0
-    });
-    
-    if ( result.response === 1 ) {
-      const appRepo = global.APP_REPO;
-      shell.openExternal(`https://github.com/${appRepo}/releases/latest`);
-    }
-  });
+  if ( process.env.TEST_MODE === undefined ) {
+    ipcMain.on("display-update-dialog", async () => {
+      const result = await dialog.showMessageBox({
+        type: "info",
+        title: "Update Available!",
+        message: "There's a new update available! Would you like to download it?",
+        buttons: ["No", "Yes"],
+        defaultId: 0
+      });
+      
+      if ( result.response === 1 ) {
+        const appRepo = global.APP_REPO;
+        shell.openExternal(`https://github.com/${appRepo}/releases/latest`);
+      }
+    });  
+  }
 
   /**
    * display a dialog when the user wants to reset to default settings

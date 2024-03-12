@@ -1,10 +1,9 @@
 "use strict";
 export default class ReleaseCheck {
-  constructor(_attrs = {}) {
+  constructor() {
     this.onUpdateCallback = () => {};
     this.onNoUpdateCallback = () => {};
     this.logger = () => {};
-    this.fetch = _attrs.fetch || global.fetch;
   }
 
   setFeed(u) {
@@ -24,7 +23,7 @@ export default class ReleaseCheck {
   checkLatestRelease() {
     this.logger(`check ${this.url} for new release`);
     let _self = this;
-    this.fetch(this.url, {
+    fetch(this.url, {
       timeout: 5000,
       headers: {
         "User-Agent": "Before Dawn"

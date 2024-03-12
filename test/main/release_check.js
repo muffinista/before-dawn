@@ -3,7 +3,6 @@
 
 import assert from 'assert';
 import path from "path";
-import fetch from "node-fetch";
 import nock from "nock";
 
 import ReleaseCheck from "../../src/main/release_check.js";
@@ -23,7 +22,7 @@ describe("ReleaseCheck", function() {
 
   beforeEach(function() {
     fixturePath = path.join(__dirname, "../fixtures/releases/updates.json");
-    releaseChecker = new ReleaseCheck({fetch: fetch});  
+    releaseChecker = new ReleaseCheck();  
   });
 
   it("handles updates", function(done) {

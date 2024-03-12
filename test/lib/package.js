@@ -7,7 +7,6 @@ import { rimrafSync } from 'rimraf'
 import sinon from "sinon";
 import nock from "nock";
 
-import fetch from 'node-fetch';
 import Package from "../../src/lib/package.js";
 
 import * as helpers from "../helpers.js";
@@ -35,8 +34,7 @@ describe("Package", function() {
 
     attrs = {
       repo: "muffinista/before-dawn-screensavers",
-      dest: workingDir,
-      fetch: fetch
+      dest: workingDir
     };
   });
 
@@ -67,6 +65,7 @@ describe("Package", function() {
   
         var p = new Package(attrs);
         let results = await p.getReleaseInfo();
+        console.log(results);
         assert.equal("muffinista", results.author.login);
       });
     });
