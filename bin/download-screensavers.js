@@ -45,8 +45,7 @@ async function main() {
 
   const p = new Package({
     repo: `${owner}/${repo}`,
-    dest: dest,
-    log: console.log
+    dest: dest
   });
 
   await p.downloadRelease(url, dest);
