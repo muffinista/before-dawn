@@ -148,16 +148,15 @@ describe("Package", function() {
       fs.mkdirSync(workingDir);
     });
 
-    it("unzips files", function(done) {
+    it("unzips files", async function() {
       if (process.platform == "darwin") {
         this.skip();
       }
       
-      p.zipToSavers(zipPath).then(() => {
-        var testDest = path.resolve(workingDir, "sparks", "index.html");
-        assert(fs.existsSync(testDest));
-        done();
-      });
+      await p.zipToSavers(zipPath);
+
+      var testDest = path.resolve(workingDir, "sparks", "index.html");
+      assert(fs.existsSync(testDest));
     });
 
     it("recovers from errors", function(done) {
