@@ -163,9 +163,7 @@ if (process.env.NODE_ENV === "production") {
     })
   );
 
-  if ( process.env.SENTRY_AUTH_TOKEN ) {
-    console.log("Using SentryWebpackPlugin");
-
+  if ( process.env.SENTRY_AUTH_TOKEN && !process.env.DISABLE_SENTRY ) {
     rendererConfig.plugins.push(
       new SentryWebpackPlugin({
         include: "src",

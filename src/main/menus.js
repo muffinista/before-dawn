@@ -5,20 +5,6 @@ import * as main from "./index.js";
 import * as path from "path";
 import { nativeImage, shell } from "electron";
 
-import { fileURLToPath } from 'url';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-const icons = {
-  "win32" : {
-    active: path.join(__dirname , "assets", "icon.ico"),
-    paused: path.join(__dirname , "assets", "icon-paused.ico")
-  },
-  "default": {
-    active: path.join(__dirname , "assets", "iconTemplate.png"),
-    paused: path.join(__dirname , "assets", "icon-pausedTemplate.png")
-  }
-};
 
 var openUrl = (url) => {
   try {
@@ -292,6 +278,17 @@ export const trayMenuTemplate = function() {
  * get icons for the current platform
  */
 export const getIcons = function() {
+  const icons = {
+    "win32" : {
+      active: path.join(main.getAssetsDir() , "icon.ico"),
+      paused: path.join(main.getAssetsDir(), "icon-paused.ico")
+    },
+    "default": {
+      active: path.join(main.getAssetsDir() , "iconTemplate.png"),
+      paused: path.join(main.getAssetsDir() , "icon-pausedTemplate.png")
+    }
+  };
+  
   if ( icons[process.platform] ) {
     return icons[process.platform];
   }
@@ -312,6 +309,7 @@ export const trayIconImage = function() {
     iconPath = icons.active;
   }
 
+  main.log.info(`use icon ${iconPath}`);
   return nativeImage.createFromPath(iconPath);
 };
 
