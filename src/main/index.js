@@ -992,6 +992,11 @@ var getUrl = function(dest) {
     return new URL(dest, new URL(baseUrl)).toString();
   }
 
+  log.info(`hey!!! ${app.getAppPath()}`);
+  if ( testMode ) {
+    return `file://${app.getAppPath()}/${dest}`;
+  }
+
   return `file://${app.getAppPath()}/output/${dest}`;
 };
 
