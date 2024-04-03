@@ -15,7 +15,6 @@
   "devport": 9081,
   "scripts": {
     "dev": "node bin/dev-runner.js",
-    "dev-no-reload": "cross-env DISABLE_RELOAD=1 node bin/dev-runner.js",
     "compile": "cross-env NODE_ENV=production webpack --mode production --config webpack.config.js",
     "eslint-all": "eslint -c .eslintrc.json src/**/*.js src/**/*.svelte test/**/*.js webpack*.js",
     "eslint": "eslint -c .eslintrc.json",
@@ -23,7 +22,7 @@
     "pack": "npm run compile && electron-builder --dir",
     "dist": "npm run compile && electron-builder --x64",
     "test": "npm run compile && mocha -b test/**/*.js",
-    "test-ui": "npm run compile && xvfb-maybe mocha test/ui/**/*.js",
+    "test-ui": "cross-env DISABLE_SENTRY=true npm run compile && xvfb-maybe mocha test/ui/**/*.js",
     "test-lib": "mocha test test/lib/**/*.js test/main/**/*.js",
     "run-local": "node bin/build-icon.js && npm run compile && cross-env ELECTRON_IS_DEV=0 electron output/main.js",
     "grab-screens": "bin/capture-screens.js",
@@ -114,15 +113,6 @@
       "output/**/*",
       "node_modules/**/*",
       "package.json"
-    ],
-    "extraResources": [
-      {
-        "from": "data/savers",
-        "to": "savers",
-        "filter": [
-          "**/*"
-        ]
-      }
     ],
     "appId": "Before Dawn",
     "mac": {

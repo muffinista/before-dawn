@@ -1,5 +1,4 @@
 import { readFile } from 'fs/promises';
-import { init } from '@sentry/electron';
 
 export default async function bootstrapApp() {
   const packageJSON = JSON.parse(
@@ -37,19 +36,5 @@ export default async function bootstrapApp() {
     global.RELEASE_SERVER = packageJSON.release_server;
     global.RELEASE_CHECK_URL = `${global.RELEASE_SERVER}/update/${process.platform}/${global.APP_VERSION_BASE}`;
     global.PACKAGE_DOWNLOAD_URL = `https://github.com/${global.APP_REPO}/releases/latest`;
-  }
-
-  if ( process.env.TEST_MODE === undefined && process.env.SENTRY_DSN !== undefined ) {
-    console.log(`setting up sentry with ${process.env.SENTRY_DSN}`);
-    try {
-      init({
-        dsn: process.env.SENTRY_DSN,
-        // eslint-disable-next-line no-console
-        onFatalError: console.log
-      });  
-    }
-    catch(e) {
-      console.log(e);
-    }
   }
 }

@@ -19,6 +19,21 @@
  */
 
 
+import { init } from '@sentry/electron';
+if ( process.env.TEST_MODE === undefined && process.env.SENTRY_DSN !== undefined ) {
+  console.log(`setting up sentry with ${process.env.SENTRY_DSN}`);
+  try {
+    init({
+      dsn: process.env.SENTRY_DSN,
+      // eslint-disable-next-line no-console
+      onFatalError: console.log
+    });  
+  }
+  catch(e) {
+    console.log(e);
+  }
+}
+   
 import {app,
   BrowserWindow,
   desktopCapturer,
@@ -70,10 +85,6 @@ import * as autostarter from "./autostarter.js";
 import FullScreen from "detect-fullscreen";
 const { isFullscreen } = FullScreen;
 
-import { fileURLToPath } from 'url';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
 const packageJSON = JSON.parse(
   await readFile(
     new URL('../../package.json', import.meta.url)
@@ -81,7 +92,6 @@ const packageJSON = JSON.parse(
 );
 
 var releaseChecker;
-
 
 // NOTE -- this needs to be global, otherwise the app icon gets
 // garbage collected and won't show up in the system tray
@@ -113,9 +123,6 @@ else {
 }
 
 let exitOnQuit = false;
-
-// load some global CSS we'll inject into running screensavers
-const globalCSSCode = fs.readFileSync( path.join(__dirname, "assets", "global.css"), "ascii");  
 
 /**
  * track some information about windows and preview bounds for the prefs window
@@ -219,7 +226,7 @@ var listScreens = async function() {
 var openGrabberWindow = function() {
   return new Promise((resolve) => {
     log.info("openGrabberWindow");
-    const grabberUrl = `file://${__dirname}/assets/grabber.html`;
+    const grabberUrl = `file://${getAssetsDir()}/grabber.html`;
 
     var grabberWindow = new BrowserWindow({
       show: false,
@@ -230,7 +237,7 @@ var openGrabberWindow = function() {
       y: 2000,
       webPreferences: {
         ...defaultWebPreferences,
-        preload: path.join(__dirname, "assets", "grabber.mjs")
+        preload: path.join(getAssetsDir(), "grabber.mjs")
       }
     });
     // grabberWindow.noTray = true;
@@ -266,7 +273,7 @@ var grabScreen = function(s) {
       (process.platform === "darwin" && systemPreferences.getMediaAccessStatus("screen") !== "granted" ) ||
       testMode === true ) {
       resolve({
-        url: path.join(__dirname, "assets", "color-bars.png")
+        url: path.join(getAssetsDir(), "color-bars.png")
       });
     }
     else {
@@ -322,11 +329,11 @@ var openTestShim = function() {
     height: 600,
     webPreferences: {
       ...defaultWebPreferences,
-      preload: path.join(__dirname, "assets", "shim.js")
+      preload: path.join(getAssetsDir(), "shim.js")
     }
   });
 
-  const shimUrl = `file://${__dirname}/assets/shim.html`;
+  const shimUrl = `file://${getAssetsDir()}/shim.html`;
   testWindow.loadURL(shimUrl);
 
   testWindow.webContents.openDevTools();
@@ -356,7 +363,6 @@ var openPrefsWindow = function() {
       screenshots[primary.id] = grab.url;
 
       const prefsUrl = getUrl("prefs.html");
-
       handles.prefs.window = new BrowserWindow({
         show: false,
         width: 910,
@@ -367,9 +373,9 @@ var openPrefsWindow = function() {
         resizable: true,
         webPreferences: {
           ...defaultWebPreferences,
-          preload: path.join(__dirname, "assets", "preload.mjs")
+          preload: path.join(getAssetsDir(), "preload.mjs")
         },
-        icon: path.join(__dirname, "assets", "iconTemplate.png")
+        icon: path.join(getAssetsDir(), "iconTemplate.png")
       });
 
       if ( !isDev && handles.prefs.window.removeMenu !== undefined ) {
@@ -412,10 +418,10 @@ var openSettingsWindow = function() {
     resizable: true,
     parent: handles.prefs.window,
     modal: true,
-    icon: path.join(__dirname, "assets", "iconTemplate.png"),
+    icon: path.join(getAssetsDir(), "iconTemplate.png"),
     webPreferences: {
       ...defaultWebPreferences,
-      preload: path.join(__dirname, "assets", "preload.mjs"),
+      preload: path.join(getAssetsDir(), "preload.mjs"),
     }
   });
 
@@ -458,9 +464,9 @@ var addNewSaver = async function(opts) {
     resizable:true,
     webPreferences: {
       ...defaultWebPreferences,
-      preload: path.join(__dirname, "assets", "preload.mjs"),
+      preload: path.join(getAssetsDir(), "preload.mjs"),
     },
-    icon: path.join(__dirname, "assets", "iconTemplate.png")
+    icon: path.join(getAssetsDir(), "iconTemplate.png")
   });
 
   handles.addNew.window.on("closed", () => {
@@ -486,10 +492,10 @@ var openAboutWindow = function() {
     width:500,
     height:600,
     resizable:false,
-    icon: path.join(__dirname, "assets", "iconTemplate.png"),
+    icon: path.join(getAssetsDir(), "iconTemplate.png"),
     webPreferences: {
       ...defaultWebPreferences,
-      preload: path.join(__dirname, "assets", "preload.mjs"),
+      preload: path.join(getAssetsDir(), "preload.mjs"),
     }
   });
 
@@ -533,7 +539,7 @@ var openEditor = (args) => {
       show: false,
       webPreferences: {
         ...defaultWebPreferences,
-        preload: path.join(__dirname, "assets", "preload.mjs"),
+        preload: path.join(getAssetsDir(), "preload.mjs"),
       },
     });  
   }
@@ -615,6 +621,9 @@ var applyScreensaverWindowEvents = function(w) {
   w.webContents.on("did-finish-load", function() {
     log.info("did-finish-load");
     if (!w.isDestroyed()) {
+      // load some global CSS we'll inject into running screensavers
+      const globalCSSCode = fs.readFileSync( path.join(getAssetsDir(), "global.css"), "ascii");  
+
       w.webContents.insertCSS(globalCSSCode);
     }
   });
@@ -931,14 +940,33 @@ var getSystemDir = function() {
   }
 
   if ( process.env.TEST_MODE ) {
-    return path.join(__dirname, "..", "..", "output");
+    return app.getAppPath();
   }
   if ( app.isPackaged ) {
     return path.join(app.getAppPath(), "output");
   }
 
-  log.info(`dev systemDir: ${__dirname} --> ../../output/${__dirname}`);
-  return path.join(__dirname, "..", "..", "output");
+  return path.join(app.getAppPath(), "..", "..", "output");
+};
+
+
+/**
+ * determine what our assets directory is. This is where global CSS,
+ * icons, etc, can be found.
+ */
+let getAssetsDir = function() {
+  if ( process.env.BEFORE_DAWN_ASSETS_DIR !== undefined ) {
+    return process.env.BEFORE_DAWN_ASSETS_DIR;
+  }
+
+  if ( app.isPackaged ) {
+    return path.join(app.getAppPath(), "output", "assets");
+  }
+  if ( process.env.TEST_MODE ) {
+    return path.join(app.getAppPath(), "assets");
+  }
+
+  return path.join(app.getAppPath(), "assets");
 };
 
 
@@ -950,30 +978,26 @@ var getSystemDir = function() {
 var getUrl = function(dest) {
   let baseUrl;
   if ( !testMode && isDev ) {
-    if ( ! process.env.DISABLE_RELOAD ) {
-      let devPort;
+    let devPort;
 
-      try {
-        devPort = packageJSON.devport;
-      }
-      catch(e) {
-        devPort = 9080;
-      }
-      
-      baseUrl = `http://localhost:${devPort}`;
-      return new URL(dest, new URL(baseUrl)).toString(); // url.resolve(baseUrl, dest);
+    try {
+      devPort = packageJSON.devport;
+    }
+    catch(e) {
+      devPort = 9080;
     }
     
-    return `${__dirname}/../../output/${dest}`;
-  }
-  else {
-    if ( app.isPackaged ) {
-      return `file://./${dest}`;
-    }
+    baseUrl = `http://localhost:${devPort}`;
 
-    return `file://${__dirname}/../../output/${dest}`;
+    return new URL(dest, new URL(baseUrl)).toString();
   }
 
+  log.info(`hey!!! ${app.getAppPath()}`);
+  if ( testMode ) {
+    return `file://${app.getAppPath()}/${dest}`;
+  }
+
+  return `file://${app.getAppPath()}/output/${dest}`;
 };
 
 var setupForTesting = function() {
@@ -1311,8 +1335,7 @@ let setupIPC = function() {
   ipcMain.handle("create-screensaver", async(_event, attrs) => {
     const factory = new SaverFactory();
     
-    let systemPath = getSystemDir();
-    const src = path.join(systemPath, "system-savers", "__template");
+    const src = path.join(getSystemDir(), "system-savers", "__template");
     log.info(`create-screensaver from ${src}`);
     const dest = prefs.localSource;
     const data = factory.create(src, dest, attrs);
@@ -1591,7 +1614,7 @@ var bootApp = async function() {
     saversDir = process.env.SAVERS_DIR;
   }
   else if ( isDev ) {
-    saversDir = path.join(__dirname, "..", "..", "data", "savers");
+    saversDir = path.join(app.getAppPath(), "..", "..", "data", "savers");
     log.info("hello from dev mode, 'node bin/download-screensavers' to grab screensavers");
   }
   else {
@@ -1614,7 +1637,7 @@ var bootApp = async function() {
   log.info("Loading prefs");
   log.info(`baseDir: ${basePath}`);
   log.info(`saversDir: ${saversDir}`);
-  log.info(`system savers: ${systemDir}`);
+  log.info(`system savers: ${systemDir}/system-savers`);
 
   prefs = new SaverPrefs(basePath, systemDir, saversDir);
   savers = new SaverListManager({
@@ -1967,6 +1990,7 @@ export {
   setStateToRunning,
   setStateToPaused,
   resetState,
+  getAssetsDir,
   getStateManager,
   getAppIcon,
   getTrayMenu,
