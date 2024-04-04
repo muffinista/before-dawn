@@ -19,12 +19,11 @@ jobs:
 
       # Checks out a copy of your repository on the ubuntu-latest machine
       - name: Checkout code
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Use Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
-          cache: 'npm'
+          node-version-file: '.nvmrc'
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"

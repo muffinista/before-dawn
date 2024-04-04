@@ -10,7 +10,7 @@
   "main": "output/main.js",
   "type": "module",
   "engines": {
-    "node": ">= 18.18.2"
+    "node": ">= 20.9.0"
   },
   "devport": 9081,
   "scripts": {
