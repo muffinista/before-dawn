@@ -1,7 +1,7 @@
 {
   "name": "before-dawn",
   "productName": "Before Dawn",
-  "version": "0.30.0",
+  "version": "0.30.1",
   "description": "A desktop screensaver app using web technologies",
   "author": "Colin Mitchell <colin@muffinlabs.com> (http://muffinlabs.com)",
   "license": "MIT",
@@ -113,6 +113,15 @@
       "output/**/*",
       "node_modules/**/*",
       "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "data/savers",
+        "to": "savers",
+        "filter": [
+          "**/*"
+        ]
+      }
     ],
     "appId": "Before Dawn",
     "mac": {
