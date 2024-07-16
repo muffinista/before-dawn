@@ -336,7 +336,7 @@ var openTestShim = function() {
   const shimUrl = `file://${getAssetsDir()}/shim.html`;
   testWindow.loadURL(shimUrl);
 
-  testWindow.webContents.openDevTools();
+  // testWindow.webContents.openDevTools();
 };
 
 
