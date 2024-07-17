@@ -17,7 +17,7 @@ export default async function bootstrapApp() {
       process.env.BEFORE_DAWN_RELEASE_NAME = `${packageJSON.productName} ${packageJSON.version}`;
     }
   }
-  catch(e) {
+  catch {
     version = "0.0.0";
   }
 

@@ -983,7 +983,7 @@ var getUrl = function(dest) {
     try {
       devPort = packageJSON.devport;
     }
-    catch(e) {
+    catch {
       devPort = 9080;
     }
     
