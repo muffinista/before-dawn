@@ -218,7 +218,7 @@
   }
 
   #preview {
-    max-width: calc(100vw - var(--sidebar-width)) - 10;
+    max-width: calc((100vw - var(--sidebar-width)) - 10);
     overflow-y: scroll;
   }
   #sidebar {
