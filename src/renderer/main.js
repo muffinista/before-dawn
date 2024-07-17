@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 import "~/css/styles.scss";
 
 import PrefsScreen from "./PrefsScreen.svelte";

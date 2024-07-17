@@ -121,6 +121,7 @@ describe("Package", function() {
 
   describe("downloadFile", function() {
     var testUrl = "https://test.file/savers.zip";
+
     beforeEach(function() {
       nock("https://test.file").
                         get("/savers.zip").

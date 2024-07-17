@@ -25,7 +25,6 @@ if ( process.env.TEST_MODE === undefined && process.env.SENTRY_DSN !== undefined
   try {
     init({
       dsn: process.env.SENTRY_DSN,
-      // eslint-disable-next-line no-console
       onFatalError: console.log
     });  
   }
@@ -193,7 +192,6 @@ const defaultWebPreferences = {
 
 const singleLock = app.requestSingleInstanceLock();
 if (! singleLock ) {
-  // eslint-disable-next-line no-console
   console.log("looks like another copy of app is running, exiting!");
   app.quit();
   process.exit();

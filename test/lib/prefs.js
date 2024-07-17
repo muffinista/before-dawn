@@ -133,6 +133,7 @@ describe("SaverPrefs", function() {
   // sources
   describe("sources", function() {
     let systemDir;
+
     beforeEach(function() {
       prefs = new SaverPrefs(tmpdir);
       helpers.specifyConfig(prefs.configFile, "config");

@@ -90,7 +90,8 @@ let mainConfig = {
   },
   plugins: [
     new ESLintPlugin({
-      fix: false
+      fix: false,
+      configType: 'flat'
     }),
     new CleanWebpackPlugin({
       cleanOnceBeforeBuildPatterns: []

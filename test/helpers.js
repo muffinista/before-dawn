@@ -104,7 +104,7 @@ export function prefsToJSON(tmpdir) {
   try {
     data = JSON.parse(fs.readFileSync(testFile));
   }
-  catch(e) {
+  catch {
     data = {};
   }
 
@@ -246,7 +246,7 @@ export async function getWindowLookup(app) {
     try {
       const title = await window.title();
       return [title, window];
-    } catch(e) {
+    } catch {
       // sometimes a window will be closing and trying to get the title
       // will throw an error, but it's probably fine
       return ["Missing window", window];

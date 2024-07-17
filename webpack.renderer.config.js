@@ -104,6 +104,7 @@ let rendererConfig = {
   plugins: [
     new ESLintPlugin({
       fix: false,
+      configType: 'flat',
       extensions: ["js"]
     }),
     new HtmlWebpackPlugin(htmlPageOptions("prefs", "Preferences")),

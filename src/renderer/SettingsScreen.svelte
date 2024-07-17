@@ -239,7 +239,7 @@ async function handleSave(output) {
     window.api.setAutostart(prefs.auto_start);
     window.api.setGlobalLaunchShortcut(prefs.launchShortcut);
   }
-  catch(e) {
+  catch {
     output = "Something went wrong!";
   }
 
