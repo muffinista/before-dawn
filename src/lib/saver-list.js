@@ -4,7 +4,7 @@ import fs from 'fs-extra';
 import path from "path";
 import { mkdirp } from "mkdirp";
 import { rimraf } from "rimraf";
-import glob from "glob";
+import { glob } from "glob";
 
 const CONFIG_FILE_NAME = "config.json";
 

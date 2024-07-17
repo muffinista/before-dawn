@@ -31,6 +31,7 @@ describe("Power", function() {
 
     describe("linux", function() {
       let platform;
+
       beforeEach(function() {
         platform = "linux";
         power = new Power(platform);

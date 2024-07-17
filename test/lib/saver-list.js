@@ -211,7 +211,7 @@ describe("SaverListManager", function() {
       try {
         await savers.delete(s);
       }
-      catch(e) {
+      catch {
         assert(true);
       }
     });

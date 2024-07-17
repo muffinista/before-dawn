@@ -37,7 +37,7 @@ export default class Power {
       try {
         return await this.query(cmd, opts);
       }
-      catch(e) {
+      catch {
         return undefined;
       }
     }

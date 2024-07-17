@@ -6,7 +6,7 @@ import "dotenv/config";
 
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
-import SentryWebpackPlugin from "@sentry/webpack-plugin";
+import { sentryWebpackPlugin } from "@sentry/webpack-plugin";
 import ESLintPlugin from "eslint-webpack-plugin";
 import { readFile } from 'fs/promises';
 import { fileURLToPath } from 'url';
@@ -104,6 +104,7 @@ let rendererConfig = {
   plugins: [
     new ESLintPlugin({
       fix: false,
+      configType: 'flat',
       extensions: ["js"]
     }),
     new HtmlWebpackPlugin(htmlPageOptions("prefs", "Preferences")),
@@ -165,7 +166,7 @@ if (process.env.NODE_ENV === "production") {
 
   if ( process.env.SENTRY_AUTH_TOKEN && !process.env.DISABLE_SENTRY ) {
     rendererConfig.plugins.push(
-      new SentryWebpackPlugin({
+      new sentryWebpackPlugin({
         include: "src",
         ignoreFile: ".sentrycliignore",
         ignore: ["node_modules", "webpack.config.js", "webpack.main.config.js", "webpack.renderer.config.js"],

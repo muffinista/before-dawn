@@ -4,8 +4,6 @@
  * environment.
  */
 
-/* eslint-disable */
-
 // Set environment for development
 process.env.NODE_ENV = 'development';
 
