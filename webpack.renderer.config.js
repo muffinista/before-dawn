@@ -166,7 +166,7 @@ if (process.env.NODE_ENV === "production") {
 
   if ( process.env.SENTRY_AUTH_TOKEN && !process.env.DISABLE_SENTRY ) {
     rendererConfig.plugins.push(
-      new sentryWebpackPlugin({
+      sentryWebpackPlugin({
         include: "src",
         ignoreFile: ".sentrycliignore",
         ignore: ["node_modules", "webpack.config.js", "webpack.main.config.js", "webpack.renderer.config.js"],
