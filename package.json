@@ -95,7 +95,7 @@
     "playwright": "^1.45.2",
     "png-to-ico": "^2.1.8",
     "sass": "^1.77.8",
-    "sass-loader": "^14.2.1",
+    "sass-loader": "^16.0.2",
     "sinon": "^18.0.0",
     "style-loader": "^4.0.0",
     "svelte": "^4.2.19",
