@@ -18,8 +18,7 @@ The core of the app is built on [Electron](https://www.electronjs.org/), a syste
 that allows you to build desktop applications that run on
 [node.js](https://nodejs.org/) and are rendered via Chrome.
 
-There's about a dozen screensavers right now, with more on the way. Here's the
-Flying Emoji screensaver:
+There's a bunch of screensavers to choose from. Here's the Flying Emoji screensaver:
 
 ![flying
 emoji](https://github.com/muffinista/before-dawn/raw/main/assets/emoji-on-monitor-opt.gif
@@ -124,7 +123,7 @@ suggestion, please feel free to open an issue here.
 
 ## Copyright/License
 
-Unless otherwise stated, Copyright (c) 2022 [Colin
+Unless otherwise stated, Copyright (c) 2024 [Colin
 Mitchell](http://muffinlabs.com).
 
 Before Dawn is is distributed under the MIT licence -- Please see LICENSE.txt

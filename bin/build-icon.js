@@ -1,12 +1,11 @@
 #!/usr/bin/env node
 
-/* eslint-disable no-console */
 import "dotenv/config";
 import * as path from "path";
 import * as tmp from "tmp";
 import * as fs from "fs";
 import pngToIco from "png-to-ico";
-import Jimp from "jimp";
+import { Jimp } from "jimp";
 
 const sizes = [256, 128, 48, 32, 16];
 
@@ -25,14 +24,14 @@ async function main() {
 
     // const images = sizes.map(async (s) => {
     const name = path.join(tmpDir, `icon-${size}.png`);
-    await image.resize(size, Jimp.AUTO);
-    await image.writeAsync(name);
+    await image.resize({w: size, h: size});
+    await image.write(name);
 
     outputs.push(name);
 
     const pausedName = path.join(tmpDir, `icon-paused-${size}.png`);
-    await pauseImage.resize(size, Jimp.AUTO);
-    await pauseImage.writeAsync(pausedName);
+    await pauseImage.resize({w: size, h: size});
+    await pauseImage.write(pausedName);
 
     pauseOutputs.push(pausedName);
   }
