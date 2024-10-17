@@ -74,7 +74,7 @@ import * as menusAndTrays from "./menus.js";
 import * as dock from "./dock.js";
 import * as windows from "./windows.js";
 
-import * as forcefocus from "forcefocus";
+import forceFocus from "forcefocus";
 import ReleaseCheck from "./release_check.js";
 import * as autostarter from "./autostarter.js";
 
@@ -670,7 +670,7 @@ var runSaver = function(screenshot, saver, s, url_opts, tickCount) {
 
         if (process.platform === "win32" ) {
           log.info("force focus");
-          forcefocus.focusWindow(w);
+          forceFocus.focusWindow(w);
         }
         
         diff = process.hrtime(tickCount);
