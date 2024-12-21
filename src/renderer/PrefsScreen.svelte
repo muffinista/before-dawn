@@ -5,7 +5,7 @@
       src="{previewUrl}"
       scrolling="no"
       class="saver-preview"
-    />
+    ></iframe>
   </div>
   <div class="saver-info space-at-top">
       <SaverSummary saver="{saverObj}" on:editScreensaver="{editSaver}" on:deleteScreensaver="{deleteSaver}" />
