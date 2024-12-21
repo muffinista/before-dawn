@@ -267,7 +267,7 @@
           src={previewUrl}
           scrolling="no"
           class="saver-preview"
-        />
+        ></iframe>
       </div>
 
       {#if validOptions && validOptions.length > 0}

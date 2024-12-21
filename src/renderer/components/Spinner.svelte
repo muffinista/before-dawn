@@ -1,5 +1,5 @@
 <div class="wrapper">
-  <div class="lds-dual-ring" />
+  <div class="lds-dual-ring"></div>
 </div>
 
 <style>
