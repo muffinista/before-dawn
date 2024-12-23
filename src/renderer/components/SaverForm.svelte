@@ -1,5 +1,5 @@
 <script>
-  export let saver;
+  let { saver = $bindable() } = $props();
 </script>
 
 <div id="saver-form">

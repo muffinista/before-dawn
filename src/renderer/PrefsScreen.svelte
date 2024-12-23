@@ -8,13 +8,13 @@
     ></iframe>
   </div>
   <div class="saver-info space-at-top">
-      <SaverSummary saver="{saverObj}" on:editScreensaver="{editSaver}" on:deleteScreensaver="{deleteSaver}" />
+      <SaverSummary saver={saverObj} on:editScreensaver={editSaver} on:deleteScreensaver="{deleteSaver}" />
       {#if saverObj !== undefined && saverObj.options}
         <SaverOptions bind:saver="{saverObj}" on:optionsChanged="{updatePreview}" />
       {/if}
   </div>
 
-  <SaverList bind:savers={savers} bind:current={saver} on:saverPicked="{saverPicked}" />
+  <SaverList bind:savers={savers} bind:current={saver} saverPicked={saverPicked} />
 
   <div class="basic-prefs space-at-top">
     <h1>Settings</h1>
@@ -24,7 +24,7 @@
           <label for="delay">Activate after:</label>
           <select
             bind:value="{prefs.delay}"
-            on:change="{({ target }) => { target.value = Number(target.value); }}"
+            onchange="{({ target }) => { target.value = Number(target.value); }}"
             name="delay"
           >
             <option value="{Number(0)}">
@@ -58,7 +58,7 @@
           <label for="sleep">Sleep after:</label>
           <select
            bind:value="{prefs.sleep}"
-           on:change="{({ target }) => { target.value = Number(target.value); }}"
+           onchange="{({ target }) => { target.value = Number(target.value); }}"
            name="sleep"
           >
             <option value="{Number(0)}">
@@ -97,7 +97,7 @@
     <div>
       <button
         class="align-middle btn create"
-        on:click="{createNewScreensaver}"
+        onclick="{createNewScreensaver}"
       >
         Create Screensaver
       </button>
@@ -106,14 +106,14 @@
     <div>
       <button
         class="btn settings"
-        on:click="{openSettings}"
+        onclick="{openSettings}"
       >
         Advanced Settings
       </button>
       <button
         class="btn save"
         disabled="{disabled}"
-        on:click="{saveDataClick}"
+        onclick="{saveDataClick}"
       >
         Save
       </button>
@@ -130,16 +130,19 @@
 	import { onMount, onDestroy, tick } from "svelte";
 
 
-	let savers = [];
-  let prefs = {};
-  let saver = undefined;
+	let savers = $state([]);
+  let prefs = $state({});
+  let saver = $state(undefined);
   let size = undefined;
   let screenshot = undefined;
-  let previewUrl = undefined;
-  let disabled = false;
+  let previewUrl = $state(undefined);
+  let disabled = $state(false);
 
-  $: saverIndex = findIndexOf(saver, savers, prefs);
-  $: saverObj = savers[saverIndex];
+  let saverIndex = $derived.by(() => {
+    return findIndexOf(saver);
+  });
+  let saverObj = $state(undefined);
+
 
 	onMount(async () => {
     console.log = window.api.log;
@@ -159,12 +162,12 @@
     const globals = await window.api.getGlobals();
     if ( globals.NEW_RELEASE_AVAILABLE ) {
       await tick();
-      window.api.displayUpdateDialog();
+      // window.api.displayUpdateDialog();
     }
   });
 
   onDestroy(() => {
-    window.api.removeListener("savers-updated", onSaversUpdated);
+   window.api.removeListener("savers-updated", onSaversUpdated);
   });
 
   async function getData() {
@@ -200,7 +203,15 @@
   }
 
   function findIndexOf(saver) {
-    return savers.findIndex((s) => s.key === saver);
+    if ( saver === undefined ) {
+      return 0;
+    }
+    let lookup = saver;
+    if ( saver.key !== undefined ) {
+      lookup = saver.key; 
+    }
+
+    return savers.findIndex((s) => s.key === lookup);
   }
 
   function urlOpts(s, opts) {
@@ -240,6 +251,7 @@
   }
 
   function saverPicked() {
+    saverObj = savers[saverIndex];
     setPreviewUrl();
   }
 
@@ -299,15 +311,15 @@
     };
     window.api.openWindow("editor", opts);
   }
+
   async function deleteSaver() {
     const index = savers.indexOf(saverObj);
     const newIndex = Math.max(index-1, 0);
     const saverToDelete = savers[index];
 
     saver = savers[newIndex].key;
-    // updateSaverPreview(true);
 
-    savers.splice(index, 1);
+    savers = savers.filter(s => s !== saverToDelete);
 
     await window.api.deleteSaver(saverToDelete);
     await getData();
@@ -315,7 +327,6 @@
     saver = prefs.saver;
     setPreviewUrl();
   }
-
 </script>
 
 <style>

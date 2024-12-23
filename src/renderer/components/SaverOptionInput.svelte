@@ -1,4 +1,4 @@
-<form data-index="{index}">
+<form>
   <div class="form-group">
     <label for="name">Name</label>
     <div>
@@ -108,15 +108,6 @@
       </div>
     </div>
   {/if}
-  <div class="form-actions">
-    <button
-      type="button"
-      class="btn btn-danger remove-option"
-      on:click="{onDeleteClick(option)}"
-    >
-      Remove this Option
-    </button>
-  </div>
 </form>
 
 <style>
@@ -133,14 +124,5 @@ div.space-evenly > .form-group {
 </style>
 
 <script>
-export let saver;
-export let option;
-
-$: index = saver.options.indexOf(option);
-
-function onDeleteClick() {
-  // const index = saver.options.indexOf(option);
-  saver.options.splice(index, 1);
-  saver = saver;
-}
+let { option = $bindable() } = $props();
 </script>

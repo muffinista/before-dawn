@@ -71,7 +71,7 @@
     {#if hasScreensaverUpdate === true}
       <button
         class="btn reset-to-defaults"
-        on:click="{downloadScreensaverUpdates}"
+        onclick={downloadScreensaverUpdates}
       >
         Download screensaver updates
         {#if downloadingUpdates}
@@ -102,7 +102,7 @@
           name="hotkey"
           readonly="readonly"
           class="form-control form-control-sm"
-          on:keydown="{updateHotkey}"
+          onkeydown={updateHotkey}
         >
         <small class="form-text text-muted">
           Enter a key combination that will be used to run a screensaver.
@@ -115,7 +115,7 @@
     <div>
       <button
         class="btn reset-to-defaults"
-        on:click="{resetToDefaults}"
+        onclick={resetToDefaults}
       >
       Reset to Defaults
       </button>
@@ -124,14 +124,14 @@
       <button
         class="btn close-window"
         disabled="{disabled}"
-        on:click="{closeWindow}"
+        onclick={closeWindow}
       >
       Cancel
       </button>
       <button
         class="btn save"
         disabled="{disabled}"
-        on:click="{saveDataClick}"
+        onclick={saveDataClick}
       >
       Save
       </button>
@@ -149,11 +149,11 @@ console.log = window.api.log;
 window.addEventListener("error", console.log);
 window.addEventListener("unhandledrejection", console.log);
 
-let prefs = {};
+let prefs = $state({});
 let release = undefined;
-let disabled = false;
-let hasScreensaverUpdate = false;
-let downloadingUpdates = false;
+let disabled = $state(false);
+let hasScreensaverUpdate = $state(false);
+let downloadingUpdates = $state(false);
 
 onMount(async () => {
   prefs = await window.api.getPrefs();
