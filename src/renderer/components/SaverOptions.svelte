@@ -13,7 +13,7 @@
                   name="{option.name}"
                   value="true"
                   checked="{saver.settings[option.name] == true || saver.settings[option.name] === "true"}"
-                  on:change={notifyPreviewChange}
+                  onchange={notifyPreviewChange}
                 ></label>
               <label>No
                 <input
@@ -21,7 +21,7 @@
                   name="{option.name}"
                   value="false"
                   checked="{saver.settings[option.name] == false || saver.settings[option.name] === "false"}"
-                  on:change={notifyPreviewChange}
+                  onchange={notifyPreviewChange}
                 ></label>
               </div>
           </form>
@@ -35,7 +35,7 @@
               max="{option.max}"
               bind:value="{saver.settings[option.name]}"
               class="inputClass"
-              on:change={notifyPreviewChange}
+              onchange={notifyPreviewChange}
             >
             <small class="form-text text-muted">{option.description}</small>
           </form>
@@ -48,7 +48,7 @@
               name="{option.name}"
               bind:value="{saver.settings[option.name]}"
               class="inputClass"
-              on:change={notifyPreviewChange}
+              onchange={notifyPreviewChange}
             >
             <small class="form-text text-muted">{option.description}</small>
           </form>
@@ -63,7 +63,7 @@
 	import { createEventDispatcher } from "svelte";
   const dispatch = createEventDispatcher();
 
-  export let saver;
+  let { saver = $bindable() } = $props();
 
   function notifyPreviewChange() {
 		dispatch("optionsChanged", {

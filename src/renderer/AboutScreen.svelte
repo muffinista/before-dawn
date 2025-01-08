@@ -2,13 +2,14 @@
   <div>
     <h1>Before Dawn</h1>
     <h2>// screensaver fun //</h2>
+    {#await loadData() then}
     <h3>{globals.APP_VERSION}</h3>
-
+    {/await}
     <p>
       An open-source screensaver project.<br>
       <a
         href="http://muffinista.github.io/before-dawn/"
-        on:click="{open}"
+        onclick={open}
       >
         learn more
       </a>
@@ -18,7 +19,7 @@
       Having trouble?
       <a
         href="http://github.com/muffinista/before-dawn/issues"
-        on:click="{open}">
+        onclick={open}>
         please let us know!
       </a>
     </p>
@@ -77,7 +78,7 @@
       <small>
         <a
           href="https://thenounproject.com/search/?q=sunrise&i=172009"
-          on:click="{open}">
+          onclick={open}>
           App
           icon
         </a> Sun by Ale Estrada from the Noun Project
@@ -88,7 +89,7 @@
       <small>
         Powered by <a
           href="https://www.electronjs.org/"
-          on:click="{open}"
+          onclick={open}
         >
           Electron
         </a>
@@ -98,17 +99,15 @@
 </div>
 
 <script>
-import { onMount } from "svelte";
-
 console.log = window.api.log;
 window.addEventListener("error", console.log);
 window.addEventListener("unhandledrejection", console.log);
 
-let globals = {};
+let globals = $state({});
 
-onMount(async () => {
+async function loadData() {
   globals = await window.api.getGlobals();
-});
+}
 
 function open(evt) {
   evt.preventDefault();

@@ -3,14 +3,14 @@
   import { onMount, onDestroy } from "svelte";
 
   import Notarize from "@/components/Notarize";
-  import SaverForm from "./components/SaverForm.svelte";
+  import SaverForm from "@/components/SaverForm.svelte";
   import SaverOptions from "@/components/SaverOptions.svelte";
   import SaverOptionInput from "@/components/SaverOptionInput.svelte";
 
-  import ReloadIcon from "./components/icons/ReloadIcon.svelte";
+  import ReloadIcon from "@/components/icons/ReloadIcon.svelte";
   import FolderIcon from "@/components/icons/FolderIcon.svelte";
-  import SaveIcon from "./components/icons/SaveIcon.svelte";
-  import BugIcon from "./components/icons/BugIcon.svelte";
+  import SaveIcon from "@/components/icons/SaveIcon.svelte";
+  import BugIcon from "@/components/icons/BugIcon.svelte";
 
   console.log = window.api.log;
   window.addEventListener("error", console.log);
@@ -18,17 +18,16 @@
 
 
   let size = undefined;
-  let saver = {options: [], requirements: []};
-  let options = [];
-  let optionValues = {};
-  let disabled = false;
+  let saver = $state({options: [], requirements: []});
+  let optionValues = $state({});
+  let disabled = $state(false);
   let lastIndex = 0;
-  let previewUrl = undefined;
+  let previewUrl = $state(undefined);
 
-  $: validOptions = saver?.options?.filter((o) => o.name !== "");
-  $: params = new URLSearchParams(document.location.search);
-  $: src = params.get("src");
-  $: screenshot = params.get("screenshot");
+  let validOptions = $derived(saver?.options?.filter((o) => o.name !== ""));
+  let params = $derived(new URLSearchParams(document.location.search));
+  let src = $derived(params.get("src"));
+  let screenshot = $derived(params.get("screenshot"));
 
   onMount(async () => {
     size = await window.api.getDisplayBounds();
@@ -37,8 +36,10 @@
     if (saver.settings === undefined) {
       saver.settings = {};
     }
+    if (saver.options === undefined) {
+      saver.options = [];
+    }
 
-    options = saver.options;
     lastIndex = saver.options.length;
 
     window.api.onFolderUpdate(() => {
@@ -69,13 +70,12 @@
     });
 
     lastIndex += 1;
-    saver = saver;
   }
 
   function optionDefaults() {
     var result = {};
-    for (var i = 0; i < options.length; i++) {
-      var opt = options[i];
+    for (var i = 0; i < saver.options.length; i++) {
+      var opt = saver.options[i];
       result[opt.name] = opt.default;
     }
 
@@ -159,6 +159,10 @@
     updatePreview();
   }
 
+  function onDeleteOption(deletedOption) {
+    saver.options = saver.options.filter(o => o.index !== deletedOption.index);
+  }
+
   async function saveData() {
     if (document.querySelectorAll(":invalid").length > 0) {
       document.querySelectorAll("form:invalid").forEach((el) => el.classList.add("submit-attempt"));
@@ -166,7 +170,6 @@
     }
 
     disabled = true;
-    // https://forum.vuejs.org/t/how-to-clone-property-value-as-simple-object/40032/2
     const clone = JSON.parse(JSON.stringify(saver));
     await window.api.saveScreensaver(clone, src);
     window.api.saversUpdated(src);
@@ -245,16 +248,16 @@
 
 <div id="editor">
   <nav>
-    <button variant="default" title="Open screensaver folder" on:click={openFolder}>
+    <button variant="default" title="Open screensaver folder" onclick={openFolder}>
       <FolderIcon />
     </button>
-    <button variant="default" title="Save changes" disabled="{disabled}" class="save" on:click={saveData}>
+    <button variant="default" title="Save changes" disabled="{disabled}" class="save" onclick={saveData}>
       <SaveIcon />
     </button>
-    <button variant="default" title="Reload preview" on:click={updatePreview}>
+    <button variant="default" title="Reload preview" onclick={updatePreview}>
       <ReloadIcon />
     </button>
-    <button variant="default" title="View Developer Console" on:click={openConsole}>
+    <button variant="default" title="View Developer Console" onclick={openConsole}>
       <BugIcon />
     </button>
   </nav>
@@ -293,13 +296,23 @@
         </small>
 
         <!-- eslint-disable no-unused-vars -->
-        {#each saver.options as _option, index}
-          <div class="saver-option-input">
+        {#each saver.options as option, index}
+          <div class="saver-option-input" data-index="{index}">
             <SaverOptionInput
-              bind:saver
               bind:option={saver.options[index]}
               on:optionsChanged={updatePreview}
+              index={index}
             />
+            <div class="form-actions">          
+              <button
+              type="button"
+              class="btn btn-danger remove-option"
+              onclick={() => { onDeleteOption(option) }}
+            >
+              Remove this Option
+              </button>
+            </div>
+
           </div>
         {/each}
 
@@ -307,7 +320,7 @@
           <button
             type="button"
             class="btn add-option"
-            on:click={addSaverOption}
+            onclick={addSaverOption}
           >
             Add Option
           </button>

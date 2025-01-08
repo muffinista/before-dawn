@@ -34,4 +34,8 @@ export default [...compat.extends(
     },
 
     rules: {},
+    ignores: [
+        "output/*",
+        "data/*"
+    ]
 }];

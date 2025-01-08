@@ -38,14 +38,14 @@
     <div>
       <button
         class="btn cancel"
-        on:click="{closeWindow}"
+        onclick={closeWindow}
       >
         Cancel
       </button>
       <button
         class="btn save"
         disabled="{disabled || !canAdd}"
-        on:click="{saveData}"
+        onclick={saveData}
       >
         Save
       </button>
@@ -63,14 +63,14 @@ window.addEventListener("error", console.log);
 window.addEventListener("unhandledrejection", console.log);
 
 
-let prefs = {};
+let prefs = $state({});
 let screenshot = undefined;
-let saver = {
+let saver = $state({
   requirements: ["screen"]
-};
-let disabled = false;
+});
+let disabled = $state(false);
 
-$: canAdd = prefs !== undefined && prefs.localSource !== undefined && prefs.localSource !== "";
+let canAdd = $derived(prefs !== undefined && prefs.localSource !== undefined && prefs.localSource !== "");
 
 onMount(async () => {
   prefs = await window.api.getPrefs();

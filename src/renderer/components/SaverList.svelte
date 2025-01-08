@@ -13,7 +13,7 @@
                 data-name="{saver.name}" 
                 value="{saver.key}" 
                 checked="{saver.key == current}"
-                on:change={onSelect}
+                onchange={onSelect}
                 >
 
               <b>{saver.name}</b>
@@ -33,18 +33,13 @@
 </div>
 
 <script>
-	import { createEventDispatcher } from "svelte";
-
-  const dispatch = createEventDispatcher();
-
-  export let savers;
-  export let current;
+  let { savers, current = $bindable(), saverPicked } = $props();
 
   const UNCHECKED_CLASS = "list-group-item flex-column entry";
   const CHECKED_CLASS = `${UNCHECKED_CLASS} active`;
 
   function onSelect(e) {
-    dispatch("saverPicked", {
+    saverPicked({
       saver: e.target.value
     });
   }

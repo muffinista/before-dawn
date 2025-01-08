@@ -7,14 +7,14 @@
   <button
     type="button"
     class="pick"
-    on:click="{showPathChooser}"
+    onclick={showPathChooser}
   >
     ...
   </button>
   <button
     type="button"
     class="clear"
-    on:click="{clearLocalSource}"
+    onclick={clearLocalSource}
   >
     X
   </button>
@@ -24,7 +24,7 @@
 import { createEventDispatcher } from "svelte";
 
 const dispatch = createEventDispatcher();
-export let source;
+  let { source = $bindable() } = $props();
 
 async function showPathChooser() {
   const result = await window.api.showOpenDialog();

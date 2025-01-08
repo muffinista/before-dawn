@@ -1,5 +1,7 @@
 import "~/css/styles.scss";
 
+import { mount } from 'svelte';
+
 import PrefsScreen from "./PrefsScreen.svelte";
 import SettingsScreen from "./SettingsScreen.svelte";
 import AboutScreen from "./AboutScreen.svelte";
@@ -26,7 +28,7 @@ const actions = {
 const id = document.querySelector("body").dataset.id;
 const klass = actions[id];
 
-const app = new klass({
+const app = mount(klass, {
   target: document.getElementById("root"), // entry point in ../public/index.html
 });
 

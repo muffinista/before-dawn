@@ -2,21 +2,21 @@
   {#if saver}
     <h1>
       {saver.name} 
-      {#if saver.aboutUrl && saver.aboutUrl !== ""}<small><a href="{saver.aboutUrl}" on:click={open}>learn more</a></small>{/if}
+      {#if saver.aboutUrl && saver.aboutUrl !== ""}<small><a href="{saver.aboutUrl}" onclick={open}>learn more</a></small>{/if}
     </h1>
     {#if saver.editable}
       <div class="actions">
         <button
           class="btn edit" 
           href="#"
-          on:click="{onEditClick}"
+          onclick={onEditClick}
         >
         edit
         </button>
         <button
           class="btn" 
           href="#"
-          on:click="{onDeleteClick}"
+          onclick={onDeleteClick}
         >
           delete
         </button>
@@ -37,7 +37,7 @@
 
   const dispatch = createEventDispatcher();
 
-  export let saver;
+  let { saver } = $props();
 
   function open(event) {
     event.preventDefault();
