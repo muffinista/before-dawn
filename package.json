@@ -10,7 +10,7 @@
   "main": "output/main.js",
   "type": "module",
   "engines": {
-    "node": ">= 20.15.0"
+    "node": ">= 20.18.2"
   },
   "devport": 9081,
   "scripts": {
@@ -33,18 +33,24 @@
     "type": "git",
     "url": "git://github.com/muffinista/before-dawn.git"
   },
+  "boo": {
+    "@muffinista/goto-sleep": "file://../goto-sleep",
+    "detect-fullscreen": "file://../detect-fullscreen",
+    "forcefocus": "file://../forcefocus",
+    "hide-cursor": "file://../hide-cursor"
+  },
   "dependencies": {
     "@muffinista/goto-sleep": "github:muffinista/goto-sleep",
+    "detect-fullscreen": "github:muffinista/detect-fullscreen",
+    "forcefocus": "github:muffinista/forcefocus",
+    "hide-cursor": "github:muffinista/hide-cursor",
     "@sentry/electron": "^5.6.0",
     "auto-launch": "^5.0.6",
     "conf": "^13.0.0",
-    "detect-fullscreen": "github:muffinista/detect-fullscreen",
     "electron-is-dev": "^3.0.0",
     "electron-log": "^5.1.6",
-    "forcefocus": "github:muffinista/forcefocus",
     "fs-extra": "^11.2.0",
     "glob": "^11.0.0",
-    "hide-cursor": "github:muffinista/hide-cursor",
     "mkdirp": "^3.0.1",
     "proper-lockfile": "^4.1.1",
     "rimraf": "^6.0.0",
@@ -69,8 +75,8 @@
     "cross-env": "^7.0.0",
     "css-loader": "^7.1.2",
     "dotenv": "^16.0.0",
-    "electron": "^33.3.1",
-    "electron-builder": "^24.13.3",
+    "electron": "^34.2.0",
+    "electron-builder": "^26.0.8",
     "eslint": "^9.7.0",
     "eslint-friendly-formatter": "^4.0.1",
     "eslint-plugin-html": "^8.1.0",
@@ -85,8 +91,8 @@
     "mini-css-extract-plugin": "^2.9.0",
     "mocha": "^10.6.0",
     "nock": "^14.0.0-beta.4",
-    "node-abi": "^3.65.0",
-    "node-gyp": "^10.2.0",
+    "node-abi": "^3.74.0",
+    "node-gyp": "^11.1.0",
     "node-loader": "^2.0.0",
     "normalize.css": "^8.0.1",
     "nyc": "^17.0.0",
