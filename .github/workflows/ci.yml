@@ -13,7 +13,7 @@ jobs:
       if: ${{ matrix.os == 'ubuntu-latest' }}
       run: |
         sudo apt-get -qq update
-        sudo apt-get install -y libx11-dev libxss-dev icnsutils graphicsmagick libappindicator1 libxtst-dev
+        sudo apt-get install -y libx11-dev libxss-dev icnsutils graphicsmagick libxtst-dev
     - uses: actions/checkout@v4
     - name: Use Node.js
       uses: actions/setup-node@v4
