@@ -42,6 +42,7 @@ let skipMainRestart = true;
 function startRenderer () {
   return new Promise((resolve) => {
     const compiler = webpack(rendererConfig);
+
     const serverOptions = {
       host: "localhost",
       port: devPort,
@@ -50,21 +51,16 @@ function startRenderer () {
         const port = devServer.server.address().port;
         console.log("Listening on port:", port);
       },
-      setupMiddlewares: function (middlewares, server) {
-        server.middleware.waitUntilValid(() => {
-          console.log("startRenderer finished");
-          resolve();
-        });
-        return  middlewares;
-      }
     };
 
     const devServer = new WebpackDevServer(
       serverOptions, compiler
     );
 
-    devServer.start(null, "localhost", () => {
-    });
+    devServer.startCallback(() => {
+      console.log("startRenderer finished");
+      resolve();
+    })
   });
 }
 
