@@ -608,7 +608,7 @@ var getWindowOpts = function(s) {
 
 var applyScreensaverWindowEvents = function(w) {
   // Emitted when the window is closed.
-  w.on("closed", function() {
+  w.once("closed", function() {
     if (process.platform !== "win32" ) {
       cursor.show();
     }
@@ -1575,7 +1575,7 @@ let setupIPC = function() {
   /**
    * handle quit app events
    */
-  ipcMain.on("quit-app", () => {
+  ipcMain.once("quit-app", () => {
     log.info("quit-app");
     quitApp();
   });
@@ -1961,7 +1961,7 @@ app.on("will-quit", function(e) {
     globalShortcut.unregisterAll();
   }
 });
-app.on("quit", function() {
+app.once("quit", function() {
   log.info("quit");
 });
 

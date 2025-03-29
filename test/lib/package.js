@@ -3,6 +3,7 @@
 import assert from 'assert';
 import path from "path";
 import fs from "fs";
+import * as tmp from "tmp";
 import { rimrafSync } from 'rimraf'
 import sinon from "sinon";
 import nock from "nock";
@@ -30,7 +31,11 @@ describe("Package", function() {
 
     workingDir = helpers.getTempDir();
     dataPath = path.join(__dirname, "..", "fixtures", "release.json");
-    zipPath = path.join(__dirname, "..", "fixtures", "test-savers.zip");
+    const saverZipSource = path.join(__dirname, "..", "fixtures", "test-savers.zip");
+
+    zipPath =  path.join(tmp.dirSync().name, "test-savers.zip");
+    fs.copyFileSync(saverZipSource, zipPath);
+
 
     attrs = {
       repo: "muffinista/before-dawn-screensavers",

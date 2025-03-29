@@ -4,6 +4,7 @@
 import assert from 'assert';
 import path from "path";
 import fs from "fs-extra";
+import * as tmp from "tmp";
 import * as helpers from "../helpers.js";
 
 import { fileURLToPath } from 'url';
@@ -11,17 +12,20 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 describe("bootstrap", function() {
-  const saverZip = path.join(__dirname, "..", "fixtures", "test-savers.zip");
+  const saverZipSource = path.join(__dirname, "..", "fixtures", "test-savers.zip");
   const saverData = path.join(__dirname, "..", "fixtures", "test-savers.json");
 
   let configDest;
   var workingDir;
   let app;
+  let saverZip;
 
   helpers.setupTest(this);
- 
 
   beforeEach(function() {
+    saverZip =  path.join(tmp.dirSync().name, "test-savers.zip");
+    fs.copyFileSync(saverZipSource, saverZip);
+  
     workingDir = helpers.getTempDir();
     configDest = path.join(workingDir, "config.json");  
   });
