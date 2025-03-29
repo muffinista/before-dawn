@@ -1,41 +1,59 @@
 import mocha from "eslint-plugin-mocha";
 import globals from "globals";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 import js from "@eslint/js";
-import { FlatCompat } from "@eslint/eslintrc";
+import svelte from 'eslint-plugin-svelte';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const compat = new FlatCompat({
-    baseDirectory: __dirname,
-    recommendedConfig: js.configs.recommended,
-    allConfig: js.configs.all
-});
 
-export default [...compat.extends(
-    "eslint:recommended",
-    "plugin:svelte/recommended",
-    "plugin:mocha/recommended",
-), {
-    plugins: {
-        mocha,
-    },
-
+/** @type {import('eslint').Linter.Config[]} */
+export default [
+  mocha.configs.flat.recommended,
+  js.configs.recommended,
+  ...svelte.configs.recommended,
+  {
     languageOptions: {
-        globals: {
-            ...globals.browser,
-            ...globals.node,
-            ...globals.mocha,
-        },
-
-        ecmaVersion: "latest",
-        sourceType: "module",
+      globals: {
+        ...globals.browser,
+        ...globals.node, // Add this if you are using SvelteKit in non-SPA mode
+      },
+      ecmaVersion: "latest",
+      sourceType: "module",
+    }
+  },
+  {
+    files: ['**/*.svelte', '**/*.svelte.js'],
+    languageOptions: {
+      parserOptions: {
+        // We recommend importing and specifying svelte.config.js.
+        // By doing so, some rules in eslint-plugin-svelte will automatically read the configuration and adjust their behavior accordingly.
+        // While certain Svelte settings may be statically loaded from svelte.config.js even if you don’t specify it,
+        // explicitly specifying it ensures better compatibility and functionality.
+        //          svelteConfig
+      }
     },
-
-    rules: {},
+    plugins: {
+      "plugin:svelte/recommended": svelte
+    }
+  },
+  {
+    files: ['test/**/*.js'],
+    plugins: {
+      "plugin:mocha/recommended": mocha
+    },
+    languageOptions: {
+      globals: {
+        ...globals.mocha
+      },
+    },
+  },
+  {
     ignores: [
-        "output/*",
-        "data/*"
-    ]
-}];
+      "output/*",
+      "data/*"
+    ],
+    
+    rules: {
+      // Override or add rule settings here, such as:
+      // 'svelte/rule-name': 'error'
+    }
+  }
+];

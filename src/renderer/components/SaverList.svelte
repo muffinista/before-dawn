@@ -1,7 +1,7 @@
 <div class="saver-list-wrapper">
   <h1>Screensavers</h1>
   <ul class="saver-list list-group-flush">
-    {#each savers as saver}
+    {#each savers as saver (saver.key)}
       <li class="{saver.key == current ? CHECKED_CLASS : UNCHECKED_CLASS}">
         <div>
           <label>

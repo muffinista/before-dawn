@@ -296,7 +296,7 @@
         </small>
 
         <!-- eslint-disable no-unused-vars -->
-        {#each saver.options as option, index}
+        {#each saver.options as option, index (option.name)}
           <div class="saver-option-input" data-index="{index}">
             <SaverOptionInput
               bind:option={saver.options[index]}

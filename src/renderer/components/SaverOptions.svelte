@@ -1,6 +1,6 @@
 <div id="wrapper">
   <ul>
-    {#each saver.options as option, index}
+    {#each saver.options as option, index (option.name)}
     <li key={index}>
       <div class="wrapper">
         {#if option.type === "boolean"}
