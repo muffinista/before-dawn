@@ -179,7 +179,7 @@ export async function application(workingDir, quietMode=false, logFile=undefined
   
   a.logData = [];
   
-  a.on("window", (w) => {
+  a.once("window", (w) => {
     w.on("console", (payload) => {
       a.logData.push(payload);
     });
