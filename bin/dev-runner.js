@@ -26,6 +26,7 @@ try {
   devPort = packageJSON.devport;
 }
 catch(e) {
+  console.log(`Can't read package.json, defaulting dev port to 9080: ${e}`);
   devPort = 9080;
 }
 
@@ -113,7 +114,7 @@ function startElectron () {
   electronProcess.stderr.on("data", data => {
     process.stdout.write(data.toString());
   });
-  electronProcess.on("close", () => {
+  electronProcess.once("close", () => {
     if (!manualRestart) {process.exit();}
   });
 }
