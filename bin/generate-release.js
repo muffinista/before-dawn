@@ -71,9 +71,6 @@ async function main() {
 
   console.log("Set new deploy");
   await sentryCli.execute(["releases", "deploys", releaseName, "new", "--env", "production"], true);
-
-  //# upload symbols
-  //bin/sentry-symbols.js
 }
 
 main().catch(e => console.error(e));
