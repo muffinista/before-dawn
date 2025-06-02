@@ -45,20 +45,12 @@ var htmlPageOptions = function(id, title) {
  * that provide pure *.vue files that need compiling
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/webpack-configurations.html#white-listing-externals
  */
-// let whiteListedModules = [];
-
-// let externals = [
-//   ...Object.keys(dependencies || {}).filter(d => !whiteListedModules.includes(d))
-// ];
-
-// console.log("EXTERNALS", externals);
 
 let rendererConfig = {
-  devtool: "inline-source-map",
+  devtool: "source-map",
   entry: {
     renderer: path.join(__dirname, "src", "renderer", "main.js")
   },
-  // externals: externals,
   module: {
     rules: [
       {

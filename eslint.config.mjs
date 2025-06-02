@@ -6,9 +6,9 @@ import svelte from 'eslint-plugin-svelte';
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [
-  mocha.configs.flat.recommended,
+  mocha.configs.recommended,
   js.configs.recommended,
-  ...svelte.configs.recommended,
+ ...svelte.configs.recommended,
   {
     languageOptions: {
       globals: {

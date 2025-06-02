@@ -61,3 +61,5 @@ assets/noun*
 
 # ignore VS code file
 *.code-workspace
+# Sentry Config File
+.env.sentry-build-plugin
