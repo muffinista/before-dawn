@@ -51,6 +51,7 @@ describe("Power", function() {
     });
 
     ["darwin", "win32"].forEach((platform) => {
+      
       describe(platform, function() {
         beforeEach(function() {
           const method = () => {
