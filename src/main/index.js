@@ -205,14 +205,19 @@ const power = new Power({
 
 let screenData = [];
 var listScreens = async function() {
-  const sources = await desktopCapturer.getSources({
-    types: ["screen"],
-    thumbnailSize: { width: 0, height: 0 }
-  });
-  
-  screenData = sources;
+  try {
+    const sources = await desktopCapturer.getSources({
+      types: ["screen"],
+    });
+    
+    screenData = sources;
 
-  return sources;
+    return sources;
+  } catch(e) {
+    log.info(e);
+  }
+
+  return [];
 };
 
 
