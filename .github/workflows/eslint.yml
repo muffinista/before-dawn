@@ -19,9 +19,9 @@ jobs:
 
       # Checks out a copy of your repository on the ubuntu-latest machine
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Use Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version-file: '.nvmrc'
           cache: 'npm'
