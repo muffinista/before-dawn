@@ -166,13 +166,16 @@ export async function application(workingDir, quietMode=false, logFile=undefined
     TEST_MODE: true,
     QUIET_MODE: quietMode,
     ELECTRON_ENABLE_LOGGING: true,
-    LOG_FILE: logFile
+    LOG_FILE: logFile,
+    XDG_SESSION_TYPE: 'x11'
   };
 
 
   let a = await playwright.launch({
     path: electron,
-    args: [path.join(__dirname, "..", "output", "main.js")],
+    args: [
+      path.join(__dirname, "..", "output", "main.js")
+    ],
     env: env
   });
 

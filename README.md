@@ -72,6 +72,13 @@ Once you've set all of that up, Before Dawn will happily run in the background,
 and when it detects that you have been idle, it will engage your screensaver.
 That's all there is to it!
 
+### A note for Linux/Wayland users
+
+When using Wayland, seemingly every time it's started the app will request 
+permission to capture the screen. I get around this by running with 
+`XDG_SESSION_TYPE=x11` set.
+
+
 ## Building It
 
 Steps for generating your own build Before Dawn are listed in [the
