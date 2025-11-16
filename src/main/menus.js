@@ -3,7 +3,12 @@
 import * as main from "./index.js";
 
 import * as path from "path";
-import { nativeImage, shell } from "electron";
+import { 
+  nativeImage, 
+  nativeTheme,
+  shell 
+} from "electron";
+
 
 
 var openUrl = (url) => {
@@ -221,6 +226,7 @@ export const trayMenuTemplate = function() {
         updateTrayIcon();
         main.getTrayMenu().items[1].visible = false;
         main.getTrayMenu().items[2].visible = true;
+        main.updateTrayMenu();
       }
     },
     {
@@ -230,6 +236,7 @@ export const trayMenuTemplate = function() {
         updateTrayIcon();
         main.getTrayMenu().items[1].visible = true;
         main.getTrayMenu().items[2].visible = false;
+        main.updateTrayMenu();
       },
       visible: false
     },
@@ -278,14 +285,16 @@ export const trayMenuTemplate = function() {
  * get icons for the current platform
  */
 export const getIcons = function() {
+  const useDarkIcon = !nativeTheme.shouldUseDarkColorsForSystemIntegratedUI;
+  const modifier = useDarkIcon ? '-dark' : ''; 
   const icons = {
     "win32" : {
       active: path.join(main.getAssetsDir() , "icon.ico"),
       paused: path.join(main.getAssetsDir(), "icon-paused.ico")
     },
     "default": {
-      active: path.join(main.getAssetsDir() , "iconTemplate.png"),
-      paused: path.join(main.getAssetsDir() , "icon-pausedTemplate.png")
+      active: path.join(main.getAssetsDir() , `iconTemplate${modifier}.png`),
+      paused: path.join(main.getAssetsDir() , `icon-pausedTemplate${modifier}.png`)
     }
   };
   

@@ -106,7 +106,7 @@ function startRenderer () {
 
 function startElectron () {
   // @todo set environment here
-  electronProcess = spawn(electron, ["--inspect=5858", path.join(__dirname, "../src/main/index.js")]);
+  electronProcess = spawn(electron, ["--no-sandbox", "--inspect=5858", path.join(__dirname, "../src/main/index.js")]);
 
   electronProcess.stdout.on("data", data => {
     process.stdout.write(data.toString());

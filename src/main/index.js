@@ -1884,6 +1884,11 @@ let getTrayMenu = function() {
   return trayMenu;
 };
 
+let updateTrayMenu = function() {
+  appIcon.setContextMenu(trayMenu); 
+}
+
+
 /**
  * if the user has updated one of their screensavers, we can let
  * the prefs window know that it needs to reload
@@ -1997,6 +2002,7 @@ export {
   getStateManager,
   getAppIcon,
   getTrayMenu,
+  updateTrayMenu,
   openPrefsWindow,
   openAboutWindow,
   addNewSaver,

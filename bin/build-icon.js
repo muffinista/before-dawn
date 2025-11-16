@@ -22,7 +22,6 @@ async function main() {
     const size = sizes[index];
     console.log(size);
 
-    // const images = sizes.map(async (s) => {
     const name = path.join(tmpDir, `icon-${size}.png`);
     await image.resize({w: size, h: size});
     await image.write(name);
