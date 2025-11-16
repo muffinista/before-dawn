@@ -99,7 +99,6 @@
     "node-gyp": "^11.2.0",
     "node-loader": "^2.1.0",
     "normalize.css": "^8.0.1",
-    "nyc": "^17.1.0",
     "octokit": "^5.0.3",
     "playwright": "^1.55.1",
     "png-to-ico": "^2.1.8",
