@@ -100,7 +100,7 @@
     "sass-loader": "^16.0.6",
     "sinon": "^21.0.1",
     "style-loader": "^4.0.0",
-    "svelte": "^5.46.4",
+    "svelte": "^5.53.0",
     "svelte-eslint-parser": "^1.4.1",
     "svelte-loader": "^3.2.4",
     "tmp": "^0.2.5",
