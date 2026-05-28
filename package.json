@@ -103,7 +103,7 @@
     "svelte": "^5.53.6",
     "svelte-eslint-parser": "^1.4.1",
     "svelte-loader": "^3.2.4",
-    "tmp": "^0.2.5",
+    "tmp": "^0.2.7",
     "url-loader": "^4.1.1",
     "webpack": "^5.104.1",
     "webpack-cli": "^6.0.1",
