@@ -67,7 +67,7 @@
     "@eslint/js": "^9.39.2",
     "@sentry/cli": "^3.0.1",
     "@sentry/electron": "^7.5.0",
-    "@sentry/webpack-plugin": "^4.6.1",
+    "@sentry/webpack-plugin": "^5.4.0",
     "babel-loader": "^10.0.0",
     "clean-webpack-plugin": "^4.0.0",
     "copy-webpack-plugin": "^13.0.1",
@@ -107,7 +107,7 @@
     "url-loader": "^4.1.1",
     "webpack": "^5.104.1",
     "webpack-cli": "^6.0.1",
-    "webpack-dev-server": "^5.2.2",
+    "webpack-dev-server": "^6.0.0",
     "webpack-hot-middleware": "^2.26.1",
     "xvfb-maybe": "^0.2.1"
   },
