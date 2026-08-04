@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-/* eslint-disable no-console */
-
 require("dotenv").config();
 
 const apiUrl = "https://ci.appveyor.com/api/account/muffinista/builds";

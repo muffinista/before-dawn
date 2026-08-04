@@ -1,6 +1,5 @@
 'use strict';
 const fs = require('fs');
-const path = require('path');
 
 var version = JSON.parse(fs.readFileSync("package.json")).version;
 

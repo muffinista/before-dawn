@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-/* eslint-disable no-console */
 import "dotenv/config";
 import * as path from "path";
 import * as fs from "fs";
@@ -52,5 +51,3 @@ async function main() {
 }
 
 main().catch(e => console.error(e));
-
-/* eslint-enable no-console */

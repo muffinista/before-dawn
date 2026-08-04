@@ -1,7 +1,7 @@
 {
   "name": "before-dawn",
   "productName": "Before Dawn",
-  "version": "0.38.0",
+  "version": "0.41.0",
   "description": "A desktop screensaver app using web technologies",
   "author": "Colin Mitchell <colin@muffinlabs.com> (http://muffinlabs.com)",
   "license": "MIT",
@@ -9,9 +9,6 @@
   "release_server": "https://before-dawn-updates.muffinlabs.com",
   "main": "output/main.js",
   "type": "module",
-  "engines": {
-    "node": ">= 22.14.0"
-  },
   "devport": 9081,
   "scripts": {
     "dev": "node bin/dev-runner.js",
@@ -53,7 +50,7 @@
   },
   "overrides": {
     "@electron/rebuild": {
-      "node-abi": "4.28.0"
+      "node-abi": "4.33.0"
     }
   },
   "devDependencies": {
@@ -74,7 +71,7 @@
     "cross-env": "^10.1.0",
     "css-loader": "^7.1.4",
     "dotenv": "^17.4.1",
-    "electron": "^41.1.1",
+    "electron": "43.2.0",
     "electron-builder": "^26.8.1",
     "eslint": "^9.39.2",
     "eslint-friendly-formatter": "^4.0.1",
