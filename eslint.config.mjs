@@ -6,14 +6,14 @@ import svelte from 'eslint-plugin-svelte';
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [
-  mocha.configs.recommended,
   js.configs.recommended,
+  mocha.configs.recommended,
  ...svelte.configs.recommended,
   {
     languageOptions: {
       globals: {
         ...globals.browser,
-        ...globals.node, // Add this if you are using SvelteKit in non-SPA mode
+        ...globals.node,
       },
       ecmaVersion: "latest",
       sourceType: "module",
@@ -50,10 +50,5 @@ export default [
       "output/*",
       "data/*"
     ],
-    
-    rules: {
-      // Override or add rule settings here, such as:
-      // 'svelte/rule-name': 'error'
-    }
   }
 ];
