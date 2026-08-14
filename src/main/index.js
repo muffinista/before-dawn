@@ -18,20 +18,6 @@
    
  */
 
-
-import { init } from '@sentry/electron';
-if ( process.env.TEST_MODE === undefined && process.env.SENTRY_DSN !== undefined ) {
-  console.log(`setting up sentry with ${process.env.SENTRY_DSN}`);
-  try {
-    init({
-      dsn: process.env.SENTRY_DSN,
-      onFatalError: console.log
-    });  
-  }
-  catch(e) {
-    console.log(e);
-  }
-}
    
 import {app,
   BrowserWindow,
@@ -290,15 +276,7 @@ var grabScreen = function(s) {
         });
 
         // close the screen grabber window
-        try {
-          windowRef.close();
-        }
-        catch(ex) {
-          if ( typeof(Sentry) !== "undefined" ) {
-            // eslint-disable-next-line no-undef
-            Sentry.captureException(ex);
-          }
-        }
+        windowRef?.close();
 
         // rewrite file paths to always have unix slashes instead
         // of windows slashes. sometimes windows slashes are fine, but
@@ -822,7 +800,6 @@ var findScreensaver = function() {
     return new Promise((resolve) => {
       savers.list(() => {
         // @todo s can be undefined
-        // https://sentry.io/organizations/colin-mitchell/issues/955633850/?project=172824&query=is%3Aunresolved&statsPeriod=14d&utc=false
         let s = savers.random();
         resolve(s.key, prefs.getOptions(s.key));
       });

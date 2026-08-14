@@ -6,7 +6,6 @@ import "dotenv/config";
 
 import CopyWebpackPlugin from "copy-webpack-plugin";
 import { CleanWebpackPlugin } from "clean-webpack-plugin";
-import { sentryWebpackPlugin } from "@sentry/webpack-plugin";
 import ESLintPlugin from "eslint-webpack-plugin";
 import { readFile } from 'fs/promises';
 import { fileURLToPath } from 'url';
@@ -24,7 +23,7 @@ const optionalDependencies = packageJSON.optionalDependencies || {};
 
 const outputDir = path.join(__dirname, "output");
 
-const COMMIT_SHA = process.env.SENTRY_RELEASE || process.env.GITHUB_SHA;
+const COMMIT_SHA = process.env.GITHUB_SHA;
 
 //
 // get a list of node dependencies, and then
@@ -133,12 +132,6 @@ let mainConfig = {
  */
 if (process.env.NODE_ENV === "production") {
   mainConfig.devtool = "source-map";
-  
-  if ( process.env.SENTRY_DSN ) {
-    mainConfig.plugins.push(
-      new webpack.EnvironmentPlugin(["SENTRY_DSN"])
-    );
-  }
 
   mainConfig.plugins.push(
     new webpack.DefinePlugin({
@@ -146,20 +139,6 @@ if (process.env.NODE_ENV === "production") {
       "process.env.BEFORE_DAWN_RELEASE_NAME": JSON.stringify(COMMIT_SHA),
     })
   );
-
-  if ( process.env.SENTRY_AUTH_TOKEN && !process.env.DISABLE_SENTRY ) {
-    mainConfig.plugins.push(
-      sentryWebpackPlugin({
-        include: "src",
-        ignoreFile: ".sentrycliignore",
-        ignore: ["node_modules", "webpack.config.js", "webpack.main.config.js", "webpack.renderer.config.js"],
-        org: "colin-mitchell",
-        project: "before-dawn",
-        authToken: process.env.SENTRY_AUTH_TOKEN,
-        release: COMMIT_SHA,
-      })
-    );
-  }
 }
 
 export default mainConfig;

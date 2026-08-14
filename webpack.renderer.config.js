@@ -6,7 +6,6 @@ import "dotenv/config";
 
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
-import { sentryWebpackPlugin } from "@sentry/webpack-plugin";
 import ESLintPlugin from "eslint-webpack-plugin";
 import { readFile } from 'fs/promises';
 import { fileURLToPath } from 'url';
@@ -22,7 +21,7 @@ const packageJSON = JSON.parse(
 const productName = packageJSON.productName;
 const outputDir = path.join(__dirname, "output");
 
-const COMMIT_SHA = process.env.SENTRY_RELEASE || process.env.GITHUB_SHA;
+const COMMIT_SHA = process.env.GITHUB_SHA;
 
 var htmlPageOptions = function(id, title) {
   return {
@@ -140,12 +139,6 @@ let rendererConfig = {
 if (process.env.NODE_ENV === "production") {
   rendererConfig.devtool = "source-map";
 
-  if ( process.env.SENTRY_DSN ) {
-    rendererConfig.plugins.push(
-      new webpack.EnvironmentPlugin(["SENTRY_DSN"])
-    );
-  }
-
   rendererConfig.plugins.push(
     new webpack.DefinePlugin({
       "process.env.NODE_ENV": JSON.stringify("production"),
@@ -155,20 +148,6 @@ if (process.env.NODE_ENV === "production") {
       minimize: true
     })
   );
-
-  if ( process.env.SENTRY_AUTH_TOKEN && !process.env.DISABLE_SENTRY ) {
-    rendererConfig.plugins.push(
-      sentryWebpackPlugin({
-        include: "src",
-        ignoreFile: ".sentrycliignore",
-        ignore: ["node_modules", "webpack.config.js", "webpack.main.config.js", "webpack.renderer.config.js"],
-        org: "colin-mitchell",
-        project: "before-dawn",
-        authToken: process.env.SENTRY_AUTH_TOKEN,
-        release: COMMIT_SHA,
-      })
-    );
-  }
 }
 
 export default rendererConfig;
