@@ -7,15 +7,6 @@ import SettingsScreen from "./SettingsScreen.svelte";
 import AboutScreen from "./AboutScreen.svelte";
 import NewScreensaverScreen from "./NewScreensaverScreen.svelte";
 import EditorScreen from "./EditorScreen.svelte";
-// import * as Sentry from "@sentry/electron/renderer";
-
-// if ( process.env.SENTRY_DSN !== undefined ) {
-//   Sentry.init({
-//     dsn: process.env.SENTRY_DSN,
-//     enableNative: false,
-//     onFatalError: console.log
-//   });  
-// }
 
 const actions = {
   "prefs": PrefsScreen,
