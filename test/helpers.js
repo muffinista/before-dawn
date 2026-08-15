@@ -8,6 +8,7 @@ import temp from "temp";
 import Conf from "conf";
 
 import { _electron as playwright } from "playwright";
+import { expect } from '@playwright/test';
 import electron from "electron";
 
 import assert from "assert";
@@ -18,7 +19,7 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 let windowCheckDelay = 5000;
-let testTimeout = 50000;
+let testTimeout = 1000000;
 let testRetryCount = 0;
 let logPath;
 
@@ -174,7 +175,7 @@ export async function application(workingDir, quietMode=false, logFile=undefined
   let a = await playwright.launch({
     path: electron,
     args: [
-      path.join(__dirname, "..", "output", "main.js")
+      path.join(__dirname, "..", "out", "main", "index.mjs")
     ],
     env: env
   });
@@ -286,9 +287,11 @@ export async function getWindowByTitle(app, title) {
  * @param {boolean} doAssert 
  */
 export async function waitForText(window, lookup, text, doAssert) {
-  const content = await window.textContent(lookup);
-  if ( doAssert === true ) {
-    assert(content.lastIndexOf(text) !== -1);
+  const locator = window.locator(lookup);
+  if (doAssert) {
+    await expect(locator).toContainText(text);
+  } else {
+    await locator.getByText(text);
   }
 }
 

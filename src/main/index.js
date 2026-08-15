@@ -1,8 +1,5 @@
 "use strict";
 
-// process.traceDeprecation = true;
-// process.traceProcessWarnings = true;
-
 
 /***
 
@@ -39,7 +36,6 @@ import log from 'electron-log';
 import { screen as electronScreen } from "electron";
 
 import * as fs from "fs";
-import { readFile } from 'fs/promises';
 import * as os from "os";
 import * as path from "path";
 import * as temp from "temp";
@@ -64,17 +60,14 @@ import forceFocus from "forcefocus";
 import ReleaseCheck from "./release_check.js";
 import * as autostarter from "./autostarter.js";
 
+// load some global CSS we'll inject into running screensavers
+import globalCSS from './assets/global.css?inline';
+
 /**
  * try and guess if we are in fullscreen mode or not
  */
 import FullScreen from "detect-fullscreen";
 const { isFullscreen } = FullScreen;
-
-const packageJSON = JSON.parse(
-  await readFile(
-    new URL('../../package.json', import.meta.url)
-  )
-);
 
 var releaseChecker;
 
@@ -215,18 +208,16 @@ var listScreens = async function() {
 var openGrabberWindow = function() {
   return new Promise((resolve) => {
     log.info("openGrabberWindow");
-    const grabberUrl = `file://${getAssetsDir()}/grabber.html`;
-
     var grabberWindow = new BrowserWindow({
       show: false,
       skipTaskbar: true,
-      width: 100,
-      height: 100,
+      // width: 800,
+      // height: 600,
       x: 6000,
       y: 2000,
       webPreferences: {
         ...defaultWebPreferences,
-        preload: path.join(getAssetsDir(), "grabber.mjs")
+        preload: path.join(__dirname, "../preload/grabber.js")
       }
     });
     // grabberWindow.noTray = true;
@@ -235,8 +226,7 @@ var openGrabberWindow = function() {
       resolve(grabberWindow);
     });
 
-    grabberWindow.loadURL(grabberUrl); 
-
+    grabberWindow.loadURL(getUrl('grabber.html'));
   });
 };
 
@@ -310,14 +300,14 @@ var openTestShim = function() {
     height: 600,
     webPreferences: {
       ...defaultWebPreferences,
-      preload: path.join(getAssetsDir(), "shim.js")
+     preload: path.join(__dirname, "../preload/shim.js")
     }
   });
 
-  const shimUrl = `file://${getAssetsDir()}/shim.html`;
-  testWindow.loadURL(shimUrl);
+  log.info(`SHIM: ${path.join(__dirname, '../renderer/shim.html')}`);
+  testWindow.loadURL(`file://${path.join(__dirname, '../renderer/shim.html')}`);
 
-  // testWindow.webContents.openDevTools();
+//  testWindow.webContents.openDevTools();
 };
 
 
@@ -343,7 +333,6 @@ var openPrefsWindow = function() {
     grabScreen(primary).then((grab) => {
       screenshots[primary.id] = grab.url;
 
-      const prefsUrl = getUrl("prefs.html");
       handles.prefs.window = new BrowserWindow({
         show: false,
         width: 910,
@@ -354,7 +343,7 @@ var openPrefsWindow = function() {
         resizable: true,
         webPreferences: {
           ...defaultWebPreferences,
-          preload: path.join(getAssetsDir(), "preload.mjs")
+          preload: path.join(__dirname, "../preload/preload.js")
         },
         icon: path.join(getAssetsDir(), "iconTemplate.png")
       });
@@ -375,8 +364,14 @@ var openPrefsWindow = function() {
       
       handles.prefs.window.once("show", resolve);
 
-      log.info("loading " + prefsUrl);
-      handles.prefs.window.loadURL(prefsUrl);
+      handles.prefs.window.loadURL(getUrl('prefs.html'));
+      // if (!app.isPackaged && process.env['ELECTRON_RENDERER_URL']) {
+      //   handles.prefs.window.loadURL(`${process.env['ELECTRON_RENDERER_URL']}/prefs.html`);
+      // } else {
+      //   log.info(path.join(__dirname, '../renderer/prefs.html'));
+      //   handles.prefs.window.loadFile(path.join(__dirname, '../renderer/prefs.html'));
+      // }
+
     });
   });
 };
@@ -389,7 +384,6 @@ var openSettingsWindow = function() {
     });
   }
 
-  var settingsUrl = getUrl("settings.html");
   handles.settings.window = new BrowserWindow({
     show: false,
     width:600,
@@ -402,7 +396,7 @@ var openSettingsWindow = function() {
     icon: path.join(getAssetsDir(), "iconTemplate.png"),
     webPreferences: {
       ...defaultWebPreferences,
-      preload: path.join(getAssetsDir(), "preload.mjs"),
+      preload: path.join(__dirname, "../preload/preload.js")
     }
   });
 
@@ -421,15 +415,20 @@ var openSettingsWindow = function() {
     dock.showDock(app);
   });
 
-  log.info(`open ${settingsUrl}`);
-  handles.settings.window.loadURL(settingsUrl);
+  handles.settings.window.loadURL(getUrl('settings.html'));
+
+  // if (!app.isPackaged && process.env['ELECTRON_RENDERER_URL']) {
+  //   handles.settings.window.loadURL(`${process.env['ELECTRON_RENDERER_URL']}/settings.html`);
+  // } else {
+  //   log.info(path.join(__dirname, '../renderer/prefs.html'));
+  //   handles.settings.window.loadFile(path.join(__dirname, '../renderer/settings.html'));
+  // }
 };
 
 /**
  * handle new screensaver event. open the window to create a screensaver
  */
 var addNewSaver = async function(opts) {
-  var newUrl = getUrl("new.html");
   var primary = electronScreen.getPrimaryDisplay();
 
   // take a screenshot of the main screen for use in previews
@@ -445,7 +444,7 @@ var addNewSaver = async function(opts) {
     resizable:true,
     webPreferences: {
       ...defaultWebPreferences,
-      preload: path.join(getAssetsDir(), "preload.mjs"),
+      preload: path.join(__dirname, "../preload/preload.js")
     },
     icon: path.join(getAssetsDir(), "iconTemplate.png")
   });
@@ -460,14 +459,21 @@ var addNewSaver = async function(opts) {
     dock.showDock(app);
   });
 
-  handles.addNew.window.loadURL(newUrl);
+    handles.addNew.window.loadURL(getUrl('new.html'));
+
+  // if (!app.isPackaged && process.env['ELECTRON_RENDERER_URL']) {
+  //   handles.addNew.window.loadURL(`${process.env['ELECTRON_RENDERER_URL']}/new.html`);
+  // } else {
+  //   log.info(path.join(__dirname, '../renderer/prefs.html'));
+  //   handles.addNew.window.loadFile(path.join(__dirname, '../renderer/new.html'));
+  // }
+
 };
 
 /**
  * Open the About window for the app
  */
 var openAboutWindow = function() {
-  var aboutUrl = getUrl("about.html");
   handles.about.window = new BrowserWindow({
     show: false,
     width:500,
@@ -476,7 +482,7 @@ var openAboutWindow = function() {
     icon: path.join(getAssetsDir(), "iconTemplate.png"),
     webPreferences: {
       ...defaultWebPreferences,
-      preload: path.join(getAssetsDir(), "preload.mjs"),
+      preload: path.join(__dirname, "../preload/preload.js")
     }
   });
 
@@ -494,8 +500,14 @@ var openAboutWindow = function() {
     dock.showDock(app);
   });
 
-  log.info(`open ${aboutUrl}`);
-  handles.about.window.loadURL(aboutUrl);
+  handles.about.window.loadURL(getUrl('about.html'));
+
+
+  // if (!app.isPackaged && process.env['ELECTRON_RENDERER_URL']) {
+  //   handles.about.window.loadURL(`${process.env['ELECTRON_RENDERER_URL']}/about.html`)
+  // } else {
+  //   handles.about.window.loadFile(path.join(__dirname, '../renderer/about.html'))
+  // }
 };
 
 
@@ -508,19 +520,14 @@ var openAboutWindow = function() {
 var openEditor = (args) => {
   var key = args.src;
   var screenshot = args.screenshot;
+  log.info("openEditor");
   
-  var editorUrl = getUrl("editor.html");
-  
-  var target = editorUrl + "?" +
-               "src=" + encodeURIComponent(key) +
-               "&screenshot=" + encodeURIComponent(screenshot);
-
   if ( handles.editor.window == null ) {
     handles.editor.window = new BrowserWindow({
       show: false,
       webPreferences: {
         ...defaultWebPreferences,
-        preload: path.join(getAssetsDir(), "preload.mjs"),
+        preload: path.join(__dirname, "../preload/preload.js")
       },
     });  
   }
@@ -548,7 +555,12 @@ var openEditor = (args) => {
     dock.hideDockIfInactive(app);
   });
 
-  handles.editor.window.loadURL(target);  
+  const params = "?" +
+              "src=" + encodeURIComponent(key) +
+              "&screenshot=" + encodeURIComponent(screenshot);
+  const dest = getUrl(`editor.html${params}`);
+  log.info("************************************");
+  handles.editor.window.loadURL(dest);
 };
 
 
@@ -602,10 +614,7 @@ var applyScreensaverWindowEvents = function(w) {
   w.webContents.on("did-finish-load", function() {
     log.info("did-finish-load");
     if (!w.isDestroyed()) {
-      // load some global CSS we'll inject into running screensavers
-      const globalCSSCode = fs.readFileSync( path.join(getAssetsDir(), "global.css"), "ascii");  
-
-      w.webContents.insertCSS(globalCSSCode);
+      w.webContents.insertCSS(globalCSS);
     }
   });
   
@@ -915,18 +924,7 @@ var stopScreenSaver = function(fromBlank) {
  * other critical files exist.
  */
 var getSystemDir = function() {
-  if ( process.env.BEFORE_DAWN_SYSTEM_DIR !== undefined ) {
-    return process.env.BEFORE_DAWN_SYSTEM_DIR;
-  }
-
-  if ( process.env.TEST_MODE ) {
-    return app.getAppPath();
-  }
-  if ( app.isPackaged ) {
-    return path.join(app.getAppPath(), "output");
-  }
-
-  return path.join(app.getAppPath(), "..", "..", "output");
+  return path.join(__dirname, "../");
 };
 
 
@@ -940,13 +938,10 @@ let getAssetsDir = function() {
   }
 
   if ( app.isPackaged ) {
-    return path.join(app.getAppPath(), "output", "assets");
-  }
-  if ( process.env.TEST_MODE ) {
-    return path.join(app.getAppPath(), "assets");
+    return path.join(app.getAppPath(), "out", "assets");
   }
 
-  return path.join(app.getAppPath(), "assets");
+  return path.join(__dirname, 'assets');
 };
 
 
@@ -956,28 +951,10 @@ let getAssetsDir = function() {
  * HTTP request, otherwise we'll use a file:// url.
  */
 var getUrl = function(dest) {
-  let baseUrl;
-  if ( !testMode && isDev ) {
-    let devPort;
-
-    try {
-      devPort = packageJSON.devport;
-    }
-    catch {
-      devPort = 9080;
-    }
-    
-    baseUrl = `http://localhost:${devPort}`;
-
-    return new URL(dest, new URL(baseUrl)).toString();
+  if (!app.isPackaged && process.env['ELECTRON_RENDERER_URL']) {
+    return `${process.env['ELECTRON_RENDERER_URL']}/${dest}`;
   }
-
-  log.info(`hey!!! ${app.getAppPath()}`);
-  if ( testMode ) {
-    return `file://${app.getAppPath()}/${dest}`;
-  }
-
-  return `file://${app.getAppPath()}/output/${dest}`;
+  return `file://${__dirname}/../renderer/${dest}`;
 };
 
 var setupForTesting = function() {
@@ -1131,17 +1108,6 @@ var askAboutMediaAccess = async function() {
   }
 
   ["microphone", "camera", "screen"].forEach(async (type) => {
-    log.info(type);
-    // note: this might be handy
-    //     "mac-screen-capture-permissions": "^1.1.0",
-    // if ( type === "screen" ) {
-    //   const {
-    //     hasScreenCapturePermission,
-    //     hasPromptedForPermission 
-    //   } = require('mac-screen-capture-permissions');
-    //   const result = hasPromptedForPermission();
-    //   const result2 = hasScreenCapturePermission();
-    // }
     // https://www.electronjs.org/docs/api/system-preferences#systempreferencesaskformediaaccessmediatype-macos
     log.info(`access to ${type}: ${systemPreferences.getMediaAccessStatus(type)}`);
 
@@ -1177,6 +1143,7 @@ let setupIPC = function() {
    * open the window specified by 'key', passing args along
    */
   ipcMain.on("open-window", (_event, key, args) => {
+    log.info(`open-window ${key}`);
     windowMethods[key](args);
   });
 
@@ -1603,14 +1570,8 @@ var bootApp = async function() {
 
   const systemDir = getSystemDir();
 
-  let basePath;
   // store our root path as a global variable so we can access it from screens
-  if ( process.env.BEFORE_DAWN_DIR !== undefined ) {
-    basePath = process.env.BEFORE_DAWN_DIR;
-  }
-  else {
-    basePath = app.getPath("userData");
-  }
+  const basePath = process.env.BEFORE_DAWN_DIR ?? app.getPath("userData"); 
   log.info("use base path", basePath);
 
 
@@ -1658,7 +1619,7 @@ var bootApp = async function() {
       }
 
       const delayTime = prefs.delay > 0 ? prefs.delay * 60 : Number.POSITIVE_INFINITY;
-      const idleState = powerMonitor.getSystemIdleState(delayTime);
+      const idleState = powerMonitor.getSystemIdleTime(delayTime);
 
       // don't restart state manager if we're paused
       if ( ! stateManager.isTicking() && !stateManager.paused() && idleState === "active" ) {

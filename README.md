@@ -137,3 +137,8 @@ Before Dawn is is distributed under the MIT licence -- Please see LICENSE.txt
 for further details.
 
 
+
+node install.js
+10086  2026-09-07 20:02  sudo chown root /home/cass/Projects/before-dawn/node_modules/electron/dist/chrome-sandbox && sudo chmod 4755 /home/cass/Projects/before-dawn/node_modules/electron/dist/chrome-sandbox
+
+DISPLAY=:0 WAYLAND_DISPLAY=wayland-0 XDG_SESSION_TYPE=wayland ./node_modules/.bin/electron-vite
