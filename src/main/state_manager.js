@@ -19,7 +19,7 @@ const IDLE_CHECK_RATE = 5000;
 // check for updates every .25 second when active
 const ACTIVE_CHECK_RATE = 250;
 
-const IDLE_PADDING_CHECK = 1;
+const IDLE_PADDING_CHECK = 3;
 
 class StateManager {
   constructor(fn) {
@@ -219,8 +219,6 @@ class StateManager {
       const nextTime = this.getNextTime();
       const hadActivity = (i < this.lastTime ||
         (this.currentState === STATES.STATE_RUNNING && i <= 10  && this.currentTimeStamp - i - IDLE_PADDING_CHECK > this.enteredStateTimestamp));
-
-      // this.logger(`${i} ${this.lastTime} -- ${this.currentStateString}`);
 
       if ( this.currentState === STATES.STATE_PAUSED ) {
         // do nothing
