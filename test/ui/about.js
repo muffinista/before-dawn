@@ -23,7 +23,6 @@ describe("About", function() {
 
   it("has some text and current version number", async function() {
     const window = await helpers.waitFor(app, "about");
-
     const elem = await window.$("body");
     const text = await elem.innerText();
     assert(text.lastIndexOf("// screensaver fun //") !== -1);
