@@ -151,7 +151,9 @@ window.addEventListener("unhandledrejection", console.log);
 
 let prefs = $state({});
 let release = undefined;
+// eslint-disable-next-line no-useless-assignment
 let disabled = $state(false);
+// eslint-disable-next-line no-useless-assignment
 let hasScreensaverUpdate = $state(false);
 let downloadingUpdates = $state(false);
 

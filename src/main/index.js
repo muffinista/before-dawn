@@ -753,17 +753,12 @@ var blankScreen = async function(s) {
  * get a list of displays connected to the computer.
  */
 var getDisplays = function() {
-  var displays = [];
   if ( debugMode === true || prefs.runOnSingleDisplay === true ) {
-    displays = [
+    return [
       electronScreen.getPrimaryDisplay()
     ];
   }
-  else {
-    displays = electronScreen.getAllDisplays();
-  }
-
-  return displays;
+  return electronScreen.getAllDisplays();
 };
 
 
@@ -1373,8 +1368,9 @@ let setupIPC = function() {
    * open a folder
    */
   ipcMain.on("open-folder", (_event, src) => {
-    var cmd;
-    var args = [];
+    let cmd;
+    // eslint-disable-next-line no-useless-assignment
+    let args = [];
 
     // figure out the path to the screensaver folder. use
     // decodeURIComponent to convert %20 to spaces

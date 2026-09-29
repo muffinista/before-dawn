@@ -99,7 +99,7 @@
       base,
       optionValues,
       optionDefaults(),
-      saver.settings
+      s.settings
     );
 
     return mergedOpts;

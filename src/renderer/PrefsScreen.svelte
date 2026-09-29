@@ -135,7 +135,9 @@
   let saver = $state(undefined);
   let size = undefined;
   let screenshot = undefined;
+  // eslint-disable-next-line no-useless-assignment
   let previewUrl = $state(undefined);
+  // eslint-disable-next-line no-useless-assignment
   let disabled = $state(false);
 
   let saverIndex = $derived.by(() => {
