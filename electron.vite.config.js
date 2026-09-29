@@ -1,4 +1,3 @@
-//import { fileURLToPath } from 'url'
 import { resolve, join } from 'path';
 
 import { defineConfig } from 'electron-vite';
@@ -51,8 +50,8 @@ export default defineConfig({
       viteStaticCopy({
         targets: [
           {
-            src: resolve("src/main/system-savers"),
-            dest: "../",
+            src: join(__dirname, "src", "main", "system-savers"),
+            dest: join(".."),
             rename: { stripBase: 1 }
           },
         ],
@@ -62,14 +61,7 @@ export default defineConfig({
       alias: {
         "@": join(__dirname, "src", "renderer"),
         "~": join(__dirname, "src")
-  
-      //   '@app': resolve(__dirname, 'src'),
-      //   '@components': resolve(__dirname, 'src/components'),
-      //   '@selectors': resolve(__dirname, 'src/selectors'),
-      //   '@hooks': resolve(__dirname, 'src/hooks'),
-      //   '@modules': resolve(__dirname, 'src/ducks/modules'),
-      //   '@utils': resolve(__dirname, 'src/utils'),
-      },
+        },
     },
   }
 });
