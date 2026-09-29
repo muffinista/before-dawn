@@ -62,7 +62,7 @@
     "@sveltejs/vite-plugin-svelte": "^6.2.4",
     "cross-env": "^10.1.0",
     "dotenv": "^17.4.2",
-    "electron": "44.3.0",
+    "electron": "44.5.0",
     "electron-builder": "^26.15.3",
     "electron-vite": "github:muffinista/electron-vite#dea1e2a91f8242941f9aeb2164dd4a7ffb798e5c",
     "eslint": "^10.10.0",
