@@ -1,3 +1,4 @@
+/* eslint-disable mocha/no-pending-tests */
 "use strict";
 
 import assert from 'assert';

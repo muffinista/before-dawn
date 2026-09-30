@@ -9,6 +9,10 @@ import {
   shell 
 } from "electron";
 
+import iconTemplate from './assets/iconTemplate.png?asset';
+import iconTemplatePaused from './assets/icon-pausedTemplate.png?asset';
+import iconTemplateDark from './assets/icon-Template-dark.png?asset';
+import iconTemplateDarkPaused from './assets/icon-pausedTemplate-dark.png?asset';
 
 
 var openUrl = (url) => {
@@ -281,6 +285,9 @@ export const trayMenuTemplate = function() {
 };
 
 
+
+
+
 /**
  * get icons for the current platform
  */
@@ -293,13 +300,25 @@ export const getIcons = function() {
       paused: path.join(main.getAssetsDir(), "icon-paused.ico")
     },
     "default": {
-      active: path.join(main.getAssetsDir() , `iconTemplate${modifier}.png`),
-      paused: path.join(main.getAssetsDir() , `icon-pausedTemplate${modifier}.png`)
+      active: iconTemplate,
+      paused: iconTemplatePaused
+    },
+    "default-dark": {
+      active: iconTemplateDark,
+      paused: iconTemplateDarkPaused
+    },
+    "linux": {
+      active: iconTemplate,
+      paused: iconTemplatePaused
+    },
+    "linux-dark": {
+      active: iconTemplateDark,
+      paused: iconTemplateDarkPaused
     }
   };
-  
-  if ( icons[process.platform] ) {
-    return icons[process.platform];
+
+  if ( icons[`${process.platform}${modifier}`] ) {
+    return icons[`${process.platform}${modifier}`];
   }
 
   return icons.default;

@@ -8,7 +8,8 @@ export default async function bootstrapApp() {
   );
   
 
-  var version = undefined;
+  // eslint-disable-next-line no-useless-assignment
+  let version = undefined;
 
   try {
     version = packageJSON.version;

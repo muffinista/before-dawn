@@ -103,6 +103,7 @@ console.log = window.api.log;
 window.addEventListener("error", console.log);
 window.addEventListener("unhandledrejection", console.log);
 
+// eslint-disable-next-line no-useless-assignment
 let globals = $state({});
 
 async function loadData() {

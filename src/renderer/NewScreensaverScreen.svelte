@@ -68,8 +68,11 @@ let screenshot = undefined;
 let saver = $state({
   requirements: ["screen"]
 });
+
+// eslint-disable-next-line no-useless-assignment
 let disabled = $state(false);
 
+// eslint-disable-next-line no-useless-assignment
 let canAdd = $derived(prefs !== undefined && prefs.localSource !== undefined && prefs.localSource !== "");
 
 onMount(async () => {

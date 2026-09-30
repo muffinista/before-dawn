@@ -4,7 +4,19 @@
  */
 
 
-const { contextBridge, ipcRenderer } = require("electron");
+import { contextBridge, ipcRenderer } from 'electron'
+
+contextBridge.exposeInMainWorld(
+  "grabber",
+  {
+    init() {
+      ipcRenderer.on("request-screenshot", async (_event, opts) => {
+        const result = await captureScreen(opts.id, opts.width, opts.height);
+        ipcRenderer.send("screenshot-" + opts.id, {buffer: result});
+      });
+    }
+  }
+);
 
 /** 
  * look for an element in the DOM and create it if it doesn't exist 
@@ -129,15 +141,3 @@ var captureScreen = async function(id, width, height) {
   return result;
 }; // captureScreen
 
-
-contextBridge.exposeInMainWorld(
-  "grabber",
-  {
-    init: () => {
-      ipcRenderer.on("request-screenshot", async (_event, opts) => {
-        const result = await captureScreen(opts.id, opts.width, opts.height);
-        ipcRenderer.send("screenshot-" + opts.id, {buffer: result});
-      });
-    }
-  }
-);
