@@ -56,14 +56,14 @@
     "@babel/preset-env": "^8.0.2",
     "@eslint/eslintrc": "^3.3.7",
     "@eslint/js": "^10.0.1",
-    "@evilmartians/lefthook": "^2.1.12",
+    "@evilmartians/lefthook": "^2.2.2",
     "@playwright/test": "^1.63.0",
     "@sveltejs/vite-plugin-svelte": "^6.2.4",
     "cross-env": "^10.1.0",
     "dotenv": "^17.4.2",
-    "electron": "44.9.1",
-    "electron-builder": "^26.17.0",
-    "electron-vite": "github:muffinista/electron-vite#dea1e2a91f8242941f9aeb2164dd4a7ffb798e5c",
+    "electron": "45.2.1",
+    "electron-builder": "^26.18.1",
+    "electron-vite": "^6.0.0",
     "eslint": "^10.10.0",
     "eslint-friendly-formatter": "^4.0.1",
     "eslint-plugin-html": "^8.2.0",
@@ -144,5 +144,12 @@
       "executableName": "before-dawn",
       "maintainer": "Colin Mitchell <colin@muffinlabs.com>"
     }
+  },
+  "allowScripts": {
+    "github:muffinista/detect-fullscreen#127c2691fdb58362fd148b03947d11d02cf00e4c": true,
+    "github:muffinista/hide-cursor#e99bd69904e987cf3217fe86f6b021e6922a83cb": true,
+    "github:muffinista/forcefocus#4e46f532d57d81d04e16cf0984fd5779c86bd253": true,
+    "lefthook@2.1.12": true,
+    "github:muffinista/goto-sleep#d5f5a79de382930d127c877e8d66e24967412a14": true
   }
 }
