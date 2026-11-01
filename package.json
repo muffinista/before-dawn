@@ -40,7 +40,7 @@
     "electron-log": "^5.4.4",
     "forcefocus": "github:muffinista/forcefocus",
     "fs-extra": "^11.4.0",
-    "glob": "^13.0.6",
+    "glob": "^14.0.2",
     "hide-cursor": "github:muffinista/hide-cursor",
     "mkdirp": "^3.0.1",
     "proper-lockfile": "^4.1.2",
