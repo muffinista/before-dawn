@@ -2,6 +2,8 @@ import { resolve, join } from 'path';
 
 import { defineConfig } from 'electron-vite';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
+
+import { normalizePath } from 'vite';
 import { viteStaticCopy } from 'vite-plugin-static-copy'
 
 /**
@@ -50,8 +52,8 @@ export default defineConfig({
       viteStaticCopy({
         targets: [
           {
-            src: join(__dirname, "src", "main", "system-savers"),
-            dest: join(".."),
+            src: normalizePath(resolve(__dirname, "src", "main", "system-savers")),
+            dest: normalizePath(resolve("..")),
             rename: { stripBase: 1 }
           },
         ],
